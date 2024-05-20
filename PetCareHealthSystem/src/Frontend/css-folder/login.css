@@ -1,0 +1,177 @@
+
+
+.bg-img{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    margin-top: 80px;
+    display: flex;
+    justify-content: center;
+}
+
+.box-left,
+ .box-right {
+    width: 50%;
+}
+
+.imagelogin img{
+    border-radius: 30px;
+}
+
+
+.orderN fa-cart-shopping{
+    color: #fff;
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+
+
+.box-left button:hover {
+    background: orange;
+    cursor: pointer;
+}
+
+.box-left {
+    display: flex;
+    justify-content: center;
+    /* align-items: center; */
+}
+
+.box-left img {
+    margin: 0px 5px;
+    width: 150px;
+    animation: animation 3s infinite linear;
+}
+
+.box-left img:nth-child(1) {
+    animation-delay: 0.5s;
+    /* margin-right: 0px; */
+}
+
+ .box-left img:nth-child(2) {
+
+    animation-delay: 1s;
+}
+
+
+@keyframes animation {
+    0% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+
+    100% {
+        transform: translateY(0px);
+    }
+
+}
+
+.form-input{
+    overflow: hidden;
+    background-color: #fff;
+    width: 350px;
+    height: 360px;
+    margin-left: 50px;
+    border-radius: 20px;
+   
+}
+.form-input h2{
+    padding-top: 20px;
+    padding-bottom: 10px;
+    color: rgb(15, 44, 138);
+    font-size: 32px;
+    font-weight: bold;
+    box-shadow: 0px 0px 10px rgb(101, 99, 99);
+    text-align: center;
+}
+.signup{
+    
+    background-color: #fff;
+    margin-top: 30px;
+    margin-left: 50px;
+    border-radius: 5px;
+    width: 350px;
+    height: 50px;
+    text-align: center;
+    justify-content: center;
+    display: flex;
+   
+}
+.signuptext{
+    margin: 12px 12px;
+   
+}
+.signup input{
+    margin: 12px 0px;
+    background-color:rgb(33, 234, 224);
+    width: 100px;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+}
+.field{
+    text-align: center;
+}
+.field input{
+   background-color: rgb(218, 217, 217);
+   margin-top: 20px;
+   
+}
+.fieldlogin{
+    text-align: center;
+}
+.fieldlogin input{
+    margin-top: 10px;
+    margin-bottom: 5px;
+    background-color:rgb(33, 234, 224);
+    width: 100px;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+}
+
+.field input{
+    border:none;
+    width: 200px;
+    height: 35px;
+    border-radius: 10px;
+}
+.show{
+    cursor: pointer;
+}
+.pass{
+    margin-left: 25px;
+    margin-top: 20px;
+}
+.pass a{
+    text-decoration: none;
+    color: black;
+    margin-right: auto;
+}
+.google{
+    text-align: center;
+    margin-top: 10px;
+}
+.google a{
+    text-decoration: none;
+    color: rgb(0, 0, 0);
+    font-weight: bold;
+    margin-top: 5px;
+}
+.or{
+    text-align: center;
+}
+
+.google img{
+    width: 25px;
+}
+.google button{
+    height: 40px;
+}
+.box-change{
+    text-align: center;
+}

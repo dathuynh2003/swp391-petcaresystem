@@ -1,0 +1,13 @@
+.video-backround{
+    height: 100%;
+    overflow: hidden;
+    position: relative;
+}
+
+#myVideo{
+    position: absolute;
+    right: 0;
+    top: 0;
+    min-width: 100%;
+    min-height: 100%;
+}

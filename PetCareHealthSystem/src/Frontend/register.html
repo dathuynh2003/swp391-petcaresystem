@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign up Page</title>
+    <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="css-folder/register.css" rel="stylesheet">
+    <link rel="stylesheet" href="css-folder/animate.css">
+</head>
+
+<body>
+
+    <div class="video-background">
+        <video autoplay muted loop id="myVideo">
+            <source src="assets/backgroundAnimate.mp4" type="video/mp4">
+        </video>
+    </div>
+
+
+    <div class="wrapper">
+        <form action="" class="form-sigup">
+            <div>
+                <h1 class="form-heading">Sign up</h1>
+            </div>
+
+            <div class="form-group_name">
+                <i class="fa fa-user"></i>
+                
+
+                    <input type="text" id="input-name" class="form-input" placeholder="First name" required>
+                
+                
+                    <input type="text" id="input-name" class="form-input" placeholder="Surname" required>
+               
+            </div>
+
+            <div class="form-group">
+                <i class="fa-regular fa-envelope"></i>
+                <input type="text" class="form-input" placeholder="Phone number or email" required>
+            </div>
+            <div class="form-group">
+                <i class="fa-regular fa-calendar-days"></i>
+                <input type="date" class="form-input" placeholder="Date of birth" required>
+            </div>
+            <div class="form-group">
+                <i class="fa-solid fa-lock"></i>
+                <input type="password" class="form-input" placeholder="Password" required> 
+            </div>
+            <div class="form-group">
+                <i class="fa-solid fa-lock"></i>
+                <input type="password" class="form-input" placeholder="Confirm password" required>
+            </div>
+            <div class="form-submit">
+                <input type="submit" value="Sign up" class="button-submit">
+            </div>
+
+        </form>
+        <div class="login-account">
+            <span class="question">Have an account?</span>
+            <input type="submit" value="Login" class="login-button">
+        </div>
+    </div>
+</body>
+
+</html>
