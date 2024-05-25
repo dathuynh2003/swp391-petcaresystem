@@ -1,17 +1,20 @@
-package com.swpproject.pethealthcaresystem.Service;
+package com.swpproject.pethealthcaresystem.service;
 
-import com.swpproject.pethealthcaresystem.Model.user;
-import com.swpproject.pethealthcaresystem.Repository.UserRepository;
+import com.swpproject.pethealthcaresystem.model.User;
+import com.swpproject.pethealthcaresystem.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class UserService {
+public class UserService implements IUserService {
     @Autowired
     private UserRepository userRepository;
 
-    public user createUser(user newUser){
-        user user = new user();
+    @Transactional
+    @Override
+    public User createUser(User newUser){
+        User user = new User();
 
         if(userRepository.existsByEmail(newUser.getEmail())) {
             return null;
@@ -31,9 +34,9 @@ public class UserService {
 
         return userRepository.save(user);
     }
-
-    public user getUserByEmail(user user){
-        user existUser = userRepository.findByEmail(user.getEmail());
+    @Override
+    public User getUserByEmail(User user){
+        User existUser = userRepository.findByEmail(user.getEmail());
         if (existUser != null && existUser.getPassword().equals(user.getPassword())) {
             return existUser;
         }

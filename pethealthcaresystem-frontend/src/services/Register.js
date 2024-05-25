@@ -14,8 +14,12 @@ export default function Register() {
         full_name: "",
         phone_number: "",
         address: "",
+        // rolde_id: 1,
+        avatar:"",
         gender: "",
+        // status: 1,
         dob: "",
+
     })
 
     const [message, setMessage] = useState()
@@ -29,10 +33,10 @@ export default function Register() {
         e.preventDefault();
         if (password === confirm_pass) {
             const result = await axios.post(`http://localhost:8080/register`, user)
-            if (result === '') {
+            if (result.data !== '') {
                 //register success
-                // navigate("/login")
-                setMessage("Register success")
+                navigate("/login")
+                // setMessage("Register success")
             } else {
                 setMessage("Username is already in use")
             }

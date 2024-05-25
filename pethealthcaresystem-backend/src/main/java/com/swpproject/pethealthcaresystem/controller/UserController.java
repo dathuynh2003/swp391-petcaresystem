@@ -1,7 +1,7 @@
-package com.swpproject.pethealthcaresystem.Controller;
+package com.swpproject.pethealthcaresystem.controller;
 
-import com.swpproject.pethealthcaresystem.Model.user;
-import com.swpproject.pethealthcaresystem.Service.UserService;
+import com.swpproject.pethealthcaresystem.model.User;
+import com.swpproject.pethealthcaresystem.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,12 +15,12 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("/register")
-    public user register(@RequestBody user newUser) {
+    public User register(@RequestBody User newUser) {
         return userService.createUser(newUser);
     }
 
     @PostMapping("/login")
-    public user login(@RequestBody user user) {
+    public User login(@RequestBody User user) {
         return userService.getUserByEmail(user);
     }
 
