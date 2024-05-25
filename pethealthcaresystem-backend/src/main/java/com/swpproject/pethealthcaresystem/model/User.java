@@ -5,11 +5,11 @@ import jakarta.persistence.*;
 import java.util.Date;
 
 @Entity
-@Table(name = "user")
+@Table(name = "User",schema = "pethealthcare")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long user_id;
+    private int user_id;
     private String email;
     private String password;
     private String full_name;
@@ -21,11 +21,11 @@ public class User {
     private Boolean status;
     private Date dob;
 
-    public Long getUser_id() {
+    public int getUser_id() {
         return user_id;
     }
 
-    public void setUser_id(Long user_id) {
+    public void setUser_id(int user_id) {
         this.user_id = user_id;
     }
 
