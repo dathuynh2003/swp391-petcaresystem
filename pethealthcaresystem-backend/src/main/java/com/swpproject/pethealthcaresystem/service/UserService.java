@@ -34,6 +34,16 @@ public class UserService implements IUserService {
 
         return userRepository.save(user);
     }
+
+    @Override
+    public User getUserByEmailAndPassword(User user){
+        User existUser = userRepository.findByEmail(user.getEmail());
+        if (existUser != null && existUser.getPassword().equals(user.getPassword())) {
+            return existUser;
+        }
+        return null;
+    }
+
     @Override
     public User getUserByEmail(User user){
         User existUser = userRepository.findByEmail(user.getEmail());
@@ -42,4 +52,6 @@ public class UserService implements IUserService {
         }
         return null;
     }
+
+
 }

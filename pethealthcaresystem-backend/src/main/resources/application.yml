@@ -1,8 +1,15 @@
 server:
   port: 8080
+  servlet:
+    session:
+      timeout: -1
+      cookie:
+        name: JSESSIONID
 
 spring:
   datasource:
     password: root
     url: "jdbc:mysql://localhost:3306/pethealthcare"
     username: root
+
+
