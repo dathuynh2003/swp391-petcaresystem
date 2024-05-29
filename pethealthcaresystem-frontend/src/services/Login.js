@@ -1,7 +1,7 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import './login.css'
 import axios from 'axios'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, } from 'react-router-dom'
 
 
 
@@ -13,12 +13,19 @@ export default function Login() {
     const [password, setPassword] = useState()
     const [message, setMessage] = useState()
 
+    useEffect(() => {
+        if (localStorage.getItem('isLoggedIn') === 'true') {
+            navigate('/')
+        }
+    }, [navigate])
+
 
 
     const handleLogin = async (e) => {
         e.preventDefault();
-        const response = await axios.post(`http://localhost:8080/login`, { email, password })
+        const response = await axios.post(`http://localhost:8080/login`, { email, password }, {withCredentials: true})  
         if (response.data !== '') {
+            localStorage.setItem('isLoggedIn', true);
             navigate('/')
         } else {
             setMessage("Invalid username or password!")
@@ -61,7 +68,7 @@ export default function Login() {
                                 <a href="#"><i>Forgot Password?</i></a>
                             </div>
                             <div class="fieldlogin">
-                                <button className='btn btn-primary' style={{width:'30%'}} onClick={handleLogin}>Login</button>
+                                <button className='btn btn-primary' style={{ width: '30%' }} onClick={handleLogin}>Login</button>
                             </div>
                             <div class="or">OR</div>
 
@@ -80,9 +87,9 @@ export default function Login() {
                         </div>
 
                     </div>
-                    <div class="signup">
-                        <div class="signuptext">Don't have account?</div>
-                        <Link className='btn btn-primary p-0 mt-2' style={{height:'70%'}} to={'/register'}>Sign-up</Link>
+                    <div className="signup row">
+                        <div className="signuptext col-6">Don't have account?</div>
+                        <Link className='btn btn-primary col-3 m-2' style={{height:'70%'}} to={'/register'}>Sign-up</Link>
                     </div>
                 </div>
             </div>

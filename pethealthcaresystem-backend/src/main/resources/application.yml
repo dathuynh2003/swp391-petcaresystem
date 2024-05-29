@@ -1,8 +1,17 @@
 server:
   port: 8080
+  servlet:
+    session:
+      timeout: -1
+      cookie:
+        name: JSESSIONID
 
 spring:
   datasource:
-    password: dat2003z
+    password: root
     url: "jdbc:mysql://localhost:3306/pethealthcare"
     username: root
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true

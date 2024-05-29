@@ -13,27 +13,44 @@ public class UserService implements IUserService {
 
     @Transactional
     @Override
-    public User createUser(User newUser){
+    public String createUser(User newUser){
         User user = new User();
 
         if(userRepository.existsByEmail(newUser.getEmail())) {
-            return null;
+            return "Email is already in use";
+        }
+
+        //Validate email abc@zxc.zxc
+        String regexPattern = "^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}$";
+        if (!newUser.getEmail().matches(regexPattern)) {
+            return "Email is invalid";
         }
 
         user.setEmail(newUser.getEmail());
         user.setPassword(newUser.getPassword());
-        user.setFull_name(newUser.getFull_name());
-        user.setPhone_number(newUser.getPhone_number());
+        user.setFullName(newUser.getFullName());
+        user.setPhoneNumber(newUser.getPhoneNumber());
         user.setAddress(newUser.getAddress());
-        user.setRole_id(1);
+        user.setRoleId(1);
         user.setAvatar("");
         user.setGender(newUser.getGender());
-        user.setStatus(true);
+        user.setIsActive(true);
         user.setDob(newUser.getDob());
 
 
-        return userRepository.save(user);
+        userRepository.save(user);
+        return "User created successfully";
     }
+
+    @Override
+    public User getUserByEmailAndPassword(User user){
+        User existUser = userRepository.findByEmail(user.getEmail());
+        if (existUser != null && existUser.getPassword().equals(user.getPassword())) {
+            return existUser;
+        }
+        return null;
+    }
+
     @Override
     public User getUserByEmail(User user){
         User existUser = userRepository.findByEmail(user.getEmail());
@@ -42,4 +59,6 @@ public class UserService implements IUserService {
         }
         return null;
     }
+
+
 }
