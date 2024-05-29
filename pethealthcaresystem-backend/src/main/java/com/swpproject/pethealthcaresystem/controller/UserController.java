@@ -14,17 +14,18 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("/register")
-    public User register(@RequestBody User newUser) {
+    public String register(@RequestBody User newUser) {
         return userService.createUser(newUser);
     }
 
     @PostMapping("/login")
-    public User login(@RequestBody User user, HttpSession session) {
+    public String login(@RequestBody User user, HttpSession session) {
         User curUser = userService.getUserByEmailAndPassword(user);
         if (curUser != null) {
             session.setAttribute("user", curUser);
+            return "Logged in successfully";
         }
-        return curUser;
+        return "Invalid username or password";
     }
 
     @PostMapping("/logout")
