@@ -8,7 +8,7 @@ server:
 
 spring:
   datasource:
-    password: dat2003z
+    password: 12345678
     url: "jdbc:mysql://localhost:3306/pethealthcare"
     username: root
 
