@@ -1,9 +1,11 @@
 package com.swpproject.pethealthcaresystem.model;
 
+
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 @Entity
@@ -12,20 +14,24 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@Table(name = "user")
-public class User {
+@Table(name = "pet")
+
+public class Pet {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    int userId;
-    String email;
-    String password;
-    String fullName;
-    String phoneNumber;
-    String address;
-    int role_id;
+    int petId;
+    @ManyToOne
+    @JoinColumn(name = "owner_id")
+    User owner;
     String avatar;
+    String name;
+    String petType;
+    String breed;
     String gender;
-    Boolean status;
-    Date dob;
+    boolean isNeutered;
+    int age;
+    String description;
+    boolean isDeceased;
 
 }
+
