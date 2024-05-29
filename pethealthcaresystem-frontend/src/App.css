@@ -1,38 +1,100 @@
+/* App.css */
+
 .App {
-  text-align: center;
-}
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
+  display: flex;
+  flex-direction: column; /* Đặt navbar nằm trên cùng */
   min-height: 100vh;
+  overflow: hidden;
+}
+
+.sidenav {
+  width: 200px;
+  background-color: #f8f9fa;
+  padding: 20px;
+  height: 100vh;
+  box-shadow: 2px 0 5px rgba(0,0,0,0.1);
   display: flex;
   flex-direction: column;
   align-items: center;
+  position: fixed; /* Giữ sidebar ở bên trái */
+  top: 0;
+  left: 0;
+  overflow: hidden;
+}
+
+.sidenav-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.logo {
+  width: 50px;
+  height: 50px;
+  margin-right: 10px;
+}
+
+.sidenav ul {
+  list-style-type: none;
+  padding: 0;
+  width: 100%;
+}
+
+.sidenav li {
+  margin: 20px 0;
+}
+
+.sidenav a {
+  text-decoration: none;
+  color: #333;
+  display: flex;
+  align-items: center;
+  font-size: 18px;
+}
+
+.sidenav a:hover {
+  color: #007bff;
+}
+
+.navbar {
+  width: calc(100% - 200px);
+  background-color: #fff; /* Ensure the background color is consistent */
+  padding: 0; /* Remove padding */
+  height: 60px; /* Set a fixed height */
+  display: flex;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  align-items: center;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  position: fixed;
+  top: 0;
+  left: 200px;
+  z-index: 1000;
 }
 
-.App-link {
-  color: #61dafb;
+.navbar h1 {
+  margin: 0;
+  font-size: 24px;
+  text-align: center;
+  padding-left: 20px;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.content {
+  padding: 20px;
+  width: calc(100% - 200px); /* Adjust width to avoid overflow */
+  margin-left: 200px; /* Accounts for the sidebar width */
+  box-sizing: border-box;
+  overflow-y: auto; /* Allows the content to scroll */
+  height: calc(100vh - 60px); /* Makes the content take full viewport height minus navbar */
+  background-color: #f1f1f1;
+}
+
+.content.full-width {
+  margin-left: 0; /* Remove the margin when sidenav is hidden */
+  width: 100%; /* Adjust width to full when sidenav is hidden */
+  padding-top: 20px; /* Adjust padding for the content */
+}
+
+.Home1 {
+  width: 100%;
+  height: 100%;
 }
