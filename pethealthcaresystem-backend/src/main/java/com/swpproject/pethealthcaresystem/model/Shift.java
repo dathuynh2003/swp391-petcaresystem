@@ -16,7 +16,7 @@ import java.util.List;
 @Entity
 @Table(
         name = "Shift",
-        schema = "pethealthcareV2"
+        schema = "pethealthcare"
 )
 public class Shift {
     @Id

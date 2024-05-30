@@ -15,13 +15,13 @@ import java.util.List;
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int user_id;
+    private int userId;
     private String email;
     private String password;
-    private String full_name;
-    private String phone_number;
+    private String fullName;
+    private String phoneNumber;
     private String address;
-    private int role_id;
+    private int roleId;
     private String avatar;
     private String gender;
     private Boolean status;

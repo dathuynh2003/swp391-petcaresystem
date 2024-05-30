@@ -8,8 +8,10 @@ server:
 
 spring:
   datasource:
-    password: 12345678
-    url: "jdbc:mysql://localhost:3306/pethealthcareV2"
+    password: root
+    url: "jdbc:mysql://localhost:3306/pethealthcare"
     username: root
-
-
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true

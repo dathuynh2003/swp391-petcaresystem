@@ -87,9 +87,9 @@ export default function Login() {
                         </div>
 
                     </div>
-                    <div class="signup">
-                        <div class="signuptext">Don't have account?</div>
-                        <Link className='btn btn-primary p-0 mt-2' style={{ height: '70%' }} to={'/register'}>Sign-up</Link>
+                    <div className="signup row">
+                        <div className="signuptext col-6">Don't have account?</div>
+                        <Link className='btn btn-primary col-3 m-2' style={{height:'70%'}} to={'/register'}>Sign-up</Link>
                     </div>
                 </div>
             </div>
