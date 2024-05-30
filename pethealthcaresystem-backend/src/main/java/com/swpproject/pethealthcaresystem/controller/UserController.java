@@ -4,6 +4,8 @@ import com.swpproject.pethealthcaresystem.model.User;
 import com.swpproject.pethealthcaresystem.service.UserService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -17,8 +19,13 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("/register")
-    public String register(@RequestBody User newUser) {
-        return userService.createUser(newUser);
+    public ResponseEntity<String> register(@RequestBody User newUser) {
+        try{
+            return new ResponseEntity<>(userService.createUser(newUser).toString(), HttpStatus.CREATED);
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
     }
 
     @PostMapping("/login")

@@ -17,7 +17,7 @@ public class UserService implements IUserService {
         User user = new User();
 
         if(userRepository.existsByEmail(newUser.getEmail())) {
-            return "Email is already in use";
+            throw new Error("Email is already in use");
         }
 
         //Validate email abc@zxc.zxc
@@ -36,7 +36,6 @@ public class UserService implements IUserService {
         user.setGender(newUser.getGender());
         user.setIsActive(true);
         user.setDob(newUser.getDob());
-
 
         userRepository.save(user);
         return "User created successfully";
