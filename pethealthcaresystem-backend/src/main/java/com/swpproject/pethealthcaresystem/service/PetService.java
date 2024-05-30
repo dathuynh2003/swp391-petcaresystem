@@ -19,4 +19,27 @@ public class PetService implements IPetService{
         newPet.setOwner(curUser);
         return petRepository.save(newPet);
     }
+
+    @Override
+    public Pet updatePet(Pet newPet, int id) {
+        return petRepository.findById(id)
+                .map(pet -> {
+                    pet.setName(newPet.getName());
+                    pet.setPetType(newPet.getPetType());
+                    pet.setAvatar(newPet.getAvatar());
+                    pet.setAge(newPet.getAge());
+                    pet.setGender(newPet.getGender());
+                    pet.setBreed(newPet.getBreed());
+                    pet.setDeceased(newPet.isDeceased());
+                    pet.setDescription(newPet.getDescription());
+                    pet.setNeutered(newPet.isNeutered());
+                    return petRepository.save(pet);
+                }).orElseThrow(() ->  new RuntimeException("Pet not found"));
+
+    }
+
+    @Override
+    public Pet getPetById(int id) {
+        return petRepository.findById(id).orElseThrow(() -> new RuntimeException("Pet not found"));
+    }
 }

@@ -15,10 +15,7 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Data
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
+
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Table(name = "user")
 public class User {
@@ -30,10 +27,10 @@ public class User {
     String fullName;
     String phoneNumber;
     String address;
-    int role_id;
+    int roleId;
     String avatar;
     String gender;
-    Boolean status;
+    Boolean isActive;
     Date dob;
 
 }
