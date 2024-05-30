@@ -6,6 +6,9 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @RestController
 //@CrossOrigin("http://localhost:3000")
 @CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
@@ -19,13 +22,17 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public String login(@RequestBody User user, HttpSession session) {
-        User curUser = userService.getUserByEmailAndPassword(user);
+    public Map<String, Object> login(@RequestBody User user, HttpSession session) {
+        Map<String, Object> response = new HashMap<>();
+        User curUser = userService.validateLogin(user);
         if (curUser != null) {
             session.setAttribute("user", curUser);
-            return "Logged in successfully";
+            response.put("isSuccess", "true");
+            response .put("user", curUser);
+        } else {
+            response.put("isSuccess", "false");
         }
-        return "Invalid username or password";
+        return response;
     }
 
     @PostMapping("/logout")
@@ -39,5 +46,4 @@ public class UserController {
         User curUser = (User) session.getAttribute("user");
         return userService.getUserByEmail(curUser);
     }
-
 }
