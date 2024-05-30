@@ -1,22 +1,25 @@
 package com.swpproject.pethealthcaresystem.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
 @Table(
         name = "Shift",
-        schema = "pethealthcare"
+        schema = "pethealthcarev2"
 )
 public class Shift {
     @Id
@@ -25,6 +28,7 @@ public class Shift {
     private String from_time;
     private String to_time;
     //one shift can have many user(vet)
-    @ManyToMany
-    List<User> users;
+    @OneToMany(mappedBy = "shift", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnoreProperties("shift")
+    private Set<VetShiftDetail> vetShiftDetails;
 }

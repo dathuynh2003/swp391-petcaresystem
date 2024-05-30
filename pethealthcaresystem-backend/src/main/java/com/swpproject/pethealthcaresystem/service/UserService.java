@@ -6,6 +6,8 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class UserService implements IUserService {
     @Autowired
@@ -13,17 +15,17 @@ public class UserService implements IUserService {
 
     @Transactional
     @Override
-    public String createUser(User newUser){
+    public User createUser(User newUser){
         User user = new User();
 
         if(userRepository.existsByEmail(newUser.getEmail())) {
-            return "Email is already in use";
+            return null;
         }
 
         //Validate email abc@zxc.zxc
         String regexPattern = "^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}$";
         if (!newUser.getEmail().matches(regexPattern)) {
-            return "Email is invalid";
+            return null;
         }
 
         user.setEmail(newUser.getEmail());
@@ -39,7 +41,7 @@ public class UserService implements IUserService {
 
 
         userRepository.save(user);
-        return "User created successfully";
+        return user;
     }
 
     @Override
@@ -49,6 +51,11 @@ public class UserService implements IUserService {
             return existUser;
         }
         return null;
+    }
+
+    @Override
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
     }
 
     @Override

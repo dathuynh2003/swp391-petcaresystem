@@ -6,15 +6,17 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
-//@CrossOrigin("http://localhost:3000")
-@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
+@CrossOrigin("*")
+//@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
 public class UserController {
     @Autowired
     private UserService userService;
 
     @PostMapping("/register")
-    public String register(@RequestBody User newUser) {
+    public User register(@RequestBody User newUser) {
         return userService.createUser(newUser);
     }
 
@@ -39,5 +41,8 @@ public class UserController {
         User curUser = (User) session.getAttribute("user");
         return userService.getUserByEmail(curUser);
     }
-
+    @GetMapping("api/users")
+    public List<User> getAllUsers() {
+        return userService.getAllUsers();
+    }
 }
