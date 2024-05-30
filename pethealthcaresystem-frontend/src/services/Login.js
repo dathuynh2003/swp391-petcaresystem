@@ -24,10 +24,15 @@ export default function Login() {
     const handleLogin = async (e) => {
         e.preventDefault();
         const response = await axios.post(`http://localhost:8080/login`, { email, password }, {withCredentials: true})  
-        if (response.data !== '') {
+        if (response.data.isSuccess === 'true') {
             localStorage.setItem('isLoggedIn', true);
+            // localStorage.setItem('roleId', response.data.user.roleId)
+            // localStorage.setItem('email', response.data.user.email)
             navigate('/')
         } else {
+            localStorage.setItem('isLoggedIn', false);
+            // localStorage.setItem('roleId', 0)
+            // localStorage.setItem('email', null)
             setMessage("Invalid username or password!")
         }
     }
@@ -87,9 +92,9 @@ export default function Login() {
                         </div>
 
                     </div>
-                    <div class="signup">
-                        <div class="signuptext">Don't have account?</div>
-                        <Link className='btn btn-primary p-0 mt-2' style={{ height: '70%' }} to={'/register'}>Sign-up</Link>
+                    <div className="signup row">
+                        <div className="signuptext col-6">Don't have account?</div>
+                        <Link className='btn btn-primary col-3 m-2' style={{height:'70%'}} to={'/register'}>Sign-up</Link>
                     </div>
                 </div>
             </div>
