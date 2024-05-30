@@ -24,15 +24,15 @@ export default function Login() {
     const handleLogin = async (e) => {
         e.preventDefault();
         const response = await axios.post(`http://localhost:8080/login`, { email, password }, {withCredentials: true})  
-        if (response.data.isSuccess) {
+        if (response.data.isSuccess === 'true') {
             localStorage.setItem('isLoggedIn', true);
             // localStorage.setItem('roleId', response.data.user.roleId)
             // localStorage.setItem('email', response.data.user.email)
             navigate('/')
         } else {
             localStorage.setItem('isLoggedIn', false);
-            localStorage.setItem('roleId', 0)
-            localStorage.setItem('email', null)
+            // localStorage.setItem('roleId', 0)
+            // localStorage.setItem('email', null)
             setMessage("Invalid username or password!")
         }
     }
