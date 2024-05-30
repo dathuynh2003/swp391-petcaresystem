@@ -14,15 +14,14 @@ export default function Register() {
         full_name: "",
         phone_number: "",
         address: "",
-        // rolde_id: 1,
-        avatar:"",
+        avatar: "",
         gender: "",
-        // status: 1,
         dob: "",
 
     })
 
-    const [message, setMessage] = useState()
+    const [messageEmail, setMessageEmail] = useState('')
+    const [messagePass, setMessagePass] = useState()
     const [confirm_pass, setConfirmPass] = useState()
     const { full_name, phone_number, address, gender, dob, email, password } = user;
     const onInputChange = (e) => {
@@ -31,24 +30,27 @@ export default function Register() {
 
     const handleRegister = async (e) => {
         e.preventDefault();
+        setMessageEmail("")
         if (password === confirm_pass) {
+            setMessagePass("")
             const result = await axios.post(`http://localhost:8080/register`, user)
-            if (result.data !== '') {
+            if (result.data === 'User created successfully') {
                 //register success
                 navigate("/login")
                 // setMessage("Register success")
-            } else {
-                setMessage("Username is already in use")
-            }
+            } else if (result.data === 'Email is invalid') {
+                setMessageEmail("Email is invalid")
+            } else if (result.data === 'Email is already in use')
+                setMessageEmail("Email is already in use")
         } else {
-            setMessage("Confirm password does not match")
+            setMessagePass("Confirm password does not match")
         }
 
     }
 
     return (
         <div>
-            
+
             <div className='container'>
                 <div className='row'>
                     <div className='col-md-6 offset-md-3 border rounded p-4 mt-2 shadow'>
@@ -77,6 +79,7 @@ export default function Register() {
                             <div className='mb-3'>
                                 <label htmlFor='Email' className='form-label'>Email</label>
                                 <input type='text' required className='form-control' placeholder='Enter your email address' name='email' value={email} onChange={(e) => onInputChange(e)}></input>
+                                <h6 className='mx-2' style={{ color: 'red', textAlign: 'center' }}>{messageEmail}</h6>
                             </div>
                             <div className='mb-3'>
                                 <label htmlFor='Password' className='form-label'>Password</label>
@@ -86,7 +89,7 @@ export default function Register() {
                                 <label htmlFor='ConfirmPass' className='form-label'>Confirm Password</label>
                                 <input type='password' required className='form-control' placeholder='Confirm your password' name='confirm_pass' value={confirm_pass} onChange={(e) => setConfirmPass(e.target.value)}></input>
                             </div>
-                            <h6 style={{ color: 'red', textAlign: 'center' }}>{message}</h6>
+                            <h6 style={{ color: 'red', textAlign: 'center' }}>{messagePass}</h6>
                             <div style={{ textAlign: 'center' }}>
                                 <button type='submit' className='btn btn-outline-primary'>Register</button>
                                 <Link className='btn btn-outline-danger mx-2' to={'/login'}>Cancel</Link>

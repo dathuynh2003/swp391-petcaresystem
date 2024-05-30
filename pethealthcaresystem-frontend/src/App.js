@@ -1,6 +1,5 @@
 import './App.css';
 import "../node_modules/bootstrap/dist/css/bootstrap.min.css";
-import React, { useState } from 'react';
 import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
 import Login from './services/Login';
 import Home from './pages/Home';
@@ -16,16 +15,15 @@ import VetWorkSchedules from './services/VetWorkSchedules';
 import Dashboard from './services/Dashboard';
 
 function App() {
-  const [role, setRole] = useState('Guest'); // Change this value to 'Customer', 'Staff', 'Vet' or 'Admin' to test different roles
 
   const location = useLocation();
   const hideNavbarAndSidenav = ['/login', '/register'].includes(location.pathname);
   return (
-    
+
     // <Router>
     <div className="App">
-    {!hideNavbarAndSidenav && <Sidenav role={role} />}
-    {!hideNavbarAndSidenav && <Navbar />}
+      {!hideNavbarAndSidenav && <Sidenav />}
+      {!hideNavbarAndSidenav && <Navbar />}
       <div className={`content ${hideNavbarAndSidenav ? 'full-width' : ''}`}>
         <Routes>
           <Route path="/" element={<Home />} />
@@ -41,7 +39,7 @@ function App() {
         </Routes>
       </div>
     </div>
-  // </Router>
+    // </Router>
 
   );
 }
