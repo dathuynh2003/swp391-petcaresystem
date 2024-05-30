@@ -1,19 +1,17 @@
 package com.swpproject.pethealthcaresystem.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.Date;
+import java.util.List;
+
 
 @Data
-@Builder
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Entity
-@Table(name = "user",schema = "pethealthcare")
+@Table(name = "User",schema = "pethealthcare")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,7 +24,9 @@ public class User {
     private int roleId;
     private String avatar;
     private String gender;
-    private Boolean isActive;
+    private Boolean status;
     private Date dob;
-
+    //A user(Vet) can have many shifts
+    @ManyToMany
+    List<Shift> shifts;
 }
