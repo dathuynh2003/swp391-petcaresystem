@@ -8,7 +8,7 @@ import Sidenav from './components/Sidenav';
 import Navbar from './components/Navbar';
 import Services from './services/Services';
 import Booking from './services/Booking';
-import Pets from './services/Pets';
+import CreatePet from './services/CreatePet';
 import Profile from './services/Profile';
 import Cages from './services/Cages';
 import VetWorkSchedules from './services/VetWorkSchedules';
@@ -31,7 +31,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/booking" element={<Booking />} />
-          <Route path="/pets" element={<Pets />} />
+          <Route path="/createPet" element={<CreatePet />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/cages" element={<Cages />} />
           <Route path="/vet-work-schedules" element={<VetWorkSchedules />} />
