@@ -36,6 +36,7 @@ function App() {
           <Route path="/cages" element={<Cages />} />
           <Route path="/vet-work-schedules" element={<VetWorkSchedules />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          
         </Routes>
       </div>
     </div>

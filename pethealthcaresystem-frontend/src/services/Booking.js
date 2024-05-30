@@ -1,9 +1,11 @@
 import React from 'react';
-
+import './booking.css'
 const Booking = () => {
   return (
+    
     <div>
-      <h1>Booking</h1>
+      <h3>Choose <b>Your Pet</b></h3>
+      
     </div>
   );
 };
