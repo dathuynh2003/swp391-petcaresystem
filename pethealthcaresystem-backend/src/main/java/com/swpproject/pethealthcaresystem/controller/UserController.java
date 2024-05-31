@@ -1,7 +1,9 @@
 package com.swpproject.pethealthcaresystem.controller;
 
 import com.swpproject.pethealthcaresystem.model.User;
+import com.swpproject.pethealthcaresystem.service.MailService;
 import com.swpproject.pethealthcaresystem.service.UserService;
+import com.swpproject.pethealthcaresystem.service.VerifyCodeService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -15,10 +17,28 @@ import java.util.Map;
 public class UserController {
     @Autowired
     private UserService userService;
+    @Autowired
+    private MailService mailService;
+    @Autowired
+    private VerifyCodeService verifyCodeService;
 
     @PostMapping("/register")
     public String register(@RequestBody User newUser) {
+        if (userService.createUser(newUser).equals("Verification email sent")) {
+            String subject = "Verify your email";
+            String code = verifyCodeService.generateVerifyCode(newUser.getEmail());
+            String body = "Your verification code: " + code;
+            mailService.sendMail(newUser.getEmail(),subject,body);
+        }
         return userService.createUser(newUser);
+    }
+
+    @PostMapping("/verify/{email}/{verifyCode}")
+    public String verifyCode(@PathVariable String email, @PathVariable String verifyCode) {
+        if(userService.verifyUser(email,verifyCode)) {
+            return "Email verify successfully";
+        }
+        return "Email verify failed";
     }
 
     @PostMapping("/login")
