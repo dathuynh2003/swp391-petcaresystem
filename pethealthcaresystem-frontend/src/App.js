@@ -14,6 +14,7 @@ import Cages from './services/Cages';
 import VetWorkSchedules from './services/VetWorkSchedules';
 import Dashboard from './services/Dashboard';
 import Verify from './services/Verify';
+import CreateShift from './services/CreateShift';
 
 function App() {
 
@@ -39,6 +40,7 @@ function App() {
           <Route path="/vet-work-schedules" element={<VetWorkSchedules />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path='/verify' element={<Verify />} />
+          <Route path="/shift" element={<CreateShift />} />
         </Routes>
       </div>
     </div>

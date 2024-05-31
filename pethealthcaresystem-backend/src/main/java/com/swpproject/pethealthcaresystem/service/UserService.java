@@ -5,9 +5,10 @@ import com.swpproject.pethealthcaresystem.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
+
 
 @Service
 public class UserService implements IUserService {
@@ -85,5 +86,9 @@ public class UserService implements IUserService {
         }
         return null;
     }
-
+  
+    @Override
+    public List<User> getVets() {
+        return userRepository.findByRoleId(3);
+    }
 }

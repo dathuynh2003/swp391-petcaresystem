@@ -21,7 +21,7 @@ export default function Sidenav() {
   };
 
   const handleLogout = async (e) => {
-    try {
+    // try {
       e.preventDefault();
       await axios.post(`http://localhost:8080/logout`, {}, { withCredentials: true });
       localStorage.removeItem('isLoggedIn')

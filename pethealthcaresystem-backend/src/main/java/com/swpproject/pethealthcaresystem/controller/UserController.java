@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -65,5 +66,10 @@ public class UserController {
     public  User getUser (HttpSession session){
         User curUser = (User) session.getAttribute("user");
         return userService.getUserByEmail(curUser);
+    }
+
+    @GetMapping("/vets")
+    public List<User> getVets() {
+        return userService.getVets();
     }
 }
