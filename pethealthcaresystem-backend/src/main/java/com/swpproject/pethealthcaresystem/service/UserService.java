@@ -6,6 +6,8 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class UserService implements IUserService {
     @Autowired
@@ -17,7 +19,7 @@ public class UserService implements IUserService {
         User user = new User();
 
         if(userRepository.existsByEmail(newUser.getEmail())) {
-            throw new Error("Email is already in use");
+            return "Email is already in use";
         }
 
         //Validate email abc@zxc.zxc
@@ -36,6 +38,7 @@ public class UserService implements IUserService {
         user.setGender(newUser.getGender());
         user.setIsActive(true);
         user.setDob(newUser.getDob());
+
 
         userRepository.save(user);
         return "User created successfully";
@@ -61,5 +64,9 @@ public class UserService implements IUserService {
         return null;
     }
 
-
+    //Long
+    @Override
+    public List<User> getVets() {
+        return userRepository.findByRoleId(3);
+    }
 }

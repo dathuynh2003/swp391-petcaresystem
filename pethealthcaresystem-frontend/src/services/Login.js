@@ -30,7 +30,7 @@ export default function Login() {
             // localStorage.setItem('email', response.data.user.email)
             navigate('/')
         } else {
-            localStorage.setItem('isLoggedIn', false);
+            // localStorage.setItem('isLoggedIn', false);
             // localStorage.setItem('roleId', 0)
             // localStorage.setItem('email', null)
             setMessage("Invalid username or password!")
@@ -41,7 +41,7 @@ export default function Login() {
 
     return (
         <div className="video-background">
-            <video autoplay muted loop id="myVideo">
+            <video autoPlay muted loop id="myVideo">
                 <source src="assets/backgroundAnimate.mp4" type="video/mp4" />
             </video>
 

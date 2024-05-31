@@ -26,7 +26,7 @@ export default function Register() {
     const { fullName, phoneNumber, address, gender, dob, email, password } = user;
     const onInputChange = (e) => {
         setUser({ ...user, [e.target.name]: e.target.value })
-        setConfirmPass(confirm_pass) 
+        setConfirmPass(confirm_pass)
     }
 
     const handleRegister = async (e) => {
@@ -34,18 +34,15 @@ export default function Register() {
         setMessageEmail("")
         if (password === confirm_pass) {
             setMessagePass("")
-            try {
             const result = await axios.post(`http://localhost:8080/register`, user)
             if (result.data === 'User created successfully') {
                 //register success
                 navigate("/login")
                 // setMessage("Register success")
-            }
-            } catch (error) {
-               alert(error.message)
-            }
-            
-              
+            } else if (result.data === 'Email is invalid') {
+                setMessageEmail("Email is invalid")
+            } else if (result.data === 'Email is already in use')
+                setMessageEmail("Email is already in use")
         } else {
             setMessagePass("Confirm password does not match")
         }
