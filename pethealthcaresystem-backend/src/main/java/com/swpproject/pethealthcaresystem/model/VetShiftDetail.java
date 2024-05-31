@@ -1,5 +1,4 @@
 package com.swpproject.pethealthcaresystem.model;
-
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -14,7 +13,6 @@ import lombok.*;
         schema = "pethealthcare"
 )
 public class VetShiftDetail {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int vs_id;
@@ -23,5 +21,8 @@ public class VetShiftDetail {
     private int shift_id;
     private String date;
     private String status;
-
+    @ManyToOne
+    @JoinColumn(name = "shitf_id")
+    @JsonIgnoreProperties("vetShiftDetails")
+    private Shift shift;
 }

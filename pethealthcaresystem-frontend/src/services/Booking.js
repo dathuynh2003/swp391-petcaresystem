@@ -1,10 +1,12 @@
 import React from 'react';
 
 const Booking = () => {
+  
   return (
-    <div>
-      <h1>Booking</h1>
-    </div>
+    <>
+      <h2>Choose <b>Your Pet</b></h2>
+      
+    </>
   );
 };
 
