@@ -1,6 +1,6 @@
 import './App.css';
 import "../node_modules/bootstrap/dist/css/bootstrap.min.css";
-import React, { useState } from 'react';
+import { BrowserRouter as Router, Route, Routes, useLocation, useMatch } from 'react-router-dom';
 import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
 import Login from './services/Login';
 import Home from './pages/Home';
@@ -9,23 +9,29 @@ import Sidenav from './components/Sidenav';
 import Navbar from './components/Navbar';
 import Services from './services/Services';
 import Booking from './services/Booking';
-import Pets from './services/Pets';
+import CreatePet from './services/CreatePet';
+import ViewPet from './services/ViewPet';
+import ListPets from './services/ListPets';
+import EditPet from './services/EditPet';
 import Profile from './services/Profile';
 import Cages from './services/Cages';
 import VetWorkSchedules from './services/VetWorkSchedules';
 import Dashboard from './services/Dashboard';
+import Verify from './services/Verify';
+import CreateShift from './services/CreateShift';
 
 function App() {
-  const [role, setRole] = useState('Guest'); // Change this value to 'Customer', 'Staff', 'Vet' or 'Admin' to test different roles
 
   const location = useLocation();
-  const hideNavbarAndSidenav = ['/login', '/register'].includes(location.pathname);
+  const matchVerify = useMatch('/verify/:email')
+  const hideNavbarAndSidenav = ['/login', '/register', '/verify'].includes(location.pathname) || matchVerify;
   return (
-    
+
     // <Router>
     <div className="App">
-    {!hideNavbarAndSidenav && <Sidenav role={role} />}
-    {!hideNavbarAndSidenav && <Navbar />}
+      {!hideNavbarAndSidenav && <Sidenav />}
+      {!hideNavbarAndSidenav && <Navbar />}
+      <div className={`content ${hideNavbarAndSidenav ? 'full-screen' : ''}`}>
       <div className={`content ${hideNavbarAndSidenav ? 'full-width' : ''}`}>
         <Routes>
           <Route path="/" element={<Home />} />
@@ -33,15 +39,21 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/booking" element={<Booking />} />
-          <Route path="/pets" element={<Pets />} />
+          <Route path="/createPet" element={<CreatePet />} />
+          <Route path="/viewPet/:petId" element={<ViewPet />} />
+          <Route path="/listPets" element={<ListPets />} />
+          <Route path="/editPet/:petId" element={<EditPet />} />
+          
           <Route path="/profile" element={<Profile />} />
           <Route path="/cages" element={<Cages />} />
           <Route path="/vet-work-schedules" element={<VetWorkSchedules />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path='/verify' element={<Verify />} />
+          <Route path="/shift" element={<CreateShift />} />
         </Routes>
       </div>
     </div>
-  // </Router>
+    // </Router>
 
   );
 }

@@ -11,94 +11,104 @@ export default function Register() {
     const [user, setUser] = useState({
         email: "",
         password: "",
-        full_name: "",
-        phone_number: "",
+        fullName: "",
+        phoneNumber: "",
         address: "",
-        // rolde_id: 1,
-        avatar:"",
+        avatar: "",
         gender: "",
-        // status: 1,
         dob: "",
 
     })
 
-    const [message, setMessage] = useState()
+    const [messageEmail, setMessageEmail] = useState('')
+    const [messagePass, setMessagePass] = useState()
     const [confirm_pass, setConfirmPass] = useState()
-    const { full_name, phone_number, address, gender, dob, email, password } = user;
+    const { fullName, phoneNumber, address, gender, dob, email, password } = user;
     const onInputChange = (e) => {
         setUser({ ...user, [e.target.name]: e.target.value })
+        setConfirmPass(confirm_pass)
     }
 
     const handleRegister = async (e) => {
         e.preventDefault();
+        setMessageEmail("")
         if (password === confirm_pass) {
+            setMessagePass("")
             const result = await axios.post(`http://localhost:8080/register`, user)
-            if (result.data !== '') {
+            if (result.data === 'Verification email sent') {
                 //register success
-                navigate("/login")
+                // navigate(`/verify/${user.email}`)
+                navigate(`/verify`, { state: { email } })
                 // setMessage("Register success")
-            } else {
-                setMessage("Username is already in use")
-            }
+            } else if (result.data === 'Email is invalid') {
+                setMessageEmail("Email is invalid")
+            } else if (result.data === 'Email is already in use')
+                setMessageEmail("Email is already in use")
         } else {
-            setMessage("Confirm password does not match")
+            setMessagePass("Confirm password does not match")
         }
 
     }
 
+
     return (
         <div>
-            
-            <div className='container'>
-                <div className='row'>
-                    <div className='col-md-6 offset-md-3 border rounded p-4 mt-2 shadow'>
-                        <h2 className='text-center m-4'>Register User</h2>
+            <div class="container">
+                <video autoPlay muted loop id="myVideo" style={{ position: 'absolute', minWidth: '100%', minHeight: '100%' }}>
+                    <source src="assets/backgroundAnimate.mp4" type="video/mp4" />
+                </video>
+                <div class="signup-content row" style={{ position: 'relative' }}>
+                    <div className='col-md-6 offset-md-3 border rounded p-4 my-5 shadow' style={{ backgroundColor: 'white' }}>
                         <form onSubmit={(e) => handleRegister(e)}>
-                            <div className='mb-3'>
-                                <label htmlFor='FullName' className='form-label'>Full Name</label>
-                                <input type='text' required className='form-control' placeholder='Enter your Fullname' name='full_name' value={full_name} onChange={(e) => onInputChange(e)}></input>
+                            <h2 className="form-title mb-3 text-center">Create account</h2>
+
+                            <div className="form-group text-center mb-3">
+                                <input type="text" required className="form-input w-75" placeholder="Your Full Name" name='fullName' value={fullName} onChange={(e) => onInputChange(e)} />
                             </div>
-                            <div className='mb-3'>
-                                <label htmlFor='PhoneNumber' className='form-label'>Phone Number</label>
-                                <input type='text' className='form-control' placeholder='Enter your Phone Number' name='phone_number' value={phone_number} onChange={(e) => onInputChange(e)}></input>
+
+                            <label for="dob" style={{ fontSize: '10px', marginLeft: '13%' }}>Date of Bird</label>
+                            <div className="form-group text-center mb-3">
+                                <input type="date" required className="form-input w-75" name='dob' value={dob} onChange={(e) => onInputChange(e)} />
                             </div>
-                            <div className='mb-3'>
-                                <label htmlFor='Address' className='form-label'>Address</label>
-                                <input type='text' className='form-control' placeholder='Enter your Address' name='address' value={address} onChange={(e) => onInputChange(e)}></input>
+
+                            <label for="gender" style={{ fontSize: '10px', marginLeft: '13%' }}>Gender</label>
+                            <div className="form-group mb-3 row mx-auto">
+                                <div class="form-check col-md-4 border" style={{ backgroundColor: 'white', marginLeft: '12.5%', marginRight: '8%' }}>
+                                    <input class="form-check-input" type="radio" name="gender" value="Male" onChange={(e) => onInputChange(e)} />
+                                    <label class="form-check-label mx-4" for="Male">Male</label>
+                                </div>
+                                <div class="form-check col-md-4 border" style={{ backgroundColor: 'white' }}>
+                                    <input className="form-check-input" type="radio" name="gender" value="Female" onChange={(e) => onInputChange(e)} />
+                                    <label class="form-check-label mx-4" for="female">Female</label>
+                                </div>
                             </div>
-                            <div className='mb-3'>
-                                <label htmlFor='Gender' className='form-label'>Gender</label>
-                                <input type='text' className='form-control' placeholder='Enter your Gender' name='gender' value={gender} onChange={(e) => onInputChange(e)}></input>
+
+                            <div className="form-group text-center mb-3">
+                                <input type="address" required className="form-input w-75" placeholder="Your Address" name='address' value={address} onChange={(e) => onInputChange(e)} />
                             </div>
-                            <div className='mb-3'>
-                                <label htmlFor='dob' className='form-label'>Date of bird</label>
-                                <input type='date' className='form-control' placeholder='Enter your dob' name='dob' value={dob} onChange={(e) => onInputChange(e)}></input>
+                            <div className="form-group text-center mb-3">
+                                <input type="phoneNumber" required className="form-input w-75" placeholder="Your Phone Number" name='phoneNumber' value={phoneNumber} onChange={(e) => onInputChange(e)} />
                             </div>
-                            <div className='mb-3'>
-                                <label htmlFor='Email' className='form-label'>Email</label>
-                                <input type='text' required className='form-control' placeholder='Enter your email address' name='email' value={email} onChange={(e) => onInputChange(e)}></input>
+                            <div className="form-group text-center mb-3">
+                                <input type="email" required className="form-input w-75" placeholder="Your Email" name='email' value={email} onChange={(e) => onInputChange(e)} />
+                                <h6 style={{ color: 'red', textAlign: 'center' }}>{messageEmail}</h6>
                             </div>
-                            <div className='mb-3'>
-                                <label htmlFor='Password' className='form-label'>Password</label>
-                                <input type='password' required className='form-control' placeholder='Enter your password' name='password' value={password} onChange={(e) => onInputChange(e)}></input>
+                            <div className="form-group text-center mb-3">
+                                <input type="password" required className="form-input w-75" placeholder="Password" name='password' value={password} onChange={(e) => onInputChange(e)} />
                             </div>
-                            <div className='mb-3'>
-                                <label htmlFor='ConfirmPass' className='form-label'>Confirm Password</label>
-                                <input type='password' required className='form-control' placeholder='Confirm your password' name='confirm_pass' value={confirm_pass} onChange={(e) => setConfirmPass(e.target.value)}></input>
+                            <div className="form-group text-center mb-3">
+                                <input type="password" required className="form-input w-75" placeholder="Repeat your password" name='confirm_pass' value={confirm_pass} onChange={(e) => setConfirmPass(e.target.value)} />
                             </div>
-                            <h6 style={{ color: 'red', textAlign: 'center' }}>{message}</h6>
-                            <div style={{ textAlign: 'center' }}>
-                                <button type='submit' className='btn btn-outline-primary'>Register</button>
-                                <Link className='btn btn-outline-danger mx-2' to={'/login'}>Cancel</Link>
+                            <h6 style={{ color: 'red', textAlign: 'center' }}>{messagePass}</h6>
+                            <div className="form-group text-center">
+                                <input type="submit" name="submit" id="submit" className="login-button btn btn-outline-primary mx-2" value="Sign up" />
                             </div>
                         </form>
-                        <div className="login-account m-3" style={{ textAlign: 'center' }}>
-                            <span className="question mx-3">Have an account?</span>
-                            <Link className="login-button btn btn-primary" to={'/login'}>login</Link>
-                        </div>
+                        <p className="loginhere text-center">
+                            Have already an account ? <Link className="login-button btn btn-primary" to={'/login'}>Login here</Link>
+                        </p>
                     </div>
                 </div>
-
             </div>
         </div>
     )

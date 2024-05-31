@@ -1,34 +1,45 @@
 package com.swpproject.pethealthcaresystem.controller;
 
 import com.swpproject.pethealthcaresystem.model.Shift;
-import com.swpproject.pethealthcaresystem.service.shift.ShiftService;
+import com.swpproject.pethealthcaresystem.model.VetShiftDetail;
+import com.swpproject.pethealthcaresystem.service.IShiftService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@CrossOrigin("*")
+@RequestMapping("/shifts")
+@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
 public class ShiftController {
+
     @Autowired
-    private ShiftService shiftService;
+    private IShiftService shiftService;
 
-    @PostMapping("/api/shift")
-    public ResponseEntity<Shift> addShift(@RequestBody Shift shift) {
-        Shift newShift = shiftService.createShift(shift);
-        return ResponseEntity.ok(newShift);
+    @GetMapping("/all")
+    public List<Shift> getAllShifts() {
+        return shiftService.getAllShifts();
     }
 
-    @GetMapping("/api/shift/{id}")
-    public ResponseEntity<Shift> getShift(@PathVariable("id") int id) {
-        Shift shift = shiftService.getShift(id);
-        return new ResponseEntity<Shift>(shift,HttpStatus.OK);
+    @PostMapping("/add")
+    public Shift addShift(@RequestBody Shift shift) {
+        return shiftService.createShift(shift);
     }
-    @GetMapping("api/shifts")
-    public ResponseEntity<List<Shift>> getAllShifts() {
-        List<Shift> shifts = shiftService.getAllShifts();
-        return new ResponseEntity<>(shifts,HttpStatus.OK);
+
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<Void> deleteShift(@PathVariable(value = "id") int shiftId) {
+        shiftService.deleteShift(shiftId);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/details")
+    public List<VetShiftDetail> getAllShiftDetails() {
+        return shiftService.getAllShiftDetails();
+    }
+
+    @PutMapping("/assign-vet")
+    public List<VetShiftDetail> assignVetToShifts(@RequestBody List<VetShiftDetail> vetShiftDetails) {
+        return shiftService.assignVetToShifts(vetShiftDetails);
     }
 }

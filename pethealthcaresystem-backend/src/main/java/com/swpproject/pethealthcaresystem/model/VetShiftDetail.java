@@ -1,35 +1,28 @@
 package com.swpproject.pethealthcaresystem.model;
-
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
 
-import java.util.Date;
-@Data
+@Setter
+@Getter
+@ToString
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(
-        name = "Vet_Shift_Detail",
-        schema = "pethealthcarev2"
+        name = "vet_shift_detail",
+        schema = "pethealthcare"
 )
 public class VetShiftDetail {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int vsId; //vet shift id
+    private int vs_id;
 
-
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-
-    private User user;
-
-
+    private int vet_id;
+    private int shift_id;
+    private String date;
+    private String status;
     @ManyToOne
     @JoinColumn(name = "shitf_id")
     @JsonIgnoreProperties("vetShiftDetails")
     private Shift shift;
-
-    //Additional fields
-    private Date date;
-    private String status;
 }

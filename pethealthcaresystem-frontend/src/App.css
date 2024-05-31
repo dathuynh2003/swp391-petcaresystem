@@ -88,11 +88,13 @@
   background-color: #f1f1f1;
 }
 
-.content.full-width {
+.content.full-screen {
   margin-left: 0; /* Remove the margin when sidenav is hidden */
   width: 100%; /* Adjust width to full when sidenav is hidden */
   padding-top: 20px; /* Adjust padding for the content */
+  height: 100%;
 }
+
 
 .Home1 {
   width: 100%;

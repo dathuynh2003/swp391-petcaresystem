@@ -5,13 +5,22 @@ import com.swpproject.pethealthcaresystem.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.List;
+
 
 import java.util.List;
 
 @Service
 public class UserService implements IUserService {
+
+    private final Map<String, User> temporaryStorage = new HashMap<>();
+
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private VerifyCodeService verifyCodeService;
 
     @Transactional
     @Override
@@ -38,34 +47,47 @@ public class UserService implements IUserService {
         user.setGender(newUser.getGender());
         user.setStatus(true);
         user.setDob(newUser.getDob());
-
-
-        userRepository.save(user);
-        return user;
+        temporaryStorage.put(user.getEmail(), user);
+        return "Verification email sent";
     }
 
     @Override
-    public User getUserByEmailAndPassword(User user){
+    public User validateLogin(User user){
         User existUser = userRepository.findByEmail(user.getEmail());
         if (existUser != null && existUser.getPassword().equals(user.getPassword())) {
+            existUser.setPassword("");
             return existUser;
         }
         return null;
     }
 
     @Override
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
+    public boolean verifyUser(String email, String code) {
+        String storedCode = verifyCodeService.getVerifyCode(email);
+        if (storedCode != null && storedCode.equals(code)) {
+            User user = temporaryStorage.get(email);
+            if (user != null) {
+                userRepository.save(user);
+                temporaryStorage.remove(email);
+                verifyCodeService.removeVerifyCode(email);
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
     public User getUserByEmail(User user){
         User existUser = userRepository.findByEmail(user.getEmail());
-        if (existUser != null && existUser.getPassword().equals(user.getPassword())) {
+        if (existUser != null) {
+            existUser.setPassword("");
             return existUser;
         }
         return null;
     }
-
-
+  
+    @Override
+    public List<User> getVets() {
+        return userRepository.findByRoleId(3);
+    }
 }

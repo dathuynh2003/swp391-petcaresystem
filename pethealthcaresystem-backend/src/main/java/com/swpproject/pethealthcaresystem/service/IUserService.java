@@ -7,6 +7,7 @@ import java.util.List;
 public interface IUserService {
     public User createUser(User newUser);
     public User getUserByEmail(User user);
-    public User getUserByEmailAndPassword(User user);
-    public List<User> getAllUsers();
+    public User validateLogin(User user);
+    public boolean verifyUser(String email, String code);
+    public List<User> getVets();
 }
