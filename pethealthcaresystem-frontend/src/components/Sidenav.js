@@ -10,20 +10,29 @@ export default function Sidenav() {
 
   const [user, setUser] = useState(null);
 
+  // const getUser = async () => {
+  //   const result = await axios.get(`http://localhost:8080/getuser`, { withCredentials: true });
+  //   setUser(result.data);
+  // };
+
   const getUser = async () => {
-    const result = await axios.get(`http://localhost:8080/getuser`, { withCredentials: true });
-    setUser(result.data);
+    try {
+      const result = await axios.get('http://localhost:8080/getuser', { withCredentials: true });
+      setUser(result.data);
+    } catch (err) {
+      console.error('Error fetching user:', err);
+    }
   };
 
   const handleLogout = async (e) => {
-    try {
+    // try {
       e.preventDefault();
       await axios.post(`http://localhost:8080/logout`, {}, { withCredentials: true });
       localStorage.removeItem('isLoggedIn')
       navigate('/');
-    } catch (error) {
-      console.error('Error during logout:', error);
-    }
+    // } catch (error) {
+    //   console.error('Error during logout:', error);
+    // }
   };
 
   useEffect(() => {

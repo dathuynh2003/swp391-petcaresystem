@@ -4,11 +4,10 @@ import com.swpproject.pethealthcaresystem.model.User;
 import com.swpproject.pethealthcaresystem.service.UserService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -19,13 +18,8 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody User newUser) {
-        try{
-            return new ResponseEntity<>(userService.createUser(newUser).toString(), HttpStatus.CREATED);
-        }catch (Exception e){
-            System.out.println(e.getMessage());
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
+    public String register(@RequestBody User newUser) {
+        return userService.createUser(newUser);
     }
 
     @PostMapping("/login")
@@ -52,5 +46,10 @@ public class UserController {
     public  User getUser (HttpSession session){
         User curUser = (User) session.getAttribute("user");
         return userService.getUserByEmail(curUser);
+    }
+
+    @GetMapping("/vets")
+    public List<User> getVets() {
+        return userService.getVets();
     }
 }
