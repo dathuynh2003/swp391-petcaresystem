@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@CrossOrigin("*")
 //@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
 public class UserController {
     @Autowired
@@ -40,9 +39,5 @@ public class UserController {
     public  User getUser (HttpSession session){
         User curUser = (User) session.getAttribute("user");
         return userService.getUserByEmail(curUser);
-    }
-    @GetMapping("api/users")
-    public List<User> getAllUsers() {
-        return userService.getAllUsers();
     }
 }
