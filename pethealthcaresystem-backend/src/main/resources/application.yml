@@ -11,6 +11,7 @@ spring:
     password: 123456
     url: "jdbc:mysql://localhost:3306/pethealthcare"
     username: root
+    password: root
   jpa:
     hibernate:
       ddl-auto: create-drop
@@ -26,3 +27,5 @@ spring:
           auth: true
           starttls:
             enable: true
+      ddl-auto: update
+    show-sql: true

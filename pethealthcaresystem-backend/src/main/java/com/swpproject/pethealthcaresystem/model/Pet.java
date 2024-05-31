@@ -1,36 +1,37 @@
 package com.swpproject.pethealthcaresystem.model;
 
+
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.util.Date;
 
+@Entity
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity
-
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@Table(name = "user")
-public class User {
+@Table(name = "pet")
+
+public class Pet {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    int userId;
-    String email;
-    String password;
-    String fullName;
-    String phoneNumber;
-    String address;
-    int roleId;
+    int petId;
+    @ManyToOne
+    @JoinColumn(name = "owner_id")
+    User owner;
     String avatar;
+    String name;
+    String petType;
+    String breed;
     String gender;
-    Boolean isActive;
-    Date dob;
+    boolean isNeutered;
+    int age;
+    String description;
+    boolean isDeceased;
 
 }
+

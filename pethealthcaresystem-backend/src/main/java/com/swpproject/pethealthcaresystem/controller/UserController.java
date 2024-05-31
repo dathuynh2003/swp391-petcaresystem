@@ -68,6 +68,7 @@ public class UserController {
         return userService.getUserByEmail(curUser);
     }
 
+
     @GetMapping("/vets")
     public List<User> getVets() {
         return userService.getVets();
