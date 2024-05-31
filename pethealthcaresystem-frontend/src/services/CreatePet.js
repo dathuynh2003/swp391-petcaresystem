@@ -139,7 +139,7 @@ export default function CreatePet() {
                     <div className="age mb-3 ">
                         <label className="mt-2 ml-4 mb-3" for="age">Age</label>
                         <NumberInput 
-                            step={1} defaultValue={1} min={1} max={50}  value={1}
+                            step={1} defaultValue={1} min={1} max={50}
                             onChange={(value)=> (setPet(prev=>({...prev, age:value})))} >
                         <NumberInputField />
                         <NumberInputStepper>
