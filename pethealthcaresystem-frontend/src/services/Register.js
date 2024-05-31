@@ -35,9 +35,10 @@ export default function Register() {
         if (password === confirm_pass) {
             setMessagePass("")
             const result = await axios.post(`http://localhost:8080/register`, user)
-            if (result.data === 'User created successfully') {
+            if (result.data === 'Verification email sent') {
                 //register success
-                navigate("/login")
+                // navigate(`/verify/${user.email}`)
+                navigate(`/verify`, { state: { email } })
                 // setMessage("Register success")
             } else if (result.data === 'Email is invalid') {
                 setMessageEmail("Email is invalid")
@@ -53,8 +54,11 @@ export default function Register() {
     return (
         <div>
             <div class="container">
-                <div class="signup-content row">
-                    <div className='col-md-6 offset-md-3 border rounded p-4 my-5 shadow'>
+                <video autoPlay muted loop id="myVideo" style={{ position: 'absolute', minWidth: '100%', minHeight: '100%' }}>
+                    <source src="assets/backgroundAnimate.mp4" type="video/mp4" />
+                </video>
+                <div class="signup-content row" style={{ position: 'relative' }}>
+                    <div className='col-md-6 offset-md-3 border rounded p-4 my-5 shadow' style={{ backgroundColor: 'white' }}>
                         <form onSubmit={(e) => handleRegister(e)}>
                             <h2 className="form-title mb-3 text-center">Create account</h2>
 
