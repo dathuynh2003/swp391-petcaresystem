@@ -1,5 +1,6 @@
 package com.swpproject.pethealthcaresystem.model;
 
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -25,6 +26,7 @@ public class Shift {
     private String from_time;
     private String to_time;
     //one shift can have many user(vet)
-//    @ManyToMany
-//    List<User> users;
+    @OneToMany(mappedBy = "shift", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnoreProperties("shift")
+    private Set<VetShiftDetail> vetShiftDetails;
 }

@@ -10,6 +10,8 @@ import java.util.Map;
 import java.util.List;
 
 
+import java.util.List;
+
 @Service
 public class UserService implements IUserService {
 
@@ -22,17 +24,17 @@ public class UserService implements IUserService {
 
     @Transactional
     @Override
-    public String createUser(User newUser){
+    public User createUser(User newUser){
         User user = new User();
 
         if(userRepository.existsByEmail(newUser.getEmail())) {
-            return "Email is already in use";
+            return null;
         }
 
         //Validate email abc@zxc.zxc
         String regexPattern = "^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}$";
         if (!newUser.getEmail().matches(regexPattern)) {
-            return "Email is invalid";
+            return null;
         }
 
         user.setEmail(newUser.getEmail());
@@ -43,12 +45,9 @@ public class UserService implements IUserService {
         user.setRoleId(1);
         user.setAvatar("");
         user.setGender(newUser.getGender());
-        user.setIsActive(true);
+        user.setStatus(true);
         user.setDob(newUser.getDob());
-
-
         temporaryStorage.put(user.getEmail(), user);
-
         return "Verification email sent";
     }
 
