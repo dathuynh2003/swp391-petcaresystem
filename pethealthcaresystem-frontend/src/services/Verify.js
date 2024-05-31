@@ -37,7 +37,7 @@ export default function Verify() {
                     <div className='col-md-6 offset-md-3 border rounded mx-auto shadow text-center py-4' style={{ backgroundColor: 'white' }}>
                         <label htmlFor="verifyCode" className='text-primary '>Enter the Verification Code</label>
                         <div className="form-group text-center m-2">
-                            <input className='form-input w-50' type="text" required name='verifyCode' value={verifyCode} onChange={(e) => setVerifyCode(e.target.value)} />
+                            <input className='form-input w-50 border shadow' type="text" required name='verifyCode' value={verifyCode} onChange={(e) => setVerifyCode(e.target.value)} />
                         </div>
                         <h6 className='text-danger'>{message}</h6>
                         <div className="form- text-center col-12">
