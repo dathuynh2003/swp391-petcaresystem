@@ -52,7 +52,7 @@ export default function Sidenav() {
           { name: 'Home', path: '/', icon: 'fas fa-home' },
           { name: 'Services', path: '/services', icon: 'fas fa-concierge-bell' },
           { name: 'Booking', path: '/booking', icon: 'fas fa-calendar-check' },
-          { name: 'Pets', path: '/pets', icon: 'fas fa-paw' },
+          { name: 'Pets', path: '/listPets', icon: 'fas fa-paw' },
           { name: 'Profile', path: '/profile', icon: 'fas fa-user' },
           { name: 'Logout', path: '', icon: 'fas fa-sign-out-alt', onClick: handleLogout },
         ];

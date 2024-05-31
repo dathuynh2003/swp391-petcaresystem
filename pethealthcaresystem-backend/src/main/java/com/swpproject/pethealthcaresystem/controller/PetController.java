@@ -9,6 +9,8 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
 public class PetController {
@@ -23,14 +25,14 @@ public class PetController {
         User curUser = (User) session.getAttribute("user");
         if (curUser != null){
             petService.createPet(newPet, curUser);
-            return "";
+            return "Add new Pet successfully";
         }else{
             return "Please login first!";
         }
 
     }
 
-    @PostMapping("/pet/{id}")
+    @PutMapping("/pet/{id}")
     Pet updatePet(@PathVariable int id, @RequestBody Pet newPet){
         return petService.updatePet(newPet, id);
     }
@@ -38,5 +40,15 @@ public class PetController {
     @GetMapping("/pet/{id}")
     Pet getPet(@PathVariable int id){
         return petService.getPetById(id);
+    }
+
+    @GetMapping("/pet")
+    List<Pet> getAllPets(){
+        return petService.getAllPets();
+    }
+
+    @PutMapping("/deletePet/{id}")
+    String deletePet(@PathVariable int id){
+        return petService.deletePet(id);
     }
 }

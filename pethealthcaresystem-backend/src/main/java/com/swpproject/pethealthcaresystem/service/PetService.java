@@ -8,6 +8,9 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 public class PetService implements IPetService{
     @Autowired
@@ -41,5 +44,21 @@ public class PetService implements IPetService{
     @Override
     public Pet getPetById(int id) {
         return petRepository.findById(id).orElseThrow(() -> new RuntimeException("Pet not found"));
+    }
+
+    @Override
+    public List<Pet> getAllPets() {
+
+        return petRepository.findAll().stream()
+                .filter(pet -> !pet.isDeceased())
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public String deletePet(int id) {
+        Pet pet = getPetById(id);
+        pet.setDeceased(true);
+        petRepository.save(pet);
+        return "Delete pet successfully";
     }
 }

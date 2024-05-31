@@ -17,9 +17,9 @@ function Radio(props) {
           borderRadius='md'
           boxShadow='md'
           _checked={{
-            bg: 'teal.600',
-            color: 'white',
-            borderColor: 'teal.600',
+            bg: props.bg,
+            color: props.color,
+            borderColor: props.borderColor,
           }}
           _focus={{
             boxShadow: 'outline',
@@ -34,12 +34,20 @@ function Radio(props) {
   }
   
 
+  Radio.propTypes = {
+    bg: PropTypes.string,
+    color: PropTypes.string,
+    borderColor: PropTypes.string,
+    checked: PropTypes.string
+}
+
 
 function RadioCard(props) {
     const { getRootProps, getRadioProps } = useRadioGroup({
         name: 'framework',
         defaultValue: 'react',
         onChange: props.onChange,
+        value: props.value
     })
 
     const group = getRootProps()
@@ -49,7 +57,7 @@ function RadioCard(props) {
     {props.options.map((value) => {
       const radio = getRadioProps({ value })
       return (
-        <Radio key={value} {...radio}>
+        <Radio key={value} {...radio} bg={props.bg} color={props.color} borderColor={props.borderColor}>
           {value}
         </Radio>
       )
@@ -61,9 +69,18 @@ function RadioCard(props) {
 
     RadioCard.propTypes = {
         options: PropTypes.array,//khai báo props, gợi ý
-        onChange: PropTypes.func
+        onChange: PropTypes.func,
+        bg: PropTypes.string,
+        color: PropTypes.string,
+        borderColor: PropTypes.string,
+        value:PropTypes.string
+
+    }
+    RadioCard.defaultProps = {
+        bg: 'teal.600',
+        color: 'white',
+        borderColor: 'teal.600'
         
     }
-
 export default RadioCard
 

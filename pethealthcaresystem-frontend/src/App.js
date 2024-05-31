@@ -9,6 +9,9 @@ import Navbar from './components/Navbar';
 import Services from './services/Services';
 import Booking from './services/Booking';
 import CreatePet from './services/CreatePet';
+import ViewPet from './services/ViewPet';
+import ListPets from './services/ListPets';
+import EditPet from './services/EditPet';
 import Profile from './services/Profile';
 import Cages from './services/Cages';
 import VetWorkSchedules from './services/VetWorkSchedules';
@@ -32,6 +35,10 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/booking" element={<Booking />} />
           <Route path="/createPet" element={<CreatePet />} />
+          <Route path="/viewPet/:petId" element={<ViewPet />} />
+          <Route path="/listPets" element={<ListPets />} />
+          <Route path="/editPet/:petId" element={<EditPet />} />
+          
           <Route path="/profile" element={<Profile />} />
           <Route path="/cages" element={<Cages />} />
           <Route path="/vet-work-schedules" element={<VetWorkSchedules />} />
