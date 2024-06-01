@@ -7,7 +7,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -27,4 +29,7 @@ public class Shift {
     //one shift can have many user(vet)
 //    @ManyToMany
 //    List<User> users;
+    @OneToMany(mappedBy = "shift", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<VetShiftDetail> vetShiftDetails = new HashSet<>();
+
 }

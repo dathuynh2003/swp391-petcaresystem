@@ -9,6 +9,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 @Builder
@@ -32,5 +34,8 @@ public class User {
     String gender;
     Boolean isActive;
     Date dob;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<VetShiftDetail> vetShiftDetails = new HashSet<>();
 
 }
