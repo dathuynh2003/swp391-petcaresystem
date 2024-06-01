@@ -9,13 +9,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Table(name = "user")
 public class User {
@@ -32,5 +33,17 @@ public class User {
     String gender;
     Boolean isActive;
     Date dob;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    Set<VetShiftDetail> vetShiftDetails = new HashSet<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    Set<Cage> cages = new HashSet<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    Set<MedicalRecord> medicalRecords = new HashSet<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    Set<HospitalizationRecord> hospitalizationRecords = new HashSet<>();
 
 }

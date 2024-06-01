@@ -23,7 +23,7 @@ export default function Login() {
 
     const handleLogin = async (e) => {
         e.preventDefault();
-        const response = await axios.post(`http://localhost:8080/login`, { email, password }, {withCredentials: true})  
+        const response = await axios.post(`http://localhost:8080/login`, { email, password }, { withCredentials: true })
         if (response.data.isSuccess === 'true') {
             localStorage.setItem('isLoggedIn', true);
             // localStorage.setItem('roleId', response.data.user.roleId)
@@ -47,11 +47,11 @@ export default function Login() {
 
             <div className="bg-img">
 
-                <div className="box-left">
-                    <div className="imagelogin">
-                        <img src="assets/dog.jpg" alt="" width="200px" height="300px" />
-                        <img src="assets/cat.jpg" alt="" width="200px" height="400px" />
-                        <img src="assets/hamster.jpg" alt="" width="200px" height="300px" />
+                <div className="box-left container">
+                    <div className="imagelogin row">
+                        <img className='h-50 my-5' src="assets/dog.jpg" alt="" />
+                        <img style={{ height: '60%' }} src="assets/cat.jpg" alt="" />
+                        <img className='h-50 my-5' src="assets/hamster.jpg" alt="" />
                     </div>
                 </div>
                 <div className="box-right">
@@ -79,22 +79,17 @@ export default function Login() {
 
                         </form>
                         <div className="google">
-                            <div className="google">
-                                <div className="flex items-center justify-center h-screen dark:bg-gray-100">
-                                    <button
-                                        className="px-4 py-2 border flex gap-2 border-slate-200 dark:border-slate-700 rounded-lg text-slate-100 dark:text-slate-100 hover:border-slate-100 dark:hover:border-slate-100 hover:text-slate-200 dark:hover:text-slate-100 hover:shadow transition duration-50">
-                                        <img className="w-4 h-4" src="https://www.svgrepo.com/show/475656/google-color.svg"
-                                            loading="lazy" alt="google logo" />
-                                        <span className="text-base">Login with Google</span>
-                                    </button>
-                                </div>
-                            </div>
+                            <button className='btn btn-light row mx-5 w-50'>
+                                <img className="row" style={{ width: '30%' }} src="https://www.svgrepo.com/show/475656/google-color.svg"
+                                    loading="lazy" alt="google logo" />
+                                Login with Google
+                            </button>
                         </div>
 
                     </div>
                     <div className="signup row">
                         <div className="signuptext col-6">Don't have account?</div>
-                        <Link className='btn btn-primary col-3 m-2' style={{height:'70%'}} to={'/register'}>Sign-up</Link>
+                        <Link className='btn btn-primary col-3 m-2' style={{ height: '70%' }} to={'/register'}>Sign-up</Link>
                     </div>
                 </div>
             </div>

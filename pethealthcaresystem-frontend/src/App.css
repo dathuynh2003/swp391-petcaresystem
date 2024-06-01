@@ -79,9 +79,8 @@
 }
 
 .content {
-  padding: 20px;
-  width: calc(100% - 200px); /* Adjust width to avoid overflow */
-  margin-left: 200px; /* Accounts for the sidebar width */
+  width: calc(100% - 120px); /* Adjust width to avoid overflow */
+  margin-left: 120px; /* Accounts for the sidebar width */
   box-sizing: border-box;
   overflow-y: auto; /* Allows the content to scroll */
   height: calc(100vh - 60px); /* Makes the content take full viewport height minus navbar */

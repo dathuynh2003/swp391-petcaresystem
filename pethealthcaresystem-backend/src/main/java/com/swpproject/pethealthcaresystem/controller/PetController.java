@@ -45,7 +45,7 @@ public class PetController {
     @GetMapping("/pet")
     List<Pet> getAllPets(HttpSession session){
         User curUser = (User) session.getAttribute("user");
-        return petService.getAllPetsByOwnerId(curUser.getUserId());
+        return petService.getAllPetsByUser(curUser.getUserId());
     }
 
     @PutMapping("/deletePet/{id}")

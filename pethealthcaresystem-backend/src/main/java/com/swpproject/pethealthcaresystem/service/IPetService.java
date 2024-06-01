@@ -12,4 +12,5 @@ public interface IPetService {
     Pet getPetById(int id);
     List<Pet> getAllPetsByOwnerId(int ownerId);
     String deletePet(int id);
+    List<Pet> getAllPetsByUser(int ownerId);
 }
