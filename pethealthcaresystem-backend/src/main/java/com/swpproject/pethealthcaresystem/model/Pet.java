@@ -5,8 +5,6 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import java.time.LocalDate;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -38,10 +36,16 @@ public class Pet {
 
     @ManyToOne
     @JoinColumn(name = "owner_id")
-    private User owner;
+    User owner;
 
     @OneToMany(mappedBy = "pet", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Booking> bookings = new HashSet<>();
+    Set<Booking> bookings = new HashSet<>();
+
+    @OneToMany(mappedBy = "pet", cascade = CascadeType.ALL, orphanRemoval = true)
+    Set<MedicalRecord> medicalRecords = new HashSet<>();
+
+    @OneToMany(mappedBy = "pet", cascade = CascadeType.ALL, orphanRemoval = true)
+    Set<HospitalizationRecord> hospitalizationRecords = new HashSet<>();
 
 
 

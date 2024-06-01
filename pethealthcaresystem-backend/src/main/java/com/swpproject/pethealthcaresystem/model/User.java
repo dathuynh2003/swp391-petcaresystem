@@ -17,7 +17,6 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Table(name = "user")
 public class User {
@@ -36,6 +35,15 @@ public class User {
     Date dob;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<VetShiftDetail> vetShiftDetails = new HashSet<>();
+    Set<VetShiftDetail> vetShiftDetails = new HashSet<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    Set<Cage> cages = new HashSet<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    Set<MedicalRecord> medicalRecords = new HashSet<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    Set<HospitalizationRecord> hospitalizationRecords = new HashSet<>();
 
 }
