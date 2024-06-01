@@ -47,10 +47,10 @@ public class PetService implements IPetService{
     }
 
     @Override
-    public List<Pet> getAllPets() {
-
+    public List<Pet> getAllPetsByOwnerId(int ownerId) {
         return petRepository.findAll().stream()
                 .filter(pet -> !pet.isDeceased())
+                .filter(pet -> pet.getOwner() != null && pet.getOwner().getUserId() == ownerId)
                 .collect(Collectors.toList());
     }
 

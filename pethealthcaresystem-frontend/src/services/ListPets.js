@@ -6,7 +6,7 @@ export default function ListPets() {
   const [pets, setPets] = useState([])
 
   const loadPets = async () => {
-    const response = await axios.get("http://localhost:8080/pet")
+    const response = await axios.get("http://localhost:8080/pet",{withCredentials: true})
     setPets(response.data)
   }
 
