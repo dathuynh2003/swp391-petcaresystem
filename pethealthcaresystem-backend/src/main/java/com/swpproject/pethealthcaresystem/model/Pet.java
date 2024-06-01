@@ -28,10 +28,10 @@ public class Pet {
     String petType;
     String breed;
     String gender;
-    boolean isNeutered;
+    Boolean isNeutered;
     int age;
     String description;
-    boolean isDeceased;
+    Boolean isDeceased;
 
 }
 

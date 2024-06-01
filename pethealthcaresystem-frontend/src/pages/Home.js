@@ -2,9 +2,8 @@ import React from 'react';
 
 const Home = () => {
   return (
-    <div>
-      <h1>Home</h1>
-      <img src="assets/dog.jpg" alt="Home1" className="Home1" />
+    <div className='container m-2'>
+      <img src="assets/dog.jpg" alt="Home1" className="Home1 row" />
     </div>
   );
 };
