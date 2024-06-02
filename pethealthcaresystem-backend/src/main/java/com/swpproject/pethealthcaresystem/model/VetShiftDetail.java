@@ -1,5 +1,7 @@
 package com.swpproject.pethealthcaresystem.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -32,9 +34,11 @@ public class VetShiftDetail {
 
     @ManyToOne
     @JoinColumn(name = "vet_id")
+    @JsonIgnoreProperties("user")
     private User user;
 
     @ManyToOne
     @JoinColumn(name = "shift_id")
+    @JsonIgnoreProperties("shift")
     private Shift shift;
 }
