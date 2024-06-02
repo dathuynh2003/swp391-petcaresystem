@@ -11,6 +11,7 @@ public interface IShiftService {
     Shift createShift(Shift shift);
     void deleteShift(int shiftId);
     List<VetShiftDetail> getAllShiftDetails();
-//    VetShiftDetail assignVetToShift(VetShiftDetail vetShiftDetail);
     List<VetShiftDetail> assignVetToShifts(List<VetShiftDetail> vetShiftDetails);
+    List<VetShiftDetail> getAllVetShiftsByUser(int vetId);
+    boolean isShiftAssignedToVet(int shiftId, int userId, String date);
 }

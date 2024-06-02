@@ -1,3 +1,4 @@
+// ShiftService.java
 package com.swpproject.pethealthcaresystem.service;
 
 import com.swpproject.pethealthcaresystem.model.Shift;
@@ -16,39 +17,49 @@ public class ShiftService implements IShiftService {
 
     @Autowired
     private ShiftRepository shiftRepository;
+
     @Autowired
     private VetShiftDetailRepository vetShiftDetailRepository;
 
-    @Transactional
     @Override
+    @Transactional(readOnly = true)
     public List<Shift> getAllShifts() {
         return shiftRepository.findAll();
     }
 
-    @Transactional
     @Override
+    @Transactional
     public Shift createShift(Shift shift) {
         return shiftRepository.save(shift);
     }
 
-    @Transactional
     @Override
-    public void deleteShift(int id) {
-        shiftRepository.deleteById(id);
+    @Transactional
+    public void deleteShift(int shiftId) {
+        shiftRepository.deleteById(shiftId);
     }
 
-    @Transactional
     @Override
+    @Transactional(readOnly = true)
     public List<VetShiftDetail> getAllShiftDetails() {
         return vetShiftDetailRepository.findAll();
     }
 
-    @Transactional
     @Override
+    @Transactional
     public List<VetShiftDetail> assignVetToShifts(List<VetShiftDetail> vetShiftDetails) {
-        return vetShiftDetails.stream()
-                .map(vetShiftDetailRepository::save)
+        return vetShiftDetailRepository.saveAll(vetShiftDetails);
+    }
+
+    @Override
+    public List<VetShiftDetail> getAllVetShiftsByUser(int vetId) {
+        return vetShiftDetailRepository.findAll().stream()
+                .filter(vetShiftDetail -> vetShiftDetail.getUser() != null && vetShiftDetail.getUser().getUserId() == vetId)
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public boolean isShiftAssignedToVet(int shiftId, int vetId, String date) {
+        return vetShiftDetailRepository.existsByShiftShiftIdAndUserUserIdAndDate(shiftId, vetId, date);
+    }
 }

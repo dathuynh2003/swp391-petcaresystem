@@ -1,14 +1,11 @@
 package com.swpproject.pethealthcaresystem.controller;
 
-import com.swpproject.pethealthcaresystem.common.ResponseData;
 import com.swpproject.pethealthcaresystem.model.User;
 import com.swpproject.pethealthcaresystem.service.MailService;
 import com.swpproject.pethealthcaresystem.service.UserService;
 import com.swpproject.pethealthcaresystem.service.VerifyCodeService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -36,39 +33,7 @@ public class UserController {
         }
         return userService.createUser(newUser);
     }
-    @PostMapping("/create-user-by-admin")
-    public ResponseEntity<ResponseData> createUserByAdmin(@RequestBody User user) {
-       try{
-           User newUser = userService.createUserByAdmin(user);
-           ResponseData<User> responseData = new ResponseData<>();
-           responseData.setData(newUser);
-           responseData.setStatusCode(201);
-           return new ResponseEntity<>(responseData, HttpStatus.CREATED);
-       }catch(Error e) {
-           ResponseData<User> responseData = new ResponseData<>();
-           responseData.setStatusCode(401);
-           responseData.setErrorMessage(e.getMessage());
-           return new ResponseEntity<>(responseData, HttpStatus.UNAUTHORIZED);
 
-        }
-
-    }
-    @GetMapping("/get-users-by-id")
-    public ResponseEntity<ResponseData> getUsersById(@RequestParam("id") int id) {
-        try{
-            System.out.println(id);
-            List<User> users = userService.getAllUsersByRoleId(id);
-            ResponseData<List<User>> responseData = new ResponseData<>();
-            responseData.setData(users);
-            responseData.setStatusCode(200);
-            return new ResponseEntity<>(responseData, HttpStatus.OK);
-        }catch (Error e){
-            ResponseData<List<User>> responseData = new ResponseData<>();
-            responseData.setStatusCode(401);
-            responseData.setErrorMessage(e.getMessage());
-            return new ResponseEntity<>(responseData, HttpStatus.UNAUTHORIZED);
-        }
-    }
     @PostMapping("/verify/{email}/{verifyCode}")
     public String verifyCode(@PathVariable String email, @PathVariable String verifyCode) {
         if(userService.verifyUser(email,verifyCode)) {

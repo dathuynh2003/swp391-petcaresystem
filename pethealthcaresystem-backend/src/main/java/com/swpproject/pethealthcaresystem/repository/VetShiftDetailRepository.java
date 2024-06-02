@@ -8,4 +8,5 @@ import java.util.List;
 
 @Repository
 public interface VetShiftDetailRepository extends JpaRepository<VetShiftDetail, Integer> {
+    boolean existsByShiftShiftIdAndUserUserIdAndDate(int shiftId, int vetId, String date);
 }

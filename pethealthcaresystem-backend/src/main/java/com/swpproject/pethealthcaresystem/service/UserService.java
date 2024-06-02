@@ -5,7 +5,6 @@ import com.swpproject.pethealthcaresystem.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
@@ -23,10 +22,10 @@ public class UserService implements IUserService {
 
     @Transactional
     @Override
-    public String createUser(User newUser) {
+    public String createUser(User newUser){
         User user = new User();
 
-        if (userRepository.existsByEmail(newUser.getEmail())) {
+        if(userRepository.existsByEmail(newUser.getEmail())) {
             return "Email is already in use";
         }
 
@@ -54,7 +53,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public User validateLogin(User user) {
+    public User validateLogin(User user){
         User existUser = userRepository.findByEmail(user.getEmail());
         if (existUser != null && existUser.getPassword().equals(user.getPassword())) {
             existUser.setPassword("");
@@ -79,7 +78,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public User getUserByEmail(User user) {
+    public User getUserByEmail(User user){
         User existUser = userRepository.findByEmail(user.getEmail());
         if (existUser != null) {
             existUser.setPassword("");
@@ -87,48 +86,9 @@ public class UserService implements IUserService {
         }
         return null;
     }
-
+  
     @Override
     public List<User> getVets() {
         return userRepository.findByRoleId(3);
-    }
-
-
-
-    @Transactional
-    @Override
-    public User createUserByAdmin(User newUser) {
-
-        User user = new User();
-
-        if (userRepository.existsByEmail(newUser.getEmail())) {
-            throw new Error("Email is already in use");
-
-        }
-
-        //Validate email abc@zxc.zxc
-        String regexPattern = "^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}$";
-        if (!newUser.getEmail().matches(regexPattern)) {
-            throw new Error("Email is invalid");
-
-        }
-        user.setEmail(newUser.getEmail());
-        user.setPassword(newUser.getPassword());
-        user.setFullName(newUser.getFullName());
-        user.setPhoneNumber(newUser.getPhoneNumber());
-        user.setAddress(newUser.getAddress());
-        user.setRoleId(newUser.getRoleId());
-        user.setAvatar("");
-        user.setGender(newUser.getGender());
-        user.setIsActive(true);
-        user.setDob(newUser.getDob());
-        return userRepository.save(user);
-    }
-    @Override
-    public List<User> getAllUsersByRoleId(int roleId) {
-        if(roleId == 0){
-            return userRepository.findAll();
-        }
-        return userRepository.findByRoleId(roleId);
     }
 }
