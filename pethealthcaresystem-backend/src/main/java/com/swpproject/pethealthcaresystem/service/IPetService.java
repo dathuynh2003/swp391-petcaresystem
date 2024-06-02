@@ -10,7 +10,7 @@ public interface IPetService {
 
     Pet updatePet(Pet newPet, int id);
     Pet getPetById(int id);
-    List<Pet> getAllPetsByOwnerId(int ownerId);
+    List<Pet> getAllPets();
     String deletePet(int id);
     List<Pet> getAllPetsByUser(int ownerId);
 }

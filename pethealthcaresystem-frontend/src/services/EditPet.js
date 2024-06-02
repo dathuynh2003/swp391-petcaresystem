@@ -25,7 +25,7 @@ export default function EditPet() {
            name: "", 
            gender:"",
            breed:"",
-           age:"",
+           age: 1,
            petType:"",
            avatar:"",
            isNeutered:"",
@@ -39,6 +39,7 @@ export default function EditPet() {
 
     const loadPet = async ()=>{
         const response = await axios.get(`${URL}/pet/${petId}`)
+        console.log(response.data);
         setPet(response.data)
     }   
     useEffect(()=>{
@@ -140,7 +141,7 @@ export default function EditPet() {
 
                         <div className="form-check form-switch">
                             <input
-                                value={pet.isNeutered}
+                                checked={pet.isNeutered}
                                 onChange={(e)=> (setPet(prev=> ({...prev,isNeutered:e.target.checked})))} 
                                 className="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault" required/>
                             <label className="form-check-label" for="flexSwitchCheckDefault">Neutered (Spayed) </label>
