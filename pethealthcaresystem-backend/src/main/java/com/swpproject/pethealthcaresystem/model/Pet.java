@@ -2,6 +2,7 @@ package com.swpproject.pethealthcaresystem.model;
 
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
