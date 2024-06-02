@@ -10,9 +10,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
-
 
 @Data
 @NoArgsConstructor
@@ -34,7 +32,17 @@ public class User {
     String gender;
     Boolean isActive;
     Date dob;
-  //A user(Vet) can have many shifts
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<VetShiftDetail> vetShiftDetails = new HashSet<VetShiftDetail>();
+
+//    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+//    Set<VetShiftDetail> vetShiftDetails = new HashSet<>();
+//
+//    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+//    Set<Cage> cages = new HashSet<>();
+//
+//    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+//    Set<MedicalRecord> medicalRecords = new HashSet<>();
+//
+//    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+//    Set<HospitalizationRecord> hospitalizationRecords = new HashSet<>();
+
 }

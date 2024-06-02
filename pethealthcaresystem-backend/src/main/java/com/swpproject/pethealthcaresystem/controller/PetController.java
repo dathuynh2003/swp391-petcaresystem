@@ -1,12 +1,15 @@
 package com.swpproject.pethealthcaresystem.controller;
 
 
+import com.swpproject.pethealthcaresystem.model.ApiResponse;
 import com.swpproject.pethealthcaresystem.model.Pet;
 import com.swpproject.pethealthcaresystem.model.User;
 import com.swpproject.pethealthcaresystem.service.PetService;
 import com.swpproject.pethealthcaresystem.service.UserService;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,14 +24,17 @@ public class PetController {
     private UserService userService;
 
     @PostMapping("/pet")
-    String createPet(@RequestBody Pet newPet, HttpSession session){
+    ApiResponse<Pet> createPet(@Valid  @RequestBody Pet newPet, HttpSession session){
         User curUser = (User) session.getAttribute("user");
-        if (curUser != null){
-            petService.createPet(newPet, curUser);
-            return "Add new Pet successfully";
-        }else{
-            return "Please login first!";
+        ApiResponse<Pet> apiResponse = new ApiResponse<>();
+
+        if (curUser != null) {
+            // Nếu không có lỗi, tiếp tục xử lý
+            apiResponse.setResult(petService.createPet(newPet, curUser));
+        } else {
+            apiResponse.setMessage("Please login first");
         }
+        return apiResponse;
 
     }
 
@@ -43,8 +49,9 @@ public class PetController {
     }
 
     @GetMapping("/pet")
-    List<Pet> getAllPets(){
-        return petService.getAllPets();
+    List<Pet> getAllPets(HttpSession session){
+        User curUser = (User) session.getAttribute("user");
+        return petService.getAllPetsByUser(curUser.getUserId());
     }
 
     @PutMapping("/deletePet/{id}")

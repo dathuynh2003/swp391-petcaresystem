@@ -20,6 +20,7 @@ public class PetService implements IPetService{
     public Pet createPet(Pet newPet, User curUser) {
 
         newPet.setOwner(curUser);
+        newPet.setIsDeceased(false);
         return petRepository.save(newPet);
     }
 
@@ -33,9 +34,9 @@ public class PetService implements IPetService{
                     pet.setAge(newPet.getAge());
                     pet.setGender(newPet.getGender());
                     pet.setBreed(newPet.getBreed());
-                    pet.setDeceased(newPet.isDeceased());
+                    pet.setIsDeceased(newPet.getIsDeceased());
                     pet.setDescription(newPet.getDescription());
-                    pet.setNeutered(newPet.isNeutered());
+                    pet.setIsNeutered(newPet.getIsNeutered());
                     return petRepository.save(pet);
                 }).orElseThrow(() ->  new RuntimeException("Pet not found"));
 
@@ -50,15 +51,22 @@ public class PetService implements IPetService{
     public List<Pet> getAllPets() {
 
         return petRepository.findAll().stream()
-                .filter(pet -> !pet.isDeceased())
+                .filter(pet -> !pet.getIsDeceased())
                 .collect(Collectors.toList());
     }
-
     @Override
     public String deletePet(int id) {
         Pet pet = getPetById(id);
-        pet.setDeceased(true);
+        pet.setIsDeceased(true);
         petRepository.save(pet);
         return "Delete pet successfully";
+    }
+
+    @Override
+    public List<Pet> getAllPetsByUser(int ownerId) {
+        return petRepository.findAll().stream()
+                .filter(pet -> !pet.getIsDeceased())
+                .filter(pet -> pet.getOwner() != null && pet.getOwner().getUserId() == ownerId)
+                .collect(Collectors.toList());
     }
 }

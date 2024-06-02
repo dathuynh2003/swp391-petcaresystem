@@ -12,17 +12,14 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(
-        name = "petservice"
-)
 public class PetService {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    private String name;
+    private String nameService;
     private String description;
     private double price;
 
-    @OneToMany(mappedBy = "petService", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<BookingDetail> bookingDetails = new HashSet<BookingDetail>();
+//    @OneToMany(mappedBy = "petService", cascade = CascadeType.ALL)
+//    private Set<BookingDetail> bookingDetails = new HashSet<>();
+
 }
