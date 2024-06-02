@@ -10,5 +10,6 @@ public interface IUserService {
     public User validateLogin(User user);
     public boolean verifyUser(String email, String code);
     public List<User> getVets();
+    public User updateUser(String email, User newUser);
 
 }
