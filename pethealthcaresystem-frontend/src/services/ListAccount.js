@@ -2,6 +2,7 @@ import { queries } from '@testing-library/react'
 import axios from 'axios'
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import './account.css'
 const ListAccount = () => {
 
     const [accounts, setAccounts] = useState([])
@@ -22,47 +23,57 @@ const ListAccount = () => {
     }, [roleId])
   
   
-    // const deletePet = async (id) => {
-    //   const response = await axios.put(`http://localhost:8080/deletePet/${id}`)
-    //   loadPets()
-    // }
+    const deleteAccount = async (id) => {
+      try {
+        const response = await axios.put(`http://localhost:8080/delete-user-by-admin/${id}`);
+        loadAccounts();
+      } catch (error) {
+        alert("There was an error deleting the account!", error);
+      }
+    };
   return (
     <div className='container'>
       <Link className='btn btn-primary m-3' to={'/create-account'}>Add new Account</Link>
-      <div className='drop-down'>
-        <label for="role">Role:</label>
-        <select defaultValue={roleId} name="roleId" id="roleId" onChange={(e) => setRoleId(e.target.value)}>
-            <option value="0">All</option>
-            <option value="2">Vet</option>
-            <option value="3">Staff</option>
-        </select>
-    </div>
-      <table className="table py-4">
-        <thead>
-          <tr>
-            <th scope="col">No</th>
-            <th scope="col">Name</th>
-            <th scope="col">RoleId</th>
-            <th scope="col" className='col-2'>Actions</th>
-          </tr>
-        </thead>
-        <tbody className="table-group-divider">
-          {
-            accounts.map((account, index) => (
-              <tr key={index}>
-                <th scope="row">{index + 1}</th>
-                <td className="col-1">{account.fullName}</td>
-                <td className="col-1">{account.roleId}</td>
-                <td className='col-3'>
-                  {/* <Link className='btn btn-primary mx-2' to={`/viewPet/${pet.petId}`}>View</Link>
-                  <Link className='btn btn-outline-primary mx-2' to={`/editPet/${pet.petId}`}>Edit</Link>
-                  <button onClick={() => deletePet(pet.petId)} className='btn btn-danger mx2'>Delete</button> */}
-                </td>
-              </tr>
-            ))
-          }
-        </tbody>
-      </table>
+      <div className="dropdown mb-3">
+  <label htmlFor="role" className="form-label me-2"></label>
+  <select
+    className="form-select"
+    defaultValue={roleId}
+    name="roleId"
+    id="roleId"
+    onChange={(e) => setRoleId(e.target.value)}
+  >
+    <option value="0">All</option>
+    <option value="2">Vet</option>
+    <option value="3">Staff</option>
+  </select>
+</div>
+
+    <table className="table table-striped table-hover">
+  <thead className="thead-dark">
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Full Name</th>
+      <th scope="col">Role ID</th>
+      <th scope="col">Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {accounts.map((account, index) => (
+      <tr key={index}>
+        <th scope="row">{index + 1}</th>
+        <td className="col-2">{account.fullName}</td>
+        <td className="col-5">{account.roleId}</td>
+        <td className="col-3">
+          {/* <Link className="btn btn-primary mx-2" to={`/viewAccount/${account.id}`}>View</Link> */}
+          {/* <Link className="btn btn-outline-primary mx-2" to={`/editAccount/${account.id}`}>Edit</Link> */}
+          <button onClick={() => deleteAccount(account.id)} className="btn btn-danger mx-2">Delete</button> 
+        </td>
+      </tr>
+    ))}
+  </tbody>
+</table>
+
     </div>
   )
 }
