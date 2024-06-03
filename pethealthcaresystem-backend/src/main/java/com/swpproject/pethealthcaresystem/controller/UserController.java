@@ -53,10 +53,29 @@ public class UserController {
         }
 
     }
+    @PutMapping("/delete-user-by-admin/{id}")
+    public ResponseEntity<ResponseData<User>> deleteUserByAdmin(@PathVariable(name = "id") int id) {
+        ResponseData<User> responseData = new ResponseData<>();
+        try {
+            User deletedUser = userService.deleteUser(id);
+            if (deletedUser == null) {
+                responseData.setStatusCode(404);
+                responseData.setErrorMessage("User not found");
+                return new ResponseEntity<>(responseData, HttpStatus.NOT_FOUND);
+            }
+            responseData.setData(deletedUser);
+            responseData.setStatusCode(200);
+            return new ResponseEntity<>(responseData, HttpStatus.OK);
+        } catch (Exception e) {
+            responseData.setStatusCode(500);
+            responseData.setErrorMessage(e.getMessage());
+            return new ResponseEntity<>(responseData, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @GetMapping("/get-users-by-id")
     public ResponseEntity<ResponseData> getUsersById(@RequestParam("id") int id) {
         try{
-            System.out.println(id);
             List<User> users = userService.getAllUsersByRoleId(id);
             ResponseData<List<User>> responseData = new ResponseData<>();
             responseData.setData(users);
