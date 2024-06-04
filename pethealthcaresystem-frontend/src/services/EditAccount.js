@@ -181,6 +181,7 @@ const EditAccount = () => {
                                     value={user.roleId} 
                                     onChange={onInputChange}
                                 >
+                                    <option value="1">Customer</option>
                                     <option value="2">Vet</option>
                                     <option value="3">Staff</option>
                                 </select>

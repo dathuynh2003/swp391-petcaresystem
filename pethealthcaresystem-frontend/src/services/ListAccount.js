@@ -48,6 +48,7 @@ const ListAccount = () => {
           onChange={(e) => setRoleId(e.target.value)}
         >
           <option value="0">All</option>
+          <option value="1">Customer</option>
           <option value="2">Vet</option>
           <option value="3">Staff</option>
         </select>
@@ -59,6 +60,7 @@ const ListAccount = () => {
             <th scope="col">#</th>
             <th scope="col">Full Name</th>
             <th scope="col">Role ID</th>
+            <th scope="col">Status</th>
             <th scope="col">Actions</th>
           </tr>
         </thead>
@@ -67,7 +69,8 @@ const ListAccount = () => {
             <tr key={index}>
               <th scope="row">{index + 1}</th>
               <td className="col-2">{account.fullName}</td>
-              <td className="col-5">{account.roleId}</td>
+              <td className="col-2">{account.roleId}</td>
+              <td className='col-2'>{account.isActive? "Active" : "InActive" }</td>
               <td className="col-3">
                 {/* <Link className="btn btn-primary mx-2" to={`/viewAccount/${account.id}`}>View</Link> */}
                  <Link className="btn btn-outline-primary mx-2" to={`/edit-account/${account.userId}`}>Edit</Link> 
