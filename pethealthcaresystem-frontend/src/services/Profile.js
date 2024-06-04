@@ -3,6 +3,8 @@ import { Form, Link, useNavigate } from 'react-router-dom';
 import './profile.css'
 import { Button, FormControl } from '@chakra-ui/react';
 import axios from 'axios';
+import { Bounce, ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 const Profile = () => {
 
   const navigate = useNavigate()
@@ -47,7 +49,8 @@ const Profile = () => {
   const handleUpdateProfile = async (e, field) => {
     const response = await axios.put(`http://localhost:8080/updateuser`, profile, { withCredentials: true })
     if (response.data !== '') {
-      alert("Update profile success");
+      // toast.success("Update profile success")
+      toast.success('Update profile success')
       setIsEditing({ ...isEditing, [field]: false })
       navigate('/profile')
     }
@@ -80,9 +83,9 @@ const Profile = () => {
     <div className='container'>
       <div className='row border border-success w-75' style={{ height: '180px', position: 'absolute' }}>
         <img className=''
-          src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSVoTj8eKTZj9LixAF9l5tqIBYPnLGQZ5dHvQ&s'
+          src=''
           alt='Mô tả hình ảnh'
-          style={{ maxWidth: '100%', maxHeight: '100%', height: 'auto', width:'auto' }}
+          style={{ maxWidth: '100%', maxHeight: '100%', height: 'auto', width: 'auto' }}
         />
       </div>
       <div className='row m-4' style={{ position: 'relative' }}>
@@ -191,6 +194,18 @@ const Profile = () => {
           </div>
         </div>
       </div>
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
     </div>
   );
 };
