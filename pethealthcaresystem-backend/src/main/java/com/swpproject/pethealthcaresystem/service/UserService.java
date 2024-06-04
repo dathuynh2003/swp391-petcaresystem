@@ -145,6 +145,27 @@ public class UserService implements IUserService {
         }
     }
 
+    @Override
+    public User updateUser(User newUser, int id) {
+        User updatedUser = getUserById(id);
+        if(updatedUser != null){
+            updatedUser.setEmail(newUser.getEmail());
+            updatedUser.setPassword(newUser.getPassword());
+            updatedUser.setFullName(newUser.getFullName());
+            updatedUser.setPhoneNumber(newUser.getPhoneNumber());
+            updatedUser.setAddress(newUser.getAddress());
+            updatedUser.setGender(newUser.getGender());
+            updatedUser.setDob(newUser.getDob());
+            return userRepository.save(updatedUser);
+        }
+        return null;
+    }
+
+    @Override
+    public User getUserById(int id) {
+        Optional<User> user = userRepository.findById(id);
+        return user.orElse(null);
+    }
 
 
 //    @Override

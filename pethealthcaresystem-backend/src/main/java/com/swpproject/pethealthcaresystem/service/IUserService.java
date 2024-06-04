@@ -13,5 +13,6 @@ public interface IUserService {
     public List<User> getVets();
     public List<User> getAllUsersByRoleId(int roleId);
     public User deleteUser(int id);
-    //ser updateUser(User newUser, int id);
+    User updateUser(User newUser, int id);
+    User getUserById(int id);
 }
