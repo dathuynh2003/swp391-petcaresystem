@@ -1,4 +1,3 @@
-// ShiftService.java
 package com.swpproject.pethealthcaresystem.service;
 
 import com.swpproject.pethealthcaresystem.model.Shift;
@@ -9,7 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -61,5 +62,15 @@ public class ShiftService implements IShiftService {
     @Override
     public boolean isShiftAssignedToVet(int shiftId, int vetId, String date) {
         return vetShiftDetailRepository.existsByShiftShiftIdAndUserUserIdAndDate(shiftId, vetId, date);
+    }
+
+    @Override
+    public boolean deleteVetShiftDetail(Long shiftId, Long vetId, String date) {
+        Optional<VetShiftDetail> vetShiftDetailOpt = vetShiftDetailRepository.findByShiftShiftIdAndUserUserIdAndDate(shiftId, vetId, date);
+        if (vetShiftDetailOpt.isPresent()) {
+            vetShiftDetailRepository.delete(vetShiftDetailOpt.get());
+            return true;
+        }
+        return false;
     }
 }
