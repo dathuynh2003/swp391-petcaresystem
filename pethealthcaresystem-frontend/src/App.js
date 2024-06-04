@@ -7,7 +7,6 @@ import Register from './services/Register';
 import Sidenav from './components/Sidenav';
 import Navbar from './components/Navbar';
 import Services from './services/Services';
-import Booking from './services/Booking';
 import CreatePet from './services/CreatePet';
 import ViewPet from './services/ViewPet';
 import ListPets from './services/ListPets';
@@ -18,9 +17,9 @@ import VetWorkSchedules from './services/VetWorkSchedules';
 import Dashboard from './services/Dashboard';
 import Verify from './services/Verify';
 import CreateShift from './services/CreateShift';
-import CreateAccount from './services/CreateAccount';
-import ListAccount from './services/ListAccount';
 
+
+import Booking from './services/Booking/Booking';
 function App() {
 
   const location = useLocation();
@@ -50,8 +49,11 @@ function App() {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path='/verify' element={<Verify />} />
             <Route path="/shift" element={<CreateShift />} />
-            <Route path='/create-account' element={<CreateAccount/>} />
-            <Route path='/list-account' element={<ListAccount/>} />
+
+
+            
+ 
+          
           </Routes>
         </div>
       </div>
