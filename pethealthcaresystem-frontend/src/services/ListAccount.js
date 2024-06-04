@@ -70,7 +70,7 @@ const ListAccount = () => {
               <td className="col-5">{account.roleId}</td>
               <td className="col-3">
                 {/* <Link className="btn btn-primary mx-2" to={`/viewAccount/${account.id}`}>View</Link> */}
-                {/* <Link className="btn btn-outline-primary mx-2" to={`/editAccount/${account.id}`}>Edit</Link> */}
+                 <Link className="btn btn-outline-primary mx-2" to={`/edit-account/${account.userId}`}>Edit</Link> 
                 <button onClick={() => deleteAccount(account.userId)} className="btn btn-danger mx-2">Delete</button>
               </td>
             </tr>

@@ -20,6 +20,7 @@ import Verify from './services/Verify';
 import CreateShift from './services/CreateShift';
 import CreateAccount from './services/CreateAccount';
 import ListAccount from './services/ListAccount';
+import EditAccount from './services/EditAccount';
 
 function App() {
 
@@ -52,6 +53,7 @@ function App() {
             <Route path="/shift" element={<CreateShift />} />
             <Route path='/create-account' element={<CreateAccount/>} />
             <Route path='/list-account' element={<ListAccount/>} />
+            <Route path="/edit-account/:userId" element={<EditAccount/>} />
           </Routes>
         </div>
       </div>
