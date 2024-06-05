@@ -8,6 +8,7 @@ import './shift.css';
 export default function AssignVetSchedules() {
   const [vets, setVets] = useState([]);
   const [shifts, setShifts] = useState([]);
+  const [shiftDetails, setShiftDetails] = useState([]);
   const [selectedVet, setSelectedVet] = useState('');
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedShifts, setSelectedShifts] = useState([]);
@@ -23,6 +24,26 @@ export default function AssignVetSchedules() {
       .then(response => setShifts(response.data))
       .catch(error => console.error('Error fetching shifts:', error));
   }, []);
+
+  useEffect(() => {
+    if (selectedVet && selectedDate) {
+      fetchShiftDetails();
+    }
+  }, [selectedVet, selectedDate]);
+
+  const fetchShiftDetails = () => {
+    const date = selectedDate.toISOString().split('T')[0];
+    axios.get('http://localhost:8080/shifts/details')
+      .then(response => {
+        const filteredDetails = response.data.filter(detail => 
+          detail.user.userId === parseInt(selectedVet) && detail.date === date
+        );
+        setShiftDetails(filteredDetails);
+        const assignedShiftIds = filteredDetails.map(detail => detail.shift.shiftId);
+        setSelectedShifts(assignedShiftIds);
+      })
+      .catch(error => console.error('Error fetching shift details:', error));
+  };
 
   const handleVetChange = (event) => {
     setSelectedVet(event.target.value);
@@ -42,8 +63,26 @@ export default function AssignVetSchedules() {
     });
   };
 
-  const handleSubmit = () => {
+  const handleDeleteAssignment = (shiftId) => {
+    const date = selectedDate.toISOString().split('T')[0];
+    axios.delete('http://localhost:8080/shifts/delete-vet-shift', {
+      params: {
+        shiftId: shiftId,
+        vetId: selectedVet,
+        date: date
+      }
+    })
+      .then(response => {
+        alert('Shift unassigned successfully!');
+        fetchShiftDetails();
+      })
+      .catch(error => {
+        console.error('Error unassigning shift:', error);
+        alert('Error unassigning shift. Please try again.');
+      });
+  };
 
+  const handleSubmit = () => {
     if (!selectedVet) {
       alert("Please select a vet.");
       return;
@@ -66,13 +105,10 @@ export default function AssignVetSchedules() {
       status: 'Available' 
     }));
   
-    console.log('Submitting data:', vetShiftDetails);
-  
     axios.put('http://localhost:8080/shifts/assign-vet', vetShiftDetails)
       .then(response => {
-        console.log('Response:', response);
         alert('Shifts assigned successfully!');
-        window.location.reload();
+        fetchShiftDetails();
       })
       .catch(error => {
         console.error('Error assigning shifts:', error);
@@ -82,10 +118,8 @@ export default function AssignVetSchedules() {
 
   const handleSelectAll = () => {
     if (selectedShifts.length === shifts.length) {
-      // Unselect all shifts if all are already selected
       setSelectedShifts([]);
     } else {
-      // Select all shifts if not all are selected
       const allShiftIds = shifts.map(shift => shift.shiftId);
       setSelectedShifts(allShiftIds);
     }
@@ -125,24 +159,36 @@ export default function AssignVetSchedules() {
           </div>
           <div>
             <h4>Select Shifts</h4>
-              <button className="btn btn-outline-primary mr-2" onClick={handleSelectAll}>
-                {selectedShifts.length === shifts.length ? "Unselect All" : "Select All"}
-              </button>
+            <button className="btn btn-outline-primary mr-2" onClick={handleSelectAll}>
+              {selectedShifts.length === shifts.length ? "Unselect All" : "Select All"}
+            </button>
             <div className="shift-buttons">
-              {shifts.map(shift => (
-                <div key={shift.shiftId} className="shift-button">
-                  <input 
-                    type="checkbox" 
-                    id={`shift-${shift.shiftId}`}
-                    value={shift.shiftId} 
-                    checked={selectedShifts.includes(shift.shiftId)}
-                    onChange={() => handleShiftChange(shift.shiftId)} 
-                  />
-                  <label htmlFor={`shift-${shift.shiftId}`}>
-                    {shift.from_time} - {shift.to_time}
-                  </label>
-                </div>
-              ))}
+              {shifts.map(shift => {
+                const isAssigned = shiftDetails.some(detail => detail.shift.shiftId === shift.shiftId);
+                return (
+                  <div key={shift.shiftId} className={`shift-button ${selectedShifts.includes(shift.shiftId) ? 'selected' : ''}`}>
+                    <input 
+                      type="checkbox" 
+                      id={`shift-${shift.shiftId}`}
+                      value={shift.shiftId} 
+                      checked={selectedShifts.includes(shift.shiftId)}
+                      onChange={() => handleShiftChange(shift.shiftId)} 
+                      disabled={isAssigned}
+                    />
+                    <label htmlFor={`shift-${shift.shiftId}`}>
+                      {shift.from_time} - {shift.to_time}
+                    </label>
+                    {isAssigned && (
+                      <button 
+                        className="delete-button" 
+                        onClick={() => handleDeleteAssignment(shift.shiftId)}
+                      >
+                        Delete
+                      </button>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </div>
           <button className="btn btn-outline-primary mt-3" onClick={handleSubmit}>Assign Vet</button>
