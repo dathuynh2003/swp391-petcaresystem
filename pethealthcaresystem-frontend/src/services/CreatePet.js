@@ -1,14 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
-  useRadioGroup,
-  HStack,
   NumberInput,
   NumberInputField,
   NumberInputStepper,
   NumberIncrementStepper,
   NumberDecrementStepper,
-  Avatar,
 } from '@chakra-ui/react';
 import RadioCard from '../components/Radio';
 import { LIST_BREED } from '../utils/constant';
@@ -20,9 +17,6 @@ import {
   Menu,
   MenuButton,
   MenuList,
-  MenuItem,
-  MenuGroup,
-  MenuDivider,
   MenuItemOption,
   MenuOptionGroup,
   Button,
@@ -42,7 +36,6 @@ export default function CreatePet() {
     description: '',
   });
 
-  const [message, setMessage] = useState('');
 
   const callAPI = async () => {
     try {
@@ -55,9 +48,7 @@ export default function CreatePet() {
       const response = await axios.post('http://localhost:8080/pet', request, { withCredentials: true });
       console.log(response.data);
       toast.success('Add new pet successfully!', 2000);
-      setMessage(response.data);
 
-    
       setTimeout(() => {
         navigate('/listPets');
       }, 2000);
@@ -67,7 +58,6 @@ export default function CreatePet() {
         alert(error.response.data.message); // Hiển thị thông điệp lỗi từ phía backend
       } else {
         console.error('Error calling API:', error);
-      
       }
     }
   };
@@ -106,7 +96,7 @@ export default function CreatePet() {
               placeholder="Enter Pet's name"
               required
             />
-            <label for="name">Enter Pet's name</label>
+            <label htmlFor="name">Enter Pet's name</label>
           </div>
 
           <div className="mb-3" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -154,14 +144,14 @@ export default function CreatePet() {
                 id="flexSwitchCheckDefault"
                 required
               />
-              <label className="form-check-label" for="flexSwitchCheckDefault">
+              <label className="form-check-label" htmlFor="flexSwitchCheckDefault">
                 Neutered (Spayed){' '}
               </label>
             </div>
           </div>
 
           <div className="age mb-3 ">
-            <label className="mt-2 ml-4 mb-3" for="age">
+            <label className="mt-2 ml-4 mb-3" htmlFor="age">
               Age(Month)
             </label>
             <NumberInput
@@ -192,7 +182,7 @@ export default function CreatePet() {
               id="description"
               placeholder="Enter Pet's description"
             />
-            <label for="description">Enter Pet's description</label>
+            <label htmlFor="description">Enter Pet's description</label>
           </div>
           <ToastContainer />
           <div className="text-center">
