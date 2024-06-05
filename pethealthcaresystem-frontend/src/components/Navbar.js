@@ -10,7 +10,6 @@ const Navbar = () => {
     const strSplit = firstPath.split("-").join(" ");
     return strSplit.split(" ").map((s) => s.charAt(0).toUpperCase() + s.slice(1)).join(" ")
   }
-
   return (
     <div className="navbar">
       <h1>{capitalizeText(pageName ?? "")}</h1>

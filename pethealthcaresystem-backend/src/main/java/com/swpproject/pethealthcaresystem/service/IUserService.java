@@ -15,6 +15,7 @@ public interface IUserService {
     @Transactional
     User createUserByAdmin(User newUser);
 
+    public User updateUser(String email, User newUser);
     public List<User> getAllUsersByRoleId(int roleId);
     public User deleteUser(int id);
     User updateUser(User newUser, int id);

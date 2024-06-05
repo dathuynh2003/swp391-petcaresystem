@@ -15,12 +15,14 @@ import java.util.Set;
 @Entity
 public class Booking {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private Date bookingDate;
     private Date appointmentDate;
     private String status;
     private double totalAmount;
-    private boolean type;
+    private Boolean type;
+    private String description;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
@@ -36,7 +38,5 @@ public class Booking {
     @ManyToOne
     @JoinColumn(name = "vs_id")
     private VetShiftDetail vetShiftDetail;
-
-
 
 }

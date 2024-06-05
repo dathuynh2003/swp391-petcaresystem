@@ -3,7 +3,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 export default function Sidenav() {
-
   let navigate = useNavigate();
 
   const isLoggedIn = localStorage.getItem('isLoggedIn');
@@ -15,7 +14,7 @@ export default function Sidenav() {
       const result = await axios.get(`http://localhost:8080/getuser`, { withCredentials: true });
       setUser(result.data);
     } catch (error) {
-      localStorage.removeItem('isLoggedIn')
+      localStorage.removeItem('isLoggedIn');
       console.error('Error during login:', error);
     }
   };
@@ -24,9 +23,8 @@ export default function Sidenav() {
     try {
       e.preventDefault();
       await axios.post(`http://localhost:8080/logout`, {}, { withCredentials: true });
-      localStorage.removeItem('isLoggedIn')
+      localStorage.removeItem('isLoggedIn');
       navigate('/login');
-
     } catch (error) {
       console.error('Error during logout:', error);
     }
@@ -34,7 +32,7 @@ export default function Sidenav() {
 
   useEffect(() => {
     if (isLoggedIn) {
-      getUser()
+      getUser();
     } else {
       setUser(null);
     }
@@ -91,7 +89,6 @@ export default function Sidenav() {
       links = [];
   }
 
-
   return (
     <div className="sidenav">
       <div className="sidenav-header">
@@ -99,7 +96,7 @@ export default function Sidenav() {
         <h4>Pet Health Care</h4>
       </div>
       <ul>
-        {links.map(link => (
+        {links.map((link) => (
           <li key={link.name}>
             <Link to={link.path} onClick={link.onClick}>
               <i className={link.icon}></i>
