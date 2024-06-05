@@ -34,11 +34,11 @@ public class VetShiftDetail {
 
     @ManyToOne
     @JoinColumn(name = "vet_id")
-    @JsonIgnoreProperties("vetShiftDetails")
+    @JsonIgnoreProperties("user")
     private User user;
 
     @ManyToOne
     @JoinColumn(name = "shift_id")
-    @JsonIgnoreProperties("vetShiftDetails")
+    @JsonIgnoreProperties("shift")
     private Shift shift;
 }

@@ -19,6 +19,8 @@ import Verify from './services/Verify';
 import CreateShift from './services/CreateShift';
 import Booking from './services/Booking/Booking';
 
+
+import Booking from './services/Booking/Booking';
 function App() {
 
   const location = useLocation();
@@ -48,6 +50,11 @@ function App() {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path='/verify' element={<Verify />} />
             <Route path="/shift" element={<CreateShift />} />
+
+
+            
+ 
+          
           </Routes>
         </div>
       </div>
