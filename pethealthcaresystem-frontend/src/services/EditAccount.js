@@ -125,29 +125,6 @@ const EditAccount = () => {
                                     />
                                 </div>
                             </div>
-                            <div className="row">
-                                <div className="col-sm-6 form-group">
-                                    <label>Password</label>
-                                    <input 
-                                        type="password" 
-                                        placeholder="Enter Old Password Here.." 
-                                        className="form-control" 
-                                        name="password"
-                                        onChange={onInputChange}
-                                    />
-                                </div>
-                                <div className="col-sm-6 form-group">
-                                    <label>Confirm Password</label>
-                                    <input 
-                                        type="password" 
-                                        placeholder="Repeat New Password" 
-                                        className="form-control" 
-                                        name="confirmPass"
-                                        value={confirmPass}
-                                        onChange={(e) => setConfirmPass(e.target.value)}
-                                    />
-                                </div>
-                            </div>
                             <div className="form-group">
                                 <label>Gender</label>
                                 <div className="gender-selection">
