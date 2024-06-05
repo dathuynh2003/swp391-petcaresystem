@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
+import java.util.Optional;
 
 
 @Service
@@ -127,8 +128,52 @@ public class UserService implements IUserService {
     @Override
     public List<User> getAllUsersByRoleId(int roleId) {
         if(roleId == 0){
-            return userRepository.findAll();
+            return userRepository.findByIsActiveTrue();
         }
-        return userRepository.findByRoleId(roleId);
+        return userRepository.findByRoleIdAndIsActiveTrue(roleId);
+
     }
+
+    public User deleteUser(int id) {
+        Optional<User> userOptional = userRepository.findById(id);
+        if (userOptional.isPresent()) {
+            User deletedUser = userOptional.get();
+            deletedUser.setIsActive(false);
+            return userRepository.save(deletedUser);
+        } else {
+            return null;
+        }
+    }
+
+    @Override
+    public User updateUser(User newUser, int id) {
+        User updatedUser = getUserById(id);
+        if(updatedUser != null){
+            updatedUser.setEmail(newUser.getEmail());
+            updatedUser.setPassword(newUser.getPassword());
+            updatedUser.setFullName(newUser.getFullName());
+            updatedUser.setPhoneNumber(newUser.getPhoneNumber());
+            updatedUser.setAddress(newUser.getAddress());
+            updatedUser.setGender(newUser.getGender());
+            updatedUser.setDob(newUser.getDob());
+            return userRepository.save(updatedUser);
+        }
+        return null;
+    }
+
+    @Override
+    public User getUserById(int id) {
+        Optional<User> user = userRepository.findById(id);
+        return user.orElse(null);
+    }
+
+
+//    @Override
+//    public User updateUser(User newUser, int id) {
+//        User updatedUser = userRepository.findById(id).get();
+//        if (updatedUser != null) {
+//
+//        }
+//
+//    }
 }

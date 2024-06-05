@@ -12,4 +12,7 @@ public interface IUserService {
     public boolean verifyUser(String email, String code);
     public List<User> getVets();
     public List<User> getAllUsersByRoleId(int roleId);
+    public User deleteUser(int id);
+    User updateUser(User newUser, int id);
+    User getUserById(int id);
 }

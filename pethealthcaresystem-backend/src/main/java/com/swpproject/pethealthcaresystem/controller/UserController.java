@@ -32,46 +32,80 @@ public class UserController {
             String subject = "Verify your email";
             String code = verifyCodeService.generateVerifyCode(newUser.getEmail());
             String body = "Your verification code: " + code;
-            mailService.sendMail(newUser.getEmail(),subject,body);
+            mailService.sendMail(newUser.getEmail(), subject, body);
         }
         return userService.createUser(newUser);
     }
+
     @PostMapping("/create-user-by-admin")
     public ResponseEntity<ResponseData> createUserByAdmin(@RequestBody User user) {
-       try{
-           User newUser = userService.createUserByAdmin(user);
-           ResponseData<User> responseData = new ResponseData<>();
-           responseData.setData(newUser);
-           responseData.setStatusCode(201);
-           return new ResponseEntity<>(responseData, HttpStatus.CREATED);
-       }catch(Error e) {
-           ResponseData<User> responseData = new ResponseData<>();
-           responseData.setStatusCode(401);
-           responseData.setErrorMessage(e.getMessage());
-           return new ResponseEntity<>(responseData, HttpStatus.UNAUTHORIZED);
+        try {
+            User newUser = userService.createUserByAdmin(user);
+            ResponseData<User> responseData = new ResponseData<>();
+            responseData.setData(newUser);
+            responseData.setStatusCode(201);
+            return new ResponseEntity<>(responseData, HttpStatus.CREATED);
+        } catch (Error e) {
+            ResponseData<User> responseData = new ResponseData<>();
+            responseData.setStatusCode(401);
+            responseData.setErrorMessage(e.getMessage());
+            return new ResponseEntity<>(responseData, HttpStatus.UNAUTHORIZED);
 
         }
 
     }
+    @PutMapping("/update-user-by-admin/{id}")
+    public ResponseEntity<ResponseData> updateUserByAdmin(@RequestBody User user, @PathVariable int id) {
+        User updateUser = userService.updateUser(user, id);
+        if (updateUser == null) {
+            ResponseData<User> responseData = new ResponseData<>();
+            responseData.setStatusCode(404);
+            responseData.setErrorMessage("User not found");
+        }
+        ResponseData<User> responseData = new ResponseData<>();
+        responseData.setData(updateUser);
+        responseData.setStatusCode(200);
+        return new ResponseEntity<>(responseData, HttpStatus.OK);
+    }
+    @PutMapping("/delete-user-by-admin/{id}")
+    public ResponseEntity<ResponseData<User>> deleteUserByAdmin(@PathVariable(name = "id") int id) {
+        ResponseData<User> responseData = new ResponseData<>();
+        try {
+            User deletedUser = userService.deleteUser(id);
+            if (deletedUser == null) {
+                responseData.setStatusCode(404);
+                responseData.setErrorMessage("User not found");
+                return new ResponseEntity<>(responseData, HttpStatus.NOT_FOUND);
+            }
+            responseData.setData(deletedUser);
+            responseData.setStatusCode(200);
+            return new ResponseEntity<>(responseData, HttpStatus.OK);
+        } catch (Exception e) {
+            responseData.setStatusCode(500);
+            responseData.setErrorMessage(e.getMessage());
+            return new ResponseEntity<>(responseData, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @GetMapping("/get-users-by-id")
     public ResponseEntity<ResponseData> getUsersById(@RequestParam("id") int id) {
-        try{
-            System.out.println(id);
+        try {
             List<User> users = userService.getAllUsersByRoleId(id);
             ResponseData<List<User>> responseData = new ResponseData<>();
             responseData.setData(users);
             responseData.setStatusCode(200);
             return new ResponseEntity<>(responseData, HttpStatus.OK);
-        }catch (Error e){
+        } catch (Error e) {
             ResponseData<List<User>> responseData = new ResponseData<>();
             responseData.setStatusCode(401);
             responseData.setErrorMessage(e.getMessage());
             return new ResponseEntity<>(responseData, HttpStatus.UNAUTHORIZED);
         }
     }
+
     @PostMapping("/verify/{email}/{verifyCode}")
     public String verifyCode(@PathVariable String email, @PathVariable String verifyCode) {
-        if(userService.verifyUser(email,verifyCode)) {
+        if (userService.verifyUser(email, verifyCode)) {
             return "Email verify successfully";
         }
         return "Email verify failed";
@@ -84,7 +118,7 @@ public class UserController {
         if (curUser != null) {
             session.setAttribute("user", curUser);
             response.put("isSuccess", "true");
-            response .put("user", curUser);
+            response.put("user", curUser);
         } else {
             response.put("isSuccess", "false");
         }
@@ -98,11 +132,26 @@ public class UserController {
     }
 
     @GetMapping("/getuser")
-    public  User getUser (HttpSession session){
+    public User getUser(HttpSession session) {
         User curUser = (User) session.getAttribute("user");
         return userService.getUserByEmail(curUser);
     }
 
+    @GetMapping("/get-user-by-id/{id}")
+    public ResponseEntity<ResponseData> getUserById(@PathVariable int id) {
+
+        User selectedUser = userService.getUserById(id);
+        ResponseData<User> responseData = new ResponseData<>();
+        if (selectedUser != null) {
+            responseData.setData(selectedUser);
+            responseData.setStatusCode(200);
+            return new ResponseEntity<>(responseData, HttpStatus.OK);
+        }
+        responseData.setStatusCode(404);
+        responseData.setErrorMessage("User not found");
+        return new ResponseEntity<>(responseData, HttpStatus.NOT_FOUND);
+
+    }
 
     @GetMapping("/vets")
     public List<User> getVets() {
