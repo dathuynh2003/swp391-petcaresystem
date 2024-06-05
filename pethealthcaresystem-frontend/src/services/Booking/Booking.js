@@ -3,20 +3,24 @@ import { Tab, TabList, Tabs, TabPanel, TabPanels } from '@chakra-ui/react';
 import axios from 'axios';
 import { CheckIcon } from '@chakra-ui/icons';
 export default function Booking() {
+
+    const [services, setServices] = useState([])
+    const [selectedServices, setSelectedServices] = useState([]);
+
     const [step, setStep] = useState(2);
 
     const [booking, setBooking] = useState({
-        bookingDate: '',
-        appointmentDate: '',
-        status: '',
-        description: '',
-        user_id: '',
-        pet_id: '',
-        vs_id: ''
+        type: false, //mac dinh la khong tai kham
+        description: ''
     });
 
     const [pets, setPets] = useState([]);
     const [selectedPet, setSelectedPet] = useState(null);
+
+    const loadServices = async () => {
+        const response = await axios.get('http://localhost:8080/services');
+        setServices(response.data)
+    }
 
     const loadPets = async () => {
         const response = await axios.get('http://localhost:8080/pet', { withCredentials: true });
@@ -24,11 +28,26 @@ export default function Booking() {
     };
 
     useEffect(() => {
+        loadServices();
         loadPets();
-
     }, []);
 
-    const handleOnClick = ((pet) => {
+    const chooseServices = ((serviceId) => {
+        setSelectedServices((prevSelectedServices) => {
+            if (prevSelectedServices.includes(serviceId)) {
+                return prevSelectedServices.filter((id) => id !== serviceId);
+            } else {
+                return [...prevSelectedServices, serviceId];
+            }
+        });
+        // console.log("Mảng có: " + selectedServices.length + " phần tử")
+    });
+
+    // useEffect(() => {
+    //     console.log("Mảng có: " + selectedServices.length + " phần tử");
+    // }, [selectedServices]);
+
+    const choosePet = ((pet) => {
         setSelectedPet(pet)
         setBooking({ ...booking, pet_id: pet?.petId, user_id: pet?.owner.userId })
 
@@ -40,40 +59,68 @@ export default function Booking() {
             <div className="row">
                 <Tabs className="col-8 mt-3 mx-auto shadow p-3 mb-5 bg-body rounded h-100" colorScheme="teal">
                     <TabList className="d-flex justify-content-between">
-                        <Tab>Choose Pet</Tab>
-                        <Tab isDisabled={selectedPet === null}>Reason</Tab>
-                        <Tab isDisabled={booking?.description === ''}>Time</Tab>
+                        <Tab>Services</Tab>
+                        <Tab isDisabled={selectedServices.length === 0}>Choose Pet</Tab>
+                        <Tab isDisabled={selectedPet === null || selectedServices.length === 0}>Reason</Tab>
+                        <Tab isDisabled={booking?.description === '' || selectedServices.length === 0}>Time</Tab>
                         <Tab>Payment</Tab>
                         <Tab>Get Ready</Tab>
                         <Tab>Consult</Tab>
                     </TabList>
 
                     <TabPanels maxH="500px" overflowY="auto">
+                        <TabPanel>
+                            <b className='row mx-auto'>Our Services</b>
+                            <div className='container'>
+                                {services.map((service, index) => (
+                                    <div className='row w-100 shadow m-3 rounded-3' style={{ height: '85px' }} onClick={() => chooseServices(service)}>
+                                        <div className='service-info col-7 my-auto mx-3 border h-75'>
+                                            <h5>{service.nameService}</h5>
+                                            <div className='fs-6'>
+                                                {service.description}
+                                            </div>
+                                        </div>
+                                        <div className='service-price col-2 my-auto mx-3 border h-75 text-center'>
+                                            <div className='my-3 p-1' >
+                                                {service.price.toLocaleString('vi-VN')} VND
+                                            </div>
+                                        </div>
+                                        <div className='service-choose col-1 mx-3 my-auto border rounded-circle' style={{ width: '50px', height: '50px' }}>
+                                            {selectedServices.some(selectedService => selectedService.id === service.id) ?
+                                                <CheckIcon
+                                                    className='rounded-circle border'
+                                                    style={{ backgroundColor: '#007DDE', width: '49px', height: '49px', marginLeft: '-12px', color: 'white' }}
+                                                /> : ''}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </TabPanel>
                         <TabPanel className="mx-auto">
                             Choose <b>Your Pet</b>
                             <div className='container'>
                                 {pets.map((pet, index) => (
-                                    <div className='row w-100 shadow m-3 rounded-3' style={{ height: '85px' }} onClick={() => handleOnClick(pet)} >
+                                    <div className='row w-100 shadow m-3 rounded-3' style={{ height: '85px' }} onClick={() => choosePet(pet)} >
                                         <div className='pet-avatar border my-auto mx-4 rounded-circle col-4' style={{ height: '65px', width: '65px', overflow: 'hidden', position: 'relative' }}>
                                             {/* Pet Image */}
                                             {pet.petType === 'Dog' &&
                                                 <img
                                                     className='rounded-circle'
-                                                    src="https://gcs.tripi.vn/public-tripi/tripi-feed/img/474119iJl/hinh-anh-cho-chibi_101024338.jpg" alt="DogImg"
+                                                    src="" alt="DogImg"
                                                     style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }} >
                                                 </img>
                                             }
                                             {pet.petType === 'Cat' &&
                                                 <img
                                                     className='rounded-circle'
-                                                    src="https://img.lovepik.com/original_origin_pic/18/10/29/2414824166a8f412b7d7c42da4b7d505.png_wh860.png" alt="CatImg"
+                                                    src="" alt="CatImg"
                                                     style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }} >
                                                 </img>
                                             }
                                             {pet.petType === 'Bird' &&
                                                 <img
                                                     className='rounded-circle'
-                                                    src="https://static.vecteezy.com/system/resources/previews/023/137/964/original/cute-kawaii-chicken-chibi-mascot-cartoon-style-vector.jpg" alt="BirdImg"
+                                                    src="" alt="BirdImg"
                                                     style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }} >
                                                 </img>
                                             }
