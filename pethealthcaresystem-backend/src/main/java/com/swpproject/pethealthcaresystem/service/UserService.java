@@ -2,6 +2,7 @@ package com.swpproject.pethealthcaresystem.service;
 
 import com.swpproject.pethealthcaresystem.model.User;
 import com.swpproject.pethealthcaresystem.repository.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
+import java.util.Optional;
 
 
 @Service
@@ -92,6 +94,22 @@ public class UserService implements IUserService {
     public List<User> getVets() {
         return userRepository.findByRoleId(3);
     }
+
+    @Override
+    public User updateUser(String email, User newUser) {
+        User existUser = userRepository.findByEmail(email);
+        if (existUser != null && newUser != null) {
+            existUser.setFullName(newUser.getFullName());
+//            existUser.setEmail(newUser.getEmail());
+            existUser.setPhoneNumber(newUser.getPhoneNumber());
+            existUser.setAddress(newUser.getAddress());
+            existUser.setGender(newUser.getGender());
+            existUser.setDob(newUser.getDob());
+            return userRepository.save(existUser);
+        }
+        throw new EntityNotFoundException("User not found");
+    }
+
 
 
 

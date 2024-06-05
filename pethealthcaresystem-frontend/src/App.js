@@ -17,6 +17,7 @@ import VetWorkSchedules from './services/VetWorkSchedules';
 import Dashboard from './services/Dashboard';
 import Verify from './services/Verify';
 import CreateShift from './services/CreateShift';
+import Booking from './services/Booking/Booking';
 
 
 import Booking from './services/Booking/Booking';

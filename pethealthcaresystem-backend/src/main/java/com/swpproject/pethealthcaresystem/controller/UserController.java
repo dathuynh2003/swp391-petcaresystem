@@ -103,9 +103,18 @@ public class UserController {
         return userService.getUserByEmail(curUser);
     }
 
-
     @GetMapping("/vets")
     public List<User> getVets() {
         return userService.getVets();
+    }
+
+    @PutMapping("/updateuser")
+    public User updateUser(@RequestBody User newUserProfile, HttpSession session) throws Exception {
+        User curUser = (User) session.getAttribute("user");
+        if (curUser != null) {
+            session.setAttribute("user", curUser);
+           return userService.updateUser(curUser.getEmail(), newUserProfile);
+        }
+        throw new Exception("You need login first");
     }
 }
