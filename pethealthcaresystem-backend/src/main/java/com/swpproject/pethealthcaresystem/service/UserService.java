@@ -5,7 +5,6 @@ import com.swpproject.pethealthcaresystem.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
@@ -24,10 +23,10 @@ public class UserService implements IUserService {
 
     @Transactional
     @Override
-    public String createUser(User newUser) {
+    public String createUser(User newUser){
         User user = new User();
 
-        if (userRepository.existsByEmail(newUser.getEmail())) {
+        if(userRepository.existsByEmail(newUser.getEmail())) {
             return "Email is already in use";
         }
 
@@ -55,7 +54,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public User validateLogin(User user) {
+    public User validateLogin(User user){
         User existUser = userRepository.findByEmail(user.getEmail());
         if (existUser != null && existUser.getPassword().equals(user.getPassword())) {
             existUser.setPassword("");
@@ -80,7 +79,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public User getUserByEmail(User user) {
+    public User getUserByEmail(User user){
         User existUser = userRepository.findByEmail(user.getEmail());
         if (existUser != null) {
             existUser.setPassword("");
@@ -88,13 +87,11 @@ public class UserService implements IUserService {
         }
         return null;
     }
-
+  
     @Override
     public List<User> getVets() {
         return userRepository.findByRoleId(3);
     }
-
-
 
     @Transactional
     @Override
@@ -166,14 +163,4 @@ public class UserService implements IUserService {
         Optional<User> user = userRepository.findById(id);
         return user.orElse(null);
     }
-
-
-//    @Override
-//    public User updateUser(User newUser, int id) {
-//        User updatedUser = userRepository.findById(id).get();
-//        if (updatedUser != null) {
-//
-//        }
-//
-//    }
 }

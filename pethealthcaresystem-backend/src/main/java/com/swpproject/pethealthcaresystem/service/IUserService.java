@@ -6,7 +6,6 @@ import java.util.List;
 
 public interface IUserService {
     public String createUser(User newUser);
-    public User createUserByAdmin(User newUser);
     public User getUserByEmail(User user);
     public User validateLogin(User user);
     public boolean verifyUser(String email, String code);

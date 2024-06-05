@@ -21,7 +21,7 @@ import CreateShift from './services/CreateShift';
 import CreateAccount from './services/CreateAccount';
 import ListAccount from './services/ListAccount';
 import EditAccount from './services/EditAccount';
-
+import AssignVetSchedules from './services/AssignVetSchedules';
 function App() {
 
   const location = useLocation();
@@ -54,6 +54,7 @@ function App() {
             <Route path='/create-account' element={<CreateAccount/>} />
             <Route path='/list-account' element={<ListAccount/>} />
             <Route path="/edit-account/:userId" element={<EditAccount/>} />
+            <Route path="/assign-schedules" element={<AssignVetSchedules />} />
           </Routes>
         </div>
       </div>
