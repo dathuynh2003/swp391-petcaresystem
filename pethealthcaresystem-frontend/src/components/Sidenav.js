@@ -83,13 +83,14 @@ export default function Sidenav() {
     case 4:
       links = [
         { name: 'Dashboard', path: '/dashboard', icon: 'fas fa-tachometer-alt' },
+        { name: 'User', path: '/list-account', icon: 'fa-solid fa-user' },
         { name: 'Logout', path: '', icon: 'fas fa-sign-out-alt', onClick: handleLogout },
       ];
       break;
     default:
       links = [];
   }
-    
+
 
   return (
     <div className="sidenav">

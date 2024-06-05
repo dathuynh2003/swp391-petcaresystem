@@ -49,8 +49,8 @@ const ListAccount = () => {
         >
           <option value="0">All</option>
           <option value="1">Customer</option>
-          <option value="2">Vet</option>
-          <option value="3">Staff</option>
+          <option value="2">Staff</option>
+          <option value="3">Vet</option>
         </select>
       </div>
 

@@ -1,11 +1,14 @@
 package com.swpproject.pethealthcaresystem.controller;
 
+import com.swpproject.pethealthcaresystem.common.ResponseData;
 import com.swpproject.pethealthcaresystem.model.User;
 import com.swpproject.pethealthcaresystem.service.MailService;
 import com.swpproject.pethealthcaresystem.service.UserService;
 import com.swpproject.pethealthcaresystem.service.VerifyCodeService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
