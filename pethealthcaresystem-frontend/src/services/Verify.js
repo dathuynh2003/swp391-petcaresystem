@@ -1,6 +1,8 @@
 import axios from 'axios';
 import React, { useState } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 
 export default function Verify() {
@@ -20,7 +22,10 @@ export default function Verify() {
         const result = await axios.post(`http://localhost:8080/verify/${email}/${verifyCode}`)
         setMessage("")
         if (result.data === 'Email verify successfully') {
-            navigate('/login')
+            toast.success('Register successfully')
+            setTimeout(() => {
+                navigate('/login');
+            }, 2000); // Trì hoãn 2 giây
         } else {
             setMessage("Verification code is invalid")
         }
@@ -47,6 +52,18 @@ export default function Verify() {
                     </div>
                 </form>
             </div>
+            <ToastContainer
+                position="top-right"
+                autoClose={5000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                // pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="light"
+            />
         </div>
     )
 }

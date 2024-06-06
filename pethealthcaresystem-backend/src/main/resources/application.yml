@@ -13,7 +13,7 @@ spring:
     password: dat2003z
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update
     show-sql: true
   mail:
     host: smtp.gmail.com
