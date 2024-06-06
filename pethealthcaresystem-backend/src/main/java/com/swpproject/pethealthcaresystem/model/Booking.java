@@ -5,9 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 @Data
 @NoArgsConstructor
@@ -33,10 +31,14 @@ public class Booking {
     private Pet pet;
 
     @OneToMany(mappedBy = "booking", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<BookingDetail> bookingDetails = new HashSet<>();
+    private List<BookingDetail> bookingDetails = new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(name = "vs_id")
     private VetShiftDetail vetShiftDetail;
+
+    @OneToOne(mappedBy = "booking", cascade = CascadeType.ALL)
+    private Payment payment;
+
 
 }
