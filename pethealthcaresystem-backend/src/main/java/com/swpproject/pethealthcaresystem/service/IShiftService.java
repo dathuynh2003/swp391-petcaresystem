@@ -16,4 +16,6 @@ public interface IShiftService {
     List<VetShiftDetail> getAllVetShiftsByUser(int vetId);
     boolean isShiftAssignedToVet(int shiftId, int userId, String date);
     boolean deleteVetShiftDetail(Long shiftId, Long vetId, String date);
+    List<VetShiftDetail> getAvailableVetShiftDetails();
+    List<VetShiftDetail> getShiftByDate(String date);
 }
