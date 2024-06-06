@@ -52,8 +52,26 @@ public class UserController {
             return new ResponseEntity<>(responseData, HttpStatus.UNAUTHORIZED);
 
         }
-
     }
+    @PostMapping("/register-gg")
+    public ResponseEntity<ResponseData> registerWithGG(@RequestBody User user, HttpSession session) {
+        try {
+            user.setRoleId(1);
+            User newUser = userService.createUserGoogle(user);
+            session.setAttribute("user", newUser);
+            ResponseData<User> responseData = new ResponseData<>();
+            responseData.setData(newUser);
+            responseData.setStatusCode(201);
+            return new ResponseEntity<>(responseData, HttpStatus.CREATED);
+        } catch (Error e) {
+            ResponseData<User> responseData = new ResponseData<>();
+            responseData.setStatusCode(401);
+            responseData.setErrorMessage(e.getMessage());
+            return new ResponseEntity<>(responseData, HttpStatus.UNAUTHORIZED);
+
+        }
+    }
+
     @PutMapping("/update-user-by-admin/{id}")
     public ResponseEntity<ResponseData> updateUserByAdmin(@RequestBody User user, @PathVariable int id) {
         User updateUser = userService.updateUser(user, id);
@@ -134,6 +152,8 @@ public class UserController {
     @GetMapping("/getuser")
     public User getUser(HttpSession session) {
         User curUser = (User) session.getAttribute("user");
+        System.out.println("-------------------------------");
+        System.out.println(curUser);
         return userService.getUserByEmail(curUser);
     }
 
