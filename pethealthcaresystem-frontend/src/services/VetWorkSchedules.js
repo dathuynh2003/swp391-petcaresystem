@@ -1,127 +1,104 @@
-import axios from "axios";
-import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-import './VetWorkSchedule.css';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
-export default function VetWorkSchedule() {
-  const [vets, setVets] = useState([]);
+export default function VetWorkSchedules() {
   const [shifts, setShifts] = useState([]);
-  const [selectedVet, setSelectedVet] = useState('');
-  const [selectedDate, setSelectedDate] = useState('');
-  const [selectedShifts, setSelectedShifts] = useState([]);
+  const [schedule, setSchedule] = useState([]);
+  const [dates, setDates] = useState([]);
+  const [currentWeek, setCurrentWeek] = useState(new Date());
 
   useEffect(() => {
-    // Fetch the list of vets from the server
-    axios.get('http://localhost:8080/vets')
-      .then(response => setVets(response.data))
-      .catch(error => console.error('Error fetching vets:', error));
-
-    // Fetch the list of shifts from the server
-    axios.get('http://localhost:8080/shifts/all')
-      .then(response => setShifts(response.data))
-      .catch(error => console.error('Error fetching shifts:', error));
-  }, []);
-
-  const handleVetChange = (event) => {
-    setSelectedVet(event.target.value);
-  };
-
-  const handleDateChange = (event) => {
-    setSelectedDate(event.target.value);
-  };
-
-  const handleShiftChange = (shiftId) => {
-    setSelectedShifts(prevSelectedShifts => {
-      if (prevSelectedShifts.includes(shiftId)) {
-        return prevSelectedShifts.filter(id => id !== shiftId);
-      } else {
-        return [...prevSelectedShifts, shiftId];
+    const fetchShifts = async () => {
+      try {
+        const response = await axios.get('http://localhost:8080/shifts/all');
+        setShifts(response.data);
+      } catch (error) {
+        console.error('Error fetching shifts:', error);
       }
-    });
+    };
+
+    const fetchSchedule = async () => {
+      try {
+        const response = await axios.get('http://localhost:8080/shifts/vet-shift', { withCredentials: true });
+        setSchedule(response.data);
+      } catch (error) {
+        console.error('Error fetching schedule:', error);
+      }
+    };
+
+    const getWeekDates = (date) => {
+      const firstDayOfWeek = date.getDate() - date.getDay() + 1; // Ngày đầu tiên của tuần (thứ 2)
+      const weekDates = Array.from({ length: 7 }, (_, i) => {
+        const newDate = new Date(date);
+        newDate.setDate(firstDayOfWeek + i);
+        return newDate;
+      });
+      setDates(weekDates);
+    };
+
+    fetchShifts();
+    fetchSchedule();
+    getWeekDates(currentWeek);
+  }, [currentWeek]);
+
+  const handlePreviousWeek = () => {
+    const previousWeek = new Date(currentWeek);
+    previousWeek.setDate(currentWeek.getDate() - 7);
+    setCurrentWeek(previousWeek);
   };
 
-  const handleSubmit = () => {
+  const handleNextWeek = () => {
+    const nextWeek = new Date(currentWeek);
+    nextWeek.setDate(currentWeek.getDate() + 7);
+    setCurrentWeek(nextWeek);
+  };
 
-    if (!selectedVet) {
-      alert("Please select a vet.");
-      return;
-    }
+  const formatDate = (date) => {
+    return date.toLocaleDateString('en-GB'); // Định dạng ngày thành dd/mm/yyyy
+  };
 
-    if (!selectedDate) {
-      alert("Please select a date.");
-      return;
-    }
-
-    if (selectedShifts.length === 0) {
-      alert("Please select at least one shift.");
-      return;
-    }
-
-    const vetShiftDetails = selectedShifts.map(shiftId => ({
-      vet_id: selectedVet,
-      shift_id: shiftId,
-      date: selectedDate,
-      status: 'existing' 
-    }));
-  
-    console.log('Submitting data:', vetShiftDetails);
-  
-    axios.put('http://localhost:8080/shifts/assign-vet', vetShiftDetails)
-      .then(response => {
-        console.log('Response:', response);
-        alert('Shifts assigned successfully!');
-      })
-      .catch(error => {
-        console.error('Error assigning shifts:', error);
-        alert('Error assigning shifts. Please try again.');
-      });
+  const formatDay = (date) => {
+    return date.toLocaleDateString('en-GB', { weekday: 'short' }); // Định dạng ngày thành Mon, Tue, Wed, ...
   };
 
   return (
     <div className="container">
-      <Link className="btn btn-outline-primary my-2" to={`/shift`}>
-        Create New Shift
-      </Link>
       <div className="row">
         <div className="col-md-12 border rounded p-4 mt-2 shadow">
-          <h2 className="text-center m-4">Vet Work Schedule</h2>
-          <div className="form-group">
-            <label>
-              Select Vet:
-              <select className="form-control" value={selectedVet} onChange={handleVetChange}>
-                <option value="">Select Vet</option>
-                {vets.map(vet => (
-                  <option key={vet.userId} value={vet.userId}>{vet.fullName}</option>
+          <div className="d-flex justify-content-between mb-3">
+            <button className="btn btn-primary" onClick={handlePreviousWeek}>Previous Week</button>
+            <button className="btn btn-primary" onClick={handleNextWeek}>Next Week</button>
+          </div>
+          <table className="table table-bordered">
+            <thead>
+              <tr>
+                <th>Work Shift</th>
+                {dates.map((date, index) => (
+                  <th key={index} className="text-center">{`${formatDate(date)} (${formatDay(date)})`}</th>
                 ))}
-              </select>
-            </label>
-          </div>
-          <div className="form-group">
-            <label>
-              Select Date:
-              <input type="date" className="form-control" value={selectedDate} onChange={handleDateChange} />
-            </label>
-          </div>
-          <div>
-            <h4>Select Shifts</h4>
-            <div className="shift-buttons">
-              {shifts.map(shift => (
-                <div key={shift.shiftId} className="shift-button">
-                  <input 
-                    type="checkbox" 
-                    id={`shift-${shift.shiftId}`}
-                    value={shift.shiftId} 
-                    checked={selectedShifts.includes(shift.shiftId)}
-                    onChange={() => handleShiftChange(shift.shiftId)} 
-                  />
-                  <label htmlFor={`shift-${shift.shiftId}`}>
-                    {shift.from_time} - {shift.to_time}
-                  </label>
-                </div>
+              </tr>
+            </thead>
+            <tbody>
+              {shifts.map((shift, shiftIndex) => (
+                <tr key={shiftIndex}>
+                  <td className="align-middle text-center">{`${shift.from_time} - ${shift.to_time}`}</td>
+                  {dates.map((date, dateIndex) => {
+                    const scheduledShift = schedule.find(
+                      (item) =>
+                        new Date(item.date).toLocaleDateString('en-GB') === formatDate(date) &&
+                        item.shift.shiftId === shift.shiftId
+                    );
+                    return (
+                      <td key={dateIndex} className={`align-middle text-center ${scheduledShift ? 'bg-success text-white' : ''}`}>
+                        {scheduledShift ? scheduledShift.status : ''}
+                      </td>
+                    );
+                  })}
+                </tr>
               ))}
-            </div>
-          </div>
-          <button className="btn btn-outline-primary mt-3" onClick={handleSubmit}>Assign Vet</button>
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
