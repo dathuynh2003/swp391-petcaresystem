@@ -8,9 +8,6 @@ import {
     Menu,
     MenuButton,
     MenuList,
-    MenuItem,
-    MenuGroup,
-    MenuDivider,
     MenuItemOption,MenuOptionGroup, Button
 
   } from '@chakra-ui/react'
@@ -25,7 +22,7 @@ export default function EditPet() {
            name: "", 
            gender:"",
            breed:"",
-           age:"",
+           age:1,
            petType:"",
            avatar:"",
            isNeutered:"",
