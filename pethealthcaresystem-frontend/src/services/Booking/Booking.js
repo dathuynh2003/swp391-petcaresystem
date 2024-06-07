@@ -1,22 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Tab, TabList, Tabs, TabPanel, TabPanels } from '@chakra-ui/react';
+import { Tab, TabList, Tabs, TabPanel, TabPanels, Button } from '@chakra-ui/react';
 import axios from 'axios';
 import { CheckIcon } from '@chakra-ui/icons';
 export default function Booking() {
   const [services, setServices] = useState([]);
   const [selectedServices, setSelectedServices] = useState([]);
 
-  const [selectedShift, setSelectedShift] = useState('');
-
-  const [step, setStep] = useState(2);
-
   const [booking, setBooking] = useState({
-    appointmentDate: '',
-    status: '',
     description: '',
-    user_id: '',
-    pet_id: '',
-    vs_id: 0,
     type: false,
   });
 
@@ -52,14 +43,12 @@ export default function Booking() {
         return [...prevSelectedServices, serviceId];
       }
     });
-
-    // console.log("Mảng có: " + selectedServices.length + " phần tử")
   };
 
-  useEffect(() => {
-    console.log('Mảng có: ' + selectedServices.length + ' phần tử');
-    console.log(selectedServices);
-  }, [selectedServices]);
+  // useEffect(() => {
+  //   console.log('Mảng có: ' + selectedServices.length + ' phần tử');
+  //   console.log(selectedServices);
+  // }, [selectedServices]);
 
   useEffect(() => {
     console.log(booking);
@@ -67,57 +56,12 @@ export default function Booking() {
 
   const choosePet = (pet) => {
     setSelectedPet(pet);
-    setBooking({ ...booking, pet_id: pet?.petId, user_id: pet?.owner.userId });
-
-    console.log(booking);
   };
 
-  //   const [currentDate, setCurrentDate] = useState(new Date());
-
-  //   const handleNextDay = () => {
-  //     const nextDate = new Date(currentDate);
-  //     nextDate.setDate(nextDate.getDate() + 1);
-  //     setCurrentDate(nextDate);
-  //   };
-  //   const handlePrevDay = () => {
-  //     const prevDate = new Date(currentDate);
-  //     prevDate.setDate(prevDate.getDate() - 1);
-  //     setCurrentDate(prevDate);
-  //   };
-
-  //   const filteredShifts = shifts?.filter((shift) => {
-  //     const shiftDate = new Date(shift.date);
-  //     return shiftDate.toDateString() === currentDate.toDateString();
-  //   });
-
-  //   const handleClickShift = (shift) => {
-  //     setBooking({ ...booking, vs_id: shift?.vs_id, appointmentDate: shift?.date });
-  //     console.log(booking);
-  //   };
-
-  //   const [schedule, setSchedule] = useState([]);
   const [dates, setDates] = useState([]);
   const [currentWeek, setCurrentWeek] = useState(new Date());
 
   useEffect(() => {
-    const fetchShifts = async () => {
-      try {
-        const response = await axios.get('http://localhost:8080/shifts/all');
-        setShifts(response.data);
-      } catch (error) {
-        console.error('Error fetching shifts:', error);
-      }
-    };
-
-    // const fetchSchedule = async () => {
-    //   try {
-    //     const response = await axios.get('http://localhost:8080/shifts/vet-shift', { withCredentials: true });
-    //     setSchedule(response.data);
-    //   } catch (error) {
-    //     console.error('Error fetching schedule:', error);
-    //   }
-    // };
-
     const getWeekDates = (date) => {
       const firstDayOfWeek = date.getDate() - date.getDay() + 1; // Ngày đầu tiên của tuần (thứ 2)
       const weekDates = Array.from({ length: 7 }, (_, i) => {
@@ -127,9 +71,6 @@ export default function Booking() {
       });
       setDates(weekDates);
     };
-
-    fetchShifts();
-    // fetchSchedule();
     getWeekDates(currentWeek);
   }, [currentWeek]);
 
@@ -153,25 +94,57 @@ export default function Booking() {
     return date.toLocaleDateString('en-GB', { weekday: 'short' }); // Định dạng ngày thành Mon, Tue, Wed, ...
   };
 
+  const [activeDateIndex, setActiveDateIndex] = useState(null);
   const [shifts, setShifts] = useState([]);
   const [selectedDate, setSelectedDate] = useState();
-  const handleClickDay = (date) => {
-    console.log(date.toLocaleDateString('en-CA'));
+  const handleClickDay = (date, index) => {
+    // console.log(date.toLocaleDateString('en-CA'));
     setSelectedDate(date.toLocaleDateString('en-CA'));
-    loadShiftsByDate();
+    setActiveDateIndex(index)
   };
 
+
+  const [vets, setVets] = useState([]);
   const loadShiftsByDate = async () => {
-    
     const response = await axios.get(`http://localhost:8080/shifts/shiftByDate/${selectedDate}`);
-    console.log(response.data);
-    setShifts(response.data);
-    console.log(setShifts);
+    const shifts = response.data;
+
+    const updateVets = []
+    shifts.forEach((shift) => {
+      const vetId = shift?.user?.userId
+      let vet = updateVets.find((vet) => vet?.vetId === vetId)
+
+      if (!vet) {
+        vet = {
+          vetId: vetId,
+          fullName: shift?.user?.fullName,
+          workSchedule: [],
+          // shifts: []
+        }
+        updateVets.push(vet)
+      }
+      vet.workSchedule.push(shift)
+      // vet.shifts.push(shift?.shift)
+    })
+    setVets(updateVets)
   };
 
+  useEffect(() => {
+    if (selectedDate) {
+      loadShiftsByDate();
+    }
+  }, [selectedDate])
+
+  const [activeShiftIndex, setActiveShiftIndex] = useState()
   const [selectedVetShift, setSelectedVetShift] = useState()
+  const chooseShift = (vs_id, index) => {
+    setSelectedVetShift(vs_id);
+    setActiveShiftIndex(index);
+  }
 
-
+  useEffect(() => {
+    console.log("vs_id: " + selectedVetShift)
+  }, [selectedVetShift])
 
 
   return (
@@ -318,20 +291,6 @@ export default function Booking() {
                   </div>
                 ))}
               </div>
-              {/* <ul className="list-group overflow-auto ">
-                                {pets.map((pet, index) => (
-                                    <li
-                                        className="list-group-item btn btn-primary"
-                                        key={index}
-                                        onClick={() => handleOnClick(pet)}
-                                        style={{ cursor: 'pointer' }}
-
-                                    >
-                                        <label>{pet.name}</label>
-                                        {pet.petId === selectedPet?.petId ? <CheckIcon /> : ''}
-                                    </li>
-                                ))}
-                            </ul> */}
             </TabPanel>
 
             <TabPanel>
@@ -347,46 +306,6 @@ export default function Booking() {
                 <label htmlFor="floatingTextarea2">Eg: My pet hasn't been eating the last few days</label>
               </div>
             </TabPanel>
-            {/* 
-            <TabPanel>
-              <button className="btn btn-primary mx-2 " onClick={handlePrevDay}>
-                Previous Day
-              </button>
-              <button className="btn btn-primary mx-2 " onClick={handleNextDay}>
-                Next Day
-              </button>
-
-              <h4>{currentDate.toDateString()}</h4>
-              <table className="table py-4">
-                <thead>
-                  <tr>
-                    <th scope="col">No</th>
-                    <th scope="col">Date</th>
-                    <th scope="col">From</th>
-                    <th scope="col">To</th>
-                    <th scope="col">Vet</th>
-                  </tr>
-                </thead>
-                <tbody className="table-group-divider">
-                  {filteredShifts.map((shift, index) => (
-                    <tr
-                      key={index}
-                      className="shadow-sm p-3 mb-5 bg-body rounded bg-primary"
-                      onClick={() => handleClickShift(shift)}
-                    >
-                      <th scope="row" className="col-1">
-                        {index + 1}
-                      </th>
-                      <td className="col-1">{shift.date}</td>
-                      <td className="col-1">{shift.shift?.from_time}</td>
-                      <td className="col-1">{shift.shift?.to_time}</td>
-                      <td className="col-1">{shift.user?.fullName}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </TabPanel>
- */}
 
             <TabPanel>
               <div className="container">
@@ -400,31 +319,31 @@ export default function Booking() {
                         Next Week
                       </button>
                     </div>
-                    <table className="table ">
-                      <thead>
-                        <tr>
-                          {dates.map((date, index) => (
-                            <th
-                              key={index}
-                              className="text-center shadow"
-                              onClick={() => handleClickDay(date)}
-                            >{`${formatDate(date)} (${formatDay(date)})`}</th>
-                          ))}
-                        </tr>
-                      </thead>
-                      <tbody>
-
-                      {shifts?.map((shift, key) => (
-                          <tr key={key}>
-                            <td>{shift?.user?.fullName}</td>
-                            <td onClick={() => setSelectedVetShift(shift?.vs_id) }>
-                                {shift?.shift?.from_time} - {shift?.shift?.to_time}
-                            </td>
-                          </tr>
-                            
-                        ))}
-                      </tbody>
-                    </table>
+                    <div className='choose-date row'>
+                      {dates.map((date, index) => (
+                        <Button
+                          key={index}
+                          className={`mx-auto btn btn-outline-primary ${activeDateIndex === index ? 'active' : ''}`}
+                          style={{ width: '12%' }}
+                          onClick={() => handleClickDay(date, index)}
+                        >{`${formatDate(date)}`} <br /> {`(${formatDay(date)})`}</Button>
+                      ))}
+                    </div>
+                    <div className='choose-vetshift'>
+                      {vets.map((vet, index) => (
+                        <div className=''>
+                          <h1 className='fs-3'>{vet?.fullName}</h1>
+                          <div className='row'>
+                            {vet?.workSchedule?.map((workSchedule, workScheduleIndex) => (
+                              <Button
+                                className={`col-2 mx-4 my-2 btn btn-outline-primary ${activeShiftIndex === vet?.vetId + '-' + workScheduleIndex ? 'active' : ''}`}
+                                onClick={() => chooseShift(workSchedule?.vs_id, vet?.vetId + '-' + workScheduleIndex)}
+                              >{workSchedule?.shift?.from_time} - {workSchedule?.shift?.to_time}</Button>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -438,6 +357,6 @@ export default function Booking() {
           </TabPanels>
         </Tabs>
       </div>
-    </div>
+    </div >
   );
 }
