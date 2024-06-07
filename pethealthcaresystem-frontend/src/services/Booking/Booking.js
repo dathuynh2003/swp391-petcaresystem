@@ -146,7 +146,7 @@ export default function Booking() {
   };
 
   const formatDate = (date) => {
-    return date.toLocaleDateString('en-GB'); // Định dạng ngày thành dd/mm/yyyy
+    return date.toLocaleDateString("en", { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }); // Định dạng ngày thành dd/mm/yyyy
   };
 
   const formatDay = (date) => {
@@ -402,13 +402,19 @@ export default function Booking() {
                     </div>
                     <table className="table ">
                       <thead>
-                        <tr>
+                        <tr className='container'>
                           {dates.map((date, index) => (
-                            <th
-                              key={index}
-                              className="text-center shadow"
-                              onClick={() => handleClickDay(date)}
-                            >{`${formatDate(date)} (${formatDay(date)})`}</th>
+
+                            <div className='btn btn-outline-primary col' onClick={() => handleClickDay(date)}>
+                                {`${formatDate(date)}`}
+                            </div>
+
+
+                            // <th
+                            //   key={index}
+                            //   className="text-center shadow"
+                            //   onClick={() => handleClickDay(date)}
+                            // >{`${formatDate(date)} (${formatDay(date)})`}</th>
                           ))}
                         </tr>
                       </thead>
