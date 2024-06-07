@@ -13,6 +13,7 @@ public class BookingDetail {
 
     @ManyToOne
     @JoinColumn(name = "booking_id")
+    @JsonIgnoreProperties("bookingDetails")
     private Booking booking;
 
     @ManyToOne

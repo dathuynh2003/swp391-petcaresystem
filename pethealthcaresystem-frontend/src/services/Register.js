@@ -63,12 +63,12 @@ export default function Register() {
                             <h2 className="form-title mb-3 text-center">Create account</h2>
 
                             <div className="form-group text-center mb-3 border w-75 mx-auto">
-                                <input type="text" required className="form-input w-75" placeholder="Your Full Name" name='fullName' value={fullName} onChange={(e) => onInputChange(e)} />
+                                <input type="text" required className="form-input w-100" placeholder="Your Full Name" name='fullName' value={fullName} onChange={(e) => onInputChange(e)} />
                             </div>
 
                             <label for="dob" style={{ fontSize: '10px', marginLeft: '13%' }}>Date of Bird</label>
                             <div className="form-group text-center mb-3 border border w-75 mx-auto">
-                                <input type="date" required className="form-input w-75" name='dob' value={dob} onChange={(e) => onInputChange(e)} />
+                                <input type="date" required className="form-input w-100" name='dob' value={dob} onChange={(e) => onInputChange(e)} />
                             </div>
 
                             <label for="gender" style={{ fontSize: '10px', marginLeft: '13%' }}>Gender</label>
@@ -84,20 +84,20 @@ export default function Register() {
                             </div>
 
                             <div className="form-group text-center mb-3 border w-75 mx-auto">
-                                <input type="address" required className="form-input w-75" placeholder="Your Address" name='address' value={address} onChange={(e) => onInputChange(e)} />
+                                <input type="address" required className="form-input w-100" placeholder="Your Address" name='address' value={address} onChange={(e) => onInputChange(e)} />
                             </div>
                             <div className="form-group text-center mb-3 border w-75 mx-auto">
-                                <input type="phoneNumber" required className="form-input w-75" placeholder="Your Phone Number" name='phoneNumber' value={phoneNumber} onChange={(e) => onInputChange(e)} />
+                                <input type="phoneNumber" required className="form-input w-100" placeholder="Your Phone Number" name='phoneNumber' value={phoneNumber} onChange={(e) => onInputChange(e)} />
                             </div>
                             <div className="form-group text-center mb-3 border w-75 mx-auto">
-                                <input type="email" required className="form-input w-75" placeholder="Your Email" name='email' value={email} onChange={(e) => onInputChange(e)} />
+                                <input type="email" required className="form-input w-100" placeholder="Your Email" name='email' value={email} onChange={(e) => onInputChange(e)} />
                                 <h6 style={{ color: 'red', textAlign: 'center' }}>{messageEmail}</h6>
                             </div>
                             <div className="form-group text-center mb-3 border w-75 mx-auto">
-                                <input type="password" required className="form-input w-75" placeholder="Password" name='password' value={password} onChange={(e) => onInputChange(e)} />
+                                <input type="password" required className="form-input w-100" placeholder="Password" name='password' value={password} onChange={(e) => onInputChange(e)} />
                             </div>
                             <div className="form-group text-center mb-3 border w-75 mx-auto">
-                                <input type="password" required className="form-input w-75" placeholder="Repeat your password" name='confirm_pass' value={confirm_pass} onChange={(e) => setConfirmPass(e.target.value)} />
+                                <input type="password" required className="form-input w-100" placeholder="Repeat your password" name='confirm_pass' value={confirm_pass} onChange={(e) => setConfirmPass(e.target.value)} />
                             </div>
                             <h6 style={{ color: 'red', textAlign: 'center' }}>{messagePass}</h6>
                             <div className="form-group text-center">
