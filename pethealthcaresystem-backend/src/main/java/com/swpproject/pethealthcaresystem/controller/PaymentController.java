@@ -18,22 +18,16 @@ public class PaymentController {
 
     @Autowired
     PaymentService paymentService;
-//    @GetMapping("/api/payment")
-//    public void test(){
-//        System.out.println("hihi");
-//    }
     @PostMapping("/api/payment")
     public void createPayment(@RequestBody Payment payment) {
-        System.out.println("hihi");
         CreatePaymentPosPayload payload = paymentService.createPaymentOs(payment);
 
-        System.out.println(payload);
 
         final String uri = "https://api-merchant.payos.vn/v2/payment-requests";
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
-        headers.set("x-client-id", paymentService.clientId);
-        headers.set("x-api-key", paymentService.apiKey);
+        headers.set("x-client-id", PaymentService.clientId);
+        headers.set("x-api-key", PaymentService.apiKey);
 
         HttpEntity<CreatePaymentPosPayload> httpEntity = new HttpEntity<>(payload, headers);
 

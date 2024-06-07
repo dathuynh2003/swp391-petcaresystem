@@ -25,9 +25,9 @@ public class PaymentService implements IPaymentService {
         return paymentRepository.save(payment);
     }
 
-  public String checksumKey = "03e871a48be196cfc46e79c416c3453a6187a04e4c9ab18e69636a0c864e761a";
-    public String clientId = "f4637ee4-2474-4a0b-8f55-feae7c6f2420";
-    public String apiKey = "1b4957b4-8989-46fd-8154-e37cd0ea0783";
+    public static final String checksumKey = "03e871a48be196cfc46e79c416c3453a6187a04e4c9ab18e69636a0c864e761a";
+    public static final String clientId = "f4637ee4-2474-4a0b-8f55-feae7c6f2420";
+    public static final String apiKey = "1b4957b4-8989-46fd-8154-e37cd0ea0783";
 
     private String createSignaturePayOs(String transaction) throws JSONException {
 
