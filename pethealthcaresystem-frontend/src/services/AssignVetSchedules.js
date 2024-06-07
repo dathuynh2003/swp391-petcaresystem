@@ -120,9 +120,22 @@ export default function AssignVetSchedules() {
     if (selectedShifts.length === shifts.length) {
       setSelectedShifts([]);
     } else {
-      const allShiftIds = shifts.map(shift => shift.shiftId);
+      const allShiftIds = shifts
+        .map(shift => shift.shiftId)
+        .filter(shiftId => !shiftDetails.some(detail => detail.shift.shiftId === shiftId) && !isShiftInThePast(shiftId));
       setSelectedShifts(allShiftIds);
     }
+  };
+
+  const isShiftInThePast = (shift) => {
+    const now = new Date();
+    if (selectedDate.toDateString() !== now.toDateString()) {
+      return false;
+    }
+    const [shiftStartHour, shiftStartMinute] = shift.from_time.split(':').map(Number);
+    const shiftStartTime = new Date(selectedDate);
+    shiftStartTime.setHours(shiftStartHour, shiftStartMinute, 0, 0);
+    return now > shiftStartTime;
   };
 
   return (
@@ -160,11 +173,12 @@ export default function AssignVetSchedules() {
           <div>
             <h4>Select Shifts</h4>
             <button className="btn btn-outline-primary mr-2" onClick={handleSelectAll}>
-              {selectedShifts.length === shifts.length ? "Unselect All" : "Select All"}
+              {selectedShifts.length === shifts.length - shiftDetails.length ? "Unselect All" : "Select All"}
             </button>
             <div className="shift-buttons">
               {shifts.map(shift => {
                 const isAssigned = shiftDetails.some(detail => detail.shift.shiftId === shift.shiftId);
+                const isPast = isShiftInThePast(shift);
                 return (
                   <div key={shift.shiftId} className={`shift-button ${selectedShifts.includes(shift.shiftId) ? 'selected' : ''}`}>
                     <input 
@@ -173,7 +187,7 @@ export default function AssignVetSchedules() {
                       value={shift.shiftId} 
                       checked={selectedShifts.includes(shift.shiftId)}
                       onChange={() => handleShiftChange(shift.shiftId)} 
-                      disabled={isAssigned}
+                      disabled={isAssigned || isPast}
                     />
                     <label htmlFor={`shift-${shift.shiftId}`}>
                       {shift.from_time} - {shift.to_time}
