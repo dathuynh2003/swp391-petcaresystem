@@ -39,6 +39,7 @@ export default function ListPets() {
         </thead>
         <tbody className="table-group-divider">
           {
+      
             pets.map((pet, index) => (
               <tr key={index}>
                 <th scope="row">{index + 1}</th>

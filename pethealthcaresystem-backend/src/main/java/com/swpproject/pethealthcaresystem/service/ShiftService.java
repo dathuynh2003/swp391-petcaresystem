@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -72,5 +74,33 @@ public class ShiftService implements IShiftService {
             return true;
         }
         return false;
+    }
+
+    @Override
+
+    public List<VetShiftDetail> getAvailableVetShiftDetails() {
+        LocalTime currentPlusSixHours = LocalTime.now().plusHours(6);
+        return vetShiftDetailRepository.findAll().stream()
+                .filter(v -> {
+                    // Lấy shift từ VetShiftDetail
+                    Shift shift = v.getShift();
+                    // Kiểm tra nếu shift không phải null và from_time không rỗng
+                    if (shift != null && shift.getFrom_time() != null) {
+                        // Chuyển đổi from_time từ chuỗi sang LocalTime
+                        LocalTime fromTime = LocalTime.parse(shift.getFrom_time());
+                        // Kiểm tra nếu from_time lớn hơn thời gian hiện tại cộng thêm 6 giờ
+                        return fromTime.isAfter(currentPlusSixHours);
+                    }
+                    return false; // Trong trường hợp shift là null hoặc from_time là null
+                })
+                .collect(Collectors.toList());
+
+    }
+
+    @Override
+    public List<VetShiftDetail> getShiftByDate(String date) {
+        return vetShiftDetailRepository.findAll().stream().filter(shift -> shift.getDate().equals(date))
+                .collect(Collectors.toList());
+
     }
 }

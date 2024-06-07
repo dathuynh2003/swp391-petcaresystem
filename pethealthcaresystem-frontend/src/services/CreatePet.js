@@ -13,14 +13,7 @@ import axios from 'axios';
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer, toast } from 'react-toastify';
 
-import {
-  Menu,
-  MenuButton,
-  MenuList,
-  MenuItemOption,
-  MenuOptionGroup,
-  Button,
-} from '@chakra-ui/react';
+import { Menu, MenuButton, MenuList, MenuItemOption, MenuOptionGroup, Button } from '@chakra-ui/react';
 
 export default function CreatePet() {
   let navigate = useNavigate();
@@ -35,7 +28,6 @@ export default function CreatePet() {
     isNeutered: '',
     description: '',
   });
-
 
   const callAPI = async () => {
     try {
