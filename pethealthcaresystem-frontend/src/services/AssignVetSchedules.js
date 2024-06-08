@@ -15,12 +15,12 @@ export default function AssignVetSchedules() {
 
   useEffect(() => {
     // Fetch the list of vets from the server
-    axios.get('http://localhost:8080/vets')
+    axios.get('http://localhost:8080/vets', { withCredentials: true })
       .then(response => setVets(response.data))
       .catch(error => console.error('Error fetching vets:', error));
 
     // Fetch the list of shifts from the server
-    axios.get('http://localhost:8080/shifts/all')
+    axios.get('http://localhost:8080/shifts/all', { withCredentials: true })
       .then(response => setShifts(response.data))
       .catch(error => console.error('Error fetching shifts:', error));
   }, []);
@@ -33,7 +33,7 @@ export default function AssignVetSchedules() {
 
   const fetchShiftDetails = () => {
     const date = selectedDate.toISOString().split('T')[0];
-    axios.get('http://localhost:8080/shifts/details')
+    axios.get('http://localhost:8080/shifts/details', { withCredentials: true })
       .then(response => {
         const filteredDetails = response.data.filter(detail => 
           detail.user.userId === parseInt(selectedVet) && detail.date === date
@@ -65,7 +65,7 @@ export default function AssignVetSchedules() {
 
   const handleDeleteAssignment = (shiftId) => {
     const date = selectedDate.toISOString().split('T')[0];
-    axios.delete('http://localhost:8080/shifts/delete-vet-shift', {
+    axios.delete('http://localhost:8080/shifts/delete-vet-shift', { withCredentials: true }, {
       params: {
         shiftId: shiftId,
         vetId: selectedVet,
@@ -105,7 +105,7 @@ export default function AssignVetSchedules() {
       status: 'Available' 
     }));
   
-    axios.put('http://localhost:8080/shifts/assign-vet', vetShiftDetails)
+    axios.put('http://localhost:8080/shifts/assign-vet', vetShiftDetails, { withCredentials: true })
       .then(response => {
         alert('Shifts assigned successfully!');
         fetchShiftDetails();

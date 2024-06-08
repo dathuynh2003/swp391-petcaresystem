@@ -1,3 +1,4 @@
+//ShiftController.java
 package com.swpproject.pethealthcaresystem.controller;
 
 import com.swpproject.pethealthcaresystem.model.Shift;
@@ -10,7 +11,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -22,28 +22,51 @@ public class ShiftController {
     private IShiftService shiftService;
 
     @GetMapping("/all")
-    public List<Shift> getAllShifts() {
-        return shiftService.getAllShifts();
+    public ResponseEntity<?> getAllShifts(HttpSession session) {
+        User curUser = (User) session.getAttribute("user");
+        if (curUser == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Please login first!");
+        }
+        List<Shift> shifts = shiftService.getAllShifts();
+        return ResponseEntity.ok(shifts);
     }
 
     @PostMapping("/add")
-    public Shift addShift(@RequestBody Shift shift) {
-        return shiftService.createShift(shift);
+    public ResponseEntity<?> addShift(@RequestBody Shift shift, HttpSession session) {
+        User curUser = (User) session.getAttribute("user");
+        if (curUser == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Please login first!");
+        }
+        Shift createdShift = shiftService.createShift(shift);
+        return ResponseEntity.ok(createdShift);
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Void> deleteShift(@PathVariable(value = "id") int shiftId) {
+    public ResponseEntity<?> deleteShift(@PathVariable(value = "id") int shiftId, HttpSession session) {
+        User curUser = (User) session.getAttribute("user");
+        if (curUser == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Please login first!");
+        }
         shiftService.deleteShift(shiftId);
         return ResponseEntity.ok().build();
     }
 
     @GetMapping("/details")
-    public List<VetShiftDetail> getAllShiftDetails() {
-        return shiftService.getAllShiftDetails();
+    public ResponseEntity<?> getAllShiftDetails(HttpSession session) {
+        User curUser = (User) session.getAttribute("user");
+        if (curUser == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Please login first!");
+        }
+        List<VetShiftDetail> shiftDetails = shiftService.getAllShiftDetails();
+        return ResponseEntity.ok(shiftDetails);
     }
 
     @PutMapping("/assign-vet")
-    public ResponseEntity<String> assignVetToShifts(@RequestBody List<VetShiftDetail> vetShiftDetails) {
+    public ResponseEntity<?> assignVetToShifts(@RequestBody List<VetShiftDetail> vetShiftDetails, HttpSession session) {
+        User curUser = (User) session.getAttribute("user");
+        if (curUser == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Please login first!");
+        }
         for (VetShiftDetail vetShiftDetail : vetShiftDetails) {
             if (shiftService.isShiftAssignedToVet(vetShiftDetail.getShift().getShiftId(), vetShiftDetail.getUser().getUserId(), vetShiftDetail.getDate().toString())) {
                 return ResponseEntity.badRequest().body("Shift is already assigned to the vet on the selected date.");
@@ -54,16 +77,25 @@ public class ShiftController {
     }
 
     @GetMapping("/vet-shift")
-    public List<VetShiftDetail> getAllVetShiftsByUser(HttpSession session){
+    public ResponseEntity<?> getAllVetShiftsByUser(HttpSession session) {
         User curUser = (User) session.getAttribute("user");
-        return shiftService.getAllVetShiftsByUser(curUser.getUserId());
+        if (curUser == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Please login first!");
+        }
+        List<VetShiftDetail> vetShifts = shiftService.getAllVetShiftsByUser(curUser.getUserId());
+        return ResponseEntity.ok(vetShifts);
     }
 
     @DeleteMapping("/delete-vet-shift")
     public ResponseEntity<?> deleteVetShiftDetail(
             @RequestParam Long shiftId,
             @RequestParam Long vetId,
-            @RequestParam String date) {
+            @RequestParam String date,
+            HttpSession session) {
+        User curUser = (User) session.getAttribute("user");
+        if (curUser == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Please login first!");
+        }
         try {
             boolean deleted = shiftService.deleteVetShiftDetail(shiftId, vetId, date);
             if (deleted) {
