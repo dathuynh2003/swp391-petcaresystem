@@ -53,10 +53,7 @@ public class PaymentService implements IPaymentService {
             CreatePaymentPosPayload payload = new CreatePaymentPosPayload();
 
             payload.setOrderCode(orderCode);
-            System.out.println(payment);
-            System.out.println(payment.getBooking().getTotalAmount());
             payload.setAmount((int) payment.getBooking().getTotalAmount());
-            System.out.println("-----");
             payload.setBuyerEmail(payment.getUser().getEmail());
             payload.setDescription("Paymentorder" + orderCode);
             payload.setBuyerPhone(payment.getUser().getPhoneNumber());
@@ -90,7 +87,6 @@ public class PaymentService implements IPaymentService {
                     "&orderCode="+ payload.getOrderCode() +
                     "&returnUrl=" + payload.getReturnUrl();
             String signature = this.createSignaturePayOs(transaction);
-            System.out.println(signature);
             payload.setSignature(signature);
 
             return payload;
