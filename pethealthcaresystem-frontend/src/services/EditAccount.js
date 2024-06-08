@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
+import 'bootstrap/dist/css/bootstrap.min.css'; // Import Bootstrap CSS
 
 const EditAccount = () => {
     let navigate = useNavigate();
@@ -15,19 +16,19 @@ const EditAccount = () => {
         avatar: "",
         gender: "",
         dob: "",
-        roleId: 3
+        roleId: 3,
+        isActive: false
     });
 
     const [messageEmail, setMessageEmail] = useState('');
     const [messagePass, setMessagePass] = useState('');
     const [confirmPass, setConfirmPass] = useState('');
 
-    const { fullName, phoneNumber, address, gender, dob, email, password } = user;
-
     useEffect(() => {
         const fetchUserData = async () => {
             try {
                 const result = await axios.get(`http://localhost:8080/get-user-by-id/${userId}`);
+                console.log('Fetched user data:', result.data?.data); // Log fetched user data
                 setUser(result.data?.data); // Accessing the nested data property
             } catch (error) {
                 console.error('Error fetching user data', error);
@@ -38,7 +39,13 @@ const EditAccount = () => {
     }, [userId]);
 
     const onInputChange = (e) => {
-        setUser({ ...user, [e.target.name]: e.target.value });
+        const { name, value, type, checked } = e.target;
+        const newValue = type === 'checkbox' ? checked : value;
+        console.log(`Input change - ${name}:`, newValue); // Log input changes
+        setUser({
+            ...user,
+            [name]: newValue
+        });
     };
 
     const handleUpdate = async (e) => {
@@ -46,16 +53,20 @@ const EditAccount = () => {
         setMessageEmail("");
         setMessagePass("");
 
-        if (password && password !== confirmPass) {
-            setMessagePass("Confirm password does not match");
-            return;
-        }
+        console.log('Updating user with data:', {
+            roleId: user.roleId,
+            isActive: user.isActive
+        }); // Log data being sent to the backend
 
         try {
-            await axios.put(`http://localhost:8080/update-user-by-admin/${userId}`, user);
+            await axios.put(`http://localhost:8080/update-user-by-admin/${userId}`, {
+                roleId: user.roleId,
+                isActive: user.isActive
+            });
             alert("User updated successfully");
             navigate('/list-account'); // Navigate to the desired route after success
         } catch (error) {
+            console.error('Error updating user:', error);
             alert(error?.response?.data?.errorMessage ?? error?.message);
         }
     };
@@ -67,89 +78,6 @@ const EditAccount = () => {
                 <div className="row">
                     <form onSubmit={handleUpdate}>
                         <div className="col-sm-12">
-                            <div className="row">
-                                <div className="col-sm-6 form-group">
-                                    <label>Full Name</label>
-                                    <input 
-                                        type="text" 
-                                        placeholder="Enter Full Name Here.." 
-                                        className="form-control" 
-                                        name="fullName"
-                                        value={fullName}
-                                        onChange={onInputChange}
-                                    />
-                                </div>
-                                <div className="col-sm-6 form-group">
-                                    <label>Email</label>
-                                    <input 
-                                        type="email" 
-                                        placeholder="Enter Email Here.." 
-                                        className="form-control" 
-                                        name="email"
-                                        value={email}
-                                        onChange={onInputChange}
-                                    />
-                                </div>
-                            </div>					
-                            <div className="form-group">
-                                <label>Address</label>
-                                <textarea 
-                                    placeholder="Enter Address Here.." 
-                                    rows="3" 
-                                    className="form-control" 
-                                    name="address"
-                                    value={address}
-                                    onChange={onInputChange}
-                                ></textarea>
-                            </div>
-                            <div className="row">
-                                <div className="col-sm-6 form-group">
-                                    <label>Phone Number</label>
-                                    <input 
-                                        type="text" 
-                                        placeholder="Enter Phone Number Here.." 
-                                        className="form-control" 
-                                        name="phoneNumber"
-                                        value={phoneNumber}
-                                        onChange={onInputChange}
-                                    />
-                                </div>		
-                                <div className="col-sm-6 form-group">
-                                    <label>Date of Birth</label>
-                                    <input 
-                                        type="date" 
-                                        className="form-control" 
-                                        name="dob"
-                                        value={dob}
-                                        onChange={onInputChange}
-                                    />
-                                </div>
-                            </div>
-                            <div className="form-group">
-                                <label>Gender</label>
-                                <div className="gender-selection">
-                                    <label className="gender-option">
-                                        <input 
-                                            type="radio" 
-                                            name="gender" 
-                                            value="Male" 
-                                            checked={gender === "Male"}
-                                            onChange={onInputChange} 
-                                        />
-                                        Male
-                                    </label>
-                                    <label className="gender-option">
-                                        <input 
-                                            type="radio" 
-                                            name="gender" 
-                                            value="Female" 
-                                            checked={gender === "Female"}
-                                            onChange={onInputChange} 
-                                        />
-                                        Female
-                                    </label>
-                                </div>
-                            </div>
                             <div className="form-group">
                                 <label>Role</label>
                                 <select 
@@ -163,12 +91,19 @@ const EditAccount = () => {
                                     <option value="3">Staff</option>
                                 </select>
                             </div>
-                            <div className="text-center">
-                                <button type="submit" className="btn btn-lg btn-info">Update</button>
+                            <div className="form-group form-switch">
+                                <input 
+                                    className="form-check-input" 
+                                    type="checkbox" 
+                                    name="isActive" 
+                                    id="isActiveSwitch" 
+                                    checked={user.isActive} 
+                                    onChange={onInputChange}
+                                />
+                                <label className="form-check-label" htmlFor="isActiveSwitch">Active Status</label>
                             </div>
                             <div className="text-center">
-                                <h6 style={{ color: 'red' }}>{messagePass}</h6>
-                                <h6 style={{ color: 'red' }}>{messageEmail}</h6>
+                                <button type="submit" className="btn btn-lg btn-info">Update</button>
                             </div>
                         </div>
                     </form> 
