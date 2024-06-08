@@ -162,13 +162,15 @@ public class UserService implements IUserService {
     public User updateUser(User newUser, int id) {
         User updatedUser = getUserById(id);
         if(updatedUser != null){
-            updatedUser.setEmail(newUser.getEmail());
-            updatedUser.setPassword(newUser.getPassword());
-            updatedUser.setFullName(newUser.getFullName());
-            updatedUser.setPhoneNumber(newUser.getPhoneNumber());
-            updatedUser.setAddress(newUser.getAddress());
-            updatedUser.setGender(newUser.getGender());
-            updatedUser.setDob(newUser.getDob());
+//            updatedUser.setEmail(newUser.getEmail());
+//            updatedUser.setPassword(newUser.getPassword());
+//            updatedUser.setFullName(newUser.getFullName());
+//            updatedUser.setPhoneNumber(newUser.getPhoneNumber());
+//            updatedUser.setAddress(newUser.getAddress());
+//            updatedUser.setGender(newUser.getGender());
+//            updatedUser.setDob(newUser.getDob());
+            updatedUser.setRoleId(newUser.getRoleId());
+            updatedUser.setIsActive(newUser.getIsActive());
             return userRepository.save(updatedUser);
         }
         return null;
