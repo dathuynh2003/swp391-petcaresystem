@@ -1,5 +1,6 @@
 package com.swpproject.pethealthcaresystem.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -17,12 +18,14 @@ import java.util.Set;
 @Entity
 public class Cage {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     int id;
     Boolean status;
     String description;
 
     @ManyToOne
     @JoinColumn(name = "staff_id")
+    @JsonIgnoreProperties("cages")
     User user;
 
     @OneToMany(mappedBy = "cage", cascade = CascadeType.ALL, orphanRemoval = true)
