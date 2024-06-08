@@ -15,12 +15,12 @@ export default function AssignVetSchedules() {
 
   useEffect(() => {
     // Fetch the list of vets from the server
-    axios.get('http://localhost:8080/vets')
+    axios.get('http://localhost:8080/vets', { withCredentials: true })
       .then(response => setVets(response.data))
       .catch(error => console.error('Error fetching vets:', error));
 
     // Fetch the list of shifts from the server
-    axios.get('http://localhost:8080/shifts/all')
+    axios.get('http://localhost:8080/shifts/all', { withCredentials: true })
       .then(response => setShifts(response.data))
       .catch(error => console.error('Error fetching shifts:', error));
   }, []);
@@ -33,7 +33,7 @@ export default function AssignVetSchedules() {
 
   const fetchShiftDetails = () => {
     const date = selectedDate.toISOString().split('T')[0];
-    axios.get('http://localhost:8080/shifts/details')
+    axios.get('http://localhost:8080/shifts/details', { withCredentials: true })
       .then(response => {
         const filteredDetails = response.data.filter(detail => 
           detail.user.userId === parseInt(selectedVet) && detail.date === date
@@ -65,7 +65,7 @@ export default function AssignVetSchedules() {
 
   const handleDeleteAssignment = (shiftId) => {
     const date = selectedDate.toISOString().split('T')[0];
-    axios.delete('http://localhost:8080/shifts/delete-vet-shift', {
+    axios.delete('http://localhost:8080/shifts/delete-vet-shift', { withCredentials: true }, {
       params: {
         shiftId: shiftId,
         vetId: selectedVet,
@@ -105,7 +105,7 @@ export default function AssignVetSchedules() {
       status: 'Available' 
     }));
   
-    axios.put('http://localhost:8080/shifts/assign-vet', vetShiftDetails)
+    axios.put('http://localhost:8080/shifts/assign-vet', vetShiftDetails, { withCredentials: true })
       .then(response => {
         alert('Shifts assigned successfully!');
         fetchShiftDetails();
@@ -120,9 +120,22 @@ export default function AssignVetSchedules() {
     if (selectedShifts.length === shifts.length) {
       setSelectedShifts([]);
     } else {
-      const allShiftIds = shifts.map(shift => shift.shiftId);
+      const allShiftIds = shifts
+        .map(shift => shift.shiftId)
+        .filter(shiftId => !shiftDetails.some(detail => detail.shift.shiftId === shiftId) && !isShiftInThePast(shiftId));
       setSelectedShifts(allShiftIds);
     }
+  };
+
+  const isShiftInThePast = (shift) => {
+    const now = new Date();
+    if (selectedDate.toDateString() !== now.toDateString()) {
+      return false;
+    }
+    const [shiftStartHour, shiftStartMinute] = shift.from_time.split(':').map(Number);
+    const shiftStartTime = new Date(selectedDate);
+    shiftStartTime.setHours(shiftStartHour, shiftStartMinute, 0, 0);
+    return now > shiftStartTime;
   };
 
   return (
@@ -160,11 +173,12 @@ export default function AssignVetSchedules() {
           <div>
             <h4>Select Shifts</h4>
             <button className="btn btn-outline-primary mr-2" onClick={handleSelectAll}>
-              {selectedShifts.length === shifts.length ? "Unselect All" : "Select All"}
+              {selectedShifts.length === shifts.length - shiftDetails.length ? "Unselect All" : "Select All"}
             </button>
             <div className="shift-buttons">
               {shifts.map(shift => {
                 const isAssigned = shiftDetails.some(detail => detail.shift.shiftId === shift.shiftId);
+                const isPast = isShiftInThePast(shift);
                 return (
                   <div key={shift.shiftId} className={`shift-button ${selectedShifts.includes(shift.shiftId) ? 'selected' : ''}`}>
                     <input 
@@ -173,7 +187,7 @@ export default function AssignVetSchedules() {
                       value={shift.shiftId} 
                       checked={selectedShifts.includes(shift.shiftId)}
                       onChange={() => handleShiftChange(shift.shiftId)} 
-                      disabled={isAssigned}
+                      disabled={isAssigned || isPast}
                     />
                     <label htmlFor={`shift-${shift.shiftId}`}>
                       {shift.from_time} - {shift.to_time}
