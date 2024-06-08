@@ -32,6 +32,4 @@ public class BookingController {
             return e.getMessage();
         }
     }
-
-
 }
