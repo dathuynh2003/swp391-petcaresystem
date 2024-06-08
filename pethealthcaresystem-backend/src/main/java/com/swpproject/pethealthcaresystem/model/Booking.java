@@ -1,5 +1,6 @@
 package com.swpproject.pethealthcaresystem.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -35,6 +36,7 @@ public class Booking {
 
     @ManyToOne
     @JoinColumn(name = "vs_id")
+    @JsonIgnoreProperties("bookings")
     private VetShiftDetail vetShiftDetail;
 
     @OneToOne(mappedBy = "booking", cascade = CascadeType.ALL)

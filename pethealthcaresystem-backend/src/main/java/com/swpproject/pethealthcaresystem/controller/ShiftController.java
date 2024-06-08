@@ -75,4 +75,12 @@ public class ShiftController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error deleting shift detail.");
         }
     }
+    @GetMapping("/availableShift")
+    public List<VetShiftDetail> getAllAvailableShifts() {
+        return shiftService.getAvailableVetShiftDetails();
+    }
+    @GetMapping("shiftByDate/{date}")
+    public List<VetShiftDetail> getAllShiftsByDate(@PathVariable(value = "date") String date) {
+        return  shiftService.getShiftByDate(date);
+    }
 }

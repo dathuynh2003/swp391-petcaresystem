@@ -67,8 +67,12 @@ export default function VetWorkSchedules() {
       <div className="row">
         <div className="col-md-12 border rounded p-4 mt-2 shadow">
           <div className="d-flex justify-content-between mb-3">
-            <button className="btn btn-primary" onClick={handlePreviousWeek}>Previous Week</button>
-            <button className="btn btn-primary" onClick={handleNextWeek}>Next Week</button>
+            <button className="btn btn-primary" onClick={handlePreviousWeek}>
+              Previous Week
+            </button>
+            <button className="btn btn-primary" onClick={handleNextWeek}>
+              Next Week
+            </button>
           </div>
           <table className="table table-bordered">
             <thead>
@@ -87,10 +91,13 @@ export default function VetWorkSchedules() {
                     const scheduledShift = schedule.find(
                       (item) =>
                         new Date(item.date).toLocaleDateString('en-GB') === formatDate(date) &&
-                        item.shift.shiftId === shift.shiftId
+                        item.shift.shiftId === shift.shiftId,
                     );
                     return (
-                      <td key={dateIndex} className={`align-middle text-center ${scheduledShift ? 'bg-success text-white' : ''}`}>
+                      <td
+                        key={dateIndex}
+                        className={`align-middle text-center ${scheduledShift ? 'bg-success text-white' : ''}`}
+                      >
                         {scheduledShift ? scheduledShift.status : ''}
                       </td>
                     );
