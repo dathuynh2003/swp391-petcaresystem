@@ -31,7 +31,7 @@ export default function Booking() {
   };
 
   const loadShift = async () => {
-    const response = await axios.get('http://localhost:8080/shifts/details');
+    const response = await axios.get('http://localhost:8080/shifts/details', { withCredentials: true });
     setShifts(response.data);
   };
 
@@ -83,12 +83,18 @@ export default function Booking() {
   const handlePreviousWeek = () => {
     const previousWeek = new Date(currentWeek);
     previousWeek.setDate(currentWeek.getDate() - 7);
+    setActiveDateIndex(null)
+    setActiveShiftIndex(null)
+    // setVets([])
     setCurrentWeek(previousWeek);
   };
 
   const handleNextWeek = () => {
     const nextWeek = new Date(currentWeek);
     nextWeek.setDate(currentWeek.getDate() + 7);
+    setActiveDateIndex(null)
+    setActiveShiftIndex(null)
+    // setVets([])
     setCurrentWeek(nextWeek);
   };
 
@@ -211,6 +217,7 @@ export default function Booking() {
               <div className="container">
                 {services.map((service, index) => (
                   <div
+                    key={index}
                     className="row w-100 shadow m-3 rounded-3"
                     style={{ height: '85px' }}
                     onClick={() => chooseServices(service)}
@@ -255,6 +262,7 @@ export default function Booking() {
               <div className="container">
                 {pets.map((pet, index) => (
                   <div
+                    key={index}
                     className="row w-100 shadow m-3 rounded-3"
                     style={{ height: '85px' }}
                     onClick={() => choosePet(pet)}
@@ -468,8 +476,8 @@ export default function Booking() {
                     Services's Information
                   </h4>
                   <div className='shadow  mb-5 bg-body-tertiary rounded'>
-                    <table class="table">
-                      <thead class="table-light">
+                    <table className="table">
+                      <thead className="table-light">
                         <tr className='text-center'>
                           <th scope="col">No</th>
                           <th scope="col">Name</th>

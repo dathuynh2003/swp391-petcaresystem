@@ -93,7 +93,7 @@ const Profile = () => {
           <img className='rounded-circle my-3 mx-5' src='https://tse1.mm.bing.net/th?id=OIP.KTq5K5E3QeLVrm71FR0w8gHaHa&pid=Api&P=0&h=220' alt=''></img>
 
           <h5 className='text-center fw-bold mb-0' style={{ width: '80%' }}>{profile.fullName}</h5>
-          <p class="fw-light text-center mb-4" style={{ width: '80%' }}>{profile.email}</p>
+          <p className="fw-light text-center mb-4" style={{ width: '80%' }}>{profile.email}</p>
           <div className=''>
             <Link className="list-group-item py-1 px-2 text-decoration-none btn btn-light my-2 shadow" to={`/listPets`}>My Pets</Link>
             <Link className="list-group-item py-1 px-2 text-decoration-none btn btn-light my-2 shadow" to={`/`}>My Appointments</Link>
