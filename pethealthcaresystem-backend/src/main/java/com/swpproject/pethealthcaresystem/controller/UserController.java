@@ -39,7 +39,6 @@ public class UserController {
 
     @PostMapping("/create-user-by-admin")
     public ResponseEntity<ResponseData> createUserByAdmin(@RequestBody User user) {
-        System.out.println("fuck");
         try {
             User newUser = userService.createUserByAdmin(user);
             ResponseData<User> responseData = new ResponseData<>();
