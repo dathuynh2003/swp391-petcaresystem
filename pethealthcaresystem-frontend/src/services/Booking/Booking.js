@@ -19,10 +19,8 @@ export default function Booking() {
   // },[])
 
 
-  const location = useLocation();
-  const data = location?.state;
-  console.log("gui qua");
-  console.log(data);
+const location = useLocation();
+
 
   const [services, setServices] = useState([]);
   const [selectedServices, setSelectedServices] = useState([]);
@@ -36,7 +34,7 @@ export default function Booking() {
   const [selectedPet, setSelectedPet] = useState(null);
 
   const loadServices = async () => {
-    const response = await axios.get('http://localhost:8080/services');
+    const response = await axios.get('http://localhost:8080/allServices');
     setServices(response.data);
   };
 
@@ -54,21 +52,14 @@ export default function Booking() {
     loadServices();
     loadPets();
     loadShift();
-
-  }, []);
-
-
-
-
-  useEffect(() => {
     // Kiểm tra xem data có tồn tại không và không được trống
+    const data = location?.state;
+    console.log("gui qua");
+    console.log(data);
     if (data) {
       setSelectedServices(prevServices => [...prevServices, data]);
     }
-  }, [data]); // useEffect sẽ chạy mỗi khi data thay đổi
-
-
-
+  }, []);
 
 
 
