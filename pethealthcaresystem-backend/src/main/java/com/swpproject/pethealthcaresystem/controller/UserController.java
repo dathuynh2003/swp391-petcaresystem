@@ -68,6 +68,24 @@ public class UserController {
         responseData.setStatusCode(200);
         return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
+    @PostMapping("/register-gg")
+    public ResponseEntity<ResponseData> registerWithGG(@RequestBody User user, HttpSession session) {
+        try {
+            user.setRoleId(1);
+            User newUser = userService.createUserGoogle(user);
+            session.setAttribute("user", newUser);
+            ResponseData<User> responseData = new ResponseData<>();
+            responseData.setData(newUser);
+            responseData.setStatusCode(201);
+            return new ResponseEntity<>(responseData, HttpStatus.CREATED);
+        } catch (Error e) {
+            ResponseData<User> responseData = new ResponseData<>();
+            responseData.setStatusCode(401);
+            responseData.setErrorMessage(e.getMessage());
+            return new ResponseEntity<>(responseData, HttpStatus.UNAUTHORIZED);
+
+        }
+    }
     @PutMapping("/delete-user-by-admin/{id}")
     public ResponseEntity<ResponseData<User>> deleteUserByAdmin(@PathVariable(name = "id") int id) {
         ResponseData<User> responseData = new ResponseData<>();

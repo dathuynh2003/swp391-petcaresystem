@@ -14,7 +14,8 @@ public interface IUserService {
 
     @Transactional
     User createUserByAdmin(User newUser);
-
+    @Transactional
+    User createUserGoogle(User newUser);
     public User updateUser(String email, User newUser);
     public List<User> getAllUsersByRoleId(int roleId);
     public User deleteUser(int id);
