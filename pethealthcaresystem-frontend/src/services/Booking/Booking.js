@@ -2,13 +2,19 @@ import React, { useState, useEffect } from 'react';
 import { Tab, TabList, Tabs, TabPanel, TabPanels, Button } from '@chakra-ui/react';
 import axios from 'axios';
 import { CheckIcon } from '@chakra-ui/icons';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer, toast } from 'react-toastify';
 
 
 
 export default function Booking() {
+
+  const location = useLocation();
+  const data = location?.state;
+  console.log("gui qua");
+  console.log(data);
+
   const [services, setServices] = useState([]);
   const [selectedServices, setSelectedServices] = useState([]);
 
@@ -39,7 +45,23 @@ export default function Booking() {
     loadServices();
     loadPets();
     loadShift();
+
   }, []);
+
+
+
+
+  useEffect(() => {
+    // Kiểm tra xem data có tồn tại không và không được trống
+    if (data) {
+      setSelectedServices(prevServices => [...prevServices, data]);
+    }
+  }, [data]); // useEffect sẽ chạy mỗi khi data thay đổi
+
+
+
+
+
 
   const chooseServices = (serviceId) => {
     setSelectedServices((prevSelectedServices) => {
@@ -50,11 +72,6 @@ export default function Booking() {
       }
     });
   };
-
-  // useEffect(() => {
-  //   console.log('Mảng có: ' + selectedServices.length + ' phần tử');
-  //   console.log(selectedServices);
-  // }, [selectedServices]);
 
   useEffect(() => {
     console.log(booking);

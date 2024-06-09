@@ -18,7 +18,7 @@ public class PetService {
     private String nameService;
     private String description;
     private double price;
-
+    private String img;
 //    @OneToMany(mappedBy = "petService", cascade = CascadeType.ALL)
 //    private Set<BookingDetail> bookingDetails = new HashSet<>();
 

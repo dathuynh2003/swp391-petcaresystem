@@ -6,7 +6,7 @@ import Home from './pages/Home';
 import Register from './services/Register';
 import Sidenav from './components/Sidenav';
 import Navbar from './components/Navbar';
-import Services from './services/Services';
+import Services from './services/PetServices/Services';
 import CreatePet from './services/CreatePet';
 import ViewPet from './services/ViewPet';
 import ListPets from './services/ListPets';
