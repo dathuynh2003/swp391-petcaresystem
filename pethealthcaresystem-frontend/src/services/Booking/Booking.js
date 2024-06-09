@@ -2,13 +2,22 @@ import React, { useState, useEffect } from 'react';
 import { Tab, TabList, Tabs, TabPanel, TabPanels, Button } from '@chakra-ui/react';
 import axios from 'axios';
 import { CheckIcon } from '@chakra-ui/icons';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer, toast } from 'react-toastify';
 
 
 
 export default function Booking() {
+
+  // ĐỂ BẮT SAU KHI LÀM XONG
+  // let navigate = useNavigate()
+  // useEffect(()=> {
+  //   if (!localStorage.getItem('isLoggedIn')) {
+  //     navigate('/login')
+  //   }
+  // },[])
+
 
   const location = useLocation();
   const data = location?.state;

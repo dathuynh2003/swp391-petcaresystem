@@ -16,17 +16,23 @@ export default function Services() {
 
   const navigate = useNavigate()
   const handleServiceClick = (serviceId, serviceName, serviceDescription, servicePrice, serviceImg) => {
-    navigate('/booking',
-      {
-        state:
+    if (!localStorage.getItem('isLoggedIn')) {
+      navigate('/login')
+    }
+    else {
+      navigate('/booking',
         {
-          id: serviceId,
-          nameService: serviceName,
-          description: serviceDescription,
-          price: servicePrice,
-          img: serviceImg
-        }
-      });
+          state:
+          {
+            id: serviceId,
+            nameService: serviceName,
+            description: serviceDescription,
+            price: servicePrice,
+            img: serviceImg
+          }
+        });
+    }
+
   }
 
 
