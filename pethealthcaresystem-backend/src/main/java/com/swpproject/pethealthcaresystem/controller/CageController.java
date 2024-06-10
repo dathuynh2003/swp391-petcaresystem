@@ -14,54 +14,38 @@ import java.util.Map;
 @RestController
 public class CageController {
     @Autowired
-    CageService cageService;
+    private CageService cageService;
 
     @PostMapping("/createCage")
-    public Map<String, Object> createCage(@RequestBody Cage newCage, HttpSession session) throws Exception {
+    public Map<String, Object> createCage(@RequestBody Cage newCage, HttpSession session) {
         Map<String, Object> response = new HashMap<>();
         try {
-            User curUser = (User) session.getAttribute("user");
-            if (curUser != null) {
-                if (curUser.getRoleId() == 2 && newCage != null) {   //là Staff và newCage không null thì mới create được
-                    newCage.setUser(curUser);
-                    response.put("cage", cageService.createCage(newCage));
-                    response.put("isSuccess", true);
-                    return response;
-                } else if (curUser.getRoleId() != 2) {
-                    throw new Exception("You don't have permission to add a new cage");
-                } else {
-                    throw new Exception("New cage is null");
-                }
-            }
-            throw new Exception("You need login first");
-        } catch (Exception e) {
-            response.put("isSuccess", false);
+            response.put("message", "Cage created");
+            response.put("cage", cageService.createCage(newCage, (User) session.getAttribute("user")));
+        } catch (IllegalArgumentException e) {
             response.put("message", e.getMessage());
-            return response;
+            response.put("cage", null);
+        } catch (Exception e) {
+            response.put("cage", null);
+            response.put("message", "An unexpected error occurred");
         }
+        return response;
     }
 
     @GetMapping("/cages")
     public Map<String, Object> getAllCages(HttpSession session) {
         Map<String, Object> response = new HashMap<>();
-        User curUser = (User) session.getAttribute("user");
-        if (curUser != null) {
-            try {
-                List<Cage> cages = cageService.getAllCages();
-                if (cages != null) {
-                    response.put("cages", cages);
-                    response.put("isSuccess", true);
-                } else {
-                    response.put("isSuccess", false);
-                    response.put("message", "No cages found");
-                }
-            } catch (Exception e) {
-                response.put("isSuccess", false);
-                response.put("message", e.getMessage());
-            }
-        } else {
-            response.put("isSuccess", false);
-            response.put("message", "You need login first");
+        try {
+            User curUser = (User) session.getAttribute("user");
+            List<Cage> cages = cageService.getAllCages(curUser);
+            response.put("cages", cages);
+            response.put("message", "Cages found");
+        } catch (IllegalArgumentException e) {
+            response.put("cages", null);
+            response.put("message", e.getMessage());
+        } catch (Exception e) {
+            response.put("cages", null);
+            response.put("message", "An unexpected error occurred");
         }
         return response;
     }
@@ -69,24 +53,35 @@ public class CageController {
     @PutMapping("/updateCage/{id}")
     public Map<String, Object> updateCage(@RequestBody Cage newCage, @PathVariable int id, HttpSession session) throws Exception {
         Map<String, Object> response = new HashMap<>();
-        User curUser = (User) session.getAttribute("user");
         try {
-            if (curUser != null) {
-                if (curUser.getRoleId() == 2 && newCage != null) {
-                    Cage cage = cageService.updateCage(id, newCage);
-                    response.put("isSuccess", true);
-                    response.put("cage", cage);
-                } else if (curUser.getRoleId() != 2) {
-                    throw new Exception("You don't have permission to add a new cage");
-                } else {
-                    throw new Exception("No have new info to update cage");
-                }
-            } else {
-                throw new Exception("You need login first");
-            }
-        } catch (Exception e) {
-            response.put("isSuccess", false);
+            User curUser = (User) session.getAttribute("user");
+            Cage cage = cageService.updateCage(id, newCage, curUser);
+            response.put("message", "Cage updated");
+            response.put("cage", cage);
+        } catch (IllegalArgumentException e) {
             response.put("message", e.getMessage());
+            response.put("cage", null);
+        } catch (Exception e) {
+            response.put("message", "An unexpected error occurred");
+            response.put("cage", null);
+        }
+        return response;
+    }
+
+    @GetMapping("/cage/search/{name}")
+    public Map<String, Object> getCageByName(@PathVariable String name, HttpSession session) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            User curUser = (User) session.getAttribute("user");
+            response.put("message", "Cage found");
+            response.put("cages", cageService.findCageByName(name, curUser));
+
+        } catch (IllegalArgumentException e) {
+            response.put("message", e.getMessage());
+            response.put("cage", null);
+        } catch (Exception e) {
+            response.put("message", "An unexpected error occurred");
+            response.put("cage", null);
         }
         return response;
     }

@@ -13,15 +13,15 @@ import java.util.List;
 public class BookingService implements IBookingService {
 
     @Autowired
-    BookingRepository bookingRepository;
+    private BookingRepository bookingRepository;
     @Autowired
-    PetRepository petRepository;
+    private PetRepository petRepository;
     @Autowired
-    VetShiftDetailRepository vetShiftDetailRepository;
+    private VetShiftDetailRepository vetShiftDetailRepository;
     @Autowired
-    PetServiceRepository petServiceRepository;
+    private PetServiceRepository petServiceRepository;
     @Autowired
-    BookingDetailRepository bookingDetailRepository;
+    private BookingDetailRepository bookingDetailRepository;
 
 
     @Override
