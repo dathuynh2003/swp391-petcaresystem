@@ -40,6 +40,7 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/booking" element={<Booking />} />
+            <Route path="/payment" element={<Payment />}/>
             <Route path="/createPet" element={<CreatePet />} />
             <Route path="/viewPet/:petId" element={<ViewPet />} />
             <Route path="/listPets" element={<ListPets />} />
