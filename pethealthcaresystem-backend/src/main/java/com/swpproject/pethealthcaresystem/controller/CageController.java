@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
+@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
 public class CageController {
     @Autowired
     private CageService cageService;
@@ -76,6 +77,48 @@ public class CageController {
             response.put("message", "Cage found");
             response.put("cages", cageService.findCageByName(name, curUser));
 
+        } catch (IllegalArgumentException e) {
+            response.put("message", e.getMessage());
+            response.put("cage", null);
+        } catch (Exception e) {
+            response.put("message", "An unexpected error occurred");
+            response.put("cage", null);
+        }
+        return response;
+    }
+
+    @GetMapping("/cage/search/")
+    public Map<String, Object> getAllCageByName(HttpSession session) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            String name = null;
+            User curUser = (User) session.getAttribute("user");
+            response.put("message", "Cage found");
+            response.put("cages", cageService.findCageByName(name, curUser));
+
+        } catch (IllegalArgumentException e) {
+            response.put("message", e.getMessage());
+            response.put("cage", null);
+        } catch (Exception e) {
+            response.put("message", "An unexpected error occurred");
+            response.put("cage", null);
+        }
+        return response;
+    }
+
+    @GetMapping("/cage/{id}")
+    public Map<String, Object> getCageById(@PathVariable int id, HttpSession session) {
+        Map<String, Object> response = new HashMap<>();
+        User curUser = (User) session.getAttribute("user");
+        try {
+            if (curUser == null) {
+                throw new IllegalArgumentException("You need to login first");
+            }
+            if (curUser.getRoleId() != 2) {
+                throw new IllegalArgumentException("You don't have permission to do this");
+            }
+            response.put("cage", cageService.findCageById(id));
+            response.put("message", "Cage found");
         } catch (IllegalArgumentException e) {
             response.put("message", e.getMessage());
             response.put("cage", null);

@@ -13,4 +13,6 @@ public interface ICageService {
     public Cage updateCage(int id, Cage newCage, User staff) throws IllegalArgumentException;
 
     public List<Cage> findCageByName(String cageName, User staff) throws IllegalArgumentException;
+
+    public Cage findCageById(int id) throws IllegalArgumentException;
 }

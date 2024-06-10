@@ -6,7 +6,7 @@ export default function ListPets() {
   const [pets, setPets] = useState([])
 
   const loadPets = async () => {
-    const response = await axios.get("http://localhost:8080/pet",{withCredentials: true})
+    const response = await axios.get("http://localhost:8080/pet", { withCredentials: true })
     setPets(response.data)
   }
 
@@ -39,7 +39,7 @@ export default function ListPets() {
         </thead>
         <tbody className="table-group-divider">
           {
-      
+
             pets.map((pet, index) => (
               <tr key={index}>
                 <th scope="row">{index + 1}</th>
