@@ -117,7 +117,7 @@ export default function EditPet() {
 
           <div className="mb-3" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <div>
-              <p className="">Gender</p>
+              <p className="">Sex</p>
               <RadioCard
                 options={['Male', 'Female']}
                 bg={'green'}
@@ -146,13 +146,13 @@ export default function EditPet() {
 
           <div className="age mb-3 ">
             <label className="mt-2 ml-4 mb-3" htmlFor="age">
-              Age
+              Age (month(s))
             </label>
             <NumberInput
               step={1}
               defaultValue={1}
               min={1}
-              max={50}
+              max={500}
               value={age}
               onChange={(value) => setPet((prev) => ({ ...prev, age: value }))}
             >
