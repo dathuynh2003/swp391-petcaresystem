@@ -19,17 +19,17 @@ public class BookingController {
     BookingService bookingService;
 
     @PostMapping("/createBooking/pet/{petId}/vet-shift/{vsId}/services/{serviceIds}")
-    public String createBooking(@RequestBody Booking booking, @PathVariable int petId, @PathVariable int vsId, @PathVariable List<Integer> serviceIds, HttpSession session) {
+    public Booking createBooking(@RequestBody Booking booking, @PathVariable int petId, @PathVariable int vsId, @PathVariable List<Integer> serviceIds, HttpSession session) {
         try {
             User user = (User) session.getAttribute("user");
             if (user == null) {
-                return "Please login first";
+                return null;
             }
-            bookingService.createBooking(booking, user, petId, vsId, serviceIds);
-            return "Booking created";
+            return bookingService.createBooking(booking, user, petId, vsId, serviceIds);
+
 
         } catch (RuntimeException e) {
-            return e.getMessage();
+            return null;
         }
     }
 }

@@ -16,6 +16,7 @@ import org.springframework.web.client.RestTemplate;
 import java.util.List;
 
 @RestController
+@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
 public class PaymentController {
 
     @Autowired
@@ -23,6 +24,7 @@ public class PaymentController {
     @PostMapping("/api/payment")
     public ResponseEntity<ResponseData> createPayment(@RequestBody Payment payment) {
         try{
+            System.out.println(payment);
             CreatePaymentPosPayload payload = paymentService.createPaymentOs(payment);
             ResponseData<PayOsDTO> data = new ResponseData();
             final String uri = "https://api-merchant.payos.vn/v2/payment-requests";
@@ -33,6 +35,8 @@ public class PaymentController {
             HttpEntity<CreatePaymentPosPayload> httpEntity = new HttpEntity<>(payload, headers);
             PayOsDTO result = restTemplate.postForObject(uri, httpEntity, PayOsDTO.class);
             data.setData(result);
+            System.out.println(payload);
+            System.out.println(result);
             return new ResponseEntity<>(data, HttpStatus.OK);
         }catch (Error e){
             ResponseData<PayOsDTO> data = new ResponseData();
