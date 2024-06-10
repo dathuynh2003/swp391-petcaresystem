@@ -1,110 +1,78 @@
 import axios from "axios";
 import React, { useState, useEffect } from "react";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
-import { Link } from "react-router-dom";
-import './shift.css';
+// import './shift.css';
 
 export default function AssignVetSchedules() {
   const [vets, setVets] = useState([]);
   const [shifts, setShifts] = useState([]);
   const [shiftDetails, setShiftDetails] = useState([]);
   const [selectedVet, setSelectedVet] = useState('');
-  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [currentWeek, setCurrentWeek] = useState(new Date());
   const [selectedShifts, setSelectedShifts] = useState([]);
+  const [selectAll, setSelectAll] = useState(false);
 
   useEffect(() => {
-    // Fetch the list of vets from the server
     axios.get('http://localhost:8080/vets', { withCredentials: true })
       .then(response => setVets(response.data))
       .catch(error => console.error('Error fetching vets:', error));
 
-    // Fetch the list of shifts from the server
     axios.get('http://localhost:8080/shifts/all', { withCredentials: true })
       .then(response => setShifts(response.data))
       .catch(error => console.error('Error fetching shifts:', error));
+
+    const getWeekDates = (date) => {
+      const firstDayOfWeek = date.getDate() - date.getDay() + 1;
+      const weekDates = Array.from({ length: 7 }, (_, i) => {
+        const newDate = new Date(date);
+        newDate.setDate(firstDayOfWeek + i);
+        return newDate;
+      });
+      setCurrentWeek(weekDates[0]); // Set currentWeek to the first day of the week
+    };
+
+    getWeekDates(currentWeek);
   }, []);
 
   useEffect(() => {
-    if (selectedVet && selectedDate) {
+    if (selectedVet) {
       fetchShiftDetails();
     }
-  }, [selectedVet, selectedDate]);
+  }, [selectedVet, currentWeek]);
 
   const fetchShiftDetails = () => {
-    const date = selectedDate.toISOString().split('T')[0];
     axios.get('http://localhost:8080/shifts/details', { withCredentials: true })
       .then(response => {
-        const filteredDetails = response.data.filter(detail => 
-          detail.user.userId === parseInt(selectedVet) && detail.date === date
-        );
-        setShiftDetails(filteredDetails);
-        const assignedShiftIds = filteredDetails.map(detail => detail.shift.shiftId);
-        setSelectedShifts(assignedShiftIds);
+        const vetSchedule = response.data.filter(detail => detail.user.userId === parseInt(selectedVet));
+        setShiftDetails(vetSchedule);
       })
       .catch(error => console.error('Error fetching shift details:', error));
   };
 
-  const handleVetChange = (event) => {
-    setSelectedVet(event.target.value);
+  const handlePreviousWeek = () => {
+    const previousWeek = new Date(currentWeek);
+    previousWeek.setDate(currentWeek.getDate() - 7);
+    setCurrentWeek(previousWeek);
   };
 
-  const handleDateChange = (date) => {
-    setSelectedDate(date);
+  const handleNextWeek = () => {
+    const nextWeek = new Date(currentWeek);
+    nextWeek.setDate(currentWeek.getDate() + 7);
+    setCurrentWeek(nextWeek);
   };
 
-  const handleShiftChange = (shiftId) => {
-    setSelectedShifts(prevSelectedShifts => {
-      if (prevSelectedShifts.includes(shiftId)) {
-        return prevSelectedShifts.filter(id => id !== shiftId);
-      } else {
-        return [...prevSelectedShifts, shiftId];
-      }
-    });
-  };
-
-  const handleDeleteAssignment = (shiftId) => {
-    const date = selectedDate.toISOString().split('T')[0];
-    axios.delete('http://localhost:8080/shifts/delete-vet-shift', { withCredentials: true }, {
-      params: {
-        shiftId: shiftId,
-        vetId: selectedVet,
-        date: date
-      }
-    })
-      .then(response => {
-        alert('Shift unassigned successfully!');
-        fetchShiftDetails();
-      })
-      .catch(error => {
-        console.error('Error unassigning shift:', error);
-        alert('Error unassigning shift. Please try again.');
-      });
-  };
-
-  const handleSubmit = () => {
-    if (!selectedVet) {
-      alert("Please select a vet.");
-      return;
-    }
-
-    if (!selectedDate) {
-      alert("Please select a date.");
-      return;
-    }
-
+  const handleShiftChange = () => {
     if (selectedShifts.length === 0) {
-      alert("Please select at least one shift.");
+      alert('Please select at least one shift to assign.');
       return;
     }
 
-    const vetShiftDetails = selectedShifts.map(shiftId => ({
-      user: { userId: selectedVet }, 
-      shift: { shiftId: shiftId },
-      date: selectedDate.toISOString().split('T')[0],
-      status: 'Available' 
+    const vetShiftDetails = selectedShifts.map(shift => ({
+      user: { userId: selectedVet },
+      shift: { shiftId: shift.shiftId },
+      date: shift.date,
+      status: 'Available'
     }));
-  
+
     axios.put('http://localhost:8080/shifts/assign-vet', vetShiftDetails, { withCredentials: true })
       .then(response => {
         alert('Shifts assigned successfully!');
@@ -116,96 +84,161 @@ export default function AssignVetSchedules() {
       });
   };
 
-  const handleSelectAll = () => {
-    if (selectedShifts.length === shifts.length) {
-      setSelectedShifts([]);
+  const handleToggleShift = (shiftId, date) => {
+    const existingIndex = selectedShifts.findIndex(item => item.shiftId === shiftId && item.date === date.toISOString().split('T')[0]);
+    if (existingIndex !== -1) {
+      const updatedSelectedShifts = [...selectedShifts];
+      updatedSelectedShifts.splice(existingIndex, 1);
+      setSelectedShifts(updatedSelectedShifts);
     } else {
-      const allShiftIds = shifts
-        .map(shift => shift.shiftId)
-        .filter(shiftId => !shiftDetails.some(detail => detail.shift.shiftId === shiftId) && !isShiftInThePast(shiftId));
-      setSelectedShifts(allShiftIds);
+      setSelectedShifts([...selectedShifts, { shiftId, date: date.toISOString().split('T')[0] }]);
     }
   };
 
-  const isShiftInThePast = (shift) => {
+  const handleSelectAll = () => {
+    if (!selectAll) {
+      const allFutureShifts = [];
+      shifts.forEach(shift => {
+        for (let i = 0; i < 7; i++) {
+          const date = new Date(currentWeek);
+          date.setDate(date.getDate() + i);
+          const shiftDate = date.toISOString().split('T')[0];
+          if (!shiftDetails.some(detail => detail.shift.shiftId === shift.shiftId && detail.date === shiftDate) && !isShiftInThePast(shift, date)) {
+            allFutureShifts.push({ shiftId: shift.shiftId, date: shiftDate });
+          }
+        }
+      });
+      setSelectedShifts(allFutureShifts);
+      setSelectAll(true);
+    } else {
+      setSelectedShifts([]);
+      setSelectAll(false);
+    }
+  };
+
+  const handleDeleteAssignment = (shiftId, date) => {
+    const dateString = date.toISOString().split('T')[0];
+    axios.delete('http://localhost:8080/shifts/delete-vet-shift', {
+      params: {
+        shiftId: shiftId,
+        vetId: selectedVet,
+        date: dateString
+      },
+      withCredentials: true
+    })
+      .then(response => {
+        alert('Shift unassigned successfully!');
+        fetchShiftDetails();
+      })
+      .catch(error => {
+        console.error('Error unassigning shift:', error);
+        alert('Error unassigning shift. Please try again.');
+      });
+  };
+
+  const isShiftInThePast = (shift, date) => {
     const now = new Date();
-    if (selectedDate.toDateString() !== now.toDateString()) {
-      return false;
+    if (date.toDateString() !== now.toDateString()) {
+      return date < now;
     }
     const [shiftStartHour, shiftStartMinute] = shift.from_time.split(':').map(Number);
-    const shiftStartTime = new Date(selectedDate);
+    const shiftStartTime = new Date(date);
     shiftStartTime.setHours(shiftStartHour, shiftStartMinute, 0, 0);
     return now > shiftStartTime;
   };
 
+  const formatDate = (date) => date.toLocaleDateString('en-GB');
+  const formatDay = (date) => date.toLocaleDateString('en-GB', { weekday: 'short' });
+
   return (
     <div className="container">
-      <Link className="btn btn-outline-primary my-2" to={`/shift`}>
-        Create New Shift
-      </Link>
       <div className="row">
         <div className="col-md-12 border rounded p-4 mt-2 shadow">
           <h2 className="text-center m-4">Assign Vet Schedules</h2>
           <div className="form-group">
-            <label>
-              Select Vet:
-              <select className="form-control" value={selectedVet} onChange={handleVetChange}>
-                <option value="">Select Vet</option>
+            <div className="doctor-selection">
+              <h4 style={{ marginBottom: '10px' }}>Select Vet:</h4>
+              <ul className="doctor-list" style={{ listStyle: 'none', padding: 0 }}>
                 {vets.map(vet => (
-                  <option key={vet.userId} value={vet.userId}>{vet.fullName}</option>
+                  <li
+                    key={vet.userId}
+                    style={{
+                      cursor: 'pointer',
+                      padding: '5px', /* Giảm padding để làm cho ô chọn nhỏ hơn */
+                      marginBottom: '5px',
+                      fontSize: '14px', /* Giảm kích thước font */
+                      backgroundColor: selectedVet === vet.userId ? '#007bff' : 'transparent',
+                      color: selectedVet === vet.userId ? '#fff' : '#000',
+                      borderRadius: '5px'
+                    }}
+                    onClick={() => setSelectedVet(vet.userId)}
+                  >
+                    {vet.fullName}
+                  </li>
                 ))}
-              </select>
-            </label>
-          </div>
-          <div className="form-group">
-            <label>
-              Select Date:
-              <DatePicker
-                selected={selectedDate}
-                onChange={handleDateChange}
-                className="form-control"
-                dateFormat="dd/MM/yyyy"
-                minDate={new Date()}
-                placeholderText="Select a date"
-              />
-            </label>
-          </div>
-          <div>
-            <h4>Select Shifts</h4>
-            <button className="btn btn-outline-primary mr-2" onClick={handleSelectAll}>
-              {selectedShifts.length === shifts.length - shiftDetails.length ? "Unselect All" : "Select All"}
-            </button>
-            <div className="shift-buttons">
-              {shifts.map(shift => {
-                const isAssigned = shiftDetails.some(detail => detail.shift.shiftId === shift.shiftId);
-                const isPast = isShiftInThePast(shift);
-                return (
-                  <div key={shift.shiftId} className={`shift-button ${selectedShifts.includes(shift.shiftId) ? 'selected' : ''}`}>
-                    <input 
-                      type="checkbox" 
-                      id={`shift-${shift.shiftId}`}
-                      value={shift.shiftId} 
-                      checked={selectedShifts.includes(shift.shiftId)}
-                      onChange={() => handleShiftChange(shift.shiftId)} 
-                      disabled={isAssigned || isPast}
-                    />
-                    <label htmlFor={`shift-${shift.shiftId}`}>
-                      {shift.from_time} - {shift.to_time}
-                    </label>
-                    {isAssigned && (
-                      <button 
-                        className="delete-button" 
-                        onClick={() => handleDeleteAssignment(shift.shiftId)}
-                      >
-                        Delete
-                      </button>
-                    )}
-                  </div>
-                );
-              })}
+              </ul>
             </div>
           </div>
-          <button className="btn btn-outline-primary mt-3" onClick={handleSubmit}>Assign Vet</button>
+          <div className="d-flex justify-content-between mb-3">
+            <button className="btn btn-primary" onClick={handlePreviousWeek}>Previous Week</button>
+            <button className="btn btn-primary" onClick={handleNextWeek}>Next Week</button>
+          </div>
+          <button className="btn btn-outline-primary mb-3" onClick={handleSelectAll}>
+            {selectAll ? "Unselect All" : "Select All"}
+          </button>
+          <button className="btn btn-primary mb-3 ml-3" onClick={handleShiftChange} disabled={!selectedVet || selectedShifts.length === 0}>Assign</button>
+          <table className="table table-bordered">
+            <thead>
+              <th>Work Shift</th>
+              {[0, 1, 2, 3, 4, 5, 6].map(index => {
+                const date = new Date(currentWeek);
+                date.setDate(date.getDate() + index);
+                return (
+                  <th key={index} className="text-center">{`${formatDate(date)} (${formatDay(date)})`}</th>
+                );
+              })}
+            </thead>
+            <tbody>
+              {shifts.map((shift, shiftIndex) => (
+                <tr key={shiftIndex}>
+                  <td className="align-middle text-center">{`${shift.from_time} - ${shift.to_time}`}</td>
+                  {[0, 1, 2, 3, 4, 5, 6].map((dateIndex) => {
+                    const date = new Date(currentWeek);
+                    date.setDate(date.getDate() + dateIndex);
+                    const isAssigned = shiftDetails.some(detail => detail.shift.shiftId === shift.shiftId && new Date(detail.date).toLocaleDateString('en-GB') === formatDate(date));
+                    const isPast = isShiftInThePast(shift, date);
+                    return (
+                      <td
+                        key={dateIndex}
+                        className={`align-middle text-center ${isAssigned ? 'bg-success text-white' : ''}`}
+                      >
+                        {!isPast && !isAssigned && (
+                          <button
+                            className={`btn btn-outline-primary ${selectedShifts.some(item => item.shiftId === shift.shiftId && item.date === date.toISOString().split('T')[0]) ? 'active' : ''}`}
+                            onClick={() => handleToggleShift(shift.shiftId, date)}
+                            disabled={!selectedVet}
+                          >
+                            Assign
+                          </button>
+                        )}
+                        {isAssigned && (
+                          <button
+                            className="btn btn-danger"
+                            onClick={() => handleDeleteAssignment(shift.shiftId, date)}
+                          >
+                            Delete
+                          </button>
+                        )}
+                        {isPast && !isAssigned && (
+                          <span className="text-muted">Past</span>
+                        )}
+                      </td>
+                    );
+                  })}
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
