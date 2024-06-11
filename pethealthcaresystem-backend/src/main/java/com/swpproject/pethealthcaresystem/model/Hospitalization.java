@@ -1,30 +1,29 @@
 package com.swpproject.pethealthcaresystem.model;
 
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Entity
-public class HospitalizationRecord {
+public class Hospitalization {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     int id;
-    String fromTime;
-    String toTime;
-    double totalAmount;
-    int status;
+    String admissionTime;   //Time admitted from Clinic
+    String dischargeTime;   //Time discharged from Clinic
+    double price;           // price per hour (Get from cage's price)
+    // Total = (dischargeTime - admissionTime) * (price per hour)
+    String status;          //admitted, discharged
 
     @ManyToOne
     @JoinColumn(name = "pet_id")

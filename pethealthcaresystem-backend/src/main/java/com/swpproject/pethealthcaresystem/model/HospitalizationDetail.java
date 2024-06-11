@@ -1,16 +1,11 @@
 package com.swpproject.pethealthcaresystem.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
-
-import java.util.Date;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -20,6 +15,7 @@ import java.util.Date;
 @Entity
 public class HospitalizationDetail {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     int id;
     String time;
     int dosage;
@@ -29,7 +25,7 @@ public class HospitalizationDetail {
 
     @ManyToOne
     @JoinColumn(name = "hospitalization_id")
-    HospitalizationRecord hospitalizationRecord;
+    Hospitalization hospitalization;
 
     @ManyToOne
     @JoinColumn(name = "medicine_id")

@@ -1,6 +1,8 @@
 package com.swpproject.pethealthcaresystem.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -17,14 +19,19 @@ import java.util.Set;
 @Entity
 public class Cage {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     int id;
-    Boolean status;
+    @NotBlank
+    String name;
+    double price; //Maybe price per hour
+    String status;  //available, occupied
     String description;
 
     @ManyToOne
     @JoinColumn(name = "staff_id")
+    @JsonIgnoreProperties("cages")
     User user;
 
     @OneToMany(mappedBy = "cage", cascade = CascadeType.ALL, orphanRemoval = true)
-    Set<HospitalizationRecord> hospitalizationRecords = new HashSet<>();
+    Set<Hospitalization> hospitalizations = new HashSet<>();
 }

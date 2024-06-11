@@ -20,9 +20,6 @@ public class Pet {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     int petId;
-//    @ManyToOne
-//    @JoinColumn(name = "owner_id")
-//    User owner;
     String avatar;
     String name;
     String petType;
@@ -45,7 +42,7 @@ public class Pet {
     Set<MedicalRecord> medicalRecords = new HashSet<>();
 
     @OneToMany(mappedBy = "pet", cascade = CascadeType.ALL, orphanRemoval = true)
-    Set<HospitalizationRecord> hospitalizationRecords = new HashSet<>();
+    Set<Hospitalization> hospitalizations = new HashSet<>();
 
 
 

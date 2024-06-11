@@ -22,6 +22,8 @@ import ListAccount from './services/ListAccount';
 import EditAccount from './services/EditAccount';
 import AssignVetSchedules from './services/AssignVetSchedules';
 import Booking from './services/Booking/Booking';
+import CreateCage from './services/CreateCage';
+import EditCage from './services/EditCage';
 function App() {
 
   const location = useLocation();
@@ -45,16 +47,18 @@ function App() {
             <Route path="/viewPet/:petId" element={<ViewPet />} />
             <Route path="/listPets" element={<ListPets />} />
             <Route path="/editPet/:petId" element={<EditPet />} />
-
             <Route path="/profile" element={<Profile />} />
             <Route path="/cages" element={<Cages />} />
+            <Route path='/create-cage' element={<CreateCage />} />
+            <Route path='/edit-cage/:cageId' element={<EditCage />} />
+
             <Route path="/vet-work-schedules" element={<VetWorkSchedules />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path='/verify' element={<Verify />} />
             <Route path="/shift" element={<CreateShift />} />
-            <Route path='/create-account' element={<CreateAccount/>} />
-            <Route path='/list-account' element={<ListAccount/>} />
-            <Route path="/edit-account/:userId" element={<EditAccount/>} />
+            <Route path='/create-account' element={<CreateAccount />} />
+            <Route path='/list-account' element={<ListAccount />} />
+            <Route path="/edit-account/:userId" element={<EditAccount />} />
             <Route path="/assign-schedules" element={<AssignVetSchedules />} />
           </Routes>
         </div>
