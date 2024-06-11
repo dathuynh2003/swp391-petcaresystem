@@ -169,8 +169,8 @@ public class UserService implements IUserService {
 //            updatedUser.setAddress(newUser.getAddress());
 //            updatedUser.setGender(newUser.getGender());
 //            updatedUser.setDob(newUser.getDob());
-            updatedUser.setRoleId(newUser.getRoleId());
             updatedUser.setIsActive(newUser.getIsActive());
+            updatedUser.setRoleId(newUser.getRoleId());
             return userRepository.save(updatedUser);
         }
         return null;

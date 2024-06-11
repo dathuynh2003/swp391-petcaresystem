@@ -176,7 +176,7 @@ const location = useLocation();
   useEffect(() => {
     console.log("vs_id: " + selectedVetShift)
   }, [selectedVetShift])
-
+  const [curBooking, setCurrentBooking] = useState()
   const serviceIds = selectedServices.map(service => service.id);//dùng để gửi mảng id đi
   const callAPI = async () => {
     console.log('gui ve');
@@ -184,9 +184,11 @@ const location = useLocation();
     console.log(selectedVetShift);
     console.log(serviceIds);
     const response = await axios.post(`http://localhost:8080/createBooking/pet/${selectedPet.petId}/vet-shift/${selectedVetShift}/services/${serviceIds}`, booking, { withCredentials: true })
+    setCurrentBooking(response.data)
     console.log(response.data);
-  }
 
+  }
+  
   const [step, setStep] = useState(0)
   const handleNextClick = (content) => {
     if (content === null || content === undefined || content === '' || content.length === 0) {
@@ -210,6 +212,30 @@ const location = useLocation();
       setStep(step + 1)
     }
     else toast.warn('Please input required information!')
+  }
+  const handlePaymentClick = async () => {
+    const payment = {
+      //orderCode: booking.orderCode,
+      paymentType: 'Credit Card',  // You can modify this as per your requirement
+      amount: 10000,
+      paymentDate: new Date().toISOString(),
+      status: 'Pending',
+      description: booking.description,
+      user: selectedPet.owner,
+      booking: curBooking
+    };
+
+    try {
+      const response = await axios.post('http://localhost:8080/api/payment', payment, { withCredentials: true });
+      const { data } = response.data;
+      toast.success('Payment initiated successfully!');
+      if (data && data.data && data.data.checkoutUrl) {
+        window.location.href = data.data.checkoutUrl;
+      }
+    } catch (error) {
+      toast.error('Payment failed!');
+      console.error(error);
+    }
   }
   return (
     <div className="container">
@@ -525,14 +551,12 @@ const location = useLocation();
                 </div>
                 <div className='text-center mt-0'>
                   {
-                    booking?.type ? null : <Link className='btn btn-outline-primary' >Payment</Link>
+                    booking?.type ? null :  <Button colorScheme="teal" onClick={handlePaymentClick}>Pay Now</Button>
                   }
                 </div>
               </div>
             </TabPanel>
-
-
-
+            
             <TabPanel>
               <p>three!</p>
             </TabPanel>
