@@ -22,6 +22,8 @@ import ListAccount from './services/ListAccount';
 import EditAccount from './services/EditAccount';
 import AssignVetSchedules from './services/AssignVetSchedules';
 import Booking from './services/Booking/Booking';
+import PaymentFail from './services/Booking/PaymentResult';
+import PaymentResult from './services/Booking/PaymentResult';
 function App() {
 
   const location = useLocation();
@@ -56,6 +58,7 @@ function App() {
             <Route path='/list-account' element={<ListAccount/>} />
             <Route path="/edit-account/:userId" element={<EditAccount/>} />
             <Route path="/assign-schedules" element={<AssignVetSchedules />} />
+            <Route path='/payment-result' element={<PaymentResult/>} />
           </Routes>
         </div>
       </div>

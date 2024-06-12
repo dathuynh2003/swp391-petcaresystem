@@ -212,7 +212,7 @@ export default function Booking() {
   const handlePaymentClick = async () => {
     console.log(curBooking)
     const payment = {
-      //orderCode: booking.orderCode,
+      // orderCode: booking.orderCode,
       paymentType: 'Credit Card',  // You can modify this as per your requirement
       amount: 10000,
       paymentDate: new Date().toISOString(),
@@ -223,11 +223,11 @@ export default function Booking() {
     };
 
     try {
-      const response = await axios.post('http://localhost:8080/api/payment', payment, { withCredentials: true });
+      const response = await axios.post('http://localhost:8080/api/payment/create', payment, { withCredentials: true });
       const { data } = response.data;
       //toast.success('Payment initiated successfully!');
       if (data && data.data && data.data.checkoutUrl) {
-        //window.location.href = data.data.checkoutUrl;
+        window.location.href = data.data.checkoutUrl;
       }
     } catch (error) {
       toast.error('Payment failed!');
