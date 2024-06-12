@@ -21,18 +21,31 @@ export default function Booking() {
   const [selectedPet, setSelectedPet] = useState(null);
 
   const loadServices = async () => {
-    const response = await axios.get('http://localhost:8080/services');
+    try {
+      const response = await axios.get('http://localhost:8080/services');
     setServices(response.data);
+    } catch (error) {
+      console.log(error)
+    }
+
   };
 
   const loadPets = async () => {
-    const response = await axios.get('http://localhost:8080/pet', { withCredentials: true });
-    setPets(response.data);
+    try {
+      const response = await axios.get('http://localhost:8080/pet', { withCredentials: true });
+      setPets(response.data);
+    } catch (error) {
+      console.log(error)
+    }
   };
 
   const loadShift = async () => {
-    const response = await axios.get('http://localhost:8080/shifts/details', { withCredentials: true });
-    setShifts(response.data);
+    try {
+      const response = await axios.get('http://localhost:8080/shifts/details', { withCredentials: true });
+      setShifts(response.data);
+    } catch (error) {
+      console.log(error)
+    }
   };
 
   useEffect(() => {
@@ -197,13 +210,14 @@ export default function Booking() {
     else toast.warn('Please input required information!')
   }
   const handlePaymentClick = async () => {
+    console.log(curBooking)
     const payment = {
       //orderCode: booking.orderCode,
       paymentType: 'Credit Card',  // You can modify this as per your requirement
       amount: 10000,
       paymentDate: new Date().toISOString(),
       status: 'Pending',
-      description: booking.description,
+      description: curBooking.description,
       user: selectedPet.owner,
       booking: curBooking
     };
@@ -211,9 +225,9 @@ export default function Booking() {
     try {
       const response = await axios.post('http://localhost:8080/api/payment', payment, { withCredentials: true });
       const { data } = response.data;
-      toast.success('Payment initiated successfully!');
+      //toast.success('Payment initiated successfully!');
       if (data && data.data && data.data.checkoutUrl) {
-        window.location.href = data.data.checkoutUrl;
+        //window.location.href = data.data.checkoutUrl;
       }
     } catch (error) {
       toast.error('Payment failed!');
@@ -539,7 +553,6 @@ export default function Booking() {
                 </div>
               </div>
             </TabPanel>
-            
             <TabPanel>
               <p>three!</p>
             </TabPanel>
