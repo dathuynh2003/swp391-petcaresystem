@@ -37,10 +37,10 @@ public class Booking {
 
     @ManyToOne
     @JoinColumn(name = "vs_id")
-    @JsonIgnoreProperties("booking")
+    @JsonIgnoreProperties("bookings")
     private VetShiftDetail vetShiftDetail;
 
-    @OneToOne(mappedBy = "booking")
-    @Nullable
-    private Payment payment;
+//    @OneToOne(mappedBy = "booking")
+//    @Nullable
+//    private Payment payment;
 }

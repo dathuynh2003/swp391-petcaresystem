@@ -49,4 +49,18 @@ public class BookingService implements IBookingService {
         }
         return bookingRepository.save(newBooking);
     }
+
+    @Override
+    public Booking updateBoking(Booking newBooking) {
+        Booking updatedBooking = bookingRepository.findById(newBooking.getId()).orElseThrow(()
+                -> new RuntimeException("Booking not found"));
+        updatedBooking.setStatus(newBooking.getStatus());
+        updatedBooking = bookingRepository.save(updatedBooking);
+        return updatedBooking;
+    }
+
+    @Override
+    public Booking getBookingByOrderCode(String orderCode) {
+        return null;
+    }
 }

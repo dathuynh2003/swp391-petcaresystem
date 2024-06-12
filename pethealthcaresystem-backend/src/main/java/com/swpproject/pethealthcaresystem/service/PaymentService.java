@@ -29,10 +29,29 @@ public class PaymentService implements IPaymentService {
 //        System.out.println("Payment Booking" + payment.getBooking());
 //        Booking curBooking = bookingRepository.findById(payment.getBooking().getId()).get();
 //        System.out.println(curBooking);
-//        Booking curBooking = bookingRepository.findById(payment.getBooking().getId()).orElseThrow(()->
-//                                                                            new RuntimeException("Booking not found"));
-//        payment.setBooking(curBooking);
+        Booking curBooking = bookingRepository.findById(payment.getBooking().getId()).orElseThrow(()->
+                                                                            new RuntimeException("Booking not found"));
+        payment.setBooking(curBooking);
         return paymentRepository.save(payment);
+    }
+
+    @Override
+    public Payment updatePayment(Payment payment) {
+        Payment updatedPayment = paymentRepository.findByOrderCode(payment.getOrderCode());
+        if(updatedPayment != null) {
+            Booking updateBooking = updatedPayment.getBooking();
+            updatedPayment.setStatus(payment.getStatus());
+            updateBooking.setStatus(payment.getStatus());
+            bookingRepository.save(updateBooking);
+            updatedPayment = paymentRepository.save(updatedPayment);
+        }
+        return updatedPayment;
+    }
+
+    @Override
+    public Payment getPaymentByOrderCode(int orderCode) {
+        Payment payment = paymentRepository.findByOrderCode(orderCode);
+        return payment;
     }
 
     public static final String checksumKey = "03e871a48be196cfc46e79c416c3453a6187a04e4c9ab18e69636a0c864e761a";
@@ -81,8 +100,8 @@ public class PaymentService implements IPaymentService {
 //        }
             payload.setItems(new ArrayList<>());
 
-            payload.setCancelUrl("http://localhost:3000");
-            payload.setReturnUrl("http://localhost:3000");
+            payload.setCancelUrl("http://localhost:3000/payment-result");
+            payload.setReturnUrl("http://localhost:3000/payment-result");
 
 //            String transaction = String.format("amount:%x,cancelUrl:%s,description:%s,orderCode:%x,returnUrl:%s",
 //                    payload.getAmount(),
@@ -104,5 +123,7 @@ public class PaymentService implements IPaymentService {
             throw new Error(error.getMessage());
         }
     }
+
+
 
 }

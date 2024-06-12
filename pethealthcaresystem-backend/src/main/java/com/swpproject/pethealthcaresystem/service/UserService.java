@@ -175,7 +175,33 @@ public class UserService implements IUserService {
         }
         return null;
     }
+    @Transactional
+    @Override
+    public User createUserGoogle(User newUser) {
 
+        User user = new User();
+
+        if (userRepository.existsByEmail(newUser.getEmail())) {
+            return userRepository.findByEmail(newUser.getEmail());
+        }
+
+        //Validate email abc@zxc.zxc
+        String regexPattern = "^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}$";
+        if (!newUser.getEmail().matches(regexPattern)) {
+            throw new Error("Email is invalid");
+        }
+        user.setEmail(newUser.getEmail());
+        user.setPassword(newUser.getPassword());
+        user.setFullName(newUser.getFullName());
+        user.setPhoneNumber(newUser.getPhoneNumber());
+        user.setAddress(newUser.getAddress());
+        user.setRoleId(newUser.getRoleId());
+        user.setAvatar("");
+        user.setGender(newUser.getGender());
+        user.setIsActive(true);
+        user.setDob(newUser.getDob());
+        return userRepository.save(user);
+    }
     @Override
     public User getUserById(int id) {
         Optional<User> user = userRepository.findById(id);
