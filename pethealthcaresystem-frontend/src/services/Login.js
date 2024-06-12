@@ -29,6 +29,7 @@ export default function Login() {
         const response = await axios.post(`http://localhost:8080/login`, { email, password }, { withCredentials: true })
         if (response.data.isSuccess === 'true') {
             localStorage.setItem('isLoggedIn', true);
+            localStorage.setItem('roleId', response.data.user.roleId)
             // localStorage.setItem('roleId', response.data.user.roleId)
             // localStorage.setItem('email', response.data.user.email)
             navigate('/')
@@ -50,7 +51,7 @@ export default function Login() {
     //     try {
     //         const result = await signInWithPopup(auth, provider)
 
-           
+
     //           await axios.post(`http://localhost:8080/register-gg`, {
     //                 email: result.user.email,
     //                 fullName: result.user.displayName,
@@ -60,7 +61,7 @@ export default function Login() {
     //             localStorage.setItem('isLoggedIn', true);
 
     //             navigate('/');
-            
+
     //     } catch (error) {
     //         alert(error?.response?.data?.errorMessage ?? error?.message);
     //     }
