@@ -18,6 +18,7 @@ import java.util.Set;
 @Entity
 public class MedicalRecord {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     int id;
     Date date;
     String diagnosis;

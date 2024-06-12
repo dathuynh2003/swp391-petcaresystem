@@ -17,8 +17,9 @@ import java.util.Set;
 @Table(name = "pet")
 
 public class Pet {
-    @Id
+
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
     int petId;
     String avatar;
     String name;
