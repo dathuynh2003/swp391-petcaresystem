@@ -45,9 +45,15 @@ public class PetController {
     @GetMapping("/pet")
     List<Pet> getAllPets(HttpSession session){
         User curUser = (User) session.getAttribute("user");
-        return petService.getAllPetsByUser(curUser.getUserId());
+        List<Pet> pets = petService.getAllPetsByUser(curUser.getUserId());
+//        System.out.println("-----------------------------------------------------------------------------------");
+//        System.out.println(pets.toString());
+        return pets;
     }
-
+    @GetMapping("/pets")
+    List<Pet> getAllPets(){
+        return petService.getAllPets();
+    }
     @PutMapping("/deletePet/{id}")
     String deletePet(@PathVariable int id){
         return petService.deletePet(id);

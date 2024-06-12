@@ -4,8 +4,10 @@ import com.fasterxml.jackson.core.io.JsonEOFException;
 import com.fasterxml.jackson.databind.util.JSONPObject;
 import com.swpproject.pethealthcaresystem.dto.payment.CreatePaymentPosPayload;
 import com.swpproject.pethealthcaresystem.dto.payment.PayOsDTO;
+import com.swpproject.pethealthcaresystem.model.Booking;
 import com.swpproject.pethealthcaresystem.model.BookingDetail;
 import com.swpproject.pethealthcaresystem.model.Payment;
+import com.swpproject.pethealthcaresystem.repository.BookingRepository;
 import com.swpproject.pethealthcaresystem.repository.PaymentRepository;
 import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,9 +21,17 @@ import java.util.*;
 public class PaymentService implements IPaymentService {
     @Autowired
     private PaymentRepository paymentRepository;
+    @Autowired
+    private BookingRepository bookingRepository;
 
     @Override
     public Payment createPayment(Payment payment) {
+//        System.out.println("Payment Booking" + payment.getBooking());
+//        Booking curBooking = bookingRepository.findById(payment.getBooking().getId()).get();
+//        System.out.println(curBooking);
+//        Booking curBooking = bookingRepository.findById(payment.getBooking().getId()).orElseThrow(()->
+//                                                                            new RuntimeException("Booking not found"));
+//        payment.setBooking(curBooking);
         return paymentRepository.save(payment);
     }
 
@@ -94,4 +104,5 @@ public class PaymentService implements IPaymentService {
             throw new Error(error.getMessage());
         }
     }
+
 }

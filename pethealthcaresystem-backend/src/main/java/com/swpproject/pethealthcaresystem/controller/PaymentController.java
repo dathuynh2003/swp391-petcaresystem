@@ -34,9 +34,10 @@ public class PaymentController {
             headers.set("x-api-key", PaymentService.apiKey);
             HttpEntity<CreatePaymentPosPayload> httpEntity = new HttpEntity<>(payload, headers);
             PayOsDTO result = restTemplate.postForObject(uri, httpEntity, PayOsDTO.class);
+
             data.setData(result);
-            System.out.println(payload);
-            System.out.println(result);
+            paymentService.createPayment(payment);
+
             return new ResponseEntity<>(data, HttpStatus.OK);
         }catch (Error e){
             ResponseData<PayOsDTO> data = new ResponseData();

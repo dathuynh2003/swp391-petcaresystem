@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.lang.Nullable;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -41,4 +42,5 @@ public class VetShiftDetail {
     @JoinColumn(name = "shift_id")
     @JsonIgnoreProperties("vetShiftDetails")
     private Shift shift;
+
 }

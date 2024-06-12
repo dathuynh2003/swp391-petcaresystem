@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.lang.Nullable;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -24,10 +25,11 @@ public class Payment {
     @ManyToOne
     @JoinColumn(name = "user_id")
     @JsonIgnoreProperties("user")
+    @Nullable
     private User user;
 
-    @OneToOne
-    @MapsId
-    @JoinColumn(name = "booking_id")
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "booking_id", referencedColumnName = "id")
+    @Nullable
     private Booking booking;
 }
