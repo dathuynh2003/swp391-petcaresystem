@@ -24,6 +24,7 @@ export default function Sidenav() {
       e.preventDefault();
       await axios.post(`http://localhost:8080/logout`, {}, { withCredentials: true });
       localStorage.removeItem('isLoggedIn');
+      localStorage.removeItem('roleId')
       navigate('/login');
     } catch (error) {
       console.error('Error during logout:', error);

@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { Tab, TabList, Tabs, TabPanel, TabPanels, Button } from '@chakra-ui/react';
 import axios from 'axios'
+import { ToastContainer, toast } from 'react-toastify';
 
 export default function ViewPet() {
+    let navigate = useNavigate();
 
     const [pet, setPet] = useState(
         {
@@ -21,12 +23,34 @@ export default function ViewPet() {
 
     const { petId } = useParams();
 
+    const roleId = localStorage.getItem('roleId');
+    const [hospitalization, setHospitalization] = useState();
 
 
     const loadPet = async () => {
-        const response = await axios.get(`http://localhost:8080/pet/${petId}`)
+        const response = await axios.get(`http://localhost:8080/pet/${petId}`, { withCredentials: true })
         setPet(response.data)
+        console.log(response.data)
     }
+
+    const handleHospitalize = async () => {
+        try {
+            const response = await axios.post(`http://localhost:8080/admit/pet/${petId}`, {}, { withCredentials: true })
+            if (response.data.message === 'Admitted pet successfully') {
+                setHospitalization(response.data.hospitalization)
+                toast.success(response.data.message, 2000);
+                navigate('/')
+            } else {
+                toast.warning(response.data.message)
+                console.log(response.data.message)
+            }
+        } catch (e) {
+            toast.error("An unexpected error occurred", 2000)
+            // console.error(e); // This helps to debug in case of an unexpected error
+
+        }
+    }
+
     useEffect(() => {
         loadPet()
     }, [])
@@ -53,25 +77,25 @@ export default function ViewPet() {
                                         <input
                                             value={pet.name}
                                             type="text" className="form-control" id="name" readOnly />
-                                        <label for="name">Pet's name</label>
+                                        <label htmlFor="name">Pet's name</label>
                                     </div>
                                     <div className="form-floating mb-3 col">
                                         <input
                                             value={pet.petType}
                                             type="text" className="form-control" id="type" readOnly />
-                                        <label for="type">Pet's type</label>
+                                        <label htmlFor="type">Pet's type</label>
                                     </div>
                                     <div className="form-floating mb-3 col">
                                         <input
                                             value={pet.breed}
                                             type="text" className="form-control" id="breed" readOnly />
-                                        <label for="breed">Pet's breed</label>
+                                        <label htmlFor="breed">Pet's breed</label>
                                     </div>
                                     <div className="form-floating mb-3 col">
                                         <input
                                             value={pet.gender}
                                             type="text" className="form-control" id="gender" readOnly />
-                                        <label for="gender">Sex</label>
+                                        <label htmlFor="gender">Sex</label>
                                     </div>
 
 
@@ -79,25 +103,25 @@ export default function ViewPet() {
                                         <input
                                             value={pet.isNeutered ? 'Yes' : 'No'}
                                             type="text" className="form-control" id="neutered" readOnly />
-                                        <label for="neutered">Neutered</label>
+                                        <label htmlFor="neutered">Neutered</label>
                                     </div>
 
                                     <div className="form-floating mb-3 col">
                                         <input
                                             value={pet.age}
                                             type="text" className="form-control" id="age" readOnly />
-                                        <label for="age">Age (month(s))</label>
+                                        <label htmlFor="age">Age (month(s))</label>
                                     </div>
                                 </div>
                                 <div className="form-floating mb-3 col">
                                     <input
                                         value={pet.description}
                                         type="text" className="form-control" id="description" readOnly />
-                                    <label for="description">Description</label>
+                                    <label htmlFor="description">Description</label>
                                 </div>
 
-                                <Link className='btn btn-primary col-md-12' to="/listPets">Back</Link>
-
+                                {roleId !== '3' && (<Link className='btn btn-primary col-md-12' to="/listPets">Back</Link>)}
+                                {roleId === '3' && (<Link className='btn btn-success col-md-12' onClick={handleHospitalize} >Hospitalize</Link>)}
                             </div>
 
 
@@ -120,12 +144,19 @@ export default function ViewPet() {
 
             </Tabs>
             <div>
-
             </div>
-
-
-
-
+            <ToastContainer
+                position="top-right"
+                autoClose={5000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="light"
+            />
         </div>
     )
 }

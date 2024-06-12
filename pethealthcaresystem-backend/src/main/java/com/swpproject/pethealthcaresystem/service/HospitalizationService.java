@@ -38,11 +38,11 @@ public class HospitalizationService implements IHospitalizationService {
             throw new RuntimeException("Pet is already admitted in a cage");
         }
         User vet = userRepository.findById(vetId).orElseThrow(() -> new RuntimeException("Vet not found"));
-        if (vet.getRoleId() != 3) throw new RuntimeException("Vet not found");
+        if (vet.getRoleId() != 3)
+            throw new RuntimeException("Please assign a veterinarian to be responsible for the pet before admitting it to the cage.");
         List<Cage> availableCages = cageRepository.findByStatus("available");
-        if (availableCages.isEmpty()) {
+        if (availableCages.isEmpty())
             throw new RuntimeException("No available cages");
-        }
 
         Cage cage = availableCages.get(0);
         cage.setStatus("occupied");

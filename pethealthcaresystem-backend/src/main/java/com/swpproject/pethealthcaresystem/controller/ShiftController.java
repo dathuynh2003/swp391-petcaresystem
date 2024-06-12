@@ -4,7 +4,7 @@ package com.swpproject.pethealthcaresystem.controller;
 import com.swpproject.pethealthcaresystem.model.Shift;
 import com.swpproject.pethealthcaresystem.model.User;
 import com.swpproject.pethealthcaresystem.model.VetShiftDetail;
-import com.swpproject.pethealthcaresystem.service.IShiftService;
+import com.swpproject.pethealthcaresystem.service.ShiftService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,7 +19,7 @@ import java.util.List;
 public class ShiftController {
 
     @Autowired
-    private IShiftService shiftService;
+    private ShiftService shiftService;
 
     @GetMapping("/all")
     public ResponseEntity<?> getAllShifts(HttpSession session) {
@@ -68,7 +68,7 @@ public class ShiftController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Please login first!");
         }
         for (VetShiftDetail vetShiftDetail : vetShiftDetails) {
-            if (shiftService.isShiftAssignedToVet(vetShiftDetail.getShift().getShiftId(), vetShiftDetail.getUser().getUserId(), vetShiftDetail.getDate().toString())) {
+            if (shiftService.isShiftAssignedToVet(vetShiftDetail.getShift().getShiftId(), vetShiftDetail.getUser().getUserId(), vetShiftDetail.getDate())) {
                 return ResponseEntity.badRequest().body("Shift is already assigned to the vet on the selected date.");
             }
         }

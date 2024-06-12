@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { Link } from 'react-router-dom';
 
 export default function VetWorkSchedules() {
   const [shifts, setShifts] = useState([]);
@@ -94,11 +95,14 @@ export default function VetWorkSchedules() {
                         item.shift.shiftId === shift.shiftId,
                     );
                     return (
-                      <td
+                      <td style={{ cursor: 'pointer' }}
                         key={dateIndex}
                         className={`align-middle text-center ${scheduledShift ? 'bg-success text-white' : ''}`}
                       >
-                        {scheduledShift ? scheduledShift.status : ''}
+                        {scheduledShift?.status === "Available" && scheduledShift.status}
+                        {scheduledShift?.status === "Booked" && scheduledShift?.bookings?.map((booking, index) => (
+                          booking?.status === "PAID" && <Link to={`/viewPet/${booking?.pet?.petId}`}>{booking?.user?.fullName}</Link>
+                        ))}
                       </td>
                     );
                   })}
