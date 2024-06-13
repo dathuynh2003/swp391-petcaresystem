@@ -1,6 +1,8 @@
 package com.swpproject.pethealthcaresystem.model;
 
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -27,6 +29,7 @@ public class Hospitalization {
 
     @ManyToOne
     @JoinColumn(name = "pet_id")
+    @JsonBackReference
     Pet pet;
 
     @ManyToOne
