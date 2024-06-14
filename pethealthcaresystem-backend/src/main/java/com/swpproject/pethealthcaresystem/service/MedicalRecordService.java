@@ -1,22 +1,60 @@
 package com.swpproject.pethealthcaresystem.service;
 
 import com.swpproject.pethealthcaresystem.model.MedicalRecord;
+import com.swpproject.pethealthcaresystem.model.Pet;
+import com.swpproject.pethealthcaresystem.model.Prescription;
 import com.swpproject.pethealthcaresystem.repository.MedicalRecordRepository;
+import com.swpproject.pethealthcaresystem.repository.PetRepository;
+import com.swpproject.pethealthcaresystem.repository.PrescriptionRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 public class MedicalRecordService implements IMedicalRecordService {
+
     @Autowired
     private MedicalRecordRepository medicalRecordRepository;
+    @Autowired
+    private PetRepository petRepository;
+    @Autowired
+    private PrescriptionRepository prescriptionRepository;
 
     @Override
-    public List<MedicalRecord> getMedicalRecordByPetId(int petId) {
-        return medicalRecordRepository.findAll().stream()
+    public Set<MedicalRecord> getMedicalRecordByPetId(int petId) {
+       Set<MedicalRecord> medicalRecords = new HashSet<>();
+        Pet pet = petRepository.findById(petId).get();
+        medicalRecords =  medicalRecordRepository.findAll().stream()
                 .filter(medicalRecord -> medicalRecord.getPet().getPetId() == petId)
-                .collect(Collectors.toList());
+                .collect(Collectors.toSet());
+        pet.setMedicalRecords(medicalRecords);
+        return  medicalRecords;
+    }
+
+    @Override
+//    @Transactional
+    public MedicalRecord addMedicalRecord(MedicalRecord medicalRecord, int petId, Set<Prescription> listPrescriptions) {
+        Pet pet = petRepository.findById(petId).orElseThrow(() -> new RuntimeException("Pet not found"));
+        medicalRecord.setPet(pet);
+        medicalRecord.setDate(new Date());
+        medicalRecord.setPrescriptions(listPrescriptions);
+        double total = 0;
+        for (Prescription prescription : medicalRecord.getPrescriptions()) {
+            total += prescription.getDosage() * prescription.getPrice();
+        }
+        medicalRecord.setTotalAmount(total);
+        MedicalRecord savedRecord = medicalRecordRepository.save(medicalRecord);
+
+        for (Prescription prescription : listPrescriptions) {
+            prescription.setMedicalRecord(savedRecord);
+            prescriptionRepository.save(prescription);
+        }
+        savedRecord.setPrescriptions(listPrescriptions);
+
+        return savedRecord;
+
     }
 }

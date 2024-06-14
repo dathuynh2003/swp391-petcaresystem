@@ -1,10 +1,11 @@
 package com.swpproject.pethealthcaresystem.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.util.Date;
@@ -16,9 +17,10 @@ import java.util.Set;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Data
 @Entity
+@EqualsAndHashCode(exclude = "prescriptions")
 public class MedicalRecord {
-    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
     int id;
     Date date;
     String diagnosis;
@@ -26,7 +28,7 @@ public class MedicalRecord {
     String vetNote;
     //String vaccine;
     double totalAmount;
-    int status;
+    int status = 1;
 
     @ManyToOne
     @JoinColumn(name = "vet_id")
@@ -34,6 +36,7 @@ public class MedicalRecord {
 
     @ManyToOne
     @JoinColumn(name = "pet_id")
+    @JsonIgnoreProperties("medicalRecords")
     Pet pet;
 
     @OneToMany(mappedBy = "medicalRecord", cascade = CascadeType.ALL, orphanRemoval = true)
