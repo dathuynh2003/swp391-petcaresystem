@@ -24,6 +24,7 @@ import AssignVetSchedules from './services/AssignVetSchedules';
 import Booking from './services/Booking/Booking';
 import CreateCage from './services/CreateCage';
 import EditCage from './services/EditCage';
+import StaffBooking from './services/Booking/StaffBooking';
 function App() {
 
   const location = useLocation();
@@ -42,6 +43,7 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/booking" element={<Booking />} />
+            <Route path="/staffBooking" element={<StaffBooking />} />
             {/* <Route path="/payment" element={<Payment />}/> */}
             <Route path="/createPet" element={<CreatePet />} />
             <Route path="/viewPet/:petId" element={<ViewPet />} />

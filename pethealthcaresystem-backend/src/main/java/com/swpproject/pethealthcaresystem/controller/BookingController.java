@@ -32,4 +32,17 @@ public class BookingController {
             return null;
         }
     }
+
+    @PostMapping("/createBookingByStaff/pet/{petId}/vet-shift/{vsId}/services/{serviceIds}")
+    public Booking createBookingByStaff(@RequestBody Booking booking, @PathVariable int petId, @PathVariable int vsId, @PathVariable List<Integer> serviceIds, HttpSession session){
+        try {
+//            User user = (User) session.getAttribute("user");
+//            if (user == null) {
+//                return null;
+//            }
+            return bookingService.createBookingByStaff(booking, petId, vsId, serviceIds);
+        } catch (RuntimeException e) {
+            return null;
+        }
+    }
 }

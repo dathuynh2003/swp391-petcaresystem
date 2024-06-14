@@ -65,7 +65,7 @@ export default function Sidenav() {
       links = [
         { name: 'Home', path: '/', icon: 'fas fa-home' },
         { name: 'Cages', path: '/cages', icon: 'fas fa-warehouse' },
-        { name: 'Booking Appointments', path: '/booking', icon: 'fas fa-calendar-check' },
+        { name: 'Booking Appointments', path: '/staffBooking', icon: 'fas fa-calendar-check' },
         { name: 'Assign Vet\'s Work Schedules', path: '/assign-schedules', icon: 'fas fa-clipboard-list' },
         { name: 'Logout', path: '/login', icon: 'fas fa-sign-out-alt', onClick: handleLogout },
       ];
