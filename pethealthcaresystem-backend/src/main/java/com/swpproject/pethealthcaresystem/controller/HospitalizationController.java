@@ -26,6 +26,7 @@ public class HospitalizationController {
                 throw new RuntimeException("You need to login first");
             }
             if (curUser.getRoleId() != 3) {
+
                 throw new RuntimeException("You don't have permission to do this");
             }
             Hospitalization hospitalization = hospitalizationService.admitPet(petId, curUser.getUserId());
@@ -79,6 +80,25 @@ public class HospitalizationController {
             response.put("message", e.getMessage());
             response.put("hospitalization", null);
         }
+        return response;
+    }
+
+    @GetMapping("/hospitalization/{id}")
+    public Map<String, Object> viewHospitalizationDetail(@PathVariable int id, HttpSession session) {
+        Map<String, Object> response = new HashMap<>();
+        User curUser = (User) session.getAttribute("user");
+        try {
+            if (curUser == null) {
+                throw new RuntimeException("You need to login first");
+            }
+            Hospitalization hospitalization = hospitalizationService.getHospitalizationById(id);
+            response.put("hospitalization", hospitalization);
+            response.put("message", "Successfully");
+        } catch (RuntimeException e) {
+            response.put("message", e.getMessage());
+            response.put("hospitalization", null);
+        }
+
         return response;
     }
 }

@@ -15,6 +15,7 @@ export default function Sidenav() {
       setUser(result.data);
     } catch (error) {
       localStorage.removeItem('isLoggedIn');
+      localStorage.removeItem('roleId')
       console.error('Error during login:', error);
     }
   };

@@ -72,6 +72,7 @@ public class HospitalizationService implements IHospitalizationService {
         String dischargeTime = now.format(formatter);
         hospitalization.setDischargeTime(dischargeTime);
         hospitalization.setStatus("discharged");
+//        hospitalization.setStatus("pending");
 
         Cage cage = hospitalization.getCage();
         if (cage == null) {
@@ -81,6 +82,11 @@ public class HospitalizationService implements IHospitalizationService {
         cageRepository.save(cage);
 
         return hospitalizationRepository.save(hospitalization);
+    }
+
+    @Override
+    public Hospitalization getHospitalizationById(int hospitalizationId) {
+        return hospitalizationRepository.findById(hospitalizationId).orElseThrow(() -> new RuntimeException("Hospitalization not found"));
     }
 
 

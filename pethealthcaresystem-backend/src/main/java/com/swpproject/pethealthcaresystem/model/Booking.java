@@ -28,6 +28,7 @@ public class Booking {
 
     @ManyToOne
     @JoinColumn(name = "pet_id")
+    @JsonIgnoreProperties("bookings")
     private Pet pet;
 
     @OneToMany(mappedBy = "booking", cascade = CascadeType.ALL, orphanRemoval = true)

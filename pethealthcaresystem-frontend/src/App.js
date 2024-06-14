@@ -24,6 +24,7 @@ import AssignVetSchedules from './services/AssignVetSchedules';
 import Booking from './services/Booking/Booking';
 import CreateCage from './services/CreateCage';
 import EditCage from './services/EditCage';
+import ViewHospitalization from './services/ViewHospitalization';
 function App() {
 
   const location = useLocation();
@@ -60,6 +61,7 @@ function App() {
             <Route path='/list-account' element={<ListAccount />} />
             <Route path="/edit-account/:userId" element={<EditAccount />} />
             <Route path="/assign-schedules" element={<AssignVetSchedules />} />
+            <Route path="/hospitalization-detail/:id" element={<ViewHospitalization />} />
           </Routes>
         </div>
       </div>

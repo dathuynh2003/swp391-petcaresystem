@@ -4,5 +4,8 @@ import com.swpproject.pethealthcaresystem.model.Hospitalization;
 
 public interface IHospitalizationService {
     public Hospitalization admitPet(int petId, int vetId);
+
     public Hospitalization dischargePet(int hospitalizationId);
+
+    public Hospitalization getHospitalizationById(int hospitalizationId);
 }
