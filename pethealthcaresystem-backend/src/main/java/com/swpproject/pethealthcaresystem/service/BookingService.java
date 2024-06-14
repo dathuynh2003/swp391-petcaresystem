@@ -62,7 +62,7 @@ public class BookingService implements IBookingService {
 
         Date curDate = new Date();
         newBooking.setBookingDate(curDate);
-        newBooking.setStatus("Pending");
+        newBooking.setStatus("PAID");
         bookingRepository.save(newBooking);
 
         for (Integer serviceId : serviceIds) {

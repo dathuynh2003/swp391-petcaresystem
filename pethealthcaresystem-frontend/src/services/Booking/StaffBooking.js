@@ -197,7 +197,7 @@ export default function Booking() {
         console.log(selectedPet.petId);
         console.log(selectedVetShift);
         console.log(serviceIds);
-        const response = await axios.post(`http://localhost:8080/createBookingByStaff/pet/${selectedPet.petId}/vet-shift/${selectedVetShift}/services/${serviceIds.join(',')}`, booking);
+        const response = await axios.post(`http://localhost:8080/createBookingByStaff/pet/${selectedPet.petId}/vet-shift/${selectedVetShift}/services/${serviceIds}`, booking, { withCredentials: true });
         setCurrentBooking(response.data)
         console.log(response.data);
 
@@ -222,10 +222,16 @@ export default function Booking() {
 
     const handleClickAPI = (content) => {
         if (content !== null && content !== undefined && content !== '') {
-            callAPI()
+            // callAPI()
             setStep(step + 1)
         }
         else toast.warn('Please input required information!')
+    }
+
+    const handleConfirmClick = async () => {
+        callAPI()
+        setStep(step + 1)
+        toast.done('Book Appointment Successfully!')
     }
     const handlePaymentClick = async () => {
         const payment = {
@@ -576,7 +582,7 @@ export default function Booking() {
                                 </div>
                                 <div className='text-center mt-0'>
                                     {
-                                        booking?.type ? null : <Button colorScheme="teal" onClick={handlePaymentClick}>Pay Now</Button>
+                                        booking?.type ? null : <Button colorScheme="teal" onClick={handleConfirmClick}>Confirm PAID</Button>
                                     }
                                 </div>
                             </div>
