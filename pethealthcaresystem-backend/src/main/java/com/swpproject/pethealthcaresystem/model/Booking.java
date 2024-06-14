@@ -40,7 +40,7 @@ public class Booking {
     @JsonIgnoreProperties("bookings")
     private VetShiftDetail vetShiftDetail;
 
-//    @OneToOne(mappedBy = "booking")
-//    @Nullable
-//    private Payment payment;
+    @OneToOne(mappedBy = "booking")
+    @JsonIgnoreProperties("booking")
+    private Payment payment;
 }
