@@ -42,9 +42,10 @@ export default function ViewPet() {
         setMedicalRecord((prev) => ({ ...prev, pet: response.data }))
         setHospitalizations(response.data.hospitalizations)
         console.log(response.data)
-        const handleViewHospitalization = async (id) => {
-            navigate(`/hospitalization-detail/${id}`)
-        }
+    }
+
+    const handleViewHospitalization = async (id) => {
+        navigate(`/hospitalization-detail/${id}`)
     }
 
     const handleHospitalize = async () => {
@@ -86,10 +87,6 @@ export default function ViewPet() {
                 navigate('/404page')
             }, 2000);
         }
-    }
-
-    const handleViewHospitalization = async (id) => {
-
     }
 
     //Tuần 7 làm!
