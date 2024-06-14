@@ -44,8 +44,8 @@ public class Pet {
     Set<MedicalRecord> medicalRecords = new HashSet<>();
 
     @OneToMany(mappedBy = "pet", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @JsonIgnoreProperties("pet")
     Set<Hospitalization> hospitalizations = new HashSet<>();
-
 
 
 }

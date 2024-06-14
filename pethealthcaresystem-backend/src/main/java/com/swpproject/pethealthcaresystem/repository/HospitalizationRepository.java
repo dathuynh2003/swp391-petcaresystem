@@ -10,5 +10,5 @@ import java.util.Set;
 @Repository
 public interface HospitalizationRepository extends JpaRepository<Hospitalization, Integer> {
     boolean existsByPetAndStatus(Pet pet, String status);
-    Set<Hospitalization> findByPet(Pet pet);
+    Set<Hospitalization> findByPetOrderByIdDesc(Pet pet);
 }

@@ -26,6 +26,7 @@ export default function Login() {
         const response = await axios.post(`http://localhost:8080/login`, { email, password }, { withCredentials: true })
         if (response.data.isSuccess === 'true') {
             localStorage.setItem('isLoggedIn', true);
+            localStorage.setItem('roleId', response.data.user.roleId)
             // localStorage.setItem('roleId', response.data.user.roleId)
             // localStorage.setItem('email', response.data.user.email)
             navigate('/')

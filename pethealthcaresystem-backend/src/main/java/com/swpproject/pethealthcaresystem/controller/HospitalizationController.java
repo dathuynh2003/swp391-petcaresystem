@@ -79,4 +79,23 @@ public class HospitalizationController {
         }
         return response;
     }
+
+    @GetMapping("/hospitalization/{id}")
+    public Map<String, Object> viewHospitalizationDetail(@PathVariable int id, HttpSession session) {
+        Map<String, Object> response = new HashMap<>();
+        User curUser = (User) session.getAttribute("user");
+        try {
+            if (curUser == null) {
+                throw new RuntimeException("You need to login first");
+            }
+            Hospitalization hospitalization = hospitalizationService.getHospitalizationById(id);
+            response.put("hospitalization", hospitalization);
+            response.put("message", "Successfully");
+        } catch (RuntimeException e) {
+            response.put("message", e.getMessage());
+            response.put("hospitalization", null);
+        }
+
+        return response;
+    }
 }

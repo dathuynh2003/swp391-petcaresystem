@@ -51,7 +51,7 @@ public class PetService implements IPetService{
     @Override
     public Pet getPetById(int id) {
         Pet pet = petRepository.findById(id).orElseThrow(() -> new RuntimeException("Pet not found"));
-        Set<Hospitalization> hospitalizationSet = hospitalizationRepository.findByPet(pet);
+        Set<Hospitalization> hospitalizationSet = hospitalizationRepository.findByPetOrderByIdDesc(pet);
         pet.setHospitalizations(hospitalizationSet);
         return pet;
     }

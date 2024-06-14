@@ -11,6 +11,8 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 @NoArgsConstructor
@@ -29,7 +31,6 @@ public class Hospitalization {
 
     @ManyToOne
     @JoinColumn(name = "pet_id")
-    @JsonBackReference
     Pet pet;
 
     @ManyToOne
@@ -39,4 +40,7 @@ public class Hospitalization {
     @ManyToOne
     @JoinColumn(name = "vet_id")
     User user;
+
+    @OneToMany(mappedBy = "hospitalization", cascade = CascadeType.ALL, orphanRemoval = true)
+    Set<HospitalizationDetail> hospitalizationDetails = new HashSet<>();
 }
