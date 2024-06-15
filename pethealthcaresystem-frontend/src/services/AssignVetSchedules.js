@@ -75,6 +75,7 @@ export default function AssignVetSchedules() {
     axios.put('http://localhost:8080/shifts/assign-vet', vetShiftDetails, { withCredentials: true })
       .then(response => {
         alert('Shifts assigned successfully!');
+        setSelectedShifts([]);
         fetchShiftDetails();
       })
       .catch(error => {
@@ -155,34 +156,34 @@ export default function AssignVetSchedules() {
         <div className="col-md-12 border rounded p-4 mt-2 shadow">
           <h2 className="text-center m-4">Assign Vet Schedules</h2>
           <div className="form-group">
-  <div className="vet-selection">
-    <h4 style={{ marginBottom: '10px' }}>Select Vet:</h4>
-    <div style={{
-      display: 'flex',
-      flexWrap: 'wrap',
-      gap: '10px',
-      marginBottom: '10px'
-    }}>
-      {vets.map(vet => (
-        <button
-          key={vet.userId}
-          style={{
-            padding: '10px',
-            backgroundColor: selectedVet === vet.userId ? '#007bff' : 'transparent',
-            color: selectedVet === vet.userId ? '#fff' : '#000',
-            border: '1px solid #007bff',
-            borderRadius: '5px',
-            cursor: 'pointer',
-            transition: 'background-color 0.3s, color 0.3s'
-          }}
-          onClick={() => setSelectedVet(vet.userId)}
-        >
-          {vet.fullName}
-        </button>
-      ))}
-    </div>
-  </div>
-</div>
+            <div className="vet-selection">
+              <h4 style={{ marginBottom: '10px' }}>Select Vet:</h4>
+              <div style={{
+                display: 'flex',
+                flexWrap: 'wrap',
+                gap: '10px',
+                marginBottom: '10px'
+              }}>
+                {vets.map(vet => (
+                  <button
+                    key={vet.userId}
+                    style={{
+                      padding: '10px',
+                      backgroundColor: selectedVet === vet.userId ? '#007bff' : 'transparent',
+                      color: selectedVet === vet.userId ? '#fff' : '#000',
+                      border: '1px solid #007bff',
+                      borderRadius: '5px',
+                      cursor: 'pointer',
+                      transition: 'background-color 0.3s, color 0.3s'
+                    }}
+                    onClick={() => setSelectedVet(vet.userId)}
+                  >
+                    {vet.fullName}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
           <div className="d-flex justify-content-between mb-3">
             <button className="btn btn-primary" onClick={handlePreviousWeek}>Previous Week</button>
             <button className="btn btn-primary" onClick={handleNextWeek}>Next Week</button>
@@ -213,52 +214,52 @@ export default function AssignVetSchedules() {
                     const isPast = isShiftInThePast(shift, date);
                     return (
                       <td
-  key={dateIndex}
-  className={`align-middle text-center ${isAssigned ? 'bg-success text-white' : ''}`}
-  style={{ position: 'relative', height: '40px' }}
-  onMouseEnter={(e) => {
-    const button = e.currentTarget.querySelector('.delete-btn');
-    if (button) button.style.display = 'block';
-  }}
-  onMouseLeave={(e) => {
-    const button = e.currentTarget.querySelector('.delete-btn');
-    if (button) button.style.display = 'none';
-  }}
->
-  {!isPast && !isAssigned && (
-    <input
-      type="checkbox"
-      style={{
-        cursor: 'pointer',
-        width: '20px',
-        height: '20px',
-      }}
-      onChange={() => handleToggleShift(shift.shiftId, date)}
-      checked={selectedShifts.some(item => item.shiftId === shift.shiftId && item.date === date.toISOString().split('T')[0])}
-      disabled={!selectedVet}
-    />
-  )}
-  {isAssigned && (
-    <div style={{ position: 'relative', height: '100%' }}>
-      <button
-        style={{
-          display: 'none',
-          position: 'absolute',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-        }}
-        className="btn btn-danger delete-btn"
-        onClick={() => handleDeleteAssignment(shift.shiftId, date)}
-      >
-        Delete
-      </button>
-    </div>
-  )}
-  {isPast && !isAssigned && (
-    <span className="text-muted">-</span>
-  )}
-</td>
+                        key={dateIndex}
+                        className={`align-middle text-center ${isAssigned ? 'bg-success text-white' : ''}`}
+                        style={{ position: 'relative', height: '40px' }}
+                        onMouseEnter={(e) => {
+                          const button = e.currentTarget.querySelector('.delete-btn');
+                          if (button) button.style.display = 'block';
+                        }}
+                        onMouseLeave={(e) => {
+                          const button = e.currentTarget.querySelector('.delete-btn');
+                          if (button) button.style.display = 'none';
+                        }}
+                      >
+                        {!isPast && !isAssigned && (
+                          <input
+                            type="checkbox"
+                            style={{
+                              cursor: 'pointer',
+                              width: '20px',
+                              height: '20px',
+                            }}
+                            onChange={() => handleToggleShift(shift.shiftId, date)}
+                            checked={selectedShifts.some(item => item.shiftId === shift.shiftId && item.date === date.toISOString().split('T')[0])}
+                            disabled={!selectedVet}
+                          />
+                        )}
+                        {isAssigned && (
+                          <div style={{ position: 'relative', height: '100%' }}>
+                            <button
+                              style={{
+                                display: 'none',
+                                position: 'absolute',
+                                top: '50%',
+                                left: '50%',
+                                transform: 'translate(-50%, -50%)',
+                              }}
+                              className="btn btn-danger delete-btn"
+                              onClick={() => handleDeleteAssignment(shift.shiftId, date)}
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        )}
+                        {isPast && !isAssigned && (
+                          <span className="text-muted">-</span>
+                        )}
+                      </td>
                     );
                   })}
                 </tr>

@@ -75,6 +75,8 @@ public class BookingService implements IBookingService {
         newBooking.setUser(owner);
 
         VetShiftDetail vetShiftDetail = vetShiftDetailRepository.findById(vsId).orElseThrow(() -> new RuntimeException("VetShift not found"));
+        vetShiftDetail.setStatus("Booked");
+        vetShiftDetailRepository.save(vetShiftDetail);
         newBooking.setVetShiftDetail(vetShiftDetail);
 
         Date curDate = new Date();
