@@ -68,7 +68,7 @@ public class ShiftController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Please login first!");
         }
         for (VetShiftDetail vetShiftDetail : vetShiftDetails) {
-            if (shiftService.isShiftAssignedToVet(vetShiftDetail.getShift().getShiftId(), vetShiftDetail.getUser().getUserId(), vetShiftDetail.getDate().toString())) {
+            if (shiftService.isShiftAssignedToVet(vetShiftDetail.getShift().getShiftId(), vetShiftDetail.getUser().getUserId(), vetShiftDetail.getDate())) {
                 return ResponseEntity.badRequest().body("Shift is already assigned to the vet on the selected date.");
             }
         }

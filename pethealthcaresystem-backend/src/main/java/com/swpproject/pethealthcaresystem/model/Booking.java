@@ -18,7 +18,6 @@ public class Booking {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private Date bookingDate;
-    private Date appointmentDate;
     private String status;
     private double totalAmount;
     private Boolean type;
@@ -30,6 +29,7 @@ public class Booking {
 
     @ManyToOne
     @JoinColumn(name = "pet_id")
+    @JsonIgnoreProperties("bookings")
     private Pet pet;
 
     @OneToMany(mappedBy = "booking", cascade = CascadeType.ALL, orphanRemoval = true)

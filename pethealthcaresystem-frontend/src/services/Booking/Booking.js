@@ -497,7 +497,7 @@ export default function Booking() {
 
                     <div className="border-bottom mb-3">
                       <label className="w-50"><b>Pet's owner: </b> {selectedPet?.owner?.fullName}</label>
-                      <label className="w-50"><b>Phone number: </b>{selectedPet?.owner?.phone}</label>
+                      <label className="w-50"><b>Phone number: </b>{selectedPet?.owner?.phoneNumber}</label>
                     </div>
 
 

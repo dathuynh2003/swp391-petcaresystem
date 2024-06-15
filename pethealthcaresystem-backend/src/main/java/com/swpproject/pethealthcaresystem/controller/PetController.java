@@ -21,29 +21,29 @@ public class PetController {
     private UserService userService;
 
     @PostMapping("/pet")
-    String createPet(@RequestBody Pet newPet, HttpSession session){
+    String createPet(@RequestBody Pet newPet, HttpSession session) {
         User curUser = (User) session.getAttribute("user");
-        if (curUser != null){
+        if (curUser != null) {
             petService.createPet(newPet, curUser);
             return "Add new Pet successfully";
-        }else{
+        } else {
             return "Please login first!";
         }
 
     }
 
     @PutMapping("/pet/{id}")
-    Pet updatePet(@PathVariable int id, @RequestBody Pet newPet){
+    Pet updatePet(@PathVariable int id, @RequestBody Pet newPet) {
         return petService.updatePet(newPet, id);
     }
 
     @GetMapping("/pet/{id}")
-    Pet getPet(@PathVariable int id){
+    Pet getPet(@PathVariable int id) {
         return petService.getPetById(id);
     }
 
     @GetMapping("/pet")
-    List<Pet> getAllPets(HttpSession session){
+    List<Pet> getAllPets(HttpSession session) {
         User curUser = (User) session.getAttribute("user");
         List<Pet> pets = petService.getAllPetsByUser(curUser.getUserId());
 //        System.out.println("-----------------------------------------------------------------------------------");
@@ -55,7 +55,7 @@ public class PetController {
         return petService.getAllPets();
     }
     @PutMapping("/deletePet/{id}")
-    String deletePet(@PathVariable int id){
+    String deletePet(@PathVariable int id) {
         return petService.deletePet(id);
     }
 

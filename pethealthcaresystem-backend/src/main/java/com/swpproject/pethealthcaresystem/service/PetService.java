@@ -1,20 +1,26 @@
 package com.swpproject.pethealthcaresystem.service;
 
 
+import com.swpproject.pethealthcaresystem.model.Hospitalization;
 import com.swpproject.pethealthcaresystem.model.Pet;
 import com.swpproject.pethealthcaresystem.model.User;
+import com.swpproject.pethealthcaresystem.repository.HospitalizationRepository;
 import com.swpproject.pethealthcaresystem.repository.PetRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
 public class PetService implements IPetService{
     @Autowired
     private PetRepository petRepository;
+    @Autowired
+    private HospitalizationRepository hospitalizationRepository;
 
     @Override
     public Pet createPet(Pet newPet, User curUser) {
@@ -44,7 +50,10 @@ public class PetService implements IPetService{
 
     @Override
     public Pet getPetById(int id) {
-        return petRepository.findById(id).orElseThrow(() -> new RuntimeException("Pet not found"));
+        Pet pet = petRepository.findById(id).orElseThrow(() -> new RuntimeException("Pet not found"));
+        Set<Hospitalization> hospitalizationSet = hospitalizationRepository.findByPetOrderByIdDesc(pet);
+        pet.setHospitalizations(hospitalizationSet);
+        return pet;
     }
 
     @Override
@@ -74,9 +83,6 @@ public class PetService implements IPetService{
                     .filter(pet -> !pet.getIsDeceased())
                     .filter(pet -> pet.getOwner() != null && pet.getOwner().getUserId() == ownerId)
                     .collect(Collectors.toList());
-
-//            System.out.println(pets);
-
             return pets;
         }catch (StackOverflowError e) {
             System.out.println("------------------------- error --------------------------");

@@ -1,13 +1,10 @@
 package com.swpproject.pethealthcaresystem.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import jakarta.persistence.*;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 @NoArgsConstructor
@@ -15,8 +12,10 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Data
 @Entity
+@EqualsAndHashCode(exclude = {"medicalRecord", "medicine"})
 public class Prescription {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     int id;
     int dosage;
     String frequency;
@@ -24,10 +23,12 @@ public class Prescription {
 
     @ManyToOne
     @JoinColumn(name = "medical_record_id")
+    @JsonIgnoreProperties("prescriptions")
     MedicalRecord medicalRecord;
 
     @ManyToOne
     @JoinColumn(name = "medicine_id")
+    @JsonIgnoreProperties("prescriptions")
     Medicine medicine;
 
 }

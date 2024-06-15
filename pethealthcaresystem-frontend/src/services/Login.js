@@ -49,22 +49,21 @@ export default function Login() {
 
         try {
             const result = await signInWithPopup(auth, provider)
+            await axios.post(`http://localhost:8080/register-gg`, {
+                email: result.user.email,
+                fullName: result.user.displayName,
+                password: "111111"
+            }, { withCredentials: true });
 
-           
-              await axios.post(`http://localhost:8080/register-gg`, {
-                    email: result.user.email,
-                    fullName: result.user.displayName,
-                    password: "111111"
-                }, { withCredentials: true });
 
-                localStorage.setItem('isLoggedIn', true);
+            localStorage.setItem('isLoggedIn', true);
+            navigate('/');
 
-                navigate('/');
-            
         } catch (error) {
             alert(error?.response?.data?.errorMessage ?? error?.message);
         }
     };
+
 
 
 

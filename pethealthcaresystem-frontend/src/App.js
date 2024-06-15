@@ -27,6 +27,7 @@ import EditCage from './services/EditCage';
 import PaymentFail from './services/Booking/PaymentResult';
 import PaymentResult from './services/Booking/PaymentResult';
 import StaffBooking from './services/Booking/StaffBooking';
+import ViewHospitalization from './services/ViewHospitalization';
 function App() {
 
   const location = useLocation();
@@ -65,10 +66,11 @@ function App() {
             <Route path="/edit-account/:userId" element={<EditAccount />} />
             <Route path="/assign-schedules" element={<AssignVetSchedules />} />
             <Route path='/payment-result' element={<PaymentResult />} />
-          </Routes>
-        </div>
-      </div>
-    </div>
+            <Route path="/hospitalization-detail/:id" element={<ViewHospitalization />} />
+          </Routes >
+        </div >
+      </div >
+    </div >
   );
 }
 

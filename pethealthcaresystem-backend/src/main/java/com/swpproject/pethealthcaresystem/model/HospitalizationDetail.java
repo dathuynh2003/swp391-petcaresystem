@@ -7,6 +7,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
@@ -30,8 +33,6 @@ public class HospitalizationDetail {
     @ManyToOne
     @JoinColumn(name = "medicine_id")
     Medicine medicine;
-
-
 
 
 }
