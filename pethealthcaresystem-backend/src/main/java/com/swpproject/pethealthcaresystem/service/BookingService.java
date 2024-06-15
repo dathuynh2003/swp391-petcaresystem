@@ -62,6 +62,9 @@ public class BookingService implements IBookingService {
     @Override
     public Booking getBookingByOrderCode(String orderCode) {
         return null;
+    }
+
+    @Override
     public Booking createBookingByStaff(Booking newBooking, int petId, int vsId, List<Integer> serviceIds) {
         Pet pet = petRepository.findById(petId).orElseThrow(() -> new RuntimeException("Pet not found"));
         newBooking.setPet(pet);

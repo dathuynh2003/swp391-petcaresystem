@@ -69,6 +69,7 @@ export default function Services() {
               <div className="card shadow" style={{ width: "17rem" }} >
                 <img src={service?.img} className="card-img-top" style={{ width: "17rem", height: "10rem" }} alt="..." />
                 <div className="card-body" style={{ height: '100px' }}>
+                  <h5 className="card-title">{service?.nameService}</h5>
                   <p className="card-text">{service?.description}</p>
                 </div>
               </div>
