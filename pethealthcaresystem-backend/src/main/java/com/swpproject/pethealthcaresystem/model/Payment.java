@@ -28,8 +28,8 @@ public class Payment {
     @Nullable
     private User user;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "booking_id", referencedColumnName = "id")
-    @Nullable
+    @OneToOne
+    @JoinColumn(name = "booking_id")
+    @JsonIgnoreProperties("payment")
     private Booking booking;
 }

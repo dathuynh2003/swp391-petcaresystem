@@ -60,8 +60,10 @@ public class BookingService implements IBookingService {
     }
 
     @Override
-    public Booking getBookingByOrderCode(String orderCode) {
-        return null;
+    public Booking getBookingByID(int id) {
+        Booking selectedBooking = bookingRepository.findById(id).orElseThrow(() ->
+                new RuntimeException("Booking not found"));
+        return selectedBooking;
     }
 
     @Override

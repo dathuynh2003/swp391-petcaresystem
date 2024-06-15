@@ -7,6 +7,7 @@ import lombok.*;
 import org.springframework.lang.Nullable;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Setter
@@ -30,8 +31,9 @@ public class VetShiftDetail {
     private String date;
     private String status;
 
-    @OneToMany(mappedBy = "vetShiftDetail", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Booking> bookings = new HashSet<>();
+    @OneToMany(mappedBy = "vetShiftDetail")
+    @JsonIgnoreProperties("vetShiftDetail")
+    private List<Booking> bookings;
 
     @ManyToOne
     @JoinColumn(name = "vet_id")
