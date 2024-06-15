@@ -7,6 +7,7 @@ import com.swpproject.pethealthcaresystem.dto.payment.PayOsDTO;
 import com.swpproject.pethealthcaresystem.model.Booking;
 import com.swpproject.pethealthcaresystem.model.BookingDetail;
 import com.swpproject.pethealthcaresystem.model.Payment;
+import com.swpproject.pethealthcaresystem.model.VetShiftDetail;
 import com.swpproject.pethealthcaresystem.repository.BookingRepository;
 import com.swpproject.pethealthcaresystem.repository.PaymentRepository;
 import org.json.JSONException;
@@ -42,6 +43,9 @@ public class PaymentService implements IPaymentService {
             Booking updateBooking = updatedPayment.getBooking();
             updatedPayment.setStatus(payment.getStatus());
             updateBooking.setStatus(payment.getStatus());
+            VetShiftDetail vetShiftDetail = updateBooking.getVetShiftDetail();
+            vetShiftDetail.setStatus("Booked");
+            updateBooking.setPaymentId(updatedPayment.getId());
             bookingRepository.save(updateBooking);
             updatedPayment = paymentRepository.save(updatedPayment);
         }

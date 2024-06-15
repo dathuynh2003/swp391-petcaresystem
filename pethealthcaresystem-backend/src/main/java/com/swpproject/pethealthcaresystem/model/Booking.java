@@ -23,7 +23,7 @@ public class Booking {
     private double totalAmount;
     private Boolean type;
     private String description;
-
+    private int paymentId;
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
@@ -40,7 +40,7 @@ public class Booking {
     @JsonIgnoreProperties("bookings")
     private VetShiftDetail vetShiftDetail;
 
-    @OneToOne(mappedBy = "booking")
-    @JsonIgnoreProperties("booking")
-    private Payment payment;
+//    @OneToOne(mappedBy = "booking")
+//    @JsonIgnoreProperties("booking")
+//    private Payment payment;
 }

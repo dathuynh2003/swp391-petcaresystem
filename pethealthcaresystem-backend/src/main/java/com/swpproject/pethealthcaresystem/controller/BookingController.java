@@ -51,4 +51,20 @@ public class BookingController {
             return new ResponseEntity<>(responseData, HttpStatus.BAD_REQUEST);
         }
     }
+    @GetMapping("/get-booking/{id}")
+    public ResponseEntity<ResponseData> getBooking(@PathVariable int id) {
+        try {
+            ResponseData<Booking> responseData = new ResponseData<>();
+            Booking selectedBooking = bookingService.getBookingByID(id);
+            responseData.setData(selectedBooking);
+            responseData.setStatusCode(201);
+            return new ResponseEntity<>(responseData, HttpStatus.OK);
+
+        }catch (Exception e) {
+            ResponseData<Booking> responseData = new ResponseData<>();
+            responseData.setStatusCode(400);
+            responseData.setErrorMessage(e.getMessage());
+            return new ResponseEntity<>(responseData, HttpStatus.BAD_REQUEST);
+        }
+    }
 }
