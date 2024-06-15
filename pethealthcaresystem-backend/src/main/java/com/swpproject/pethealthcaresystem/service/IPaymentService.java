@@ -5,5 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface IPaymentService {
     Payment createPayment(Payment payment);
-
+    Payment updatePayment(Payment payment);
+    Payment getPaymentByOrderCode(int orderCode);
 }

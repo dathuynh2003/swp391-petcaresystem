@@ -19,7 +19,7 @@ export default function Booking() {
   // },[])
 
 
-const location = useLocation();
+  const location = useLocation();
 
 
   const [services, setServices] = useState([]);
@@ -34,18 +34,31 @@ const location = useLocation();
   const [selectedPet, setSelectedPet] = useState(null);
 
   const loadServices = async () => {
-    const response = await axios.get('http://localhost:8080/allServices');
-    setServices(response.data);
+    try {
+      const response = await axios.get('http://localhost:8080/services');
+      setServices(response.data);
+    } catch (error) {
+      console.log(error)
+    }
+
   };
 
   const loadPets = async () => {
-    const response = await axios.get('http://localhost:8080/pet', { withCredentials: true });
-    setPets(response.data);
+    try {
+      const response = await axios.get('http://localhost:8080/pet', { withCredentials: true });
+      setPets(response.data);
+    } catch (error) {
+      console.log(error)
+    }
   };
 
   const loadShift = async () => {
-    const response = await axios.get('http://localhost:8080/shifts/details', { withCredentials: true });
-    setShifts(response.data);
+    try {
+      const response = await axios.get('http://localhost:8080/shifts/details', { withCredentials: true });
+      setShifts(response.data);
+    } catch (error) {
+      console.log(error)
+    }
   };
 
   useEffect(() => {
@@ -188,7 +201,7 @@ const location = useLocation();
     console.log(response.data);
 
   }
-  
+
   const [step, setStep] = useState(0)
   const handleNextClick = (content) => {
     if (content === null || content === undefined || content === '' || content.length === 0) {
@@ -214,21 +227,22 @@ const location = useLocation();
     else toast.warn('Please input required information!')
   }
   const handlePaymentClick = async () => {
+    console.log(curBooking)
     const payment = {
-      //orderCode: booking.orderCode,
+      // orderCode: booking.orderCode,
       paymentType: 'Credit Card',  // You can modify this as per your requirement
       amount: 10000,
       paymentDate: new Date().toISOString(),
       status: 'Pending',
-      description: booking.description,
+      description: curBooking.description,
       user: selectedPet.owner,
       booking: curBooking
     };
 
     try {
-      const response = await axios.post('http://localhost:8080/api/payment', payment, { withCredentials: true });
+      const response = await axios.post('http://localhost:8080/api/payment/create', payment, { withCredentials: true });
       const { data } = response.data;
-      toast.success('Payment initiated successfully!');
+      //toast.success('Payment initiated successfully!');
       if (data && data.data && data.data.checkoutUrl) {
         window.location.href = data.data.checkoutUrl;
       }
@@ -551,12 +565,11 @@ const location = useLocation();
                 </div>
                 <div className='text-center mt-0'>
                   {
-                    booking?.type ? null :  <Button colorScheme="teal" onClick={handlePaymentClick}>Pay Now</Button>
+                    booking?.type ? null : <Button colorScheme="teal" onClick={handlePaymentClick}>Pay Now</Button>
                   }
                 </div>
               </div>
             </TabPanel>
-            
             <TabPanel>
               <p>three!</p>
             </TabPanel>

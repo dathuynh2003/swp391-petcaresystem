@@ -35,8 +35,8 @@ public class Pet {
     @JoinColumn(name = "owner_id")
     User owner;
 
-    @OneToMany(mappedBy = "pet", cascade = CascadeType.ALL, orphanRemoval = true)
-    Set<Booking> bookings = new HashSet<>();
+//    @OneToMany(mappedBy = "pet", cascade = CascadeType.ALL, orphanRemoval = true)
+//    Set<Booking> bookings = new HashSet<>();
 
     @OneToMany(mappedBy = "pet", cascade = CascadeType.ALL, orphanRemoval = true)
     Set<MedicalRecord> medicalRecords = new HashSet<>();

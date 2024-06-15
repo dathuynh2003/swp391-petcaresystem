@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.lang.Nullable;
 
 import java.util.*;
 
@@ -39,8 +40,7 @@ public class Booking {
     @JsonIgnoreProperties("bookings")
     private VetShiftDetail vetShiftDetail;
 
-    @OneToOne(mappedBy = "booking", cascade = CascadeType.ALL)
-    private Payment payment;
-
-
+//    @OneToOne(mappedBy = "booking")
+//    @Nullable
+//    private Payment payment;
 }

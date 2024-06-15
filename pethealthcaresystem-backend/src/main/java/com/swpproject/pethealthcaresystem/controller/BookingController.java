@@ -1,5 +1,6 @@
 package com.swpproject.pethealthcaresystem.controller;
 
+import com.swpproject.pethealthcaresystem.common.ResponseData;
 import com.swpproject.pethealthcaresystem.model.Booking;
 import com.swpproject.pethealthcaresystem.model.BookingDetail;
 import com.swpproject.pethealthcaresystem.model.User;
@@ -8,6 +9,8 @@ import com.swpproject.pethealthcaresystem.service.BookingService;
 import com.swpproject.pethealthcaresystem.service.PetService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -30,6 +33,22 @@ public class BookingController {
 
         } catch (RuntimeException e) {
             return null;
+        }
+    }
+
+    @PutMapping("/update-booking")
+    public ResponseEntity<ResponseData> updateBooking(@RequestBody Booking booking) {
+        try{
+            ResponseData<Booking> responseData = new ResponseData<>();
+            Booking updatedBooking = bookingService.updateBoking(booking);
+            responseData.setData(updatedBooking);
+            responseData.setStatusCode(200);
+            return new ResponseEntity<>(responseData, HttpStatus.OK);
+        }catch(Error e){
+            ResponseData<Booking> responseData = new ResponseData<>();
+            responseData.setStatusCode(400);
+            responseData.setErrorMessage(e.getMessage());
+            return new ResponseEntity<>(responseData, HttpStatus.BAD_REQUEST);
         }
     }
 }

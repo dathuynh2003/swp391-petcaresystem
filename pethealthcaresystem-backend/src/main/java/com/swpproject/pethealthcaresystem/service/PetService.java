@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -50,10 +51,14 @@ public class PetService implements IPetService{
     @Override
     public List<Pet> getAllPets() {
 
-        return petRepository.findAll().stream()
-                .filter(pet -> !pet.getIsDeceased())
-                .collect(Collectors.toList());
+//        return petRepository.findAll().stream()
+//                .filter(pet -> !pet.getIsDeceased())
+//                .collect(Collectors.toList());
+    return petRepository.findAll();
     }
+
+
+
 
     @Override
     public String deletePet(int id) {
@@ -65,9 +70,20 @@ public class PetService implements IPetService{
 
     @Override
     public List<Pet> getAllPetsByUser(int ownerId) {
-        return petRepository.findAll().stream()
-                .filter(pet -> !pet.getIsDeceased())
-                .filter(pet -> pet.getOwner() != null && pet.getOwner().getUserId() == ownerId)
-                .collect(Collectors.toList());
+        try {
+            List<Pet> pets = petRepository.findAll().stream()
+                    .filter(pet -> !pet.getIsDeceased())
+                    .filter(pet -> pet.getOwner() != null && pet.getOwner().getUserId() == ownerId)
+                    .collect(Collectors.toList());
+
+//            System.out.println(pets);
+
+            return pets;
+        }catch (StackOverflowError e) {
+            System.out.println("------------------------- error --------------------------");
+            System.out.println(e.toString());
+           return new ArrayList<>();
+        }
+
     }
 }

@@ -3,8 +3,8 @@ import './login.css'
 import axios from 'axios'
 import { Link, useNavigate, } from 'react-router-dom'
 
-// import { GoogleAuthProvider, getAuth, signInWithPopup } from "firebase/auth";
-// import app from '../firebase';
+import { GoogleAuthProvider, getAuth, signInWithPopup } from "firebase/auth";
+import app from '../firebase';
 
 
 
@@ -29,42 +29,42 @@ export default function Login() {
         const response = await axios.post(`http://localhost:8080/login`, { email, password }, { withCredentials: true })
         if (response.data.isSuccess === 'true') {
             localStorage.setItem('isLoggedIn', true);
-            // localStorage.setItem('roleId', response.data.user.roleId)
-            // localStorage.setItem('email', response.data.user.email)
+            localStorage.setItem('roleId', response.data.user.roleId)
+            localStorage.setItem('email', response.data.user.email)
             navigate('/')
         } else {
-            // localStorage.setItem('isLoggedIn', false);
-            // localStorage.setItem('roleId', 0)
-            // localStorage.setItem('email', null)
+            localStorage.setItem('isLoggedIn', false);
+            localStorage.setItem('roleId', 0)
+            localStorage.setItem('email', null)
             setMessage("Invalid username or password!")
         }
     }
 
-    // const provider = new GoogleAuthProvider();
+    const provider = new GoogleAuthProvider();
 
-    // const auth = getAuth(app);
+    const auth = getAuth(app);
 
-    // const handleLoginGoogle = async (e) => {
-    //     e.preventDefault();
+    const handleLoginGoogle = async (e) => {
+        e.preventDefault();
 
-    //     try {
-    //         const result = await signInWithPopup(auth, provider)
+        try {
+            const result = await signInWithPopup(auth, provider)
 
            
-    //           await axios.post(`http://localhost:8080/register-gg`, {
-    //                 email: result.user.email,
-    //                 fullName: result.user.displayName,
-    //                 password: "111111"
-    //             }, { withCredentials: true });
+              await axios.post(`http://localhost:8080/register-gg`, {
+                    email: result.user.email,
+                    fullName: result.user.displayName,
+                    password: "111111"
+                }, { withCredentials: true });
 
-    //             localStorage.setItem('isLoggedIn', true);
+                localStorage.setItem('isLoggedIn', true);
 
-    //             navigate('/');
+                navigate('/');
             
-    //     } catch (error) {
-    //         alert(error?.response?.data?.errorMessage ?? error?.message);
-    //     }
-    // };
+        } catch (error) {
+            alert(error?.response?.data?.errorMessage ?? error?.message);
+        }
+    };
 
 
 
@@ -107,13 +107,13 @@ export default function Login() {
                             <div className="or">OR</div>
 
                         </form>
-                        {/* <div className="google">
+                        <div className="google">
                             <button className='btn btn-light row mx-5 w-50' onClick={handleLoginGoogle}>
                                 <img className="row" style={{ width: '30%' }} src="https://www.svgrepo.com/show/475656/google-color.svg"
                                     loading="lazy" alt="google logo" />
                                 Login with Google
                             </button>
-                        </div> */}
+                        </div>
 
                     </div>
                     <div className="signup row">

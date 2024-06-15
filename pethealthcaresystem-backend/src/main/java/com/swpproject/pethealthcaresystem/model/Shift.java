@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
@@ -30,6 +31,7 @@ public class Shift {
 //    @ManyToMany
 //    List<User> users;
     @OneToMany(mappedBy = "shift", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Nullable
     private Set<VetShiftDetail> vetShiftDetails = new HashSet<>();
 
 }
