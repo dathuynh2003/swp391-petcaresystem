@@ -54,7 +54,7 @@ export default function Booking() {
             setPets(response.data);
         } catch (error) {
             console.error('Error searching pets:', error);
-            toast.error('Error searching pets');
+            toast.error(error.message);
         }
     };
 
@@ -138,6 +138,7 @@ export default function Booking() {
     const [selectedDate, setSelectedDate] = useState();
     const handleClickDay = (date, index) => {
         setSelectedDate(date.toLocaleDateString('en-CA'));
+        console.log(selectedDate)
         setDisplaySelectedDate(date.toLocaleDateString("en-Gb", { month: 'numeric', day: 'numeric', year: 'numeric' }))
         setActiveDateIndex(index)
     };
