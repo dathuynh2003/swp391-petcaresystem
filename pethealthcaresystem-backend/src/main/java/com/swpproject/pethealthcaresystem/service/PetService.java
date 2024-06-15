@@ -4,7 +4,6 @@ package com.swpproject.pethealthcaresystem.service;
 import com.swpproject.pethealthcaresystem.model.Pet;
 import com.swpproject.pethealthcaresystem.model.User;
 import com.swpproject.pethealthcaresystem.repository.PetRepository;
-import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -85,5 +84,12 @@ public class PetService implements IPetService{
            return new ArrayList<>();
         }
 
+    }
+
+    @Override
+    public List<Pet> getPetsByOwnerPhoneNumber(String phoneNumber) {
+        return petRepository.findAll().stream()
+                .filter(pet -> pet.getOwner() != null && phoneNumber.equals(pet.getOwner().getPhoneNumber()))
+                .collect(Collectors.toList());
     }
 }

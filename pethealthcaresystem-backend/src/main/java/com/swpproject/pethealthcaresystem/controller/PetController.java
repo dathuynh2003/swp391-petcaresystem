@@ -58,4 +58,9 @@ public class PetController {
     String deletePet(@PathVariable int id){
         return petService.deletePet(id);
     }
+
+    @GetMapping("/pets/ownerPhone/{phoneNumber}")
+    public List<Pet> getPetsByOwnerPhoneNumber(@PathVariable String phoneNumber){
+        return petService.getPetsByOwnerPhoneNumber(phoneNumber);
+    }
 }
