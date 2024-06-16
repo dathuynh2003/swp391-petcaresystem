@@ -13,9 +13,6 @@ const Cages = () => {
     const response = await axios.get(`http://localhost:8080/cage/search/${name}`, { withCredentials: true })
     if (response.data.message === "Cage found") {
       setCages(response.data.cages)
-      console.log(response.data.cages)
-    } else {
-      console.log(response.data.message)
     }
   }
 
@@ -62,20 +59,40 @@ const Cages = () => {
                 }}
               ></img>
             </div>
-            <div className="cage-info col-8 row border border-dark my-2 mx-2">
-              <h4 className='fs-5 my-0 col-4'>Cage: {cage?.name}</h4>
-              {cage?.status === "available" && (
-                <div className='col-3 text-center mx-3 mt-4 border border-dark rounded-pill bg-success text-white'>Status: {cage?.status}</div>
-              )}
-              {cage?.status === "occupied" && (
-                <div className='col-3 text-center mx-3 mt-4 border border-dark rounded-pill bg-danger text-white'>Status: {cage?.status}</div>
-              )}
-
-              <div className='col-3 text-center mx-3 mt-4 border border-dark bg-success-subtle'>
-                {cage?.price.toLocaleString('vi-VN')} VND/hour
+            <div className="cage-info col-8 row border border-dark my-2 mx-2 mx-auto ">
+              <div className='d-flex justify-content-between row'>
+                <h4 className='fs-5 my-0 col-6'>Cage: {cage?.name}</h4>
+                <div className='col-6 text-center my-1 border border-dark bg-success-subtle w-25'>
+                  {cage?.price.toLocaleString('vi-VN')} VND/hour
+                </div>
               </div>
 
-              <div className="fs-6 col-12 mt-0">
+              <div className='row d-flex justify-content-around'>
+                <div className='d-flex flex-column col-6 w-25'>
+                  <div className='text-start'>
+                    Size: {cage?.size}
+                  </div>
+                  <div className='text-start'>
+                    Reserved for: {cage?.type}
+                  </div>
+                </div>
+
+                {cage?.status === "available" && (
+                  <div className='col-6 text-center fw-bold text-success pt-3'>Status: {cage?.status}</div>
+                )}
+                {cage?.status === "occupied" && (
+                  <div className='col-6 text-center fw-bold text-danger pt-3'>Status: {cage?.status}</div>
+                )}
+              </div>
+
+              <div
+                className="fs-6 row mt-0 w-50"
+                style={{
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'clip'
+                }}
+              >
                 {cage?.description}
               </div>
 

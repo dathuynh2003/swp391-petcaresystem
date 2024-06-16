@@ -15,38 +15,15 @@ public class CageService implements ICageService {
 
 
     @Override
-    public Cage createCage(Cage newCage, User curUser) throws IllegalArgumentException {
-        if (curUser == null) {
-            throw new IllegalArgumentException("You need to login first");
-        }
-
-        if (curUser.getRoleId() != 2) {
-            throw new IllegalArgumentException("You don't have permission to do this");
-        }
-
-        if (newCage == null) {
-            throw new IllegalArgumentException("New cage cannot be null");
-        }
+    public Cage createCage(Cage newCage, User curUser) throws Exception {
 
         List<Cage> tempCage = cageRepository.findByNameContaining(newCage.getName());
         if (!tempCage.isEmpty()) {
-            throw new IllegalArgumentException("Cage name already exists");
+            throw new Exception("Cage name already exists");
         }
 
         newCage.setUser(curUser);
         return cageRepository.save(newCage);
-    }
-
-    @Override
-    public List<Cage> getAllCages(User curUser) throws IllegalArgumentException {
-        if (curUser == null) {
-            throw new IllegalArgumentException("You need to login first");
-        }
-        if (curUser.getRoleId() != 2) {
-            throw new IllegalArgumentException("You don't have permission to do this");
-        }
-
-        return cageRepository.findAll();
     }
 
     @Override
@@ -79,14 +56,7 @@ public class CageService implements ICageService {
     }
 
     @Override
-    public List<Cage> findCageByName(String cageName, User curUser) throws IllegalArgumentException {
-        if (curUser == null) {
-            throw new IllegalArgumentException("You need to login first");
-        }
-
-        if (curUser.getRoleId() != 2) {
-            throw new IllegalArgumentException("You don't have permission to do this");
-        }
+    public List<Cage> findCageByName(String cageName) throws IllegalArgumentException {
 
         if (cageName == null || cageName.isEmpty()) {
             return cageRepository.findAll();

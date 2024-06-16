@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -21,32 +20,21 @@ public class CageController {
     public Map<String, Object> createCage(@RequestBody Cage newCage, HttpSession session) {
         Map<String, Object> response = new HashMap<>();
         try {
-            response.put("message", "Cage created");
-            response.put("cage", cageService.createCage(newCage, (User) session.getAttribute("user")));
-        } catch (IllegalArgumentException e) {
-            response.put("message", e.getMessage());
-            response.put("cage", null);
-        } catch (Exception e) {
-            response.put("cage", null);
-            response.put("message", "An unexpected error occurred");
-        }
-        return response;
-    }
-
-    @GetMapping("/cages")
-    public Map<String, Object> getAllCages(HttpSession session) {
-        Map<String, Object> response = new HashMap<>();
-        try {
             User curUser = (User) session.getAttribute("user");
-            List<Cage> cages = cageService.getAllCages(curUser);
-            response.put("cages", cages);
-            response.put("message", "Cages found");
-        } catch (IllegalArgumentException e) {
-            response.put("cages", null);
-            response.put("message", e.getMessage());
+            if (curUser == null) {
+                throw new Exception("You need login first");
+            }
+            if (curUser.getRoleId() != 2) {
+                throw new Exception("You don't have permission to do this");
+            }
+            if (newCage == null) {
+                throw new Exception("New cage cannot be null");
+            }
+            response.put("message", "Cage created");
+            response.put("cage", cageService.createCage(newCage, curUser));
         } catch (Exception e) {
-            response.put("cages", null);
-            response.put("message", "An unexpected error occurred");
+            response.put("cage", null);
+            response.put("message", e.getMessage());
         }
         return response;
     }
@@ -74,8 +62,15 @@ public class CageController {
         Map<String, Object> response = new HashMap<>();
         try {
             User curUser = (User) session.getAttribute("user");
+            if (curUser == null) {
+                throw new IllegalArgumentException("You need to login first");
+            }
+            if (curUser.getRoleId() != 2) {
+                throw new IllegalArgumentException("You don't have permission to do this");
+            }
+
             response.put("message", "Cage found");
-            response.put("cages", cageService.findCageByName(name, curUser));
+            response.put("cages", cageService.findCageByName(name));
 
         } catch (IllegalArgumentException e) {
             response.put("message", e.getMessage());
@@ -93,8 +88,14 @@ public class CageController {
         try {
             String name = null;
             User curUser = (User) session.getAttribute("user");
+            if (curUser == null) {
+                throw new IllegalArgumentException("You need to login first");
+            }
+            if (curUser.getRoleId() != 2) {
+                throw new IllegalArgumentException("You don't have permission to do this");
+            }
             response.put("message", "Cage found");
-            response.put("cages", cageService.findCageByName(name, curUser));
+            response.put("cages", cageService.findCageByName(name));
 
         } catch (IllegalArgumentException e) {
             response.put("message", e.getMessage());
