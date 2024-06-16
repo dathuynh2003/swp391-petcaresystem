@@ -78,10 +78,10 @@ const Cages = () => {
                 </div>
 
                 {cage?.status === "available" && (
-                  <div className='col-6 text-center fw-bold text-success pt-3'>Status: {cage?.status}</div>
+                  <div className='col-5 text-start fw-bold text-success pt-3'>Status: {cage?.status}</div>
                 )}
                 {cage?.status === "occupied" && (
-                  <div className='col-6 text-center fw-bold text-danger pt-3'>Status: {cage?.status}</div>
+                  <div className='col-5 text-start fw-bold text-danger pt-3'>Status: {cage?.status}</div>
                 )}
               </div>
 

@@ -8,27 +8,40 @@ export default function EditCage() {
     const { cageId } = useParams()
     const [cage, setCage] = useState()
 
-    const loadCage = async () => {
-        const response = await axios.get(`http://localhost:8080/cage/${cageId}`, { withCredentials: true })
-        if (response.data.message === "Cage found") {
-            setCage(response.data.cage)
-            console.log(response.data.cage)
-        } else {
-            toast.warning(response.data.message)
-        }
-    }
-
     useEffect(() => {
+        const loadCage = async () => {
+            try {
+                const response = await axios.get(`http://localhost:8080/cage/${cageId}`, { withCredentials: true })
+                if (response.data.message === "Cage found") {
+                    setCage(response.data.cage)
+                    console.log(response.data.cage)
+                } else {
+                    toast.warning(response.data.message)
+                }
+            } catch (e) {
+                toast.error("Error loading cage data");
+                navigate('/404page')
+            }
+        }
         loadCage()
-    }, [])
+    }, [cageId, navigate])
 
     const onInputChange = (e) => {
         setCage({ ...cage, [e.target.name]: e.target.value })
+        console.log(cage)
     }
 
     const handleEditCage = async () => {
         if (cage?.name === '' || cage?.price === null || cage?.price === '') {
             toast.info("Please enter Cage's name and price")
+            return
+        }
+        if (cage?.size === '') {
+            toast.info("Please select the cage's size");
+            return
+        }
+        if (cage?.type === '') {
+            toast.info("Please select the cage's type")
             return
         }
         try {
@@ -63,6 +76,34 @@ export default function EditCage() {
                     placeholder="Enter the new cage's price...."
                     onChange={(e) => onInputChange(e)}
                 />
+                <div className='w-75 mx-auto mt-3 px-0'>
+                    <label htmlFor='size' className='col-6 px-2'>Select Size: </label>
+                    <label htmlFor='type' className='col-6 px-2'>Cage's Type: </label>
+                    <div className='d-flex justify-content-between'>
+                        <select
+                            className='border border-dark mb-3 fs-4 col-5'
+                            name='size'
+                            onChange={onInputChange}
+                            value={cage?.size}
+                        >
+                            <option className='fs-6' value="">Select size</option>
+                            <option className='fs-6' value="Small">Small</option>
+                            <option className='fs-6' value="Medium">Medium</option>
+                            <option className='fs-6' value="Large">Large</option>
+                        </select>
+                        <select
+                            className='border border-dark mb-3 fs-4 col-6'
+                            name='type'
+                            onChange={onInputChange}
+                            value={cage?.type}
+                        >
+                            <option className='fs-6' value="">Select type</option>
+                            <option className='fs-6' value="Dog">Dog</option>
+                            <option className='fs-6' value="Cat">Cat</option>
+                            <option className='fs-6' value="Bird">Bird</option>
+                        </select>
+                    </div>
+                </div>
                 <label htmlFor='description' className='w-75 mx-auto mt-3'>Cage Description: </label>
                 <textarea
                     className='border border-dark mx-auto mb-3 fs-4 w-75 row'
@@ -75,7 +116,7 @@ export default function EditCage() {
             </div>
             <div className='row w-50 mx-auto text-center'>
                 <Link className='btn btn-danger col-3 mx-auto' to={'/cages'}>Cancel</Link>
-                <Link className='btn btn-primary col-3 mx-auto' onClick={handleEditCage}>Save</Link>
+                <Link className='btn btn-primary col-3 mx-auto' onClick={() => handleEditCage()}>Save</Link>
             </div>
             <ToastContainer
                 position="top-right"

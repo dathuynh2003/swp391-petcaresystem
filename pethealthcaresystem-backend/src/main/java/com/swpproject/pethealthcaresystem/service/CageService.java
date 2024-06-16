@@ -28,19 +28,14 @@ public class CageService implements ICageService {
 
     @Override
     public Cage updateCage(int id, Cage newCage, User curUser) throws IllegalArgumentException {
-
-        if (curUser == null) {
-            throw new IllegalArgumentException("You need to login first");
-        }
-//        Cage tempCage = cageRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Cage not found with id:" + id));
-        if (curUser.getRoleId() != 2) {
-            throw new IllegalArgumentException("You don't have permission to do this");
-        }
         if (newCage == null) {
             throw new IllegalArgumentException("New cage information cannot be null");
         }
+        //newCage != null => Chắc chắn tempCage chỉ chứa 1 cage
         List<Cage> tempCage = cageRepository.findByNameContaining(newCage.getName());
         Cage oldCage = cageRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Cage not found"));
+
+        //tempCage not empty + tempCageName != oldCageName => CageName đã tồn tại (ko cho trùng tên)
         if (!tempCage.isEmpty() && !tempCage.get(0).getName().equals(oldCage.getName())) {
             throw new IllegalArgumentException("Cage name already exists");
         }
@@ -50,7 +45,9 @@ public class CageService implements ICageService {
                     cage.setPrice(newCage.getPrice());
                     cage.setStatus(newCage.getStatus());
                     cage.setDescription(newCage.getDescription());
-                    cage.setUser(curUser);
+                    cage.setSize(newCage.getSize());
+                    cage.setType(newCage.getType());
+                    cage.setUser(curUser);  //Staff nào update thì cập nhật Staff đó quản lí Cage luôn
                     return cageRepository.save(cage);
                 }).orElseThrow(() -> new IllegalArgumentException("Cage not found with id:" + id));
     }
@@ -70,5 +67,17 @@ public class CageService implements ICageService {
         return cageRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Cage not found with id:" + id));
     }
 
+    @Override
+    public List<Cage> findCageByTypeAndStatus(String type, String status) throws Exception {
+        if (type == null || type.isEmpty()) {
+            throw new Exception("Cage type is empty. Cannot find");
+        }
 
+        if (status == null || status.isEmpty()) {
+            throw new Exception("Cage type is empty. Cannot find");
+        }
+
+
+        return cageRepository.findByTypeAndStatus(type, status);
+    }
 }

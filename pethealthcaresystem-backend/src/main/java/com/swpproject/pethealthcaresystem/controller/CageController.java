@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -44,6 +45,12 @@ public class CageController {
         Map<String, Object> response = new HashMap<>();
         try {
             User curUser = (User) session.getAttribute("user");
+            if (curUser == null) {
+                throw new IllegalArgumentException("You need to login first");
+            }
+            if (curUser.getRoleId() != 2) {
+                throw new IllegalArgumentException("You don't have permission to do this");
+            }
             Cage cage = cageService.updateCage(id, newCage, curUser);
             response.put("message", "Cage updated");
             response.put("cage", cage);
@@ -126,6 +133,31 @@ public class CageController {
         } catch (Exception e) {
             response.put("message", "An unexpected error occurred");
             response.put("cage", null);
+        }
+        return response;
+    }
+
+    @GetMapping("/cages/{type}")
+    public Map<String, Object> getCageByType(@PathVariable String type, HttpSession session) {
+        Map<String, Object> response = new HashMap<>();
+        User curUser = (User) session.getAttribute("user");
+        try {
+            if (curUser == null) {
+                throw new IllegalArgumentException("You need to login first");
+            }
+            List<Cage> cages = cageService.findCageByTypeAndStatus(type, "available");
+            if (cages.isEmpty()) {
+                response.put("message", "There are no more available cages");
+                return response;
+            }
+            response.put("cages", cageService.findCageByTypeAndStatus(type, "available"));
+            response.put("message", "Cage found");
+        } catch (IllegalArgumentException e) {
+            response.put("message", e.getMessage());
+            response.put("cages", null);
+        } catch (Exception e) {
+            response.put("message", "An unexpected error occurred");
+            response.put("cages", null);
         }
         return response;
     }

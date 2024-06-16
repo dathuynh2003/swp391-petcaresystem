@@ -190,6 +190,26 @@ export default function ViewPet() {
 
     }
 
+    const { isOpen: isOpenChooseCage, onOpen: onOpenChooseCage, onClose: onCloseChooseCage } = useDisclosure();
+    const [cages, setCages] = useState()
+    // useEffect(() => {
+    const loadAvailableCage = async () => {
+        try {
+            const response = await axios.get(`http://localhost:8080/cages/${pet?.petType}`, { withCredentials: true })
+            if (response.data.message === 'Cage found') {
+                setCages(response.data.cages)
+                console.log(response.data.cages)
+            } else {
+                console.log(response.data.message)
+            }
+        }
+        catch (e) {
+            navigate('/404page')
+        }
+    }
+    //     loadAvailableCage()
+    // }, [])
+
     return (
         <div>
 
@@ -267,11 +287,70 @@ export default function ViewPet() {
                                     pet?.hospitalizations?.some(admitPet => admitPet?.status === "admitted") ? (
                                         <Link className='btn btn-danger col-md-12' onClick={() => handleDischarge(hospitalizations.find(hospitalization => hospitalization.status === "admitted").id)} >Discharge</Link>
                                     ) : (
-                                        // <Link className='btn btn-success col-md-12' onClick={() => handleHospitalize()} >Hospitalize</Link>
                                         pet?.hospitalizations?.some(admitPet => admitPet?.status === "pending") ? (
                                             <Link className='btn btn-warning col-md-12' onClick={() => handlePayment(hospitalizations.find(hospitalization => hospitalization.status === "admitted").id)} >Waiting Payment</Link>
                                         ) : (
-                                            <Link className='btn btn-success col-md-12' onClick={() => handleHospitalize()} >Hospitalize</Link>
+                                            // <Link className='btn btn-success col-md-12' onClick={() => handleHospitalize()} >Hospitalize</Link>
+                                            <>
+                                                <button onClick={() => { onOpenChooseCage(); loadAvailableCage() }} className='mb-3 btn btn-success col-12'>Requires Hospitalization</button>
+                                                <Modal isOpen={isOpenChooseCage} onClose={onCloseChooseCage} size={'3xl'} >
+                                                    <ModalOverlay />
+                                                    <ModalContent>
+                                                        <ModalHeader className='text-center'>Pet's hospitalization requirements</ModalHeader>
+                                                        <ModalCloseButton />
+                                                        <ModalBody>
+                                                            <FormControl mt={4} className='d-flex'>
+                                                                <FormLabel className='w-50'>Pet's owner  <Input readOnly ref={initialRef} value={pet?.owner?.fullName} /></FormLabel>
+                                                                <FormLabel className='w-50'>Phone number <Input readOnly value={pet?.owner?.phoneNumber} /></FormLabel>
+                                                            </FormControl>
+                                                            <FormControl className='d-flex'>
+                                                                <FormLabel className='w-50'>Pet's name <Input readOnly ref={initialRef} value={pet.name} /></FormLabel>
+                                                                <FormLabel className='w-50'>Pet's type <Input readOnly value={pet.petType} /></FormLabel>
+                                                            </FormControl>
+                                                            <FormControl className='d-flex justify-content-between'>
+                                                                <FormLabel>Pet's breed <Input readOnly ref={initialRef} value={pet.breed} /></FormLabel>
+                                                                <FormLabel>Pet's sex <Input readOnly value={pet.gender} /></FormLabel>
+                                                                <FormLabel>Pet's age <Input readOnly value={pet.age} /></FormLabel>
+                                                            </FormControl>
+                                                            <FormControl className='d-flex'>
+                                                                <FormLabel className='w-100'>
+                                                                    <Input readOnly value="Cage Available" className='text-center fw-bold' />
+                                                                </FormLabel>
+                                                            </FormControl>
+                                                            <FormControl className='row'>
+                                                                {cages?.map((cage, index) => (
+                                                                    <FormLabel className='w-75 mx-auto'>
+                                                                        <div className='border d-flex justify-content-between align-items-center fw-normal rounded'>
+                                                                            <div className='w-75'>
+                                                                                <div className='d-flex justify-content-start mx-3'>
+                                                                                    <span className='mx-3 w-25'>Cage: {cage?.name}</span>
+                                                                                    <span className='text-warning mx-5 w-50'>{cage?.price.toLocaleString('vi-VN')} VND</span>
+                                                                                </div>
+                                                                                <div className='d-flex justify-content-start mx-3'>
+                                                                                    <span className='mx-3 w-25'>Size: {cage?.size}</span>
+                                                                                    <span className='mx-5 w-50'>Reserved for: {cage?.type}</span>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div className='rounded-circle border mx-4' style={{ width: '40px', height: '40px' }}>
+
+                                                                            </div>
+                                                                        </div>
+                                                                    </FormLabel>
+                                                                ))}
+                                                            </FormControl>
+                                                        </ModalBody>
+                                                        <ModalFooter>
+                                                            <Button colorScheme="blue" mr={3} onClick={onCloseChooseCage}>
+                                                                Close
+                                                            </Button>
+                                                            <Button colorScheme="green" onClick={onCloseChooseCage}>
+                                                                Save
+                                                            </Button>
+                                                        </ModalFooter>
+                                                    </ModalContent>
+
+                                                </Modal>
+                                            </>
                                         )
                                     )
                                 )}
