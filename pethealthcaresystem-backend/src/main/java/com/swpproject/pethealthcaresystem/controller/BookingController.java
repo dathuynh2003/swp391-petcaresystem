@@ -63,7 +63,41 @@ public class BookingController {
             return null;
         }
     }
+    @GetMapping("/bookings")
+    public ResponseEntity<ResponseData> getAllBookings(HttpSession session) {
+        try {
+            User currentUser = (User) session.getAttribute("user");
+            if(currentUser != null) {
+                ResponseData<List<Booking>> responseData = new ResponseData<>();
+                List<Booking> bookings = bookingService.getAllBookings(currentUser);
+                responseData.setData(bookings);
+                responseData.setStatusCode(200);
+                return new ResponseEntity<>(responseData, HttpStatus.OK);
+            }
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }catch (RuntimeException e){
+            ResponseData<Booking> responseData = new ResponseData<>();
+            responseData.setStatusCode(400);
+            responseData.setErrorMessage(e.getMessage());
+            return new ResponseEntity<>(responseData, HttpStatus.BAD_REQUEST);
+        }
+    }
+    @GetMapping("/get-booking/{id}/details")
+    public ResponseEntity<ResponseData> getBookingDetail(@PathVariable int id) {
+        try {
+            ResponseData<List<BookingDetail>> responseData = new ResponseData<>();
+            List<BookingDetail> bookingDetails = bookingService.bookingDetail(id);
+            responseData.setData(bookingDetails);
+            responseData.setStatusCode(200);
+            return new ResponseEntity<>(responseData, HttpStatus.OK);
 
+        }catch (RuntimeException e){
+            ResponseData<BookingDetail> responseData = new ResponseData<>();
+            responseData.setStatusCode(400);
+            responseData.setErrorMessage(e.getMessage());
+            return new ResponseEntity<>(responseData, HttpStatus.BAD_REQUEST);
+        }
+    }
     // @GetMapping("/get-booking/{id}")
     // public ResponseEntity<ResponseData> getBooking(@PathVariable int id) {
     //     try {

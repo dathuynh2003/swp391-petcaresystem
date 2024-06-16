@@ -3,9 +3,12 @@ package com.swpproject.pethealthcaresystem.service;
 import com.swpproject.pethealthcaresystem.model.*;
 import com.swpproject.pethealthcaresystem.model.PetService;
 import com.swpproject.pethealthcaresystem.repository.*;
+import com.swpproject.pethealthcaresystem.ultis.DateFormatter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.text.SimpleDateFormat;
+import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -22,7 +25,6 @@ public class BookingService implements IBookingService {
     private PetServiceRepository petServiceRepository;
     @Autowired
     private BookingDetailRepository bookingDetailRepository;
-
 
     @Override
     public Booking createBooking(Booking newBooking, User user, int petId, int vsId, List<Integer> serviceIds) {
@@ -64,6 +66,26 @@ public class BookingService implements IBookingService {
         Booking selectedBooking = bookingRepository.findById(id).orElseThrow(() ->
                 new RuntimeException("Booking not found"));
         return selectedBooking;
+    }
+
+    @Override
+    public List<Booking> getAllBookings(User currentUser) {
+        List<Booking> bookings = bookingRepository.findBookingsByUserAndStatus(currentUser, "PAID");
+        if (bookings.isEmpty()) {
+            throw new RuntimeException("Booking not found");
+        }
+
+        return bookings;
+    }
+
+    @Override
+    public List<BookingDetail> bookingDetail(int bookingId) {
+        Booking selectedBooking = getBookingByID(bookingId);
+        if (selectedBooking == null) {
+            throw new RuntimeException("Booking not found");
+        }
+        List<BookingDetail> bookingDetails = selectedBooking.getBookingDetails();
+        return bookingDetails;
     }
 
     @Override
