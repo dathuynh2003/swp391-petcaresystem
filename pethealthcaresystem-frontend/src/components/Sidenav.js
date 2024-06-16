@@ -58,6 +58,7 @@ export default function Sidenav() {
         { name: 'Home', path: '/', icon: 'fas fa-home' },
         { name: 'Services', path: '/services', icon: 'fas fa-concierge-bell' },
         { name: 'Booking', path: '/booking', icon: 'fas fa-calendar-check' },
+        { name: 'Reservation', path: '/reservation', icon: 'fa-solid fa-book' },
         { name: 'Pets', path: '/listPets', icon: 'fas fa-paw' },
         { name: 'Profile', path: '/profile', icon: 'fas fa-user' },
         { name: 'Logout', path: '/login', icon: 'fas fa-sign-out-alt', onClick: handleLogout },

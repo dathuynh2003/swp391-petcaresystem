@@ -28,6 +28,7 @@ import PaymentFail from './services/Booking/PaymentResult';
 import PaymentResult from './services/Booking/PaymentResult';
 import StaffBooking from './services/Booking/StaffBooking';
 import ViewHospitalization from './services/ViewHospitalization';
+import Reservation from './services/Booking/Reservation';
 function App() {
 
   const location = useLocation();
@@ -67,6 +68,7 @@ function App() {
             <Route path="/assign-schedules" element={<AssignVetSchedules />} />
             <Route path='/payment-result' element={<PaymentResult />} />
             <Route path="/hospitalization-detail/:id" element={<ViewHospitalization />} />
+            <Route path="/reservation" element={<Reservation />} />
           </Routes >
         </div >
       </div >
