@@ -111,20 +111,24 @@ export default function Booking() {
   }, [currentWeek]);
 
   const handlePreviousWeek = () => {
+    setSelectedVetShift(null);
+    setActiveShiftIndex(null);
     const previousWeek = new Date(currentWeek);
     previousWeek.setDate(currentWeek.getDate() - 7);
     setActiveDateIndex(null)
     setActiveShiftIndex(null)
-    // setVets([])
+    setVets([])
     setCurrentWeek(previousWeek);
   };
 
   const handleNextWeek = () => {
+    setSelectedVetShift(null);
+    setActiveShiftIndex(null);
     const nextWeek = new Date(currentWeek);
     nextWeek.setDate(currentWeek.getDate() + 7);
     setActiveDateIndex(null)
     setActiveShiftIndex(null)
-    // setVets([])
+    setVets([])
     setCurrentWeek(nextWeek);
   };
 
@@ -132,21 +136,15 @@ export default function Booking() {
     return date.toLocaleDateString("en", { weekday: 'short', month: 'long', day: 'numeric' }); // Định dạng ngày thành dd/mm/yyyy
   };
 
+  const [vets, setVets] = useState([]);
   const [activeDateIndex, setActiveDateIndex] = useState(null);
   const [shifts, setShifts] = useState([]);
-  const [selectedDate, setSelectedDate] = useState();
-  const handleClickDay = (date, index) => {
-    setSelectedDate(date.toLocaleDateString('en-CA'));
+  const handleClickDay = async (date, index) => {
+    setSelectedVetShift(null);
+    setActiveShiftIndex(null);
     setDisplaySelectedDate(date.toLocaleDateString("en-Gb", { month: 'numeric', day: 'numeric', year: 'numeric' }))
     setActiveDateIndex(index)
-  };
-
-  const [selectedDisplayDate, setDisplaySelectedDate] = useState()
-
-
-  const [vets, setVets] = useState([]);
-  const loadShiftsByDate = async () => {
-    const response = await axios.get(`http://localhost:8080/shifts/shiftByDate/${selectedDate}`);
+    const response = await axios.get(`http://localhost:8080/shifts/shiftByDate/${date.toLocaleDateString('en-CA')}`);
     const shifts = response.data;
     const updateVets = []
     shifts.forEach((shift) => {
@@ -168,19 +166,19 @@ export default function Booking() {
     setVets(updateVets)
   };
 
-  useEffect(() => {
-    if (selectedDate) {
-      loadShiftsByDate();
-    }
-  }, [selectedDate])
-
+  const [selectedDisplayDate, setDisplaySelectedDate] = useState()
   const [activeShiftIndex, setActiveShiftIndex] = useState()
   const [selectedVetShift, setSelectedVetShift] = useState()
 
   const [time, setTime] = useState()
   const chooseShift = (vs_id, index, vetName, time) => {
-    setSelectedVetShift(vs_id);
-    setActiveShiftIndex(index);
+    if (index === activeShiftIndex) {
+      setSelectedVetShift(null);
+      setActiveShiftIndex(null);
+    } else {
+      setSelectedVetShift(vs_id);
+      setActiveShiftIndex(index);
+    }
     setVetName(vetName)
     setTime(time)
   }
@@ -461,10 +459,15 @@ export default function Booking() {
                           <h1 className='fs-3'>{vet?.fullName}</h1>
                           <div className='row'>
                             {vet?.workSchedule?.map((workSchedule, workScheduleIndex) => (
-                              <Button
-                                className={`col-2 mx-4 my-2 btn btn-outline-primary ${activeShiftIndex === vet?.vetId + '-' + workScheduleIndex ? 'active' : ''}`}
-                                onClick={() => chooseShift(workSchedule?.vs_id, vet?.vetId + '-' + workScheduleIndex, vet?.fullName, workSchedule?.shift.from_time + ' - ' + workSchedule?.shift.to_time)}
-                              >{workSchedule?.shift?.from_time} - {workSchedule?.shift?.to_time}</Button>
+                              <>
+                                <button
+                                  className={`col-2 mx-4 my-2 btn btn-outline-primary text-black ${activeShiftIndex === workSchedule?.vs_id ? 'active' : ''}`}
+                                  disabled={workSchedule?.status !== "Available"}
+                                  onClick={() => chooseShift(workSchedule?.vs_id, workSchedule?.vs_id, vet?.fullName, workSchedule?.shift.from_time + ' - ' + workSchedule?.shift.to_time)}
+                                >
+                                  {workSchedule?.shift?.from_time} - {workSchedule?.shift?.to_time}
+                                </button>
+                              </>
                             ))}
                           </div>
                         </div>
