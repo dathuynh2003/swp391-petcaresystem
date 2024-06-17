@@ -3,8 +3,11 @@ package com.swpproject.pethealthcaresystem.service;
 import com.swpproject.pethealthcaresystem.model.*;
 import com.swpproject.pethealthcaresystem.model.PetService;
 import com.swpproject.pethealthcaresystem.repository.*;
-import com.swpproject.pethealthcaresystem.ultis.DateFormatter;
+//import com.swpproject.pethealthcaresystem.ultis.DateFormatter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
@@ -86,6 +89,16 @@ public class BookingService implements IBookingService {
         }
         List<BookingDetail> bookingDetails = selectedBooking.getBookingDetails();
         return bookingDetails;
+    }
+
+    @Override
+    public Page<Booking> getBookings(Integer pageNo, Integer pageSize) {
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
+        Page<Booking> bookings = bookingRepository.findAll(pageable);
+        if (bookings.isEmpty()) {
+            throw new RuntimeException("Booking not found");
+        }
+        return bookings;
     }
 
     @Override

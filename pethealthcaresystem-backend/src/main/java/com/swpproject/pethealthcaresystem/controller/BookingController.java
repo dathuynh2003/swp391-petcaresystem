@@ -9,6 +9,7 @@ import com.swpproject.pethealthcaresystem.service.BookingService;
 import com.swpproject.pethealthcaresystem.service.PetService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -97,6 +98,28 @@ public class BookingController {
             responseData.setErrorMessage(e.getMessage());
             return new ResponseEntity<>(responseData, HttpStatus.BAD_REQUEST);
         }
+    }
+    @GetMapping("/bookings-staff")
+    public ResponseEntity<ResponseData> getBookingssByStaff
+            (HttpSession session,
+             @RequestParam(name =  "pageNo", defaultValue = "1") Integer pageNo,
+             @RequestParam(name = "pageSize") Integer pageSize) {
+        try {
+            User currentUser = (User) session.getAttribute("user");
+            if(currentUser != null) {
+                ResponseData<Page<Booking>> responseData = new ResponseData<>();
+                responseData.setData(bookingService.getBookings(pageNo, pageSize));
+                responseData.setStatusCode(200);
+                return new ResponseEntity<>(responseData, HttpStatus.OK);
+            }
+        }catch (RuntimeException e){
+            ResponseData<Page<Booking>> responseData = new ResponseData<>();
+            responseData.setStatusCode(400);
+            responseData.setErrorMessage(e.getMessage());
+            return new ResponseEntity<>(responseData, HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+
     }
     // @GetMapping("/get-booking/{id}")
     // public ResponseEntity<ResponseData> getBooking(@PathVariable int id) {

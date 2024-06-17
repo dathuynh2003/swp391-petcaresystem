@@ -1,6 +1,8 @@
 package com.swpproject.pethealthcaresystem.service;
 
 import com.swpproject.pethealthcaresystem.model.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -12,4 +14,5 @@ public interface IBookingService {
      Booking getBookingByID(int id);
      List<Booking> getAllBookings(User currentUser);
      List<BookingDetail> bookingDetail(int bookingId);
+     Page<Booking> getBookings(Integer pageNo, Integer pageSize);
 }
