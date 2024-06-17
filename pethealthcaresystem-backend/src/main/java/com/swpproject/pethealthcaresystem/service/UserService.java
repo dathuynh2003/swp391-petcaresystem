@@ -25,10 +25,16 @@ public class UserService implements IUserService {
     @Transactional
     @Override
     public String createUser(User newUser){
-        User user = new User();
+        User user = userRepository.findByPhoneNumber(newUser.getPhoneNumber());
 
-        if(userRepository.existsByEmail(newUser.getEmail())) {
+        if (user == null) {
+            user = new User();
+        } else if (user.getEmail() != null && userRepository.existsByEmail(newUser.getEmail())) {
+            // Nếu tài khoản đã có email và email này đang được sử dụng
             return "Email is already in use";
+        } else if (user.getEmail() != null && !user.getEmail().equals(newUser.getEmail())) {
+            // Nếu tài khoản đã có email nhưng không trùng với email mới
+            return "Phone number is already associated with a different email";
         }
 
         //Validate email abc@zxc.zxc
@@ -45,7 +51,7 @@ public class UserService implements IUserService {
         user.setRoleId(1);
         user.setAvatar("");
         user.setGender(newUser.getGender());
-        user.setIsActive(true);
+        user.setIsActive(false); // Đặt là không hoạt động cho đến khi xác thực
         user.setDob(newUser.getDob());
 
 
@@ -70,6 +76,7 @@ public class UserService implements IUserService {
         if (storedCode != null && storedCode.equals(code)) {
             User user = temporaryStorage.get(email);
             if (user != null) {
+                user.setIsActive(true); // Kích hoạt tài khoản sau khi xác thực thành công
                 userRepository.save(user);
                 temporaryStorage.remove(email);
                 verifyCodeService.removeVerifyCode(email);
@@ -206,5 +213,22 @@ public class UserService implements IUserService {
     public User getUserById(int id) {
         Optional<User> user = userRepository.findById(id);
         return user.orElse(null);
+    }
+
+    @Transactional
+    @Override
+    public User createAnonymousUser(String phoneNumber, String fullName, String gender) {
+        if (userRepository.existsByPhoneNumber(phoneNumber)) {
+            throw new Error("Phone number is already in use");
+        }
+
+        User user = User.builder()
+                .phoneNumber(phoneNumber)
+                .fullName(fullName)
+                .gender(gender)
+                .isActive(true)
+                .build();
+
+        return userRepository.save(user);
     }
 }

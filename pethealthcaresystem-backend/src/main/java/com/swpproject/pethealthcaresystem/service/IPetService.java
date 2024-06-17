@@ -14,4 +14,6 @@ public interface IPetService {
     String deletePet(int id);
     List<Pet> getAllPetsByUser(int ownerId);
     List<Pet> getPetsByOwnerPhoneNumber(String phoneNumber);
+
+    Pet createPetForAnonymousUser(Pet newPet, String phoneNumber);
 }

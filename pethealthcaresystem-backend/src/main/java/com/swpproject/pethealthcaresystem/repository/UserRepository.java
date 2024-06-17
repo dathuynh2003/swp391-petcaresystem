@@ -13,4 +13,7 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     List<User> findByRoleId(int roleId);
     List<User> findByIsActiveTrue();
     List<User> findByRoleIdAndIsActiveTrue(int roleId);
+
+    Boolean existsByPhoneNumber(String phoneNumber);
+    User findByPhoneNumber(String phoneNumber);
 }

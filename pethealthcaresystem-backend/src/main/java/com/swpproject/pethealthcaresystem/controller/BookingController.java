@@ -80,4 +80,24 @@ public class BookingController {
     //         return new ResponseEntity<>(responseData, HttpStatus.BAD_REQUEST);
     //     }
     // }
+
+    @PutMapping("booking/paid")
+    public ResponseEntity<Booking> updateBookingAfterPAID(@RequestBody Booking booking) {
+        try {
+            Booking updatedBooking = bookingService.updateBookingAfterPAID(booking);
+            return ResponseEntity.ok(updatedBooking);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(404).body(null);
+        }
+    }
+
+    @PutMapping("booking/cancelled")
+    public ResponseEntity<Booking> updateBookingAfterCANCELLED(@RequestBody Booking booking) {
+        try {
+            Booking updatedBooking = bookingService.updateBookingAfterCANCELLED(booking);
+            return ResponseEntity.ok(updatedBooking);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(404).body(null);
+        }
+    }
 }

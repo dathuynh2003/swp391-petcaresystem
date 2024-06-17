@@ -13,4 +13,8 @@ public interface IBookingService {
 //    Booking getBookingByOrderCode(String orderCode);
     Booking createBookingByStaff(Booking newBooking, int petId, int vsId, List<Integer> serviceIds);
      Booking getBookingByID(int id);
+
+    Booking updateBookingAfterPAID(Booking newBooking);
+
+    Booking updateBookingAfterCANCELLED(Booking newBooking);
 }

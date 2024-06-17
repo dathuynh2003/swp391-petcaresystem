@@ -71,6 +71,7 @@ export default function CreatePet() {
 
   return (
     <div>
+
       <div className="container">
         <div className="col-md-6 offset-md-3 border rounded p-4 mt-2 shadow">
           <h2 className="text-center m-4">Add new Pet</h2>

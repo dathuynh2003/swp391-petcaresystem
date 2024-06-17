@@ -6,11 +6,11 @@ import com.swpproject.pethealthcaresystem.model.Pet;
 import com.swpproject.pethealthcaresystem.model.User;
 import com.swpproject.pethealthcaresystem.repository.HospitalizationRepository;
 import com.swpproject.pethealthcaresystem.repository.PetRepository;
+import com.swpproject.pethealthcaresystem.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -21,6 +21,8 @@ public class PetService implements IPetService{
     private PetRepository petRepository;
     @Autowired
     private HospitalizationRepository hospitalizationRepository;
+    @Autowired
+    private UserRepository userRepository;
 
     @Override
     public Pet createPet(Pet newPet, User curUser) {
@@ -97,5 +99,17 @@ public class PetService implements IPetService{
         return petRepository.findAll().stream()
                 .filter(pet -> pet.getOwner() != null && phoneNumber.equals(pet.getOwner().getPhoneNumber()))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Pet createPetForAnonymousUser(Pet newPet, String phoneNumber) {
+        User anonymousUser = userRepository.findByPhoneNumber(phoneNumber);
+        if (anonymousUser == null) {
+            throw new RuntimeException("Anonymous user not found");
+        }
+
+        newPet.setOwner(anonymousUser);
+        newPet.setIsDeceased(false);
+        return petRepository.save(newPet);
     }
 }

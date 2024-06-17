@@ -18,6 +18,8 @@ import Dashboard from './services/Dashboard';
 import Verify from './services/Verify';
 import CreateShift from './services/CreateShift';
 import CreateAccount from './services/CreateAccount';
+import CreateAccountByStaff from './services/CreateAccountByStaff';
+import CreatePetByStaff from './services/CreatePetByStaff';
 import ListAccount from './services/ListAccount';
 import EditAccount from './services/EditAccount';
 import AssignVetSchedules from './services/AssignVetSchedules';
@@ -67,6 +69,8 @@ function App() {
             <Route path="/assign-schedules" element={<AssignVetSchedules />} />
             <Route path='/payment-result' element={<PaymentResult />} />
             <Route path="/hospitalization-detail/:id" element={<ViewHospitalization />} />
+            <Route path="/create-account-by-staff" element={<CreateAccountByStaff />} />
+            <Route path="/create-pet-by-staff" element={<CreatePetByStaff />} />
           </Routes >
         </div >
       </div >

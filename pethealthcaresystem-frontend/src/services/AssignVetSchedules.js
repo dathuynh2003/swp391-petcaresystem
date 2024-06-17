@@ -226,6 +226,7 @@ export default function AssignVetSchedules() {
                           if (button) button.style.display = 'none';
                         }}
                       >
+
                         {!isPast && !isAssigned && (
                           <input
                             type="checkbox"

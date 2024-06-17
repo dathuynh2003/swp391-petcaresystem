@@ -75,13 +75,13 @@ public class BookingService implements IBookingService {
         newBooking.setUser(owner);
 
         VetShiftDetail vetShiftDetail = vetShiftDetailRepository.findById(vsId).orElseThrow(() -> new RuntimeException("VetShift not found"));
-        vetShiftDetail.setStatus("Booked");
+        vetShiftDetail.setStatus("Waiting");
         vetShiftDetailRepository.save(vetShiftDetail);
         newBooking.setVetShiftDetail(vetShiftDetail);
 
         Date curDate = new Date();
         newBooking.setBookingDate(curDate);
-        newBooking.setStatus("PAID");
+        newBooking.setStatus("Pending");
         bookingRepository.save(newBooking);
 
         for (Integer serviceId : serviceIds) {
@@ -93,5 +93,33 @@ public class BookingService implements IBookingService {
             newBooking.setTotalAmount(newBooking.getTotalAmount() + petService.getPrice());
         }
         return bookingRepository.save(newBooking);
+    }
+
+    @Override
+    public Booking updateBookingAfterPAID(Booking newBooking) {
+        VetShiftDetail vetShiftDetail = vetShiftDetailRepository.findById(newBooking.getVetShiftDetail().getVs_id()).orElseThrow(() -> new RuntimeException("VetShift not found"));
+        vetShiftDetail.setStatus("Booked");
+        vetShiftDetailRepository.save(vetShiftDetail);
+        newBooking.setVetShiftDetail(vetShiftDetail);
+
+        Booking updatedBooking = bookingRepository.findById(newBooking.getId()).orElseThrow(()
+                -> new RuntimeException("Booking not found"));
+        updatedBooking.setStatus("PAID");
+        updatedBooking = bookingRepository.save(updatedBooking);
+        return updatedBooking;
+    }
+
+    @Override
+    public Booking updateBookingAfterCANCELLED(Booking newBooking) {
+        VetShiftDetail vetShiftDetail = vetShiftDetailRepository.findById(newBooking.getVetShiftDetail().getVs_id()).orElseThrow(() -> new RuntimeException("VetShift not found"));
+        vetShiftDetail.setStatus("Available");
+        vetShiftDetailRepository.save(vetShiftDetail);
+        newBooking.setVetShiftDetail(vetShiftDetail);
+
+        Booking updatedBooking = bookingRepository.findById(newBooking.getId()).orElseThrow(()
+                -> new RuntimeException("Booking not found"));
+        updatedBooking.setStatus("CANCELLED");
+        updatedBooking = bookingRepository.save(updatedBooking);
+        return updatedBooking;
     }
 }

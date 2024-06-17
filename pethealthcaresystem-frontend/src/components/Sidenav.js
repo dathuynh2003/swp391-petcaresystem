@@ -69,6 +69,7 @@ export default function Sidenav() {
         { name: 'Cages', path: '/cages', icon: 'fas fa-warehouse' },
         { name: 'Booking Appointments', path: '/staffBooking', icon: 'fas fa-calendar-check' },
         { name: 'Assign Vet\'s Work Schedules', path: '/assign-schedules', icon: 'fas fa-clipboard-list' },
+        { name: 'Anomyous User', path: '/create-account-by-staff', icon: 'fa-solid fa-user' },
         { name: 'Logout', path: '/login', icon: 'fas fa-sign-out-alt', onClick: handleLogout },
       ];
       break;

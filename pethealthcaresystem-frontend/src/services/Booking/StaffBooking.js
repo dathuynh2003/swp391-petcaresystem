@@ -201,6 +201,26 @@ export default function Booking() {
 
     }
 
+    const updateBookingAfterPAID = async (booking) => {
+        try {
+            const response = await axios.put(`http://localhost:8080/booking/paid`, booking);
+            return response.data;
+        } catch (error) {
+            console.error("There was an error updating the booking to PAID!", error);
+            throw error;
+        }
+    };
+
+    const updateBookingAfterCANCELLED = async (booking) => {
+        try {
+            const response = await axios.put(`http://localhost:8080/booking/cancelled`, booking);
+            return response.data;
+        } catch (error) {
+            console.error("There was an error updating the booking to CANCELLED!", error);
+            throw error;
+        }
+    };
+
     const [step, setStep] = useState(0)
     const handleNextClick = (content) => {
         if (content === null || content === undefined || content === '' || content.length === 0) {
@@ -220,41 +240,36 @@ export default function Booking() {
 
     const handleClickAPI = (content) => {
         if (content !== null && content !== undefined && content !== '') {
-            // callAPI()
+            callAPI()
             setStep(step + 1)
         }
         else toast.warn('Please input required information!')
     }
 
     const handleConfirmClick = async () => {
-        callAPI()
+        try {
+            const updatedBooking = await updateBookingAfterPAID(curBooking);
+            console.log('Booking updated to PAID:', updatedBooking);
+            setBooking(updatedBooking); // Update state with the updated booking
+        } catch (error) {
+            console.error('Error updating booking to PAID:', error);
+        }
         setStep(step + 1)
         toast.done('Book Appointment Successfully!')
     }
-    const handlePaymentClick = async () => {
-        const payment = {
-            //orderCode: booking.orderCode,
-            paymentType: 'Credit Card',  // You can modify this as per your requirement
-            amount: 10000,
-            paymentDate: new Date().toISOString(),
-            status: 'Pending',
-            description: booking.description,
-            user: selectedPet.owner,
-            booking: curBooking
-        };
 
+    const handleCancelClick = async () => {
         try {
-            const response = await axios.post('http://localhost:8080/api/payment', payment, { withCredentials: true });
-            const { data } = response.data;
-            toast.success('Payment initiated successfully!');
-            if (data && data.data && data.data.checkoutUrl) {
-                window.location.href = data.data.checkoutUrl;
-            }
+            const updatedBooking = await updateBookingAfterCANCELLED(curBooking);
+            console.log('Booking updated to CANCELLED:', updatedBooking);
+            setBooking(updatedBooking); // Update state with the updated booking
         } catch (error) {
-            toast.error('Payment failed!');
-            console.error(error);
+            console.error('Error updating booking to CANCELLED:', error);
         }
+        setStep(step + 1)
+        toast.done('Cancel Book Appointment Successfully!')
     }
+
     return (
         <div className="container">
             <div className="row">
@@ -267,7 +282,7 @@ export default function Booking() {
                         {/* isDisabled={booking?.description === '' || selectedServices.length === 0} */}
                         <Tab >Time</Tab>
                         <Tab>Payment</Tab>
-                        <Tab>Get Ready</Tab>
+                        {/* <Tab>Get Ready</Tab> */}
                         <Tab>Consult</Tab>
                     </TabList>
 
@@ -581,16 +596,64 @@ export default function Booking() {
                                         <label className="w-50 "><b>Status: </b>{!(booking?.type) ? 'Pending' : 'Paid'}</label>
                                     </div>
                                 </div>
-                                <div className='text-center mt-0'>
-                                    {
-                                        booking?.type ? null : <Button colorScheme="teal" onClick={handleConfirmClick}>Confirm PAID</Button>
-                                    }
+                                <div className='text-center mt-3'>
+                                    <div className='btn btn-danger' onClick={() => handleCancelClick()}>Cancel</div>
+                                    <div className='btn btn-primary' onClick={() => handleConfirmClick()}>Confirm PAID</div>
                                 </div>
                             </div>
                         </TabPanel>
 
                         <TabPanel>
-                            <p>three!</p>
+                            <div>
+                                <div className="card-body">
+                                    {booking.status === 'CANCELLED' && (
+                                        <div>
+                                            <h2 className="text-center text-danger">CANCELLED</h2>
+                                        </div>
+                                    )}
+                                    {booking.status === 'PAID' && (
+                                        <div>
+                                            <h2 className="text-center text-success">PAID</h2>
+                                        </div>
+                                    )}
+                                </div>
+                                <h3 className="text-center">Booking Information</h3>
+                                <div className="mb-3">
+                                    <label className="form-label"><b>Booking ID:</b> {booking.id}</label>
+                                </div>
+                                <div className="mb-3">
+                                    <label className="form-label"><b>Booking Date:</b> {new Date(booking.bookingDate).toLocaleString()}</label>
+                                </div>
+                                <div className="mb-3">
+                                    <label className="form-label"><b>Appointment Date:</b> {new Date(booking.appointmentDate).toLocaleString()}</label>
+                                </div>
+                                <div className="mb-3">
+                                    <label className="form-label"><b>Status:</b> {booking.status}</label>
+                                </div>
+                                <div className="mb-3">
+                                    <label className="form-label"><b>Total Amount:</b> {booking?.totalAmount?.toFixed(2)} VND</label>
+                                </div>
+                                <div className="mb-3">
+                                    <label className="form-label"><b>Description:</b> {booking?.description}</label>
+                                </div>
+                                <h4 className="text-center">User Information</h4>
+                                <div className="mb-3">
+                                    <label className="form-label"><b>Full Name:</b> {booking?.user?.fullName}</label>
+                                </div>
+                                <div className="mb-3">
+                                    <label className="form-label"><b>Email:</b> {booking?.user?.email}</label>
+                                </div>
+                                <div className="mb-3">
+                                    <label className="form-label"><b>Phone Number:</b> {booking?.user?.phoneNumber}</label>
+                                </div>
+                                <div className="mb-3">
+                                    <label className="form-label"><b>Address:</b> {booking?.user?.address}</label>
+                                </div>
+                                <h4 className="text-center">Pet Information</h4>
+                                <div className="mb-3">
+                                    <label className="form-label"><b>Pet Name:</b> {booking?.pet?.name}</label>
+                                </div>
+                            </div>
                         </TabPanel>
                     </TabPanels>
                 </Tabs>

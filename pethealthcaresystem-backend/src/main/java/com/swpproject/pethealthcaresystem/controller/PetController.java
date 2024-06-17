@@ -7,6 +7,8 @@ import com.swpproject.pethealthcaresystem.service.PetService;
 import com.swpproject.pethealthcaresystem.service.UserService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -62,5 +64,21 @@ public class PetController {
     @GetMapping("/pets/ownerPhone/{phoneNumber}")
     public List<Pet> getPetsByOwnerPhoneNumber(@PathVariable String phoneNumber){
         return petService.getPetsByOwnerPhoneNumber(phoneNumber);
+    }
+
+    @PostMapping("/createForAnonymous")
+    public ResponseEntity<Pet> createPetForAnonymousUser(@RequestBody Pet newPet, HttpSession session) throws Exception {
+        User curUser = (User) session.getAttribute("user");
+        if (curUser != null) {
+            try {
+                System.out.println("Received newPet: " + newPet);
+                Pet pet = petService.createPetForAnonymousUser(newPet, newPet.getOwner().getPhoneNumber());
+                return ResponseEntity.ok(pet);
+            } catch (Exception e) {
+                e.printStackTrace();
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+            }
+        }
+        throw new Exception("You need login first");
     }
 }

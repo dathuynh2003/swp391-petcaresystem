@@ -22,4 +22,7 @@ public interface IUserService {
     User getUserById(int id);
     @Transactional
     User createUserGoogle(User newUser);
+
+    @Transactional
+    User createAnonymousUser(String phoneNumber, String fullName, String gender);
 }
