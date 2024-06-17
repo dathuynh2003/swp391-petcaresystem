@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { Tab, TabList, Tabs, TabPanel, TabPanels, Button } from '@chakra-ui/react';
+import { Tab, TabList, Tabs, TabPanel, TabPanels, Button, Textarea } from '@chakra-ui/react';
 import axios from 'axios'
 import { ToastContainer, toast } from 'react-toastify';
 import {
     Accordion, AccordionItem, AccordionButton, AccordionIcon, AccordionPanel, Box, useDisclosure, Input, FormControl, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader,
     ModalOverlay, FormLabel
 } from '@chakra-ui/react';
-import { SearchIcon } from '@chakra-ui/icons';
+import { CheckCircleIcon, SearchIcon } from '@chakra-ui/icons';
 import {
     NumberInput,
     NumberInputField,
@@ -49,8 +49,12 @@ export default function ViewPet() {
     }
 
     const handleHospitalize = async () => {
+        if (chooseCage === '') {
+            toast.warning("Please select the cage for admission")
+            return
+        }
         try {
-            const response = await axios.post(`http://localhost:8080/admit/pet/${petId}`, {}, { withCredentials: true })
+            const response = await axios.post(`http://localhost:8080/admit/pet/${petId}/cage/${chooseCage}`, {}, { withCredentials: true })
             if (response.data.message === 'Admitted pet successfully') {
                 // setHospitalization(response.data.hospitalization)
                 toast.success(response.data.message);
@@ -191,8 +195,8 @@ export default function ViewPet() {
     }
 
     const { isOpen: isOpenChooseCage, onOpen: onOpenChooseCage, onClose: onCloseChooseCage } = useDisclosure();
+    const [chooseCage, setChooseCage] = useState('')
     const [cages, setCages] = useState()
-    // useEffect(() => {
     const loadAvailableCage = async () => {
         try {
             const response = await axios.get(`http://localhost:8080/cages/${pet?.petType}`, { withCredentials: true })
@@ -207,8 +211,87 @@ export default function ViewPet() {
             navigate('/404page')
         }
     }
-    //     loadAvailableCage()
-    // }, [])
+
+    const { isOpen: isOpenUpdateHosp, onOpen: onOpenUpdateHosp, onClose: onCloseUpdateHosp } = useDisclosure();
+    const hospitalizationDetail = {
+        description: '',    //vet note
+        dosage: 1,
+        price: null,
+        // hospitalization: 
+        medicine: null
+    }
+    const [hospitalizationDetails, setHospitalizationDetails] = useState([])
+    const addMedicine = (medicine) => {
+        setHospitalizationDetails(prevHospDetails => {
+            const medicineExists = prevHospDetails.some(hospDetail => hospDetail.medicine.id === medicine.id)
+            if (!medicineExists) {
+                const newHospDetail = {
+                    ...hospitalizationDetail,
+                    price: medicine.price,
+                    medicine: medicine
+                }
+                return [...prevHospDetails, newHospDetail]
+            }
+            return prevHospDetails;
+        })
+
+    };
+    const updateHospDetail = (index, field, value) => {
+        setHospitalizationDetails(prevDetails =>
+            prevDetails.map((detail, i) =>
+                i === index ? { ...detail, dosage: value } : detail
+            )
+        )
+    }
+    const [vetNote, setVetNote] = useState()
+    const saveVetNoteToHospitalizationDetails = (e) => {
+        setVetNote(e.target.value)
+        const vetNote = e.target.value
+        const hospDetails = hospitalizationDetails?.map(detail => ({
+            ...detail, description: vetNote
+        }))
+        setHospitalizationDetails(hospDetails);
+    }
+
+    const updateAdmissionInfo = async (hospId) => {
+        try {
+            const respone = await axios.post(`http://localhost:8080/hospitalization/update/${hospId}`, hospitalizationDetails, { withCredentials: true })
+            if (respone.data.message === "Successfully") {
+                loadPet();
+                setHospitalizationDetails([]);
+                toast.success("Hospitalization information has been updated")
+            } else {
+                toast.warning(respone.data.message)
+            }
+        } catch (e) {
+            toast.error(e.message)
+        }
+    }
+    const updateAdmissionInfoWithoutMedicine = async (hospId, vetNote) => {
+        try {
+            const respone = await axios.post(`http://localhost:8080/hospitalization/update/${hospId}/note/${vetNote}`, {}, { withCredentials: true })
+            if (respone.data.message === "Successfully") {
+                loadPet();
+                setHospitalizationDetails([]);
+                toast.success("Hospitalization information has been updated")
+            } else {
+                toast.warning(respone.data.message)
+            }
+        } catch (e) {
+            toast.error(e.message)
+        }
+    }
+
+    // Nhóm các hospitalizationDetails theo thuộc tính time
+    const groupByTime = (hospDetails) => {
+        return hospDetails.reduce((time, hospDetail) => {
+            if (!time[hospDetail.time]) {
+                time[hospDetail.time] = [];
+            }
+            time[hospDetail.time].push(hospDetail);
+            return time;
+        }, {});
+    };
 
     return (
         <div>
@@ -290,7 +373,6 @@ export default function ViewPet() {
                                         pet?.hospitalizations?.some(admitPet => admitPet?.status === "pending") ? (
                                             <Link className='btn btn-warning col-md-12' onClick={() => handlePayment(hospitalizations.find(hospitalization => hospitalization.status === "admitted").id)} >Waiting Payment</Link>
                                         ) : (
-                                            // <Link className='btn btn-success col-md-12' onClick={() => handleHospitalize()} >Hospitalize</Link>
                                             <>
                                                 <button onClick={() => { onOpenChooseCage(); loadAvailableCage() }} className='mb-3 btn btn-success col-12'>Requires Hospitalization</button>
                                                 <Modal isOpen={isOpenChooseCage} onClose={onCloseChooseCage} size={'3xl'} >
@@ -319,32 +401,32 @@ export default function ViewPet() {
                                                             </FormControl>
                                                             <FormControl className='row'>
                                                                 {cages?.map((cage, index) => (
-                                                                    <FormLabel className='w-75 mx-auto'>
+                                                                    <FormLabel className='w-75 mx-auto' onClick={() => setChooseCage(cage?.id)}>
                                                                         <div className='border d-flex justify-content-between align-items-center fw-normal rounded'>
                                                                             <div className='w-75'>
                                                                                 <div className='d-flex justify-content-start mx-3'>
                                                                                     <span className='mx-3 w-25'>Cage: {cage?.name}</span>
-                                                                                    <span className='text-warning mx-5 w-50'>{cage?.price.toLocaleString('vi-VN')} VND</span>
+                                                                                    <span className='text-warning mx-5 w-50'>{cage?.price.toLocaleString('vi-VN')} VND/hour</span>
                                                                                 </div>
                                                                                 <div className='d-flex justify-content-start mx-3'>
                                                                                     <span className='mx-3 w-25'>Size: {cage?.size}</span>
                                                                                     <span className='mx-5 w-50'>Reserved for: {cage?.type}</span>
                                                                                 </div>
                                                                             </div>
-                                                                            <div className='rounded-circle border mx-4' style={{ width: '40px', height: '40px' }}>
-
-                                                                            </div>
+                                                                            {cage?.id === chooseCage &&
+                                                                                <CheckCircleIcon color={'green'} style={{ width: '40px', height: '40px' }} className='mx-4' />
+                                                                            }
                                                                         </div>
                                                                     </FormLabel>
                                                                 ))}
                                                             </FormControl>
                                                         </ModalBody>
                                                         <ModalFooter>
-                                                            <Button colorScheme="blue" mr={3} onClick={onCloseChooseCage}>
+                                                            <Button colorScheme="red" mr={3} onClick={() => onCloseChooseCage()}>
                                                                 Close
                                                             </Button>
-                                                            <Button colorScheme="green" onClick={onCloseChooseCage}>
-                                                                Save
+                                                            <Button colorScheme="green" onClick={() => { onCloseChooseCage(); handleHospitalize() }}>
+                                                                Hospitalize
                                                             </Button>
                                                         </ModalFooter>
                                                     </ModalContent>
@@ -586,75 +668,206 @@ export default function ViewPet() {
 
                     </TabPanel >
 
-
                     <TabPanel>
-                        <div className='container'>
+                        <Accordion defaultIndex={[0]} allowMultiple>
                             {hospitalizations?.map((hospitalization, index) => {
-                                const formattedId = String(hospitalization?.id).padStart(6, '0');
-                                // Chuyển đổi chuỗi thời gian thành đối tượng Date
-                                const parseLocalDateTime = (localDateTime) => {
-                                    if (!localDateTime) return null;  // Kiểm tra nếu localDateTime là null hoặc undefined
-                                    const [day, month, yearAndTime] = localDateTime.split('/');
-                                    const [year, time] = yearAndTime.split(' ');
-                                    return new Date(`${year}-${month}-${day}T${time}:00`);
-                                };
-
-                                const admissionDate = parseLocalDateTime(hospitalization?.admissionTime);
-                                const dischargeDate = parseLocalDateTime(hospitalization?.dischargeTime);
-
-                                // Tính toán thời gian chênh lệch trong giờ
-                                const timeDifference = Math.ceil((dischargeDate - admissionDate) / (1000 * 60 * 60)); //Số ms chênh lệch / số ms trong 1h = số giờ
-                                const totalCost = timeDifference * hospitalization?.cage?.price;
-
+                                const groupedHospDetails = groupByTime(hospitalization?.hospitalizationDetails);
+                                // Chuyển Object groupedHospDetails thành mảng (Array) các nhóm hospDetails theo time
+                                //Có dạng: groupedHospDetailsByTime[]: [ {time: '', details:[]} ]
+                                const groupedHospDetailsByTime = Object.keys(groupedHospDetails).map(time => ({
+                                    time,
+                                    details: groupedHospDetails[time]
+                                }));
                                 return (
-                                    <div className='hospitalization row border border-dark shadow my-3' onClick={() => handleViewHospitalization(formattedId)}>
-                                        <div className='col-4'>
-                                            Hopitalization ID: {formattedId}
-                                        </div>
-                                        <div className='col-4'>
-                                            Admisstion Time: {hospitalization?.admissionTime}
-                                        </div>
-                                        <div className='col-4'>
-                                            Discharge Time: {hospitalization?.dischargeTime}
-                                        </div>
-                                        <div className='col-2'>
-                                            Cage: {hospitalization?.cage?.name}
-                                        </div>
-                                        <div className='col-2 mx-auto'>
-                                            {hospitalization?.status === "discharged" ?
-                                                (
-                                                    <div className='text-center text-danger fw-bold'>
-                                                        Discharged
+                                    <AccordionItem key={index}>
+                                        <h2>
+                                            <AccordionButton className=''>
+                                                <Box as='span' flex='1' textAlign='left'>
+                                                    {hospitalization?.admissionTime}
+                                                </Box>
+                                                <AccordionIcon />
+                                            </AccordionButton>
+                                        </h2>
+                                        <AccordionPanel pb={4} >
+                                            <div className='px-5 pt-2 pb-5 shadow border border-dark'>
+                                                {hospitalization?.status === 'admitted' &&
+                                                    <FormControl className='d-flex justify-content-end'>
+                                                        <Button colorScheme="green" onClick={() => onOpenUpdateHosp()}>
+                                                            Update
+                                                        </Button>
+                                                        <Modal isOpen={isOpenUpdateHosp} onClose={onCloseUpdateHosp} size={'3xl'}>
+                                                            <ModalOverlay />
+                                                            <ModalContent>
+                                                                <ModalHeader className='text-center'>Update the hospitalization care process</ModalHeader>
+                                                                <ModalCloseButton />
+                                                                <ModalBody>
+                                                                    <FormControl>
+                                                                        <div className='d-flex gap-1'>
+                                                                            <Input placeholder='Search medicine' onChange={(e) => setKeyWord(e.target.value)} onClick={() => setDisplayMapMedicine(false)} />
+                                                                            <SearchIcon boxSize={'1.5rem'} className='mt-2 ml-2' />
+                                                                        </div>
+                                                                        {displayMapMedicine === false &&
+                                                                            <div style={{ maxHeight: '200px', overflow: "auto" }} >
+                                                                                {listMedicineBySearch?.map((medicine, index) => (
+                                                                                    <p
+                                                                                        key={index}
+                                                                                        className="form-control "
+                                                                                        onClick={() => {
+                                                                                            addMedicine(medicine);
+                                                                                            // setPrescription(prev => ({ ...prev, medicine: medicine, unit: medicine.unit, price: medicine.price, name: medicine.name, medicine_id: medicine.id }));
+                                                                                            setDisplayMapMedicine(true)
+                                                                                        }}>
+                                                                                        {medicine.name}
+                                                                                    </p>
+
+                                                                                ))}
+                                                                            </div>
+                                                                        }
+                                                                    </FormControl>
+                                                                    {hospitalizationDetails?.length !== 0 &&
+                                                                        <FormControl className='d-flex justify-content-between fw-bold mt-3 mb-1'>
+                                                                            <div className='col-1'>No</div>
+                                                                            <div className='col-4'>Medical Name</div>
+                                                                            <div className='col-1 text-center'>Dosage</div>
+                                                                            <div className='col-1'>Unit</div>
+                                                                            <div className='col-2'>Price</div>
+                                                                        </FormControl>
+                                                                    }
+                                                                    {hospitalizationDetails?.map((hospitalizationDetail, index) => (
+                                                                        <FormControl className='d-flex justify-content-between'>
+                                                                            <div className='col-1'>{index + 1}</div>
+                                                                            <div className='col-4'>{hospitalizationDetail?.medicine?.name}</div>
+                                                                            <NumberInput
+                                                                                defaultValue={1}
+                                                                                min={1}
+                                                                                max={hospitalizationDetail?.medicine?.quantity}
+                                                                                value={hospitalizationDetail.dosage || 1}
+                                                                                onChange={(value) => updateHospDetail(index, 'dossage', value)}
+                                                                                className='col-1'
+                                                                                width={'10%'}
+                                                                            >
+                                                                                <NumberInputField />
+                                                                                <NumberInputStepper>
+                                                                                    <NumberIncrementStepper />
+                                                                                    <NumberDecrementStepper />
+                                                                                </NumberInputStepper>
+                                                                            </NumberInput>
+                                                                            <div className='col-1'>{hospitalizationDetail?.medicine?.unit}</div>
+                                                                            <div className='col-2'>{(hospitalizationDetail?.price * hospitalizationDetail.dosage).toLocaleString('vi-VN')} VND</div>
+                                                                        </FormControl>
+                                                                    ))}
+                                                                    <FormControl className='d-flex justify-content-between my-3'>
+                                                                        <div style={{ width: '13%' }}>
+                                                                            Vet Note:
+                                                                        </div>
+                                                                        <Textarea
+                                                                            onChange={saveVetNoteToHospitalizationDetails}
+                                                                            placeholder="Enter vet note here"
+                                                                            className='w-100'
+                                                                        />
+                                                                    </FormControl>
+                                                                </ModalBody>
+                                                                <ModalFooter>
+                                                                    <Button colorScheme="blue" mr={3} onClick={onCloseUpdateHosp}>
+                                                                        Close
+                                                                    </Button>
+                                                                    <Button
+                                                                        colorScheme="green"
+                                                                        onClick={() => {
+                                                                            onCloseUpdateHosp();
+                                                                            hospitalizationDetails.length === 0 || hospitalizationDetails === null ?
+                                                                                updateAdmissionInfoWithoutMedicine(hospitalization.id, vetNote)
+                                                                                :
+                                                                                updateAdmissionInfo(hospitalization.id)
+
+                                                                        }}
+                                                                    >
+                                                                        Save
+                                                                    </Button>
+                                                                </ModalFooter>
+                                                            </ModalContent>
+                                                        </Modal>
+                                                    </FormControl>
+                                                }
+                                                <FormControl mt={4} className='d-flex'>
+                                                    <FormLabel className='w-50'>Pet's owner  <Input readOnly ref={initialRef} value={pet?.owner?.fullName} /></FormLabel>
+                                                    <FormLabel className='w-50'>Phone number <Input readOnly value={pet?.owner?.phoneNumber} /></FormLabel>
+                                                </FormControl>
+                                                <FormControl className='d-flex'>
+                                                    <FormLabel className='w-50'>Pet's name <Input readOnly ref={initialRef} value={pet.name} /></FormLabel>
+                                                    <FormLabel className='w-50'>Pet's type <Input readOnly value={pet.petType} /></FormLabel>
+                                                </FormControl>
+                                                <FormControl className='d-flex justify-content-between'>
+                                                    <FormLabel>Pet's breed <Input ref={initialRef} value={pet.breed} /></FormLabel>
+                                                    <FormLabel>Pet's sex <Input readOnly value={pet.gender} /></FormLabel>
+                                                    <FormLabel>Pet's age <Input readOnly value={pet.age} /></FormLabel>
+                                                </FormControl>
+                                                {(groupedHospDetailsByTime.length !== 0) &&
+                                                    <FormControl
+                                                        className='d-flex justify-content-between fw-bold mt-3 mb-1 border border-top-0 border-end-0 border-start-0'>
+                                                        <div className='col-2'>Time</div>
+                                                        <div className='col-4'>Medical Name</div>
+                                                        <div className='col-1 text-center'>Dosage</div>
+                                                        <div className='col-1'>Unit</div>
+                                                        <div className='col-2'>Price</div>
+                                                    </FormControl>
+                                                }
+                                                {groupedHospDetailsByTime?.map((hospitalizationDetail) => (
+                                                    <div className=''>
+                                                        <FormControl className='d-flex justify-content-between mt-3 mb-1'>
+                                                            <div className='col-2 fw-medium text-success'>{hospitalizationDetail.time}</div>
+                                                            <div className='col-4'>
+                                                                {hospitalizationDetail?.details?.map((detail) => (
+                                                                    <>
+                                                                        {detail?.dosage !== 0 ?
+                                                                            <div>{detail?.medicine?.name}</div> : ''
+                                                                        }
+                                                                    </>
+                                                                ))}
+                                                            </div>
+                                                            <div className='col-1 text-center'>
+                                                                {hospitalizationDetail?.details.map((detail, index) => (
+                                                                    <>
+                                                                        {detail?.dosage !== 0 ?
+                                                                            <div>{detail?.dosage}</div> : ''
+                                                                        }
+                                                                    </>
+                                                                ))}
+                                                            </div>
+                                                            <div className='col-1'>
+                                                                {hospitalizationDetail?.details.map((detail, index) => (
+                                                                    <>
+                                                                        {detail?.dosage !== 0 ?
+                                                                            <div>{detail?.medicine?.unit}</div> : ''
+                                                                        }
+                                                                    </>
+                                                                ))}
+                                                            </div>
+                                                            <div className='col-2'>
+                                                                {hospitalizationDetail?.details.map((detail, index) => (
+                                                                    <>
+                                                                        {detail?.dosage !== 0 ?
+                                                                            <div>{detail?.price}</div> : ''
+                                                                        }
+                                                                    </>
+                                                                ))}
+                                                            </div>
+                                                        </FormControl>
+                                                        <FormControl className='d-flex border border-top-0 border-end-0 border-start-0'>
+                                                            <div className='col-2 text-end fw-medium'>Vet Note:</div>
+                                                            <div className='col-10 text-start mx-5 text-info fw-bold'>
+                                                                {hospitalizationDetail?.details[0].description}
+                                                            </div>
+                                                        </FormControl>
                                                     </div>
-                                                ) : (
-                                                    hospitalization?.status === "admitted" ? (
-                                                        <div className='text-center text-success fw-bold'>
-                                                            Admitted
-                                                        </div>
-                                                    ) : (
-                                                        <div className='text-center text-warning fw-bold'>
-                                                            Waiting Payment
-                                                        </div>
-                                                    )
-                                                )}
-                                        </div>
-                                        <div className='col-4'>
-                                            {totalCost >= 0 ?
-                                                <div>
-                                                    Total Amount: {totalCost.toLocaleString('vi-VN') + " VND"}
-                                                </div>
-                                                :
-                                                <div className='text-warning'>
-                                                    Pet is being hospitalized and cared for...
-                                                </div>
-                                            }
-                                            {/* Total Amount: {totalCost >= 0 ? totalCost.toLocaleString('vi-VN') + " VND" : "Waiting discharge from cage..."} */}
-                                        </div>
-                                    </div>
+                                                ))}
+
+                                            </div>
+                                        </AccordionPanel>
+                                    </AccordionItem>
                                 )
                             })}
-
-                        </div>
+                        </Accordion>
                     </TabPanel >
                 </TabPanels >
 

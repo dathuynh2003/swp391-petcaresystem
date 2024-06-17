@@ -2,8 +2,10 @@ package com.swpproject.pethealthcaresystem.service;
 
 
 import com.swpproject.pethealthcaresystem.model.Hospitalization;
+import com.swpproject.pethealthcaresystem.model.HospitalizationDetail;
 import com.swpproject.pethealthcaresystem.model.Pet;
 import com.swpproject.pethealthcaresystem.model.User;
+import com.swpproject.pethealthcaresystem.repository.HospitalizationDetailRepository;
 import com.swpproject.pethealthcaresystem.repository.HospitalizationRepository;
 import com.swpproject.pethealthcaresystem.repository.PetRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,11 +18,13 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
-public class PetService implements IPetService{
+public class PetService implements IPetService {
     @Autowired
     private PetRepository petRepository;
     @Autowired
     private HospitalizationRepository hospitalizationRepository;
+    @Autowired
+    private HospitalizationDetailRepository hospitalizationDetailRepository;
 
     @Override
     public Pet createPet(Pet newPet, User curUser) {
@@ -44,7 +48,7 @@ public class PetService implements IPetService{
                     pet.setDescription(newPet.getDescription());
                     pet.setIsNeutered(newPet.getIsNeutered());
                     return petRepository.save(pet);
-                }).orElseThrow(() ->  new RuntimeException("Pet not found"));
+                }).orElseThrow(() -> new RuntimeException("Pet not found"));
 
     }
 
@@ -52,6 +56,14 @@ public class PetService implements IPetService{
     public Pet getPetById(int id) {
         Pet pet = petRepository.findById(id).orElseThrow(() -> new RuntimeException("Pet not found"));
         Set<Hospitalization> hospitalizationSet = hospitalizationRepository.findByPetOrderByIdDesc(pet);
+        for (Hospitalization hospitalization : hospitalizationSet) {
+            Set<HospitalizationDetail> hospDetails = hospitalizationDetailRepository
+                    .findByHospitalizationOrderByTimeAsc(hospitalization);
+            for (HospitalizationDetail hospDetail : hospDetails) {
+                hospDetail.setHospitalization(null);
+            }
+            hospitalization.setHospitalizationDetails(hospDetails);
+        }
         pet.setHospitalizations(hospitalizationSet);
         return pet;
     }
@@ -62,10 +74,8 @@ public class PetService implements IPetService{
 //        return petRepository.findAll().stream()
 //                .filter(pet -> !pet.getIsDeceased())
 //                .collect(Collectors.toList());
-    return petRepository.findAll();
+        return petRepository.findAll();
     }
-
-
 
 
     @Override
@@ -84,10 +94,10 @@ public class PetService implements IPetService{
                     .filter(pet -> pet.getOwner() != null && pet.getOwner().getUserId() == ownerId)
                     .collect(Collectors.toList());
             return pets;
-        }catch (StackOverflowError e) {
+        } catch (StackOverflowError e) {
             System.out.println("------------------------- error --------------------------");
             System.out.println(e.toString());
-           return new ArrayList<>();
+            return new ArrayList<>();
         }
 
     }

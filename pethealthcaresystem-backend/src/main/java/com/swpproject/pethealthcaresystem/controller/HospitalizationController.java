@@ -1,6 +1,7 @@
 package com.swpproject.pethealthcaresystem.controller;
 
 import com.swpproject.pethealthcaresystem.model.Hospitalization;
+import com.swpproject.pethealthcaresystem.model.HospitalizationDetail;
 import com.swpproject.pethealthcaresystem.model.User;
 import com.swpproject.pethealthcaresystem.service.HospitalizationService;
 import jakarta.servlet.http.HttpSession;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
@@ -17,8 +19,8 @@ public class HospitalizationController {
     private HospitalizationService hospitalizationService;
 
     //By Vet
-    @PostMapping("/admit/pet/{petId}")
-    public Map<String, Object> admitPet(@PathVariable int petId, HttpSession session) {
+    @PostMapping("/admit/pet/{petId}/cage/{cageId}")
+    public Map<String, Object> admitPet(@PathVariable int petId, @PathVariable int cageId, HttpSession session) {
         User curUser = (User) session.getAttribute("user");
         Map<String, Object> response = new HashMap<>();
         try {
@@ -29,7 +31,7 @@ public class HospitalizationController {
 
                 throw new RuntimeException("You don't have permission to do this");
             }
-            Hospitalization hospitalization = hospitalizationService.admitPet(petId, curUser.getUserId());
+            Hospitalization hospitalization = hospitalizationService.admitPet(petId, curUser.getUserId(), cageId);
             response.put("message", "Admitted pet successfully");
             response.put("hospitalization", hospitalization);
         } catch (RuntimeException e) {
@@ -40,8 +42,8 @@ public class HospitalizationController {
     }
 
     //By Staff
-    @PostMapping("/admit/pet/{petId}/vet/{vetId}")
-    public Map<String, Object> admitPet(@PathVariable int petId, @PathVariable int vetId, HttpSession session) {
+    @PostMapping("/admit/pet/{petId}/vet/{vetId}/cage/{cageId}")
+    public Map<String, Object> admitPet(@PathVariable int petId, @PathVariable int vetId, @PathVariable int cageId, HttpSession session) {
         User curUser = (User) session.getAttribute("user");
         Map<String, Object> response = new HashMap<>();
         try {
@@ -51,7 +53,7 @@ public class HospitalizationController {
             if (curUser.getRoleId() != 2) {
                 throw new RuntimeException("You don't have permission to do this");
             }
-            Hospitalization hospitalization = hospitalizationService.admitPet(petId, vetId);
+            Hospitalization hospitalization = hospitalizationService.admitPet(petId, vetId, cageId);
             response.put("message", "Admitted pet successfully");
             response.put("hospitalization", hospitalization);
         } catch (RuntimeException e) {
@@ -101,4 +103,37 @@ public class HospitalizationController {
 
         return response;
     }
+
+    @PostMapping("/hospitalization/update/{hospId}")
+    public Map<String, Object> updateHospitalization(@PathVariable int hospId, @RequestBody Set<HospitalizationDetail> hospitalizationDetails, HttpSession session) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            User curUser = (User) session.getAttribute("user");
+            if (curUser == null) {
+                throw new RuntimeException("You need to login first");
+            }
+            response.put("message", "Successfully");
+            response.put("hospitalization", hospitalizationService.updateAdmissionInfo(hospId, hospitalizationDetails));
+        } catch (Exception e) {
+            response.put("message", e.getMessage());
+        }
+        return response;
+    }
+
+    @PostMapping("/hospitalization/update/{hospId}/note/{vetNote}")
+    public Map<String, Object> updateHospitalization(@PathVariable int hospId, @PathVariable String vetNote, HttpSession session) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            User curUser = (User) session.getAttribute("user");
+            if (curUser == null) {
+                throw new RuntimeException("You need to login first");
+            }
+            response.put("message", "Successfully");
+            response.put("hospitalization", hospitalizationService.updateAdmissionInfo(hospId, vetNote));
+        } catch (Exception e) {
+            response.put("message", e.getMessage());
+        }
+        return response;
+    }
+
 }

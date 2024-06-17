@@ -1,5 +1,6 @@
 package com.swpproject.pethealthcaresystem.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -28,10 +29,12 @@ public class HospitalizationDetail {
 
     @ManyToOne
     @JoinColumn(name = "hospitalization_id")
+    @JsonIgnoreProperties("hospitalizationDetails")
     Hospitalization hospitalization;
 
     @ManyToOne
     @JoinColumn(name = "medicine_id")
+//    @JsonIgnoreProperties("hospitalizationDetails")
     Medicine medicine;
 
 
