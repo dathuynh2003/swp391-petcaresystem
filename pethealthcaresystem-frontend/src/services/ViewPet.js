@@ -678,6 +678,24 @@ export default function ViewPet() {
                                     time,
                                     details: groupedHospDetails[time]
                                 }));
+
+                                // Chuyển đổi chuỗi thời gian thành đối tượng Date
+                                const parseLocalDateTime = (localDateTime) => {
+                                    if (!localDateTime) return null;  // Kiểm tra nếu localDateTime là null hoặc undefined
+                                    const [day, month, yearAndTime] = localDateTime.split('/');
+                                    const [year, time] = yearAndTime.split(' ');
+                                    return new Date(`${year}-${month}-${day}T${time}:00`);
+                                };
+
+
+                                const admissionDate = parseLocalDateTime(hospitalization?.admissionTime);
+                                const dischargeDate = parseLocalDateTime(hospitalization?.dischargeTime);
+
+
+                                // Tính toán thời gian chênh lệch trong giờ
+                                const timeDifference = Math.ceil((dischargeDate - admissionDate) / (1000 * 60 * 60)); //Số ms chênh lệch / số ms trong 1h = số giờ
+                                const hospFee = (timeDifference >= 0) ? timeDifference * hospitalization?.cage?.price : 0
+
                                 return (
                                     <AccordionItem key={index}>
                                         <h2>
@@ -692,9 +710,11 @@ export default function ViewPet() {
                                             <div className='px-5 pt-2 pb-5 shadow border border-dark'>
                                                 {hospitalization?.status === 'admitted' &&
                                                     <FormControl className='d-flex justify-content-end'>
-                                                        <Button colorScheme="green" onClick={() => onOpenUpdateHosp()}>
-                                                            Update
-                                                        </Button>
+                                                        {roleId === '3' &&
+                                                            <Button colorScheme="green" onClick={() => onOpenUpdateHosp()}>
+                                                                Update
+                                                            </Button>
+                                                        }
                                                         <Modal isOpen={isOpenUpdateHosp} onClose={onCloseUpdateHosp} size={'3xl'}>
                                                             <ModalOverlay />
                                                             <ModalContent>
@@ -714,7 +734,6 @@ export default function ViewPet() {
                                                                                         className="form-control "
                                                                                         onClick={() => {
                                                                                             addMedicine(medicine);
-                                                                                            // setPrescription(prev => ({ ...prev, medicine: medicine, unit: medicine.unit, price: medicine.price, name: medicine.name, medicine_id: medicine.id }));
                                                                                             setDisplayMapMedicine(true)
                                                                                         }}>
                                                                                         {medicine.name}
@@ -779,7 +798,6 @@ export default function ViewPet() {
                                                                                 updateAdmissionInfoWithoutMedicine(hospitalization.id, vetNote)
                                                                                 :
                                                                                 updateAdmissionInfo(hospitalization.id)
-
                                                                         }}
                                                                     >
                                                                         Save
@@ -787,6 +805,11 @@ export default function ViewPet() {
                                                                 </ModalFooter>
                                                             </ModalContent>
                                                         </Modal>
+                                                    </FormControl>
+                                                }
+                                                {hospitalization?.status === 'discharged' &&
+                                                    <FormControl className='d-flex justify-content-end'>
+                                                        <div width={'13%'} className='text-center text-danger fw-bold'>Discharged</div>
                                                     </FormControl>
                                                 }
                                                 <FormControl mt={4} className='d-flex'>
@@ -847,8 +870,11 @@ export default function ViewPet() {
                                                                 {hospitalizationDetail?.details.map((detail, index) => (
                                                                     <>
                                                                         {detail?.dosage !== 0 ?
-                                                                            <div>{detail?.price}</div> : ''
+                                                                            <div>
+                                                                                {detail?.price.toLocaleString('vi-VN')} VND
+                                                                            </div> : ''
                                                                         }
+
                                                                     </>
                                                                 ))}
                                                             </div>
@@ -861,6 +887,27 @@ export default function ViewPet() {
                                                         </FormControl>
                                                     </div>
                                                 ))}
+                                                <FormControl className='d-flex justify-content-between mt-3 mb-1 border border-top-0 border-end-0 border-start-0'>
+                                                    <div className='col-2 fw-bold'>Admission Time:</div>
+                                                    <div className='col-2'>{hospitalization?.admissionTime}</div>
+                                                    <div className='col-2 fw-bold'>Discharged Time:</div>
+                                                    <div className='col-2'>{hospitalization?.dischargeTime ? hospitalization?.dischargeTime : "N/A"}</div>
+                                                    <div className='col-2 fw-bold'>Hospitalization fee: </div>
+                                                    <div className='col-2'>
+                                                        {hospFee > 0 ? hospFee.toLocaleString('vi-VN') + " VND" : "Hospitalizing..."}
+                                                    </div>
+                                                </FormControl>
+                                                <FormControl className='d-flex justify-content-between fw-bold mt-3 mb-1 border border-top-0 border-end-0 border-start-0'>
+                                                    <div className='col-2'></div>
+                                                    <div className='col-4'></div>
+                                                    <div className='col-1'></div>
+                                                    <div className='col-1'>Total: </div>
+                                                    <div className='col-2'>
+                                                        {(hospitalization?.hospitalizationDetails?.reduce((accumulator, curDetail) => accumulator + curDetail?.price, 0) + hospFee)
+                                                            .toLocaleString('vi-Vn')
+                                                        } VND
+                                                    </div>
+                                                </FormControl>
 
                                             </div>
                                         </AccordionPanel>
@@ -871,7 +918,7 @@ export default function ViewPet() {
                     </TabPanel >
                 </TabPanels >
 
-            </Tabs>
+            </Tabs >
             <ToastContainer
                 position="top-right"
                 autoClose={5000}
