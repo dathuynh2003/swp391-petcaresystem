@@ -17,16 +17,15 @@ import VetWorkSchedules from './services/VetWorkSchedules';
 import Dashboard from './services/Dashboard';
 import Verify from './services/Verify';
 import CreateShift from './services/CreateShift';
-import CreateAccount from './services/CreateAccount';
+// import CreateAccount from './services/CreateAccount';
 import CreateAccountByStaff from './services/CreateAccountByStaff';
 import CreatePetByStaff from './services/CreatePetByStaff';
-import ListAccount from './services/ListAccount';
-import EditAccount from './services/EditAccount';
+// import ListAccount from './services/ListAccount';
+// import EditAccount from './services/EditAccount';
 import AssignVetSchedules from './services/AssignVetSchedules';
 import Booking from './services/Booking/Booking';
 import CreateCage from './services/CreateCage';
 import EditCage from './services/EditCage';
-import PaymentFail from './services/Booking/PaymentResult';
 import PaymentResult from './services/Booking/PaymentResult';
 import StaffBooking from './services/Booking/StaffBooking';
 import ViewHospitalization from './services/ViewHospitalization';
@@ -68,9 +67,9 @@ function App() {
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path='/verify' element={<Verify />} />
               <Route path="/shift" element={<CreateShift />} />
-              <Route path='/create-account' element={<CreateAccount />} />
-              <Route path='/list-account' element={<ListAccount />} />
-              <Route path="/edit-account/:userId" element={<EditAccount />} />
+              {/* <Route path='/create-account' element={<CreateAccount />} /> */}
+              {/* <Route path='/list-account' element={<ListAccount />} /> */}
+              {/* <Route path="/edit-account/:userId" element={<EditAccount />} /> */}
               <Route path="/assign-schedules" element={<AssignVetSchedules />} />
               <Route path='/payment-result' element={<PaymentResult />} />
               <Route path="/hospitalization-detail/:id" element={<ViewHospitalization />} />
@@ -82,7 +81,7 @@ function App() {
               <Route path="/medicine" element={<Medicine />} />
             </Routes >
 
-            {/* <AccountPage /> */}
+            <AccountPage />
 
 
           </Fragment>

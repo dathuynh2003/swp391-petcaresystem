@@ -7,9 +7,7 @@ import {
     Accordion, AccordionItem, AccordionButton, AccordionIcon, AccordionPanel, Box, useDisclosure, Input, FormControl, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader,
     ModalOverlay, FormLabel
 } from '@chakra-ui/react';
-import { SearchIcon } from '@chakra-ui/icons';
 import DeleteIcon from '@mui/icons-material/Delete';
-import EditIcon from '@mui/icons-material/Edit';
 import { CheckCircleIcon, SearchIcon } from '@chakra-ui/icons';
 import {
     NumberInput,
