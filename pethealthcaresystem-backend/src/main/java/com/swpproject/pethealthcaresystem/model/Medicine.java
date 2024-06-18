@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.time.LocalDate;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -23,6 +25,9 @@ public class Medicine {
     int quantity;
     String type;
     String unit;
+    LocalDate mfgDate;
+    LocalDate expDate;
+    Boolean status = true;
 
     @OneToMany(mappedBy = "medicine", cascade = CascadeType.ALL, orphanRemoval = true)
     Set<HospitalizationDetail> hospitalizationDetails = new HashSet<>();

@@ -1,9 +1,11 @@
 package com.swpproject.pethealthcaresystem.service;
 
 import com.swpproject.pethealthcaresystem.model.MedicalRecord;
+import com.swpproject.pethealthcaresystem.model.Medicine;
 import com.swpproject.pethealthcaresystem.model.Pet;
 import com.swpproject.pethealthcaresystem.model.Prescription;
 import com.swpproject.pethealthcaresystem.repository.MedicalRecordRepository;
+import com.swpproject.pethealthcaresystem.repository.MedicineRepository;
 import com.swpproject.pethealthcaresystem.repository.PetRepository;
 import com.swpproject.pethealthcaresystem.repository.PrescriptionRepository;
 import jakarta.transaction.Transactional;
@@ -22,6 +24,8 @@ public class MedicalRecordService implements IMedicalRecordService {
     private PetRepository petRepository;
     @Autowired
     private PrescriptionRepository prescriptionRepository;
+    @Autowired
+    private MedicineRepository medicineRepository;
 
     @Override
     public Set<MedicalRecord> getMedicalRecordByPetId(int petId) {
@@ -43,6 +47,11 @@ public class MedicalRecordService implements IMedicalRecordService {
         medicalRecord.setPrescriptions(listPrescriptions);
         double total = 0;
         for (Prescription prescription : medicalRecord.getPrescriptions()) {
+            Medicine medicine = medicineRepository.findById(prescription.getMedicine().getId()).get();
+            medicine.setQuantity(medicine.getQuantity() - prescription.getDosage());
+            if (medicine.getQuantity() < 0) {
+                return null;
+            }
             total += prescription.getDosage() * prescription.getPrice();
         }
         medicalRecord.setTotalAmount(total);
