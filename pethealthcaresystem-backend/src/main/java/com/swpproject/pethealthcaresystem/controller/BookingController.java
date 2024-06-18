@@ -100,7 +100,7 @@ public class BookingController {
         }
     }
     @GetMapping("/bookings-staff")
-    public ResponseEntity<ResponseData> getBookingssByStaff
+    public ResponseEntity<ResponseData> getBookingsByStaff
             (HttpSession session,
              @RequestParam(name =  "pageNo", defaultValue = "1") Integer pageNo,
              @RequestParam(name = "pageSize") Integer pageSize) {
