@@ -35,6 +35,7 @@ import Reservation from './services/Booking/Reservation';
 import AccountPage from './pages/Account';
 import BookingHistory from './services/Booking/BookingHistory'
 import { Fragment } from 'react';
+import Medicine from './services/Medicine/Medicine';
 function App() {
 
   const location = useLocation();
@@ -78,6 +79,7 @@ function App() {
               <Route path="/create-anomyous-user" element={<UserAnonymous />} />
               <Route path="/reservation" element={<Reservation />} />
               <Route path='/booking-history' element={<BookingHistory />} />
+              <Route path="/medicine" element={<Medicine />} />
             </Routes >
 
             {/* <AccountPage /> */}
@@ -86,6 +88,7 @@ function App() {
           </Fragment>
         </div >
       </div >
+
     </div >
   );
 }

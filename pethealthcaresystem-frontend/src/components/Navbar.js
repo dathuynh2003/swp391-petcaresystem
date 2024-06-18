@@ -12,7 +12,7 @@ const Navbar = () => {
   }
   return (
     <div className="navbar">
-      <h1>{capitalizeText(pageName ?? "")}</h1>
+      <h1 style={{color:'#ffff'}}>{capitalizeText(pageName ?? "")}</h1>
     </div>
   );
 };

@@ -8,6 +8,8 @@ import {
     ModalOverlay, FormLabel
 } from '@chakra-ui/react';
 import { SearchIcon } from '@chakra-ui/icons';
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
 import {
     NumberInput,
     NumberInputField,
@@ -15,6 +17,7 @@ import {
     NumberIncrementStepper,
     NumberDecrementStepper,
 } from '@chakra-ui/react'
+
 
 export default function ViewPet() {
     let navigate = useNavigate();
@@ -123,14 +126,16 @@ export default function ViewPet() {
 
     const [listMedicineBySearch, setListMedicineBySearch] = useState([])
     const [keyword, setKeyWord] = useState()
+
     const loadMedicineBySearch = async () => {
         if (keyword) {
-            const response = await axios.get(`http://localhost:8080/medicine/search/${keyword}`, { withCredentials: true })
-            setListMedicineBySearch(response.data.MEDICINES)
+            const response = await axios.get(`http://localhost:8080/medicine/searchByName/${keyword}`, { withCredentials: true });
+            setListMedicineBySearch(response.data.MEDICINES);
+
         }
 
-
     }
+
     useEffect(() => {
 
         loadMedicineBySearch()
@@ -148,10 +153,11 @@ export default function ViewPet() {
         medicine: {},
         name: '',
         medicine_id: 0,
-        vetNote: ''
-
+        vetNote: '',
+        quantity: 0
     })
     console.log(prescription);
+    console.log("list chọn");
     console.log(listSelectedMedicines);
     const [displayMapMedicine, setDisplayMapMedicine] = useState(false)
     const [medicalRecord, setMedicalRecord] = useState({
@@ -170,15 +176,33 @@ export default function ViewPet() {
 
     };
 
+
+
     const medicalRecordRequest = {
 
         medicalRecord: medicalRecord,
         listPrescriptions: listSelectedMedicines
     };
     const callAPI = async () => {
-        const response = await axios.post(`http://localhost:8080/medicalRecord/add/${petId}`, medicalRecordRequest, { withCredentials: true })
-        console.log(response.data);
-        loadMedicalRecord()
+        try {
+            if (medicalRecord.diagnosis || medicalRecord.treatment){
+                const response = await axios.post(`http://localhost:8080/medicalRecord/add/${petId}`, medicalRecordRequest, { withCredentials: true })
+                console.log(response.data.MedicalRecord);
+                if (response.data.MedicalRecord === null || response.data.MedicalRecord === undefined) {
+                    toast.error("Add new medical record failed!")
+                } else {
+                    toast.success("Add new medical record successfully!")
+                }
+        
+                loadMedicalRecord()
+            }
+            else{
+                toast.error("Diagnosis and Treatment are required!")
+            }
+        
+        } catch (error) {
+            console.log(error);
+        }
     }
 
     const [medicalRecords, setMedicalRecords] = useState([])
@@ -187,9 +211,12 @@ export default function ViewPet() {
         console.log(response.data);
         response.data.sort((a, b) => new Date(b.date) - new Date(a.date))
         setMedicalRecords(response.data)
-
     }
 
+
+    const handleDeleteMedicine = (e) => {
+        setListSelectedMedicines((prev) => (prev.filter(medicine => medicine.medicine_id !== e.medicine_id)))
+    }
     return (
         <div>
 
@@ -332,7 +359,7 @@ export default function ViewPet() {
                                                             {displayMapMedicine === false ?
                                                                 <div style={{ maxHeight: '200px', overflow: "auto" }} >
                                                                     {listMedicineBySearch?.map((medicine, index) => (
-                                                                        <p key={index} className="form-control " onClick={() => { setPrescription(prev => ({ ...prev, medicine: medicine, unit: medicine.unit, price: medicine.price, name: medicine.name, medicine_id: medicine.id })); setDisplayMapMedicine(true) }}>{medicine.name}</p>
+                                                                        <p key={index} className="form-control " onClick={() => { setPrescription(prev => ({ ...prev, medicine: medicine, unit: medicine.unit, price: medicine.price, name: medicine.name, medicine_id: medicine.id, quantity: medicine.quantity })); setDisplayMapMedicine(true) }}>{medicine.name}</p>
 
                                                                     ))}
                                                                 </div> : <></>}
@@ -344,7 +371,7 @@ export default function ViewPet() {
                                                         </FormControl>
                                                         <FormControl>
                                                             <FormLabel>Dosage</FormLabel>
-                                                            <NumberInput defaultValue={1} min={1} max={100} onChange={(value) => setPrescription((prev) => ({ ...prev, dosage: value }))}>
+                                                            <NumberInput defaultValue={1} min={1} max={prescription.medicine.quantity} onChange={(value) => setPrescription((prev) => ({ ...prev, dosage: value }))}>
                                                                 <NumberInputField />
                                                                 <NumberInputStepper>
                                                                     <NumberIncrementStepper />
@@ -358,7 +385,7 @@ export default function ViewPet() {
                                                         </FormControl>
                                                     </ModalBody>
                                                     <ModalFooter>
-                                                        <Button colorScheme='blue' mr={3} onClick={handleAddPrescription}>
+                                                        <Button colorScheme='teal' mr={3} onClick={handleAddPrescription}>
                                                             Add
                                                         </Button>
                                                         <Button onClick={() => setIsAddingMedicine(false)}>Cancel</Button>
@@ -370,23 +397,48 @@ export default function ViewPet() {
                                             <table className='table'>
                                                 <thead>
                                                     <tr className='fw-bold'>
-                                                        <td>No</td>
-                                                        <td>Medical Name</td>
-                                                        <td>Unit</td>
-                                                        <td>Dosage</td>
-                                                        <td>Price</td>
-
+                                                        <td className="col-1">No</td>
+                                                        <td className="col-3">Medical Name</td>
+                                                        <td className="col-1">Unit</td>
+                                                        <td className="col-1">Dosage</td>
+                                                        <td className="col-2">Price</td>
+                                                        <td className="col-1">Action</td>
                                                     </tr>
 
                                                 </thead>
                                                 <tbody>
                                                     {listSelectedMedicines.map((medicine, index) => (<>
                                                         <tr key={index} >
-                                                            <td className="col-1">{index + 1}</td>
-                                                            <td className="col-3">{medicine.name}</td>
-                                                            <td className="col-1">{medicine.unit}</td>
-                                                            <td className="col-1">{medicine.dosage}</td>
-                                                            <td className="col-1">{medicine.price.toLocaleString('vi-VN')}/{medicine.unit}</td>
+                                                            <td >{index + 1}</td>
+                                                            <td >{medicine.name}</td>
+                                                            <td >{medicine.unit}</td>
+                                                            <td >
+                                                                <NumberInput maxW={20} min={1} value={medicine.dosage} max={medicine.quantity}
+                                                                    onChange={(e) => {
+                                                                        setListSelectedMedicines((prev) =>
+                                                                            prev.map((item, idx) =>
+                                                                                idx === index ? { ...item, dosage: e } : item
+                                                                            )
+                                                                        )
+                                                                    }
+                                                                    }
+                                                                >
+                                                                    <NumberInputField />
+                                                                    <NumberInputStepper>
+                                                                        <NumberIncrementStepper />
+                                                                        <NumberDecrementStepper />
+                                                                    </NumberInputStepper>
+                                                                </NumberInput>
+                                                            </td>
+                                                            <td >{medicine.price.toLocaleString('vi-VN')}/{medicine.unit}</td>
+
+                                                            <td className='text-center'>
+                                                                <span className='icon-container'>
+                                                                    <DeleteIcon style={{ color: 'red', cursor: 'pointer' }} onClick = {() => handleDeleteMedicine(medicine)}/>
+                                                                    <span className="icon-text">Delete</span>
+                                                                </span>
+                                                            </td>
+
                                                         </tr>
 
                                                         <th colSpan="4" className='fst-italic'>{medicine.frequency}</th></>
@@ -413,7 +465,7 @@ export default function ViewPet() {
                                     </ModalBody>
 
                                     <ModalFooter>
-                                        <Button colorScheme='blue' mr={3} onClick={callAPI}>
+                                        <Button colorScheme='teal' mr={3} onClick={callAPI}>
                                             Save
                                         </Button>
                                         <Button onClick={onClose}>Cancel</Button>
@@ -426,7 +478,7 @@ export default function ViewPet() {
                                 {medicalRecords.map((medicalRecord, index) => (
                                     <AccordionItem key={index}>
                                         <h2>
-                                            <AccordionButton className=''>
+                                            <AccordionButton className='rounded fst-italic fw-bold' _hover={{ background: '#95D2B3', color: '#F9F9F9' }}>
                                                 <Box as='span' flex='1' textAlign='left'>
                                                     {new Date(medicalRecord.date).toLocaleString("en-GB", { weekday: 'short', day: 'numeric', month: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric' })}
                                                 </Box>
@@ -434,11 +486,14 @@ export default function ViewPet() {
                                             </AccordionButton>
                                         </h2>
                                         <AccordionPanel pb={4} >
-                                            <div pb={6} className='p-5 shadow'>
+                                            <div pb={6} className='p-5 shadow' style={{background: ''}}>
+                                        
+                                            <div className='d-flex align-items-center'><img src="assets/logoPetCare.png" alt="Logo" className="logo rounded-circle" /> <b>Pet Health Care</b></div>
+
                                                 <FormControl mt={4} className='d-flex'>
                                                     <FormLabel className='w-50'>Pet's owner  <Input ref={initialRef} value={pet?.owner?.fullName} /></FormLabel>
                                                     <FormLabel className='w-50'>Phone number <Input value={pet?.owner?.phoneNumber} /></FormLabel>
-                                                    <FormLabel className='w-50'>Date <Input value={pet?.owner?.phoneNumber} /></FormLabel>
+                                                    <FormLabel className='w-50'>Date <Input value={new Date(medicalRecord.date).toLocaleDateString("en-GB")} /></FormLabel>
                                                 </FormControl>
                                                 <FormControl className='d-flex'>
                                                     <FormLabel className='w-50'>Pet's name <Input ref={initialRef} value={pet.name} /></FormLabel>
@@ -447,13 +502,13 @@ export default function ViewPet() {
                                                 <FormControl className='d-flex justify-content-between'>
                                                     <FormLabel>Pet's breed <Input ref={initialRef} value={pet.breed} /></FormLabel>
                                                     <FormLabel>Pet's sex <Input value={pet.gender} /></FormLabel>
-                                                    <FormLabel>Pet's age <Input value={pet.age} /></FormLabel>
+                                                    <FormLabel>Pet's age <Input value={pet.age + " month(s)"} /></FormLabel>
                                                 </FormControl>
                                                 <FormControl  >
-                                                    <FormLabel>Diagnosis <Input ref={initialRef} placeholder='Diagnosis' value={medicalRecord.diagnosis} /></FormLabel>
+                                                    <FormLabel>Diagnosis <Input ref={initialRef} placeholder='Diagnosis'className='fst-italic' value={medicalRecord.diagnosis} /></FormLabel>
                                                 </FormControl>
                                                 <FormControl  >
-                                                    <FormLabel>Treatment <Input ref={initialRef} placeholder='Treatment' value={medicalRecord.treatment} /></FormLabel>
+                                                    <FormLabel>Treatment <Input ref={initialRef} placeholder='Treatment' className='fst-italic' value={medicalRecord.treatment} /></FormLabel>
                                                 </FormControl>
                                                 {medicalRecord.prescriptions.length !== 0 ?
                                                     <table className='table'>
@@ -592,6 +647,9 @@ export default function ViewPet() {
                 pauseOnHover
                 theme="light"
             />
+            <div className=''>
+
+            </div>
         </div >
     )
 }

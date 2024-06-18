@@ -1,0 +1,59 @@
+.icon-container {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+}
+
+.icon {
+  font-size: 24px;
+}
+
+.icon-text {
+  position: absolute;
+  top: 100%; /* Đặt vị trí ở dưới icon */
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(0, 0, 0, 0.6);
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-size: 14px;
+  white-space: nowrap;
+  visibility: hidden; /* Ẩn văn bản ban đầu */
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out, visibility 0.3s ease-out;
+  color: white;
+}
+
+.icon-container:hover .icon-text {
+  visibility: visible; /* Hiện văn bản khi hover */
+  opacity: 1;
+}
+tr .item:hover {
+  background-color: teal !important;
+}
+
+.table-hover tbody tr:hover {
+  background-color: teal !important; /* Màu nền khi hover */
+  color: white !important; /* Màu chữ khi hover */
+}
+.search-container {
+  padding: 5px; 
+  width: fit-content;
+   /* Độ rộng sẽ phù hợp với nội dung bên trong */
+   cursor: pointer;
+}
+
+.search-wrapper {
+  display: flex; /* Sử dụng flexbox */
+  align-items: center; /* Căn chỉnh các phần tử theo chiều dọc */
+}
+
+.input {
+   border: none; /*Loại bỏ border của input */
+  width: 100%; /* Độ rộng 100% */
+  padding: 5px; /* Khoảng cách nội dung và border của input */
+  outline: none; /* Loại bỏ outline khi focus */
+}
+.search-icon:hover{
+    color: teal;
+}

@@ -61,10 +61,10 @@ public class PetService implements IPetService{
     @Override
     public List<Pet> getAllPets() {
 
-//        return petRepository.findAll().stream()
-//                .filter(pet -> !pet.getIsDeceased())
-//                .collect(Collectors.toList());
-    return petRepository.findAll();
+        return petRepository.findAll().stream()
+                .filter(pet -> !pet.getIsDeceased())
+                .collect(Collectors.toList());
+
     }
 
 
