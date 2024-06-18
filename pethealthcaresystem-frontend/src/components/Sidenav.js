@@ -70,6 +70,7 @@ export default function Sidenav() {
         { name: 'Cages', path: '/cages', icon: 'fas fa-warehouse' },
         { name: 'Booking Appointments', path: '/staffBooking', icon: 'fas fa-calendar-check' },
         { name: 'Assign Vet\'s Work Schedules', path: '/assign-schedules', icon: 'fas fa-clipboard-list' },
+        { name: 'Booking History', path: 'booking-history', icon: 'fa fa-history' },
         { name: 'Logout', path: '/login', icon: 'fas fa-sign-out-alt', onClick: handleLogout },
       ];
       break;
@@ -84,7 +85,7 @@ export default function Sidenav() {
     case 4:
       links = [
         { name: 'Dashboard', path: '/dashboard', icon: 'fas fa-tachometer-alt' },
-        { name: 'User', path: '/list-account', icon: 'fa-solid fa-user' },
+        { name: 'Account', path: '/account', icon: 'fa-solid fa-user' },
         { name: 'Logout', path: '', icon: 'fas fa-sign-out-alt', onClick: handleLogout },
       ];
       break;

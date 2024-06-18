@@ -17,9 +17,6 @@ import VetWorkSchedules from './services/VetWorkSchedules';
 import Dashboard from './services/Dashboard';
 import Verify from './services/Verify';
 import CreateShift from './services/CreateShift';
-import CreateAccount from './services/CreateAccount';
-import ListAccount from './services/ListAccount';
-import EditAccount from './services/EditAccount';
 import AssignVetSchedules from './services/AssignVetSchedules';
 import Booking from './services/Booking/Booking';
 import CreateCage from './services/CreateCage';
@@ -29,6 +26,9 @@ import PaymentResult from './services/Booking/PaymentResult';
 import StaffBooking from './services/Booking/StaffBooking';
 import ViewHospitalization from './services/ViewHospitalization';
 import Reservation from './services/Booking/Reservation';
+import AccountPage from './pages/Account';
+import BookingHistory from './services/Booking/BookingHistory'
+import { Fragment } from 'react';
 function App() {
 
   const location = useLocation();
@@ -41,35 +41,40 @@ function App() {
       {!hideNavbarAndSidenav && <Navbar />}
       <div className={`content ${hideNavbarAndSidenav ? 'full-screen' : ''}`}>
         <div className={`content ${hideNavbarAndSidenav ? 'full-screen' : ''}`}>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/services" element={<Services />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/booking" element={<Booking />} />
-            <Route path="/staffBooking" element={<StaffBooking />} />
-            {/* <Route path="/payment" element={<Payment />}/> */}
-            <Route path="/createPet" element={<CreatePet />} />
-            <Route path="/viewPet/:petId" element={<ViewPet />} />
-            <Route path="/listPets" element={<ListPets />} />
-            <Route path="/editPet/:petId" element={<EditPet />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/cages" element={<Cages />} />
-            <Route path='/create-cage' element={<CreateCage />} />
-            <Route path='/edit-cage/:cageId' element={<EditCage />} />
+          <Fragment>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/services" element={<Services />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/booking" element={<Booking />} />
+              <Route path="/staffBooking" element={<StaffBooking />} />
+              {/* <Route path="/payment" element={<Payment />}/> */}
+              <Route path="/createPet" element={<CreatePet />} />
+              <Route path="/viewPet/:petId" element={<ViewPet />} />
+              <Route path="/listPets" element={<ListPets />} />
+              <Route path="/editPet/:petId" element={<EditPet />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/cages" element={<Cages />} />
+              <Route path='/create-cage' element={<CreateCage />} />
+              <Route path='/edit-cage/:cageId' element={<EditCage />} />
 
-            <Route path="/vet-work-schedules" element={<VetWorkSchedules />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path='/verify' element={<Verify />} />
-            <Route path="/shift" element={<CreateShift />} />
-            <Route path='/create-account' element={<CreateAccount />} />
-            <Route path='/list-account' element={<ListAccount />} />
-            <Route path="/edit-account/:userId" element={<EditAccount />} />
-            <Route path="/assign-schedules" element={<AssignVetSchedules />} />
-            <Route path='/payment-result' element={<PaymentResult />} />
-            <Route path="/hospitalization-detail/:id" element={<ViewHospitalization />} />
-            <Route path="/reservation" element={<Reservation />} />
-          </Routes >
+              <Route path="/vet-work-schedules" element={<VetWorkSchedules />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path='/verify' element={<Verify />} />
+              <Route path="/shift" element={<CreateShift />} />
+
+              <Route path="/assign-schedules" element={<AssignVetSchedules />} />
+              <Route path='/payment-result' element={<PaymentResult />} />
+              <Route path="/hospitalization-detail/:id" element={<ViewHospitalization />} />
+              <Route path="/reservation" element={<Reservation />} />
+              <Route path='/booking-history' element={<BookingHistory />} />
+            </Routes >
+
+            <AccountPage />
+
+
+          </Fragment>
         </div >
       </div >
     </div >
