@@ -58,6 +58,7 @@ export default function Sidenav() {
         { name: 'Home', path: '/', icon: 'fas fa-home' },
         { name: 'Services', path: '/services', icon: 'fas fa-concierge-bell' },
         { name: 'Booking', path: '/booking', icon: 'fas fa-calendar-check' },
+        { name: 'Reservation', path: '/reservation', icon: 'fa-solid fa-book' },
         { name: 'Pets', path: '/listPets', icon: 'fas fa-paw' },
         { name: 'Profile', path: '/profile', icon: 'fas fa-user' },
         { name: 'Logout', path: '/login', icon: 'fas fa-sign-out-alt', onClick: handleLogout },
@@ -70,6 +71,7 @@ export default function Sidenav() {
         { name: 'Booking Appointments', path: '/staffBooking', icon: 'fas fa-calendar-check' },
         { name: 'Assign Vet\'s Work Schedules', path: '/assign-schedules', icon: 'fas fa-clipboard-list' },
         { name: 'Anomyous User', path: '/create-anomyous-user', icon: 'fa-solid fa-user' },
+        { name: 'Booking History', path: 'booking-history', icon: 'fa fa-history' },
         { name: 'Logout', path: '/login', icon: 'fas fa-sign-out-alt', onClick: handleLogout },
       ];
       break;
@@ -84,7 +86,7 @@ export default function Sidenav() {
     case 4:
       links = [
         { name: 'Dashboard', path: '/dashboard', icon: 'fas fa-tachometer-alt' },
-        { name: 'User', path: '/list-account', icon: 'fa-solid fa-user' },
+        { name: 'Account', path: '/account', icon: 'fa-solid fa-user' },
         { name: 'Logout', path: '', icon: 'fas fa-sign-out-alt', onClick: handleLogout },
       ];
       break;

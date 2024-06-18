@@ -1,11 +1,15 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import './account.css';
+import { useAuth } from '../../context/auth.context';
+
+import './css/account.css';
 
 const ListAccount = () => {
   const [accounts, setAccounts] = useState([]);
   const [roleId, setRoleId] = useState(0);
+
+  const { user } = useAuth()
 
   const loadAccounts = async () => {
     try {
@@ -36,8 +40,9 @@ const ListAccount = () => {
   };
 
   return (
+
     <div className='container'>
-      <Link className='btn btn-primary m-3' to={'/create-account'}>Add new Account</Link>
+      <Link className='btn btn-primary m-3' to={'/account/create'}>Add new Account</Link>
       <div className="dropdown mb-3">
         <label htmlFor="roleId" className="form-label me-2">Role:</label>
         <select
@@ -70,10 +75,10 @@ const ListAccount = () => {
               <th scope="row">{index + 1}</th>
               <td className="col-2">{account.fullName}</td>
               <td className="col-2">{account.roleId}</td>
-              <td className='col-2'>{account.isActive? "Active" : "InActive" }</td>
+              <td className='col-2'>{account.isActive ? "Active" : "InActive"}</td>
               <td className="col-3">
                 {/* <Link className="btn btn-primary mx-2" to={`/viewAccount/${account.id}`}>View</Link> */}
-                 <Link className="btn btn-outline-primary mx-2" to={`/edit-account/${account.userId}`}>Edit</Link> 
+                <Link className="btn btn-outline-primary mx-2" to={`/edit-account/${account.userId}`}>Edit</Link>
                 <button onClick={() => deleteAccount(account.userId)} className="btn btn-danger mx-2">Delete</button>
               </td>
             </tr>
@@ -81,6 +86,7 @@ const ListAccount = () => {
         </tbody>
       </table>
     </div>
+
   );
 };
 
