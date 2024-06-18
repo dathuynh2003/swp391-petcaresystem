@@ -11,4 +11,8 @@ public interface CageRepository extends JpaRepository<Cage, Integer> {
     List<Cage> findByNameContaining(String cageName);
 
     List<Cage> findByStatus(String status);
+
+    List<Cage> findByTypeAndStatus(String type, String status);
+
+    Cage findByIdAndStatus(int id, String status);
 }
