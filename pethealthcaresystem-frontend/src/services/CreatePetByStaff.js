@@ -45,7 +45,7 @@ export default function CreatePetByStaff() {
             toast.success('Add new pet successfully!', 2000);
 
             setTimeout(() => {
-                navigate('/create-account-by-staff');
+                navigate('/');
             }, 2000);
         } catch (error) {
             if (error.response) {
@@ -208,7 +208,7 @@ export default function CreatePetByStaff() {
                             Save
                         </button>
 
-                        <Link className="btn btn-outline-danger mx-2" to="/listpets">
+                        <Link className="btn btn-outline-danger mx-2" to="/create-anomyous-user">
                             Cancel
                         </Link>
                     </div>

@@ -30,6 +30,7 @@ import PaymentFail from './services/Booking/PaymentResult';
 import PaymentResult from './services/Booking/PaymentResult';
 import StaffBooking from './services/Booking/StaffBooking';
 import ViewHospitalization from './services/ViewHospitalization';
+import UserAnonymous from './services/UserAnomyous';
 function App() {
 
   const location = useLocation();
@@ -71,6 +72,7 @@ function App() {
             <Route path="/hospitalization-detail/:id" element={<ViewHospitalization />} />
             <Route path="/create-account-by-staff" element={<CreateAccountByStaff />} />
             <Route path="/create-pet-by-staff" element={<CreatePetByStaff />} />
+            <Route path="/create-anomyous-user" element={<UserAnonymous />} />
           </Routes >
         </div >
       </div >

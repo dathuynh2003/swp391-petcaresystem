@@ -73,8 +73,8 @@ export default function Register() {
 
                             <label for="gender" style={{ fontSize: '10px', marginLeft: '13%' }}>Gender</label>
                             <div className="form-group mb-3 row mx-auto w-75 mx-auto">
-                                <div class="form-check col-md-4 border w-25" style={{marginLeft: '12.5%', marginRight: '8%' }}>
-                                    <input class="form-check-input" type="radio" id='male' name="gender" value="Male" onChange={(e) => onInputChange(e)} />
+                                <div class="form-check col-md-4 border w-25" style={{ marginLeft: '12.5%', marginRight: '8%' }}>
+                                    <input className="form-check-input" type="radio" id='male' name="gender" value="Male" onChange={(e) => onInputChange(e)} />
                                     <label class="form-check-label mx-1 w-100" for="male">Male</label>
                                 </div>
                                 <div class="form-check col-md-4 border w-25" style={{ backgroundColor: 'white' }}>
