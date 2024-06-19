@@ -268,7 +268,7 @@ export default function ViewPet() {
             )
         )
     }
-    const [vetNote, setVetNote] = useState()
+    const [vetNote, setVetNote] = useState('')
     const saveVetNoteToHospitalizationDetails = (e) => {
         setVetNote(e.target.value)
         const vetNote = e.target.value
@@ -294,6 +294,10 @@ export default function ViewPet() {
     }
     const updateAdmissionInfoWithoutMedicine = async (hospId, vetNote) => {
         try {
+            if (vetNote.length === 0) {
+                toast.info("Please fill in care information")
+                return
+            }
             const respone = await axios.post(`http://localhost:8080/hospitalization/update/${hospId}/note/${vetNote}`, {}, { withCredentials: true })
             if (respone.data.message === "Successfully") {
                 loadPet();
@@ -859,7 +863,7 @@ export default function ViewPet() {
                                 return (
                                     <AccordionItem key={index}>
                                         <h2>
-                                            <AccordionButton className=''>
+                                            <AccordionButton className='rounded fst-italic fw-bold' _hover={{ background: '#95D2B3', color: '#F9F9F9' }}>
                                                 <Box as='span' flex='1' textAlign='left'>
                                                     {hospitalization?.admissionTime}
                                                 </Box>
@@ -988,7 +992,7 @@ export default function ViewPet() {
                                                     <FormLabel className='w-50'>Pet's type <Input readOnly value={pet.petType} /></FormLabel>
                                                 </FormControl>
                                                 <FormControl className='d-flex justify-content-between'>
-                                                    <FormLabel>Pet's breed <Input ref={initialRef} value={pet.breed} /></FormLabel>
+                                                    <FormLabel>Pet's breed <Input readOnly ref={initialRef} value={pet.breed} /></FormLabel>
                                                     <FormLabel>Pet's sex <Input readOnly value={pet.gender} /></FormLabel>
                                                     <FormLabel>Pet's age <Input readOnly value={pet.age} /></FormLabel>
                                                 </FormControl>
@@ -1005,7 +1009,7 @@ export default function ViewPet() {
                                                 {groupedHospDetailsByTime?.map((hospitalizationDetail) => (
                                                     <div className=''>
                                                         <FormControl className='d-flex justify-content-between mt-3 mb-1'>
-                                                            <div className='col-2 fw-medium text-success'>{hospitalizationDetail.time}</div>
+                                                            <div className='col-2 fw-medium text-success'>{hospitalizationDetail.time.slice(0, -3)}</div>
                                                             <div className='col-4'>
                                                                 {hospitalizationDetail?.details?.map((detail) => (
                                                                     <>
@@ -1055,15 +1059,32 @@ export default function ViewPet() {
                                                     </div>
                                                 ))}
                                                 <FormControl
-                                                    className='d-flex justify-content-between mt-3 mb-1 border border-top-0 border-end-0 border-start-0'
+                                                    className='d-flex justify-content-between mt-3 mb-1 rounded'
+                                                    bg='gray.50'
+                                                    border='1px' borderColor='dark.200'
                                                 >
-                                                    <div className='col-2 fw-bold'>Admission Time:</div>
-                                                    <div className='col-2'>{hospitalization?.admissionTime}</div>
-                                                    <div className='col-2 fw-bold'>Discharged Time:</div>
-                                                    <div className='col-2'>{hospitalization?.dischargeTime ? hospitalization?.dischargeTime : "N/A"}</div>
-                                                    <div className='col-2 fw-bold'>Hospitalization fee: </div>
-                                                    <div className='col-2'>
-                                                        {hospFee > 0 ? hospFee.toLocaleString('vi-VN') + " VND" : "Hospitalizing..."}
+                                                    <div className='col-4'>
+                                                        <div className='row'>
+                                                            <span className='fw-bold col-6'>Admission Time:</span>
+                                                            <span className='col-6'>{hospitalization?.admissionTime}</span>
+                                                        </div>
+                                                        <div className='row'>
+                                                            <span className='fw-bold col-6'>Discharged Time:</span>
+                                                            <span className='col-6'>
+                                                                {hospitalization?.dischargeTime ? hospitalization?.dischargeTime : "N/A"}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                    <div className='col-2 my-auto'>
+                                                        <span className='fw-bold'>Toal Time: </span>
+                                                        <span>{timeDifference > 0 ? timeDifference + " hour(s)" : "N/A"}</span>
+
+                                                    </div>
+                                                    <div className='col-4 my-auto'>
+                                                        <span className='col-6 fw-bold'>Hospitalization fee: </span>
+                                                        <span className='col-6'>
+                                                            {hospFee > 0 ? hospFee.toLocaleString('vi-VN') + " VND" : "Hospitalizing..."}
+                                                        </span>
                                                     </div>
                                                 </FormControl>
                                                 <FormControl

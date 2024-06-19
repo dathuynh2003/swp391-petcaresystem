@@ -65,6 +65,8 @@ public class PetService implements IPetService {
                 hospDetail.setHospitalization(null);
             }
             hospitalization.setHospitalizationDetails(hospDetails);
+            // Chống lặp lại vô hạn
+            hospitalization.getUser().setVetShiftDetails(null);
         }
         pet.setHospitalizations(hospitalizationSet);
         return pet;

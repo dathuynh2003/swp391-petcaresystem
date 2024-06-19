@@ -35,6 +35,9 @@ public class MedicalRecordService implements IMedicalRecordService {
                 .filter(medicalRecord -> medicalRecord.getPet().getPetId() == petId)
                 .collect(Collectors.toSet());
         pet.setMedicalRecords(medicalRecords);
+        for (MedicalRecord medicalRecord : medicalRecords) {
+            medicalRecord.getUser().setVetShiftDetails(null);
+        }
         return  medicalRecords;
     }
 

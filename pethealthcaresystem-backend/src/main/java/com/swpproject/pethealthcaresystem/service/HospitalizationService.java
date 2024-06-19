@@ -24,7 +24,7 @@ public class HospitalizationService implements IHospitalizationService {
     @Autowired
     private HospitalizationDetailRepository hospitalizationDetailRepository;
 
-    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
 
 
     @Override

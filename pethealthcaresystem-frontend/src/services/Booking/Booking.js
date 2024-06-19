@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Tab, TabList, Tabs, TabPanel, TabPanels, Button } from '@chakra-ui/react';
+import { Tab, TabList, Tabs, TabPanel, TabPanels, Button, Select } from '@chakra-ui/react';
 import axios from 'axios';
 import { CheckIcon } from '@chakra-ui/icons';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
@@ -175,12 +175,15 @@ export default function Booking() {
     if (index === activeShiftIndex) {
       setSelectedVetShift(null);
       setActiveShiftIndex(null);
+      setVetName('')
+      setTime('')
     } else {
       setSelectedVetShift(vs_id);
       setActiveShiftIndex(index);
+      setVetName(vetName)
+      setTime(time)
     }
-    setVetName(vetName)
-    setTime(time)
+
   }
 
   const [vetName, setVetName] = useState()
@@ -249,6 +252,58 @@ export default function Booking() {
       console.error(error);
     }
   }
+
+  const [vetList, setVetList] = useState([]);
+  const handleGetVets = async () => {
+    try {
+      const respone = await axios.get('http://localhost:8080/vets', { withCredentials: true })
+      if (respone.data.message === "Successfully") {
+        setVetList(respone.data.vets);
+      }
+    } catch (e) {
+      toast.error(e.message);
+    }
+  }
+  const [selectedVet, setSelectedVet] = useState('');
+  const [groupedVetShiftDetails, setGroupedVetShiftDetails] = useState({});
+  // Hàm để nhóm các đối tượng theo ngày
+  const groupByDate = (vetShiftDetails) => {
+    return vetShiftDetails.reduce((acc, detail) => {
+      if (!acc[detail.date]) {
+        acc[detail.date] = []
+      }
+      acc[detail.date].push(detail)
+      return acc;
+    }, {})
+  }
+
+  const handleVetChange = (e) => {
+    const userId = parseInt(e.target.value, 10)
+    const vet = vetList.find(vet => vet.userId === userId);
+    setSelectedVet(vet);
+    if (vet) {
+      const grouped = groupByDate(vet.vetShiftDetails)
+      setGroupedVetShiftDetails(grouped)
+    }
+  }
+
+  // Chuyển đổi đối tượng groupedVetShiftDetails thành mảng
+  const groupedVetShiftDetailsArray = Object.keys(groupedVetShiftDetails).map(date => ({
+    date,
+    details: groupedVetShiftDetails[date]
+  }));
+
+  const [selectedDate, setSelectedDate] = useState()
+  const handleClickDay2 = async (date, index) => {
+    setSelectedVetShift(null);
+    setActiveShiftIndex(null);
+    setDisplaySelectedDate(date.toLocaleDateString("en-Gb", { month: 'numeric', day: 'numeric', year: 'numeric' }))
+    setActiveDateIndex(index)
+    setSelectedDate(new Date(date).toLocaleDateString('en-CA'))
+  };
+
+
+
   return (
     <div className="container">
       <div className="row">
@@ -258,7 +313,6 @@ export default function Booking() {
             <Tab>Services</Tab>
             <Tab >Choose Pet</Tab>
             <Tab >Reason</Tab>
-            {/* isDisabled={booking?.description === '' || selectedServices.length === 0} */}
             <Tab >Time</Tab>
             <Tab>Payment</Tab>
             <Tab>Get Ready</Tab>
@@ -430,60 +484,155 @@ export default function Booking() {
             </TabPanel>
 
             <TabPanel>
-              <div className="container">
-                <div className="row">
-                  <div className="col-md-12 border rounded p-4 mt-2 shadow">
-                    <div className="d-flex justify-content-between mb-3">
-                      <button className="btn btn-primary" onClick={handlePreviousWeek}>
-                        Previous Week
-                      </button>
-                      <button className="btn btn-primary" onClick={handleNextWeek}>
-                        Next Week
-                      </button>
-                    </div>
-                    <div className='choose-date row'>
-                      {dates.map((date, index) => (
-                        <Button
-                          key={index}
-                          className={`mx-auto btn btn-outline-primary fw-normal ${activeDateIndex === index ? 'active' : ''}`}
-                          style={{ width: '12%' }}
-                          onClick={() => handleClickDay(date, index)}
-                        >{`${formatDate(date)}`} <br /> </Button>
-                        // {`(${formatDay(date)})`}  
-
-                      ))}
-                    </div>
-                    <div className='choose-vetshift'>
-                      {vets.map((vet, index) => (
-                        <div className=''>
-                          <h1 className='fs-3'>{vet?.fullName}</h1>
-                          <div className='row'>
-                            {vet?.workSchedule?.map((workSchedule, workScheduleIndex) => (
-                              <>
-                                <button
-                                  className={`col-2 mx-4 my-2 btn btn-outline-primary text-black ${activeShiftIndex === workSchedule?.vs_id ? 'active' : ''}`}
-                                  disabled={workSchedule?.status !== "Available"}
-                                  onClick={() => chooseShift(workSchedule?.vs_id, workSchedule?.vs_id, vet?.fullName, workSchedule?.shift.from_time + ' - ' + workSchedule?.shift.to_time)}
-                                >
-                                  {workSchedule?.shift?.from_time} - {workSchedule?.shift?.to_time}
-                                </button>
-                              </>
+              <Tabs variant='soft-rounded' colorScheme='blue'>
+                <TabList className=''>
+                  <Tab
+                    className='col-4 mx-5'
+                    _selected={{ bg: '#0D6EFD', color: 'white' }}
+                    _hover={{ bg: 'blue.600' }}
+                    onClick={() => {
+                      setSelectedVetShift(null);
+                      setActiveShiftIndex(null);
+                      setActiveDateIndex(null)
+                      setVets([])
+                      setVetName('');
+                      setTime('')
+                    }}
+                  >
+                    Choose Date First
+                  </Tab>
+                  <Tab
+                    className='col-4 mx-5'
+                    _selected={{ bg: '#0D6EFD', color: 'white' }}
+                    _hover={{ bg: 'blue.600' }}
+                    onClick={() => {
+                      setSelectedVetShift(null)
+                      setActiveShiftIndex(null)
+                      setActiveDateIndex(null)
+                      setSelectedDate(null)
+                      setVetName('')
+                      setTime('')
+                      handleGetVets();
+                    }}
+                  >
+                    Choose Vet First
+                  </Tab>
+                </TabList>
+                <TabPanels>
+                  <TabPanel>
+                    <div className="container">
+                      <div className="row">
+                        <div className="col-md-12 border rounded p-4 mt-2 shadow">
+                          <div className="d-flex justify-content-between mb-3">
+                            <button className="btn btn-primary" onClick={handlePreviousWeek}>
+                              Previous Week
+                            </button>
+                            <button className="btn btn-primary" onClick={handleNextWeek}>
+                              Next Week
+                            </button>
+                          </div>
+                          <div className='choose-date row'>
+                            {dates.map((date, index) => (
+                              <Button
+                                key={index}
+                                className={`mx-auto btn btn-outline-primary fw-normal ${activeDateIndex === index ? 'active' : ''}`}
+                                style={{ width: '12%' }}
+                                onClick={() => handleClickDay(date, index)}
+                              >{`${formatDate(date)}`} <br /> </Button>
+                            ))}
+                          </div>
+                          <div className='choose-vetshift'>
+                            {vets.map((vet, index) => (
+                              <div className=''>
+                                <h1 className='fs-3'>{vet?.fullName}</h1>
+                                <div className='row'>
+                                  {vet?.workSchedule?.map((workSchedule, workScheduleIndex) => (
+                                    <>
+                                      <button
+                                        className={`col-2 mx-4 my-2 btn btn-outline-primary text-black ${activeShiftIndex === workSchedule?.vs_id ? 'active' : ''}`}
+                                        disabled={workSchedule?.status !== "Available"}
+                                        onClick={() => chooseShift(workSchedule?.vs_id, workSchedule?.vs_id, vet?.fullName, workSchedule?.shift.from_time + ' - ' + workSchedule?.shift.to_time)}
+                                      >
+                                        {workSchedule?.shift?.from_time} - {workSchedule?.shift?.to_time}
+                                      </button>
+                                    </>
+                                  ))}
+                                </div>
+                              </div>
                             ))}
                           </div>
                         </div>
-                      ))}
+                      </div>
                     </div>
-                  </div>
-                  {/* <div className='btn btn-primary' onClick={() => callAPI()}>
-                    Choose
-                  </div> */}
+                    <div className='text-center mt-3'>
+                      <div className='btn btn-primary' onClick={() => handleBackClick()}>Back</div>
+                      <div className='btn btn-primary' onClick={() => handleClickAPI(selectedVetShift)}>Next</div>
+                    </div>
+                  </TabPanel>
+                  <TabPanel>
+                    <div className="container">
+                      <div className="row border rounded p-4 mt-2 shadow">
+                        <div className='d-flex justify-content-center'>
+                          <Select
+                            placeholder='Select Vet'
+                            width={'50%'}
+                            onChange={handleVetChange}
+                          >
+                            {vetList?.map((vet, index) => (
+                              <option value={vet?.userId}>{vet?.fullName}</option>
+                            ))}
+                          </Select>
+                        </div>
+                        {selectedVet !== '' &&
+                          <div className='col-12 my-2'>
+                            <div className="d-flex justify-content-between mb-3">
+                              <button className="btn btn-primary" onClick={handlePreviousWeek}>
+                                Previous Week
+                              </button>
+                              <button className="btn btn-primary" onClick={handleNextWeek}>
+                                Next Week
+                              </button>
+                            </div>
+                            <div className='choose-date row'>
+                              {dates.map((date, index) => (
+                                <Button
+                                  key={index}
+                                  className={`mx-auto btn btn-outline-primary fw-normal ${activeDateIndex === index ? 'active' : ''}`}
+                                  style={{ width: '12%' }}
+                                  onClick={() => handleClickDay2(date, index)}
+                                  isDisabled={!groupedVetShiftDetailsArray.some(detail => detail.date === new Date(date).toLocaleDateString('en-CA'))}
+                                >{`${formatDate(date)}`} <br /> </Button>
+                              ))}
+                            </div>
+                            <div className='choose-vetshift'>
+                              {groupedVetShiftDetailsArray
+                                .filter(detail => detail.date === selectedDate)
+                                .map((vetShiftDetail, index) => (
+                                  <div className='row'>
+                                    {vetShiftDetail?.details?.map((detail, detailIndex) => (
+                                      <button
+                                        className={`col-2 mx-4 my-2 btn btn-outline-primary text-black ${activeShiftIndex === detail?.vs_id ? 'active' : ''}`}
+                                        disabled={detail?.status !== "Available"}
+                                        onClick={() => chooseShift(detail?.vs_id, detail?.vs_id, selectedVet.fullName, detail?.shift.from_time + ' - ' + detail?.shift.to_time)}
+                                      >
+                                        {detail?.shift?.from_time} - {detail?.shift?.to_time}
+                                      </button>
+                                    ))}
+                                  </div>
+                                ))}
+                            </div>
+                          </div>
+                        }
 
-                </div>
-              </div>
-              <div className='text-center mt-3'>
-                <div className='btn btn-primary' onClick={() => handleBackClick()}>Back</div>
-                <div className='btn btn-primary' onClick={() => handleClickAPI(selectedVetShift)}>Next</div>
-              </div>
+                      </div>
+                    </div>
+                    <div className='text-center mt-3'>
+                      <div className='btn btn-primary' onClick={() => handleBackClick()}>Back</div>
+                      <div className='btn btn-primary' onClick={() => handleClickAPI(selectedVetShift)}>Next</div>
+                    </div>
+                  </TabPanel>
+                </TabPanels>
+              </Tabs>
             </TabPanel>
             <TabPanel>
               <div className='container row'>
