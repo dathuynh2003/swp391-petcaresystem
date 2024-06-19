@@ -15,6 +15,7 @@ export default function Sidenav() {
       setUser(result.data);
     } catch (error) {
       localStorage.removeItem('isLoggedIn');
+      localStorage.removeItem('roleId')
       console.error('Error during login:', error);
     }
   };
@@ -24,6 +25,7 @@ export default function Sidenav() {
       e.preventDefault();
       await axios.post(`http://localhost:8080/logout`, {}, { withCredentials: true });
       localStorage.removeItem('isLoggedIn');
+      localStorage.removeItem('roleId')
       navigate('/login');
     } catch (error) {
       console.error('Error during logout:', error);
@@ -56,6 +58,7 @@ export default function Sidenav() {
         { name: 'Home', path: '/', icon: 'fas fa-home' },
         { name: 'Services', path: '/services', icon: 'fas fa-concierge-bell' },
         { name: 'Booking', path: '/booking', icon: 'fas fa-calendar-check' },
+        { name: 'Reservation', path: '/reservation', icon: 'fa-solid fa-book' },
         { name: 'Pets', path: '/listPets', icon: 'fas fa-paw' },
         { name: 'Profile', path: '/profile', icon: 'fas fa-user' },
         { name: 'Logout', path: '/login', icon: 'fas fa-sign-out-alt', onClick: handleLogout },
@@ -65,8 +68,11 @@ export default function Sidenav() {
       links = [
         { name: 'Home', path: '/', icon: 'fas fa-home' },
         { name: 'Cages', path: '/cages', icon: 'fas fa-warehouse' },
-        { name: 'Booking Appointments', path: '/booking', icon: 'fas fa-calendar-check' },
+        { name: 'Booking Appointments', path: '/staffBooking', icon: 'fas fa-calendar-check' },
         { name: 'Assign Vet\'s Work Schedules', path: '/assign-schedules', icon: 'fas fa-clipboard-list' },
+        { name: 'Anomyous User', path: '/create-anomyous-user', icon: 'fa-solid fa-user' },
+        { name: 'Booking History', path: 'booking-history', icon: 'fa fa-history' },
+        { name: 'Medicine', path: '/medicine', icon: 'fas fa-clipboard-list' },
         { name: 'Logout', path: '/login', icon: 'fas fa-sign-out-alt', onClick: handleLogout },
       ];
       break;
@@ -81,7 +87,7 @@ export default function Sidenav() {
     case 4:
       links = [
         { name: 'Dashboard', path: '/dashboard', icon: 'fas fa-tachometer-alt' },
-        { name: 'User', path: '/list-account', icon: 'fa-solid fa-user' },
+        { name: 'Account', path: '/account', icon: 'fa-solid fa-user' },
         { name: 'Logout', path: '', icon: 'fas fa-sign-out-alt', onClick: handleLogout },
       ];
       break;
@@ -90,16 +96,16 @@ export default function Sidenav() {
   }
 
   return (
-    <div className="sidenav">
+    <div className="sidenav" style={{ background: 'teal' }}>
       <div className="sidenav-header">
-        <img src="assets/logoPetCare.png" alt="Logo" className="logo" />
-        <h4>Pet Health Care</h4>
+        <img src="assets/logoPetCare.png" alt="Logo" className="logo rounded-circle " />
+        <h5 style={{ color: 'white' }}>Pet Health Care</h5>
       </div>
       <ul>
         {links.map((link) => (
           <li key={link.name}>
             <Link to={link.path} onClick={link.onClick}>
-              <i className={link.icon}></i>
+              <i className={link.icon} style={{ marginRight: '20px', color: 'white' }}></i>
               {link.name}
             </Link>
           </li>

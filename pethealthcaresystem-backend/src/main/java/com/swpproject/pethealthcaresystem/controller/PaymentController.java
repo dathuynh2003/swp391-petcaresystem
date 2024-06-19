@@ -21,9 +21,10 @@ public class PaymentController {
 
     @Autowired
     PaymentService paymentService;
-    @PostMapping("/api/payment")
+
+    @PostMapping("/api/payment/create")
     public ResponseEntity<ResponseData> createPayment(@RequestBody Payment payment) {
-        try{
+        try {
             System.out.println(payment);
             CreatePaymentPosPayload payload = paymentService.createPaymentOs(payment);
             ResponseData<PayOsDTO> data = new ResponseData();
@@ -35,12 +36,45 @@ public class PaymentController {
             HttpEntity<CreatePaymentPosPayload> httpEntity = new HttpEntity<>(payload, headers);
             PayOsDTO result = restTemplate.postForObject(uri, httpEntity, PayOsDTO.class);
             data.setData(result);
-            System.out.println(payload);
-            System.out.println(result);
+            payment.setOrderCode(result.getData().getOrderCode());
+            paymentService.createPayment(payment);
+
             return new ResponseEntity<>(data, HttpStatus.OK);
-        }catch (Error e){
+        } catch (Error e) {
             ResponseData<PayOsDTO> data = new ResponseData();
             data.setErrorMessage("Payment failed");
+            data.setStatusCode(404);
+            return new ResponseEntity<>(data, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PutMapping("/payment-update")
+    public ResponseEntity<ResponseData> updatePayment(@RequestBody Payment payment) {
+        try {
+            ResponseData<Payment> data = new ResponseData();
+            Payment updatedPayment = paymentService.updatePayment(payment);
+            data.setStatusCode(200);
+            data.setData(updatedPayment);
+            return new ResponseEntity<>(data, HttpStatus.OK);
+        } catch (Error e) {
+            ResponseData<Payment> data = new ResponseData();
+            data.setErrorMessage(e.getMessage());
+            data.setStatusCode(404);
+            return new ResponseEntity<>(data, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @GetMapping("/payment/{orderCode}")
+    public ResponseEntity<ResponseData> getPayment(@PathVariable int orderCode) {
+        try {
+            ResponseData<Payment> data = new ResponseData();
+            Payment selectedPayment = paymentService.getPaymentByOrderCode(orderCode);
+            data.setData(selectedPayment);
+            data.setStatusCode(200);
+            return new ResponseEntity<>(data, HttpStatus.OK);
+        } catch (Error e) {
+            ResponseData<Payment> data = new ResponseData();
+            data.setErrorMessage(e.getMessage());
             data.setStatusCode(404);
             return new ResponseEntity<>(data, HttpStatus.BAD_REQUEST);
         }

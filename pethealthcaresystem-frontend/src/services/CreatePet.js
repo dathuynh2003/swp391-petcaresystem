@@ -71,6 +71,7 @@ export default function CreatePet() {
 
   return (
     <div>
+
       <div className="container">
         <div className="col-md-6 offset-md-3 border rounded p-4 mt-2 shadow">
           <h2 className="text-center m-4">Add new Pet</h2>
@@ -178,9 +179,9 @@ export default function CreatePet() {
           </div>
           <ToastContainer />
           <div className="text-center">
-            <button className="btn btn-outline-primary" onClick={() => callAPI()}>
+            <Button className="btn " onClick={callAPI} style={{background: 'teal', color:'white'}} >
               Save
-            </button>
+            </Button>
 
             <Link className="btn btn-outline-danger mx-2" to="/listpets">
               Cancel

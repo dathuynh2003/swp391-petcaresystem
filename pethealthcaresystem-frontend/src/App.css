@@ -46,19 +46,20 @@
 
 .sidenav a {
   text-decoration: none;
-  color: #333;
+  color: #f1f1f1;
   display: flex;
   align-items: center;
   font-size: 18px;
 }
 
 .sidenav a:hover {
-  color: #007bff;
+  color:rgb(79, 209, 197);
 }
 
 .navbar {
   width: calc(100% - 200px);
-  background-color: #fff; /* Ensure the background color is consistent */
+
+  background-color: rgb(80, 200, 180); /* Ensure the background color is consistent */
   padding: 0; /* Remove padding */
   height: 60px; /* Set a fixed height */
   display: flex;
@@ -79,19 +80,23 @@
 }
 
 .content {
-  width: calc(100% - 120px); /* Adjust width to avoid overflow */
-  margin-left: 120px; /* Accounts for the sidebar width */
+ /* Adjust width to avoid overflow */
+ width: calc(100% - 120px); 
+
+  margin-left: 120px; 
+  /* Accounts for the sidebar width */
   box-sizing: border-box;
-  overflow-y: auto; /* Allows the content to scroll */
+  overflow-y: auto; 
   height: calc(100vh - 60px); /* Makes the content take full viewport height minus navbar */
   background-color: #f1f1f1;
 }
 
-.content.full-screen {
+.content1.full-screen {
   margin-left: 0; /* Remove the margin when sidenav is hidden */
   width: 100%; /* Adjust width to full when sidenav is hidden */
   padding-top: 20px; /* Adjust padding for the content */
-  height: 100%;
+  height: 100%; 
+  
 }
 
 
@@ -99,3 +104,4 @@
   width: 100%;
   height: 100%;
 }
+

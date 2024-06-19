@@ -20,4 +20,9 @@ public interface IUserService {
     public User deleteUser(int id);
     User updateUser(User newUser, int id);
     User getUserById(int id);
+    @Transactional
+    User createUserGoogle(User newUser);
+
+    @Transactional
+    User createAnonymousUser(String phoneNumber, String fullName, String gender);
 }

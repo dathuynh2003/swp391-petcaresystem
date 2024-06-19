@@ -1,21 +1,15 @@
 package com.swpproject.pethealthcaresystem.service;
 
-import com.swpproject.pethealthcaresystem.model.Cage;
-import com.swpproject.pethealthcaresystem.model.Hospitalization;
-import com.swpproject.pethealthcaresystem.model.Pet;
-import com.swpproject.pethealthcaresystem.model.User;
-import com.swpproject.pethealthcaresystem.repository.CageRepository;
-import com.swpproject.pethealthcaresystem.repository.HospitalizationRepository;
-import com.swpproject.pethealthcaresystem.repository.PetRepository;
-import com.swpproject.pethealthcaresystem.repository.UserRepository;
+import com.swpproject.pethealthcaresystem.model.*;
+import com.swpproject.pethealthcaresystem.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class HospitalizationService implements IHospitalizationService {
@@ -27,24 +21,27 @@ public class HospitalizationService implements IHospitalizationService {
     private UserRepository userRepository;
     @Autowired
     private CageRepository cageRepository;
+    @Autowired
+    private HospitalizationDetailRepository hospitalizationDetailRepository;
+
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
 
     @Override
     @Transactional
-    public Hospitalization admitPet(int petId, int vetId) {
+    public Hospitalization admitPet(int petId, int vetId, int cageId) {
         Pet pet = petRepository.findById(petId).orElseThrow(() -> new RuntimeException("Pet not found"));
         if (hospitalizationRepository.existsByPetAndStatus(pet, "admitted")) {
             throw new RuntimeException("Pet is already admitted in a cage");
         }
         User vet = userRepository.findById(vetId).orElseThrow(() -> new RuntimeException("Vet not found"));
-        if (vet.getRoleId() != 3) throw new RuntimeException("Vet not found");
-        List<Cage> availableCages = cageRepository.findByStatus("available");
-        if (availableCages.isEmpty()) {
-            throw new RuntimeException("No available cages");
-        }
-
-        Cage cage = availableCages.get(0);
+        if (vet.getRoleId() != 3)
+            throw new RuntimeException("Please assign a veterinarian to be responsible for the pet before admitting it to the cage.");
+//        List<Cage> availableCages = cageRepository.findByStatus("available");
+//        if (availableCages.isEmpty())
+//            throw new RuntimeException("No available cages");
+        Cage cage = cageRepository.findByIdAndStatus(cageId, "available");
+        if (cage == null) throw new RuntimeException("Cage not found");
         cage.setStatus("occupied");
         cageRepository.save(cage);
 
@@ -72,6 +69,7 @@ public class HospitalizationService implements IHospitalizationService {
         String dischargeTime = now.format(formatter);
         hospitalization.setDischargeTime(dischargeTime);
         hospitalization.setStatus("discharged");
+//        hospitalization.setStatus("pending");
 
         Cage cage = hospitalization.getCage();
         if (cage == null) {
@@ -81,6 +79,43 @@ public class HospitalizationService implements IHospitalizationService {
         cageRepository.save(cage);
 
         return hospitalizationRepository.save(hospitalization);
+    }
+
+    @Override
+    public Hospitalization getHospitalizationById(int id) {
+        Hospitalization hospitalization = hospitalizationRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Hospitalization not found"));
+        Set<HospitalizationDetail> hospDetails = hospitalizationDetailRepository.findByHospitalizationOrderByTimeAsc(hospitalization);
+        hospitalization.setHospitalizationDetails(hospDetails);
+        return hospitalization;
+    }
+
+    @Override
+    public Hospitalization updateAdmissionInfo(int hospId, Set<HospitalizationDetail> hospitalizationDetails) throws Exception {
+        Hospitalization hosp = hospitalizationRepository.findById(hospId).orElseThrow(() -> new Exception("Hospitalization not found"));
+        if (hospitalizationDetails.isEmpty()) throw new Exception("Cannot find information to update");
+        LocalDateTime now = LocalDateTime.now();
+        String time = now.format(formatter);
+        for (HospitalizationDetail hospDetail : hospitalizationDetails) {
+            hospDetail.setTime(time);
+            hospDetail.setHospitalization(hosp);
+        }
+        hospitalizationDetailRepository.saveAll(hospitalizationDetails);
+        return hosp;
+    }
+
+    @Override
+    public Hospitalization updateAdmissionInfo(int hospId, String vetNote) throws Exception {
+        Hospitalization hosp = hospitalizationRepository.findById(hospId).orElseThrow(() -> new Exception("Hospitalization not found"));
+        if (vetNote.isEmpty()) throw new Exception("Cannot find information to update");
+        LocalDateTime now = LocalDateTime.now();
+        String time = now.format(formatter);
+        HospitalizationDetail hospDetail = new HospitalizationDetail();
+        hospDetail.setTime(time);
+        hospDetail.setHospitalization(hosp);
+        hospDetail.setDescription(vetNote);
+        hospitalizationDetailRepository.save(hospDetail);
+        return hosp;
     }
 
 

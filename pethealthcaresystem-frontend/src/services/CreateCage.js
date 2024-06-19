@@ -10,12 +10,15 @@ export default function CreateCage() {
     const [cage, setCage] = useState({
         name: '',
         price: null,
+        size: '',
+        type: '',
         status: 'available',
         description: ''
     })
 
     const onInputChange = (e) => {
         setCage({ ...cage, [e.target.name]: e.target.value })
+        console.log(cage);
     }
 
     const handleCreateCage = async () => {
@@ -23,10 +26,18 @@ export default function CreateCage() {
             toast.info("Please enter Cage's name and price")
             return
         }
+        if (cage?.size === '') {
+            toast.info("Please select the cage's size");
+            return
+        }
+        if (cage?.type === '') {
+            toast.info("Please select the cage's type")
+            return
+        }
         try {
             const respone = await axios.post('http://localhost:8080/createCage', cage, { withCredentials: true })
             if (respone.data.message === 'Cage created') {
-                toast.success('Add new pet successfully!', 2000);
+                toast.success('Add new cage successfully!', 2000);
                 navigate('/cages')
             } else {
                 toast.warning(respone.data.message)
@@ -56,6 +67,32 @@ export default function CreateCage() {
                     placeholder="Enter the new cage's price...."
                     onChange={(e) => onInputChange(e)}
                 />
+                <div className='w-75 mx-auto mt-3 px-0'>
+                    <label htmlFor='size' className='col-6 px-2'>Select Size: </label>
+                    <label htmlFor='type' className='col-6 px-2'>Cage's Type: </label>
+                    <div className='d-flex justify-content-between'>
+                        <select
+                            className='border border-dark mb-3 fs-4 col-5'
+                            name='size'
+                            onChange={onInputChange}
+                        >
+                            <option className='fs-6' value="">Select size</option>
+                            <option className='fs-6' value="Small">Small</option>
+                            <option className='fs-6' value="Medium">Medium</option>
+                            <option className='fs-6' value="Large">Large</option>
+                        </select>
+                        <select
+                            className='border border-dark mb-3 fs-4 col-6'
+                            name='type'
+                            onChange={onInputChange}
+                        >
+                            <option className='fs-6' value="">Select type</option>
+                            <option className='fs-6' value="Dog">Dog</option>
+                            <option className='fs-6' value="Cat">Cat</option>
+                            <option className='fs-6' value="Bird">Bird</option>
+                        </select>
+                    </div>
+                </div>
                 <label htmlFor='description' className='w-75 mx-auto mt-3'>Cage Description: </label>
                 <textarea
                     className='border border-dark mx-auto mb-3 fs-4 w-75 row'
@@ -82,6 +119,6 @@ export default function CreateCage() {
                 pauseOnHover
                 theme="light"
             />
-        </div>
+        </div >
     )
 }

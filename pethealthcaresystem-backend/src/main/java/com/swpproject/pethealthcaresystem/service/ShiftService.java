@@ -101,6 +101,6 @@ public class ShiftService implements IShiftService {
     public List<VetShiftDetail> getShiftByDate(String date) {
         return vetShiftDetailRepository.findAll().stream().filter(shift -> shift.getDate().equals(date))
                 .collect(Collectors.toList());
-
+//        return vetShiftDetailRepository.findAll();
     }
 }

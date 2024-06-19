@@ -13,6 +13,7 @@ import java.util.Set;
 @AllArgsConstructor
 @Entity
 public class PetService {
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     private int id;
     private String nameService;

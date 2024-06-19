@@ -19,7 +19,7 @@ export default function Booking() {
   // },[])
 
 
-const location = useLocation();
+  const location = useLocation();
 
 
   const [services, setServices] = useState([]);
@@ -34,18 +34,31 @@ const location = useLocation();
   const [selectedPet, setSelectedPet] = useState(null);
 
   const loadServices = async () => {
-    const response = await axios.get('http://localhost:8080/allServices');
-    setServices(response.data);
+    try {
+      const response = await axios.get('http://localhost:8080/allServices');
+      setServices(response.data);
+    } catch (error) {
+      console.log(error)
+    }
+
   };
 
   const loadPets = async () => {
-    const response = await axios.get('http://localhost:8080/pet', { withCredentials: true });
-    setPets(response.data);
+    try {
+      const response = await axios.get('http://localhost:8080/pet', { withCredentials: true });
+      setPets(response.data);
+    } catch (error) {
+      console.log(error)
+    }
   };
 
   const loadShift = async () => {
-    const response = await axios.get('http://localhost:8080/shifts/details', { withCredentials: true });
-    setShifts(response.data);
+    try {
+      const response = await axios.get('http://localhost:8080/shifts/details', { withCredentials: true });
+      setShifts(response.data);
+    } catch (error) {
+      console.log(error)
+    }
   };
 
   useEffect(() => {
@@ -98,20 +111,24 @@ const location = useLocation();
   }, [currentWeek]);
 
   const handlePreviousWeek = () => {
+    setSelectedVetShift(null);
+    setActiveShiftIndex(null);
     const previousWeek = new Date(currentWeek);
     previousWeek.setDate(currentWeek.getDate() - 7);
     setActiveDateIndex(null)
     setActiveShiftIndex(null)
-    // setVets([])
+    setVets([])
     setCurrentWeek(previousWeek);
   };
 
   const handleNextWeek = () => {
+    setSelectedVetShift(null);
+    setActiveShiftIndex(null);
     const nextWeek = new Date(currentWeek);
     nextWeek.setDate(currentWeek.getDate() + 7);
     setActiveDateIndex(null)
     setActiveShiftIndex(null)
-    // setVets([])
+    setVets([])
     setCurrentWeek(nextWeek);
   };
 
@@ -119,21 +136,15 @@ const location = useLocation();
     return date.toLocaleDateString("en", { weekday: 'short', month: 'long', day: 'numeric' }); // Định dạng ngày thành dd/mm/yyyy
   };
 
+  const [vets, setVets] = useState([]);
   const [activeDateIndex, setActiveDateIndex] = useState(null);
   const [shifts, setShifts] = useState([]);
-  const [selectedDate, setSelectedDate] = useState();
-  const handleClickDay = (date, index) => {
-    setSelectedDate(date.toLocaleDateString('en-CA'));
+  const handleClickDay = async (date, index) => {
+    setSelectedVetShift(null);
+    setActiveShiftIndex(null);
     setDisplaySelectedDate(date.toLocaleDateString("en-Gb", { month: 'numeric', day: 'numeric', year: 'numeric' }))
     setActiveDateIndex(index)
-  };
-
-  const [selectedDisplayDate, setDisplaySelectedDate] = useState()
-
-
-  const [vets, setVets] = useState([]);
-  const loadShiftsByDate = async () => {
-    const response = await axios.get(`http://localhost:8080/shifts/shiftByDate/${selectedDate}`);
+    const response = await axios.get(`http://localhost:8080/shifts/shiftByDate/${date.toLocaleDateString('en-CA')}`);
     const shifts = response.data;
     const updateVets = []
     shifts.forEach((shift) => {
@@ -155,19 +166,19 @@ const location = useLocation();
     setVets(updateVets)
   };
 
-  useEffect(() => {
-    if (selectedDate) {
-      loadShiftsByDate();
-    }
-  }, [selectedDate])
-
+  const [selectedDisplayDate, setDisplaySelectedDate] = useState()
   const [activeShiftIndex, setActiveShiftIndex] = useState()
   const [selectedVetShift, setSelectedVetShift] = useState()
 
   const [time, setTime] = useState()
   const chooseShift = (vs_id, index, vetName, time) => {
-    setSelectedVetShift(vs_id);
-    setActiveShiftIndex(index);
+    if (index === activeShiftIndex) {
+      setSelectedVetShift(null);
+      setActiveShiftIndex(null);
+    } else {
+      setSelectedVetShift(vs_id);
+      setActiveShiftIndex(index);
+    }
     setVetName(vetName)
     setTime(time)
   }
@@ -188,7 +199,7 @@ const location = useLocation();
     console.log(response.data);
 
   }
-  
+
   const [step, setStep] = useState(0)
   const handleNextClick = (content) => {
     if (content === null || content === undefined || content === '' || content.length === 0) {
@@ -214,21 +225,22 @@ const location = useLocation();
     else toast.warn('Please input required information!')
   }
   const handlePaymentClick = async () => {
+    console.log(curBooking)
     const payment = {
-      //orderCode: booking.orderCode,
+      // orderCode: booking.orderCode,
       paymentType: 'Credit Card',  // You can modify this as per your requirement
       amount: 10000,
       paymentDate: new Date().toISOString(),
       status: 'Pending',
-      description: booking.description,
+      description: curBooking.description,
       user: selectedPet.owner,
       booking: curBooking
     };
 
     try {
-      const response = await axios.post('http://localhost:8080/api/payment', payment, { withCredentials: true });
+      const response = await axios.post('http://localhost:8080/api/payment/create', payment, { withCredentials: true });
       const { data } = response.data;
-      toast.success('Payment initiated successfully!');
+      //toast.success('Payment initiated successfully!');
       if (data && data.data && data.data.checkoutUrl) {
         window.location.href = data.data.checkoutUrl;
       }
@@ -447,10 +459,15 @@ const location = useLocation();
                           <h1 className='fs-3'>{vet?.fullName}</h1>
                           <div className='row'>
                             {vet?.workSchedule?.map((workSchedule, workScheduleIndex) => (
-                              <Button
-                                className={`col-2 mx-4 my-2 btn btn-outline-primary ${activeShiftIndex === vet?.vetId + '-' + workScheduleIndex ? 'active' : ''}`}
-                                onClick={() => chooseShift(workSchedule?.vs_id, vet?.vetId + '-' + workScheduleIndex, vet?.fullName, workSchedule?.shift.from_time + ' - ' + workSchedule?.shift.to_time)}
-                              >{workSchedule?.shift?.from_time} - {workSchedule?.shift?.to_time}</Button>
+                              <>
+                                <button
+                                  className={`col-2 mx-4 my-2 btn btn-outline-primary text-black ${activeShiftIndex === workSchedule?.vs_id ? 'active' : ''}`}
+                                  disabled={workSchedule?.status !== "Available"}
+                                  onClick={() => chooseShift(workSchedule?.vs_id, workSchedule?.vs_id, vet?.fullName, workSchedule?.shift.from_time + ' - ' + workSchedule?.shift.to_time)}
+                                >
+                                  {workSchedule?.shift?.from_time} - {workSchedule?.shift?.to_time}
+                                </button>
+                              </>
                             ))}
                           </div>
                         </div>
@@ -483,7 +500,7 @@ const location = useLocation();
 
                     <div className="border-bottom mb-3">
                       <label className="w-50"><b>Pet's owner: </b> {selectedPet?.owner?.fullName}</label>
-                      <label className="w-50"><b>Phone number: </b>{selectedPet?.owner?.phone}</label>
+                      <label className="w-50"><b>Phone number: </b>{selectedPet?.owner?.phoneNumber}</label>
                     </div>
 
 
@@ -551,12 +568,11 @@ const location = useLocation();
                 </div>
                 <div className='text-center mt-0'>
                   {
-                    booking?.type ? null :  <Button colorScheme="teal" onClick={handlePaymentClick}>Pay Now</Button>
+                    booking?.type ? null : <Button colorScheme="teal" onClick={handlePaymentClick}>Pay Now</Button>
                   }
                 </div>
               </div>
             </TabPanel>
-            
             <TabPanel>
               <p>three!</p>
             </TabPanel>

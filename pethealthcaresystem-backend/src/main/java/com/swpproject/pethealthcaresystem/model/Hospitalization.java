@@ -1,6 +1,8 @@
 package com.swpproject.pethealthcaresystem.model;
 
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -9,6 +11,8 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 @NoArgsConstructor
@@ -36,4 +40,7 @@ public class Hospitalization {
     @ManyToOne
     @JoinColumn(name = "vet_id")
     User user;
+
+    @OneToMany(mappedBy = "hospitalization", cascade = CascadeType.ALL, orphanRemoval = true)
+    Set<HospitalizationDetail> hospitalizationDetails = new HashSet<>();
 }

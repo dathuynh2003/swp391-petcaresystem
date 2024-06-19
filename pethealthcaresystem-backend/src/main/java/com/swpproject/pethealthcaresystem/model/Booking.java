@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.lang.Nullable;
 
 import java.util.*;
 
@@ -17,18 +18,18 @@ public class Booking {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private Date bookingDate;
-    private Date appointmentDate;
     private String status;
     private double totalAmount;
     private Boolean type;
     private String description;
-
+    private int paymentId;
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 
     @ManyToOne
     @JoinColumn(name = "pet_id")
+    @JsonIgnoreProperties("bookings")
     private Pet pet;
 
     @OneToMany(mappedBy = "booking", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -39,8 +40,7 @@ public class Booking {
     @JsonIgnoreProperties("bookings")
     private VetShiftDetail vetShiftDetail;
 
-    @OneToOne(mappedBy = "booking", cascade = CascadeType.ALL)
-    private Payment payment;
-
-
+//    @OneToOne(mappedBy = "booking")
+//    @JsonIgnoreProperties("booking")
+//    private Payment payment;
 }

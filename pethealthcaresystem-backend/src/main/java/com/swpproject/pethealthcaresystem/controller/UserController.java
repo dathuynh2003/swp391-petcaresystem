@@ -28,13 +28,14 @@ public class UserController {
 
     @PostMapping("/register")
     public String register(@RequestBody User newUser) {
-        if (userService.createUser(newUser).equals("Verification email sent")) {
+        String result = userService.createUser(newUser);
+        if (result.equals("Verification email sent")) {
             String subject = "Verify your email";
             String code = verifyCodeService.generateVerifyCode(newUser.getEmail());
             String body = "Your verification code: " + code;
             mailService.sendMail(newUser.getEmail(), subject, body);
         }
-        return userService.createUser(newUser);
+        return result;
     }
 
     @PostMapping("/create-user-by-admin")
@@ -51,8 +52,27 @@ public class UserController {
             responseData.setErrorMessage(e.getMessage());
             return new ResponseEntity<>(responseData, HttpStatus.UNAUTHORIZED);
 
+
         }
 
+    }
+    @PostMapping("/register-gg")
+    public ResponseEntity<ResponseData> registerWithGG(@RequestBody User user, HttpSession session) {
+        try {
+            user.setRoleId(1);
+            User newUser = userService.createUserGoogle(user);
+            session.setAttribute("user", newUser);
+            ResponseData<User> responseData = new ResponseData<>();
+            responseData.setData(newUser);
+            responseData.setStatusCode(201);
+            return new ResponseEntity<>(responseData, HttpStatus.CREATED);
+        } catch (Error e) {
+            ResponseData<User> responseData = new ResponseData<>();
+            responseData.setStatusCode(401);
+            responseData.setErrorMessage(e.getMessage());
+            return new ResponseEntity<>(responseData, HttpStatus.UNAUTHORIZED);
+
+        }
     }
     @PutMapping("/update-user-by-admin/{id}")
     public ResponseEntity<ResponseData> updateUserByAdmin(@RequestBody User user, @PathVariable int id) {
@@ -164,6 +184,16 @@ public class UserController {
         if (curUser != null) {
             session.setAttribute("user", curUser);
            return userService.updateUser(curUser.getEmail(), newUserProfile);
+        }
+        throw new Exception("You need login first");
+    }
+
+    @PostMapping("/createAnonymousUserByStaff")
+    public ResponseEntity<User> createAnonymousUser(@RequestBody User newUser, HttpSession session) throws Exception {
+        User curUser = (User) session.getAttribute("user");
+        if (curUser != null) {
+            User user = userService.createAnonymousUser(newUser.getPhoneNumber(), newUser.getFullName(), newUser.getGender());
+            return ResponseEntity.ok(user);
         }
         throw new Exception("You need login first");
     }

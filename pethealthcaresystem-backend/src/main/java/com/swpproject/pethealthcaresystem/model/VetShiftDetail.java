@@ -4,8 +4,10 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.lang.Nullable;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Setter
@@ -29,8 +31,9 @@ public class VetShiftDetail {
     private String date;
     private String status;
 
-    @OneToMany(mappedBy = "vetShiftDetail", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Booking> bookings = new HashSet<>();
+    @OneToMany(mappedBy = "vetShiftDetail")
+    @JsonIgnoreProperties("vetShiftDetail")
+    private List<Booking> bookings;
 
     @ManyToOne
     @JoinColumn(name = "vet_id")
@@ -41,4 +44,5 @@ public class VetShiftDetail {
     @JoinColumn(name = "shift_id")
     @JsonIgnoreProperties("vetShiftDetails")
     private Shift shift;
+
 }

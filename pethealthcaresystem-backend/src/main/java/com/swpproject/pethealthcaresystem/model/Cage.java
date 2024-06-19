@@ -23,7 +23,9 @@ public class Cage {
     int id;
     @NotBlank
     String name;
-    double price; //Maybe price per hour
+    String size;    //Small, Medium, Large
+    String type;    //for petType (Dog, Cat, Bird, ...) All;
+    double price; //price per hour
     String status;  //available, occupied
     String description;
 
