@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
-import { Box, Button, Table, Thead, Tbody, Tr, Th, Td, Spinner, useToast } from '@chakra-ui/react';
+import { Box, Button, Table, Thead, Tbody, Tr, Th, Td, Text, Spinner, useToast, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, FormControl, FormLabel, Select, Switch } from '@chakra-ui/react';
 
 const ListAccount = () => {
     const [accounts, setAccounts] = useState([]);
@@ -9,6 +9,8 @@ const ListAccount = () => {
     const [error, setError] = useState(null);
     const [page, setPage] = useState(0);
     const [totalPages, setTotalPages] = useState(1);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedUser, setSelectedUser] = useState(null);
     const toast = useToast();
 
     useEffect(() => {
@@ -45,7 +47,6 @@ const ListAccount = () => {
                 duration: 5000,
                 isClosable: true,
             });
-            // Reload accounts after successful deletion
             setAccounts(accounts.filter(account => account.userId !== id));
         } catch (error) {
             console.error("Error deleting account:", error);
@@ -57,6 +58,54 @@ const ListAccount = () => {
                 isClosable: true,
             });
         }
+    };
+
+    const handleEdit = (account) => {
+        setSelectedUser(account);
+        setIsModalOpen(true);
+    };
+
+    const handleUpdate = async () => {
+        try {
+            await axios.put(`http://localhost:8080/update-user-by-admin/${selectedUser.userId}`, {
+                roleId: selectedUser.roleId,
+                isActive: selectedUser.isActive
+            });
+            toast({
+                title: "User updated.",
+                description: "The user has been successfully updated.",
+                status: "success",
+                duration: 5000,
+                isClosable: true,
+            });
+            setIsModalOpen(false);
+            // Refresh the accounts list
+            const response = await axios.get("http://localhost:8080/get-users-by-id", {
+                params: {
+                    pageNo: page,
+                    pageSize: 5,
+                }
+            });
+            setAccounts(response.data.data.content);
+        } catch (error) {
+            console.error('Error updating user:', error);
+            toast({
+                title: "Error",
+                description: "There was an error updating the user.",
+                status: "error",
+                duration: 5000,
+                isClosable: true,
+            });
+        }
+    };
+
+    const onInputChange = (e) => {
+        const { name, value, type, checked } = e.target;
+        const newValue = type === 'checkbox' ? checked : value;
+        setSelectedUser({
+            ...selectedUser,
+            [name]: newValue
+        });
     };
 
     if (loading) {
@@ -76,7 +125,7 @@ const ListAccount = () => {
     return (
         <Box className="container">
             <Link to="/account/create">
-                <Button colorScheme="blue" mb={3} size="sm">Add New Account</Button>
+                <Button colorScheme="blue" mb={3}>Add New Account</Button>
             </Link>
             <Table variant="striped" colorScheme="teal">
                 <Thead>
@@ -100,15 +149,13 @@ const ListAccount = () => {
                                     variant="outline"
                                     borderColor={account.isActive ? 'green.500' : 'red.500'}
                                     bg={account.isActive ? 'green.100' : 'red.100'}
-                                    size="sm" // Make the isActive button smaller
+                                    size="sm"
                                 >
                                     {account.isActive ? "Active" : "Inactive"}
                                 </Button>
                             </Td>
                             <Td>
-                                <Link to={`/edit-account/${account.userId}`}>
-                                    <Button colorScheme="blue" size="sm" mr={2}>Edit</Button>
-                                </Link>
+                                <Button colorScheme="blue" size="sm" mr={2} onClick={() => handleEdit(account)}>Edit</Button>
                                 <Button colorScheme="red" size="sm" onClick={() => handleDelete(account.userId)}>Delete</Button>
                             </Td>
                         </Tr>
@@ -116,22 +163,44 @@ const ListAccount = () => {
                 </Tbody>
             </Table>
             <Box mt={4}>
-                <Button 
-                    onClick={() => setPage(page - 1)} 
-                    isDisabled={page <= 0}
-                    size="sm" // Make the pagination buttons smaller
-                >
-                    Previous
-                </Button>
-                <Button 
-                    onClick={() => setPage(page + 1)} 
-                    isDisabled={page >= totalPages - 1}
-                    ml={2}
-                    size="sm" // Make the pagination buttons smaller
-                >
-                    Next
-                </Button>
+                <Button onClick={() => setPage(page - 1)} isDisabled={page <= 0}>Previous</Button>
+                <Button onClick={() => setPage(page + 1)} isDisabled={page >= totalPages - 1} ml={2}>Next</Button>
             </Box>
+
+            {/* Modal for editing account */}
+            {selectedUser && (
+                <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+                    <ModalOverlay />
+                    <ModalContent>
+                        <ModalHeader>Edit Account</ModalHeader>
+                        <ModalCloseButton />
+                        <ModalBody>
+                            <FormControl id="roleId" mb={4}>
+                                <FormLabel>Role</FormLabel>
+                                <Select name="roleId" value={selectedUser.roleId} onChange={onInputChange}>
+                                    <option value="1">Customer</option>
+                                    <option value="2">Vet</option>
+                                    <option value="3">Staff</option>
+                                </Select>
+                            </FormControl>
+                            <FormControl id="isActive" display="flex" alignItems="center" mb={4}>
+                                <Switch
+                                    id="isActiveSwitch"
+                                    name="isActive"
+                                    isChecked={selectedUser.isActive}
+                                    onChange={onInputChange}
+                                    mr={2}
+                                />
+                                <FormLabel htmlFor="isActiveSwitch" mb="0">Active Status</FormLabel>
+                            </FormControl>
+                        </ModalBody>
+                        <ModalFooter>
+                            <Button colorScheme="blue" mr={3} onClick={handleUpdate}>Update</Button>
+                            <Button variant="ghost" onClick={() => setIsModalOpen(false)}>Cancel</Button>
+                        </ModalFooter>
+                    </ModalContent>
+                </Modal>
+            )}
         </Box>
     );
 };

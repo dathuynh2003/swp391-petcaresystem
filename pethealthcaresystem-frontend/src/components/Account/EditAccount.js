@@ -80,10 +80,10 @@ const EditAccount = () => {
                         <div className="col-sm-12">
                             <div className="form-group">
                                 <label>Role</label>
-                                <select 
-                                    className="form-control" 
-                                    name="roleId" 
-                                    value={user.roleId} 
+                                <select
+                                    className="form-control"
+                                    name="roleId"
+                                    value={user.roleId}
                                     onChange={onInputChange}
                                 >
                                     <option value="1">Customer</option>
@@ -92,12 +92,12 @@ const EditAccount = () => {
                                 </select>
                             </div>
                             <div className="form-group form-switch">
-                                <input 
-                                    className="form-check-input" 
-                                    type="checkbox" 
-                                    name="isActive" 
-                                    id="isActiveSwitch" 
-                                    checked={user.isActive} 
+                                <input
+                                    className="form-check-input"
+                                    type="checkbox"
+                                    name="isActive"
+                                    id="isActiveSwitch"
+                                    checked={user.isActive}
                                     onChange={onInputChange}
                                 />
                                 <label className="form-check-label" htmlFor="isActiveSwitch">Active Status</label>
@@ -106,7 +106,7 @@ const EditAccount = () => {
                                 <button type="submit" className="btn btn-lg btn-info">Update</button>
                             </div>
                         </div>
-                    </form> 
+                    </form>
                 </div>
             </div>
         </div>
