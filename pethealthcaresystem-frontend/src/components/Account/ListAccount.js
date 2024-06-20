@@ -1,93 +1,139 @@
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useAuth } from '../../context/auth.context';
-
-import './css/account.css';
+import { Box, Button, Table, Thead, Tbody, Tr, Th, Td, Spinner, useToast } from '@chakra-ui/react';
 
 const ListAccount = () => {
-  const [accounts, setAccounts] = useState([]);
-  const [roleId, setRoleId] = useState(0);
+    const [accounts, setAccounts] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [page, setPage] = useState(0);
+    const [totalPages, setTotalPages] = useState(1);
+    const toast = useToast();
 
-  const { user } = useAuth()
+    useEffect(() => {
+        const fetchAccounts = async () => {
+            setLoading(true);
+            try {
+                const response = await axios.get("http://localhost:8080/get-users-by-id", {
+                    params: {
+                        pageNo: page,
+                        pageSize: 5,
+                    }
+                });
+                const data = response.data.data;
+                setAccounts(data.content);
+                setTotalPages(data.totalPages);
+                setLoading(false);
+            } catch (error) {
+                console.error("Error fetching accounts:", error);
+                setError("Error fetching accounts. Please try again later.");
+                setLoading(false);
+            }
+        };
 
-  const loadAccounts = async () => {
-    try {
-      const response = await axios.get("http://localhost:8080/get-users-by-id", {
-        withCredentials: true,
-        params: {
-          id: roleId,
-        },
-      });
-      setAccounts(response.data?.data ?? []);
-    } catch (error) {
-      console.log(error);
+        fetchAccounts();
+    }, [page]);
+
+    const handleDelete = async (id) => {
+        try {
+            await axios.put(`http://localhost:8080/delete-user-by-admin/${id}`);
+            toast({
+                title: "Account deleted.",
+                description: "The account has been successfully deleted.",
+                status: "success",
+                duration: 5000,
+                isClosable: true,
+            });
+            // Reload accounts after successful deletion
+            setAccounts(accounts.filter(account => account.userId !== id));
+        } catch (error) {
+            console.error("Error deleting account:", error);
+            toast({
+                title: "Error",
+                description: "There was an error deleting the account.",
+                status: "error",
+                duration: 5000,
+                isClosable: true,
+            });
+        }
+    };
+
+    if (loading) {
+        return <Box className="container"><Spinner /></Box>;
     }
-  };
 
-  useEffect(() => {
-    loadAccounts();
-  }, [roleId]);
-
-  const deleteAccount = async (id) => {
-    try {
-      await axios.put(`http://localhost:8080/delete-user-by-admin/${id}`);
-      loadAccounts();
-    } catch (error) {
-      alert("There was an error deleting the account!");
-      console.error(error);
+    if (error) {
+        return (
+            <Box className="container">
+                <Box className="alert alert-danger" role="alert">
+                    {error}
+                </Box>
+            </Box>
+        );
     }
-  };
 
-  return (
-
-    <div className='container'>
-      <Link className='btn btn-primary m-3' to={'/account/create'}>Add new Account</Link>
-      <div className="dropdown mb-3">
-        <label htmlFor="roleId" className="form-label me-2">Role:</label>
-        <select
-          className="form-select"
-          defaultValue={roleId}
-          name="roleId"
-          id="roleId"
-          onChange={(e) => setRoleId(e.target.value)}
-        >
-          <option value="0">All</option>
-          <option value="1">Customer</option>
-          <option value="2">Staff</option>
-          <option value="3">Vet</option>
-        </select>
-      </div>
-
-      <table className="table table-striped table-hover">
-        <thead className="thead-dark">
-          <tr>
-            <th scope="col">#</th>
-            <th scope="col">Full Name</th>
-            <th scope="col">Role ID</th>
-            <th scope="col">Status</th>
-            <th scope="col">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {accounts.map((account, index) => (
-            <tr key={index}>
-              <th scope="row">{index + 1}</th>
-              <td className="col-2">{account.fullName}</td>
-              <td className="col-2">{account.roleId}</td>
-              <td className='col-2'>{account.isActive ? "Active" : "InActive"}</td>
-              <td className="col-3">
-                {/* <Link className="btn btn-primary mx-2" to={`/viewAccount/${account.id}`}>View</Link> */}
-                <Link className="btn btn-outline-primary mx-2" to={`/edit-account/${account.userId}`}>Edit</Link>
-                <button onClick={() => deleteAccount(account.userId)} className="btn btn-danger mx-2">Delete</button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-
-  );
+    return (
+        <Box className="container">
+            <Link to="/account/create">
+                <Button colorScheme="blue" mb={3} size="sm">Add New Account</Button>
+            </Link>
+            <Table variant="striped" colorScheme="teal">
+                <Thead>
+                    <Tr>
+                        <Th>#</Th>
+                        <Th>Full Name</Th>
+                        <Th>Role ID</Th>
+                        <Th>Status</Th>
+                        <Th>Actions</Th>
+                    </Tr>
+                </Thead>
+                <Tbody>
+                    {accounts.map((account, index) => (
+                        <Tr key={index}>
+                            <Td><b>{index + 1}</b></Td>
+                            <Td><b>{account.fullName}</b></Td>
+                            <Td><b>{account.roleId}</b></Td>
+                            <Td>
+                                <Button
+                                    colorScheme={account.isActive ? 'green' : 'red'}
+                                    variant="outline"
+                                    borderColor={account.isActive ? 'green.500' : 'red.500'}
+                                    bg={account.isActive ? 'green.100' : 'red.100'}
+                                    size="sm" // Make the isActive button smaller
+                                >
+                                    {account.isActive ? "Active" : "Inactive"}
+                                </Button>
+                            </Td>
+                            <Td>
+                                <Link to={`/edit-account/${account.userId}`}>
+                                    <Button colorScheme="blue" size="sm" mr={2}>Edit</Button>
+                                </Link>
+                                <Button colorScheme="red" size="sm" onClick={() => handleDelete(account.userId)}>Delete</Button>
+                            </Td>
+                        </Tr>
+                    ))}
+                </Tbody>
+            </Table>
+            <Box mt={4}>
+                <Button 
+                    onClick={() => setPage(page - 1)} 
+                    isDisabled={page <= 0}
+                    size="sm" // Make the pagination buttons smaller
+                >
+                    Previous
+                </Button>
+                <Button 
+                    onClick={() => setPage(page + 1)} 
+                    isDisabled={page >= totalPages - 1}
+                    ml={2}
+                    size="sm" // Make the pagination buttons smaller
+                >
+                    Next
+                </Button>
+            </Box>
+        </Box>
+    );
 };
 
 export default ListAccount;

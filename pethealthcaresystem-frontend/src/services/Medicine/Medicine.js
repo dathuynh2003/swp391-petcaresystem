@@ -73,9 +73,9 @@ export default function Medicine() {
     try {
       setCurrentPage("pageNo")
       setPageNoExpired(0)
-      console.log("DANG o: " + currentPage);
-      console.log("pageNo: " + pageNo);
-      console.log("pageSearch: " + pageNoSearch);
+      // console.log("DANG o: " + currentPage);
+      // console.log("pageNo: " + pageNo);
+      // console.log("pageSearch: " + pageNoSearch);
       const response = await axios.get(`http://localhost:8080/medicine/list?pageNo=${pageNo}&pageSize=${pageSize}`, { withCredentials: true })
       setMedicines(response.data.content)
       setTotalPages(response.data.totalPages)
@@ -83,10 +83,10 @@ export default function Medicine() {
       console.log(error);
     }
   }
-  console.log("Trang hien tai la: " + currentPage);
-  console.log("pageNo: " + pageNo);
-  console.log("pageNoSearch: " + pageNoSearch);
-  console.log("tong trang: " + totalPages);
+  // console.log("Trang hien tai la: " + currentPage);
+  // console.log("pageNo: " + pageNo);
+  // console.log("pageNoSearch: " + pageNoSearch);
+  // console.log("tong trang: " + totalPages);
 
   useEffect(() => {
 

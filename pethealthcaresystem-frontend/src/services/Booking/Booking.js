@@ -199,7 +199,24 @@ export default function Booking() {
     console.log(response.data);
 
   }
-
+  const updateBookingAfterPAID = async (booking) => {
+    try {
+      const response = await axios.put(`http://localhost:8080/booking/paid`, booking);
+      return response.data;
+    } catch (error) {
+      console.error("There was an error updating the booking to PAID!", error);
+      throw error;
+    }
+  };
+  const updateBookingAfterCANCELLED = async (booking) => {
+    try {
+        const response = await axios.put(`http://localhost:8080/booking/cancelled`, booking);
+        return response.data;
+    } catch (error) {
+        console.error("There was an error updating the booking to CANCELLED!", error);
+        throw error;
+    }
+};
   const [step, setStep] = useState(0)
   const handleNextClick = (content) => {
     if (content === null || content === undefined || content === '' || content.length === 0) {
@@ -217,6 +234,29 @@ export default function Booking() {
     setStep(step + 1)
   }
 
+  const handleConfirmClick = async () => {
+    try {
+      const updatedBooking = await updateBookingAfterPAID(curBooking);
+      console.log('Booking updated to PAID:', updatedBooking);
+      setBooking(updatedBooking); // Update state with the updated booking
+    } catch (error) {
+      console.error('Error updating booking to PAID:', error);
+    }
+    setStep(step + 1)
+    toast.done('Book Appointment Successfully!')
+  }
+
+  const handleCancelClick = async () => {
+    try {
+      const updatedBooking = await updateBookingAfterCANCELLED(curBooking);
+      console.log('Booking updated to CANCELLED:', updatedBooking);
+      setBooking(updatedBooking); // Update state with the updated booking
+    } catch (error) {
+      console.error('Error updating booking to CANCELLED:', error);
+    }
+    setStep(step + 1)
+    toast.done('Cancel Book Appointment Successfully!')
+  }
   const handleClickAPI = (content) => {
     if (content !== null && content !== undefined && content !== '') {
       callAPI()
@@ -227,9 +267,9 @@ export default function Booking() {
   const handlePaymentClick = async () => {
     console.log(curBooking)
     const payment = {
-      // orderCode: booking.orderCode,
+      orderCode: booking.orderCode,
       paymentType: 'Credit Card',  // You can modify this as per your requirement
-      amount: 10000,
+      // amount: 10000,
       paymentDate: new Date().toISOString(),
       status: 'Pending',
       description: curBooking.description,
@@ -494,7 +534,7 @@ export default function Booking() {
                   </h2>
                   <div className='shadow p-3 mb-5 bg-body-tertiary rounded'>
                     <div className="border-bottom mb-3">
-                      <label className="w-50 "><b>Booking ID: </b>Chưa xử lí</label>
+                      <label className="w-50 "><b>Booking ID: </b>{booking.id}</label>
                       <label className="w-50 "><b>Date: </b>{new Date().toLocaleDateString("en-Gb", { month: 'numeric', day: 'numeric', year: 'numeric' })} </label>
                     </div>
 
