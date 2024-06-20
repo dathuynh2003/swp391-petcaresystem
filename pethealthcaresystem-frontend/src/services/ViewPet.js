@@ -1061,7 +1061,6 @@ export default function ViewPet() {
                                                 <FormControl
                                                     className='d-flex justify-content-between mt-3 mb-1 rounded'
                                                     bg='gray.50'
-                                                    border='1px' borderColor='dark.200'
                                                 >
                                                     <div className='col-4'>
                                                         <div className='row'>

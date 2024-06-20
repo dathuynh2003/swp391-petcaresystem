@@ -33,9 +33,6 @@ export default function Login() {
             localStorage.setItem('email', response.data.user.email)
             navigate('/')
         } else {
-            localStorage.setItem('isLoggedIn', false);
-            localStorage.setItem('roleId', 0)
-            localStorage.setItem('email', null)
             setMessage("Invalid username or password!")
         }
     }
