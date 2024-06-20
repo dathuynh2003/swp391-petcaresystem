@@ -7,6 +7,7 @@ import com.swpproject.pethealthcaresystem.service.UserService;
 import com.swpproject.pethealthcaresystem.service.VerifyCodeService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -108,20 +109,29 @@ public class UserController {
     }
 
     @GetMapping("/get-users-by-id")
-    public ResponseEntity<ResponseData> getUsersById(@RequestParam("id") int id) {
+    public ResponseEntity<ResponseData<Page<User>>> getUsersById(
+            @RequestParam(defaultValue = "0") int pageNo,
+            @RequestParam(defaultValue = "10") int pageSize) {
+
         try {
-            List<User> users = userService.getAllUsersByRoleId(id);
-            ResponseData<List<User>> responseData = new ResponseData<>();
+            Page<User> users = userService.getAllUsers(pageNo, pageSize);
+
+            ResponseData<Page<User>> responseData = new ResponseData<>();
             responseData.setData(users);
-            responseData.setStatusCode(200);
+            responseData.setStatusCode(HttpStatus.OK.value());
+
             return new ResponseEntity<>(responseData, HttpStatus.OK);
-        } catch (Error e) {
-            ResponseData<List<User>> responseData = new ResponseData<>();
-            responseData.setStatusCode(401);
-            responseData.setErrorMessage(e.getMessage());
-            return new ResponseEntity<>(responseData, HttpStatus.UNAUTHORIZED);
+
+        } catch (Exception e) {
+            ResponseData<Page<User>> responseData = new ResponseData<>();
+            responseData.setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            responseData.setErrorMessage("Failed to retrieve users: " + e.getMessage());
+
+            return new ResponseEntity<>(responseData, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-    }
+
+
+}
 
     @PostMapping("/verify/{email}/{verifyCode}")
     public String verifyCode(@PathVariable String email, @PathVariable String verifyCode) {

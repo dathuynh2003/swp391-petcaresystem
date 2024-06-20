@@ -32,7 +32,11 @@ public class MedicineController {
     }
 
     @GetMapping("/search/{name}")
-    public Map<String, Object> searchMedicine(@PathVariable String name, @RequestParam(name = "pageNo", defaultValue = "1") Integer pageNo, @RequestParam(name = "pageSize") Integer pageSize, HttpSession session) {
+    public Map<String, Object> searchMedicine(
+            @PathVariable String name,
+            @RequestParam(name = "pageNo", defaultValue = "1") Integer pageNo,
+            @RequestParam(name = "pageSize") Integer pageSize,
+            HttpSession session) {
         HashMap<String, Object> response = new HashMap<>();
 
         if (session.getAttribute("user") == null) {

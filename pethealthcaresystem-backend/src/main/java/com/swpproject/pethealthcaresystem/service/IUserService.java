@@ -2,6 +2,7 @@ package com.swpproject.pethealthcaresystem.service;
 
 import com.swpproject.pethealthcaresystem.model.User;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
@@ -16,7 +17,7 @@ public interface IUserService {
     User createUserByAdmin(User newUser);
 
     public User updateUser(String email, User newUser);
-    public List<User> getAllUsersByRoleId(int roleId);
+    public Page<User> getAllUsers(int pageNo, int pageSize);
     public User deleteUser(int id);
     User updateUser(User newUser, int id);
     User getUserById(int id);

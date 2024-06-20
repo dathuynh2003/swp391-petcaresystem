@@ -38,19 +38,46 @@ public class PaymentService implements IPaymentService {
 
     @Override
     public Payment updatePayment(Payment payment) {
-        Payment updatedPayment = paymentRepository.findByOrderCode(payment.getOrderCode());
-        if(updatedPayment != null) {
-            Booking updateBooking = updatedPayment.getBooking();
-            updatedPayment.setStatus(payment.getStatus());
-            updateBooking.setStatus(payment.getStatus());
-            VetShiftDetail vetShiftDetail = updateBooking.getVetShiftDetail();
-            vetShiftDetail.setStatus("Booked");
-            updateBooking.setPaymentId(updatedPayment.getId());
-            bookingRepository.save(updateBooking);
-            updatedPayment = paymentRepository.save(updatedPayment);
+        // Find the existing payment by order code
+        Payment existingPayment = paymentRepository.findByOrderCode(payment.getOrderCode());
+
+        if (existingPayment != null) {
+            // Update the status of the payment
+            existingPayment.setStatus(payment.getStatus());
+
+            // Get the associated booking
+            Booking booking = existingPayment.getBooking();
+            if (booking != null) {
+                // Update the booking status
+                booking.setStatus(payment.getStatus());
+
+                // Get the associated vet shift detail
+                VetShiftDetail vetShiftDetail = booking.getVetShiftDetail();
+                if (vetShiftDetail != null) {
+                    if (payment.getStatus().equals("CANCELLED")) {
+                        // Set the vet shift status to "Available" if the payment is cancelled
+                        vetShiftDetail.setStatus("Available");
+                    } else {
+                        // Set the vet shift status to "Booked" if the payment is confirmed
+                        vetShiftDetail.setStatus("Booked");
+                    }
+                }
+                // Set the payment ID on the booking
+                booking.setPaymentId(existingPayment.getId());
+
+                // Save the updated booking
+                bookingRepository.save(booking);
+            }
+
+            // Save the updated payment
+            existingPayment = paymentRepository.save(existingPayment);
+        } else {
+            throw new RuntimeException("Payment with order code " + payment.getOrderCode() + " not found.");
         }
-        return updatedPayment;
+
+        return existingPayment;
     }
+
 
     @Override
     public Payment getPaymentByOrderCode(int orderCode) {
