@@ -5,7 +5,7 @@ import { CheckIcon } from '@chakra-ui/icons';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer, toast } from 'react-toastify';
-
+import { Box, Image, Table, Tbody, Td, Text, Th, Thead, Tr } from '@chakra-ui/react';
 
 
 export default function Booking() {
@@ -210,13 +210,13 @@ export default function Booking() {
   };
   const updateBookingAfterCANCELLED = async (booking) => {
     try {
-        const response = await axios.put(`http://localhost:8080/booking/cancelled`, booking);
-        return response.data;
+      const response = await axios.put(`http://localhost:8080/booking/cancelled`, booking);
+      return response.data;
     } catch (error) {
-        console.error("There was an error updating the booking to CANCELLED!", error);
-        throw error;
+      console.error("There was an error updating the booking to CANCELLED!", error);
+      throw error;
     }
-};
+  };
   const [step, setStep] = useState(0)
   const handleNextClick = (content) => {
     if (content === null || content === undefined || content === '' || content.length === 0) {
@@ -525,94 +525,89 @@ export default function Booking() {
                 <div className='btn btn-primary' onClick={() => handleClickAPI(selectedVetShift)}>Next</div>
               </div>
             </TabPanel>
+
             <TabPanel>
-              <div className='container row'>
-                <div className='col border rounded-lg p-4 mt-2 shadow p-3 mb-5 bg-body-tertiary rounded '>
-                  <div className='d-flex align-items-center'><img src="assets/logoPetCare.png" alt="Logo" className="logo" /> Pet Health Care</div>
-                  <h2 className='text-center mb-3'>
+              <Box className='container row'>
+                <Box className='col border rounded-lg p-4 mt-2 shadow p-3 mb-5 bg-body-tertiary rounded'>
+                  <Box display='flex' alignItems='center'>
+                    <Image src="assets/logoPetCare.png" alt="Logo" className="logo" /> Pet Health Care
+                  </Box>
+                  <Text as='h2' textAlign='center' mb={3}>
                     Booking Information
-                  </h2>
-                  <div className='shadow p-3 mb-5 bg-body-tertiary rounded'>
-                    <div className="border-bottom mb-3">
-                      <label className="w-50 "><b>Booking ID: </b>{booking.id}</label>
-                      <label className="w-50 "><b>Date: </b>{new Date().toLocaleDateString("en-Gb", { month: 'numeric', day: 'numeric', year: 'numeric' })} </label>
-                    </div>
+                  </Text>
+                  <Box p={3} mb={5} bg='gray.100' borderRadius='lg'>
+                    <Box borderBottom='1px' borderColor='gray.200' mb={3}>
+                      <Text width='50%'><b>Booking ID: </b>{booking.id}</Text>
+                      <Text width='50%'><b>Date: </b>{new Date().toLocaleDateString("en-GB", { month: 'numeric', day: 'numeric', year: 'numeric' })}</Text>
+                    </Box>
+                    <Box borderBottom='1px' borderColor='gray.200' mb={3}>
+                      <Text width='50%'><b>Pet's owner: </b> {selectedPet?.owner?.fullName}</Text>
+                      <Text width='50%'><b>Phone number: </b>{selectedPet?.owner?.phoneNumber}</Text>
+                      <Text width='50%'><b>Pet's name: </b> {selectedPet?.name}</Text>
+                      <Text width='50%'><b>Pet's type: </b> {selectedPet?.petType}</Text>
+                      <Text><b>Pet's breed: </b> {selectedPet?.breed}</Text>
+                      <Text><b>Pet's sex: </b> {selectedPet?.gender}</Text>
+                      <Text><b>Pet's age: </b> {selectedPet?.age} month(s)</Text>
+                    </Box>
 
-                    <div className="border-bottom mb-3">
-                      <label className="w-50"><b>Pet's owner: </b> {selectedPet?.owner?.fullName}</label>
-                      <label className="w-50"><b>Phone number: </b>{selectedPet?.owner?.phoneNumber}</label>
-                    </div>
+                  </Box>
 
+                  <Text as='h4' textAlign='center' mb={3} mt={3} fontWeight='normal'>
+                    My appointment date
+                  </Text>
 
-                    <div className="border-bottom mb-3 ">
-                      <label className="w-50"><b >Pet's name: </b> {selectedPet?.name}</label>
-                      <label className="w-50" ><b>Pet's type: </b> {selectedPet?.petType}</label>
-                    </div>
-                    <div className="d-flex justify-content-between">
-                      <label ><b>Pet's breed: </b> {selectedPet?.breed}</label>
-                      <label ><b >Pet's sex: </b> {selectedPet?.gender}</label>
-                      <label ><b>Pet's age: </b> {selectedPet?.age} month(s)</label>
-                    </div>
+                  <Box p={3} mb={5} bg='gray.100' borderRadius='lg'>
+                    <Box mb={1} display='flex' justifyContent='space-between'>
+                      <Text><b>Appointment date: </b> {selectedDisplayDate}</Text>
+                      <Text><b>Time: </b> {time}</Text>
+                      <Text><b>Vet: </b>{vetName}</Text>
+                    </Box>
+                    {/* <Box borderTop='1px' borderColor='gray.200' mt={2}>
+                      <Text><b>Description: </b>{booking?.description}</Text>
+                    </Box> */}
+                  </Box>
 
-                  </div>
-                  <h4 className='text-center mb-3 mt-3 font-weight-bold fw-normal'>
-                    My appoinment date
-                  </h4>
+                  <Text as='h4' textAlign='center' mb={1} mt={3} fontWeight='normal'>
+                    Services' Information
+                  </Text>
+                  <Box mb={5} bg='gray.100' borderRadius='lg'>
+                    <Table variant='simple'>
+                      <Thead bg='gray.200'>
+                        <Tr textAlign='center'>
+                          <Th>No</Th>
+                          <Th>Name</Th>
+                          <Th>Description</Th>
+                          <Th>Price</Th>
+                        </Tr>
+                      </Thead>
+                      <Tbody>
+                        {selectedServices.map((service, index) => (
+                          <Tr key={index} textAlign='center'>
+                            <Td>{index + 1}</Td>
+                            <Td>{service?.nameService}</Td>
+                            <Td>{service?.description}</Td>
+                            <Td>{service?.price.toLocaleString('vi-VN')}</Td>
+                          </Tr>
+                        ))}
+                      </Tbody>
+                    </Table>
 
-                  <div className='shadow p-3 mb-5 bg-body-tertiary rounded'>
-                    <div className="mb-1 d-flex justify-content-between">
-                      <label ><b>Appointment date: </b> {selectedDisplayDate}</label>
-                      <label ><b>Time: </b> {time}</label>
-                      <label ><b>Vet: </b>{vetName}</label>
-                    </div>
-                    <div className="border-top mt-2">
-                      <label ><b>Description:  </b>{booking?.description}</label>
-                    </div>
-                  </div>
+                  </Box>
 
-
-
-                  <h4 className='text-center mb-1 mt-3 font-weight-bold fw-normal'>
-                    Services's Information
-                  </h4>
-                  <div className='shadow  mb-5 bg-body-tertiary rounded'>
-                    <table className="table">
-                      <thead className="table-light">
-                        <tr className='text-center'>
-                          <th scope="col">No</th>
-                          <th scope="col">Name</th>
-                          <th scope="col">Description</th>
-                          <th scope="col">Price</th>
-                        </tr>
-                      </thead>
-
-                      {selectedServices.map((service, index) => (
-
-                        <tbody>
-                          <tr className='text-center'>
-                            <td>{index + 1}</td>
-                            <td>{service?.nameService}</td>
-                            <td>{service?.description}</td>
-                            <td>{service?.price.toLocaleString('vi-VN')}</td>
-                          </tr>
-                        </tbody>
-                      ))
-
-                      }
-                    </table>
-                  </div>
-                  <div className="form-control mb-3 rounded shadow">
-                    <label className="w-50 mb-3 mt-3 mr-3 ml-3"><b >Total amount: </b>{selectedServices.map(service => service.price).reduce((total, price) => total + price, 0).toLocaleString('vi-VN')} VND </label>
-                    <label className="w-50 "><b>Status: </b>{!(booking?.type) ? 'Pending' : 'Paid'}</label>
-                  </div>
-                </div>
-                <div className='text-center mt-0'>
+                  <Box display="flex" justifyContent="flex-end" alignItems="center" className="form-control mb-3">
+                    <Text width="50%" mb={3} mt={3} mr={3} ml={3} textAlign="right">
+                      <b>Total: </b>{selectedServices.map(service => service.price).reduce((total, price) => total + price, 0).toLocaleString('vi-VN')} VND
+                    </Text>
+                  </Box>
+                </Box>
+                <Box textAlign='center' mt={0}>
                   {
                     booking?.type ? null : <Button colorScheme="teal" onClick={handlePaymentClick}>Pay Now</Button>
                   }
-                </div>
-              </div>
+                </Box>
+              </Box>
             </TabPanel>
+
             <TabPanel>
               <p>three!</p>
             </TabPanel>
