@@ -14,8 +14,23 @@ import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer, toast } from 'react-toastify';
 import { Menu, MenuButton, MenuList, MenuItemOption, MenuOptionGroup, Button } from '@chakra-ui/react';
 export default function EditPet() {
+
+
+  let navigate = useNavigate()
+  useEffect(() => {
+    if (!localStorage.getItem('isLoggedIn')) {
+      navigate('/login')
+    }
+    const roleId = localStorage.getItem('roleId')
+    if (roleId === 3 || roleId === 4) {
+      navigate('/404page')
+    }
+
+  }, [])
+
+
   const { petId } = useParams();
-  let navigate = useNavigate();
+
 
   const [pet, setPet] = useState({
     name: '',
@@ -179,9 +194,9 @@ export default function EditPet() {
           </div>
           <ToastContainer />
           <div className="text-center">
-            <button className="btn btn-outline-primary" onClick={() => callAPI()}>
+            <Button style={{background: 'teal', color: 'white'}} onClick={() => callAPI()}>
               Save
-            </button>
+            </Button>
             <Link className="btn btn-outline-danger mx-2" to="/listpets">
               Cancel
             </Link>

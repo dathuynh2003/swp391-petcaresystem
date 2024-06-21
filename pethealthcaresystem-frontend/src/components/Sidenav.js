@@ -98,7 +98,7 @@ export default function Sidenav() {
   return (
     <div className="sidenav" style={{ background: 'teal' }}>
       <div className="sidenav-header">
-        <img src="assets/logoPetCare.png" alt="Logo" className="logo rounded-circle " />
+        <img src="logoApp.svg" alt="Logo" className="logo rounded-circle " style={{background: 'white'}}/>
         <h5 style={{ color: 'white' }}>Pet Health Care</h5>
       </div>
       <ul>

@@ -188,8 +188,8 @@ const Profile = () => {
               </form>
 
             </div>
-            <div className='row'>
-              <Link className='btn btn-primary my-4 col-12 mx-auto' to={"/"}>Back to home</Link>
+            <div className='row mt-3'>
+              <Link  to={"/"}><Button className='col-12 mx-auto' style={{background: 'teal', color: 'white'}} >Back to home</Button></Link>
             </div>
           </div>
         </div>

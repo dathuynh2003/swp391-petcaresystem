@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Button, Input, Select, useDisclosure } from '@chakra-ui/react'
+import { Button, Input, Select, background, useDisclosure } from '@chakra-ui/react'
 import ReactPaginate from 'react-paginate'
 import axios from 'axios'
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -39,6 +39,19 @@ export default function Medicine() {
   }, [])
 
 
+
+  // const [filter, setFilter] = useState({
+
+  //   searchTerm: '',
+  //   expiredMedicine: false,
+  //   pageNo: 0,
+  //   pageSize: 5
+  // })
+
+
+
+
+
   let keyword1 = ''
   const [returnListAll, setReturnListAll] = useState(false)
   const [currentPage, setCurrentPage] = useState('pageNo')
@@ -55,13 +68,15 @@ export default function Medicine() {
     console.log('chon trang: ' + data.selected);
     switch (currentPage) {
       case 'pageNo':
-        setPageNo(data.selected);
+        setPageNo(() => data.selected);
         break;
       case 'pageNoSearch':
-        setPageNoSearch(data.selected);
+        setPageNo(() => 0)
+        setPageNoSearch(() => data.selected);
+        
         break;
       case 'pageNoExpired':
-        setPageNoExpired(data.selected);
+        setPageNoExpired(() => data.selected);
         break;
       default:
         break;
@@ -71,8 +86,8 @@ export default function Medicine() {
 
   const loadMedicines = async () => {
     try {
-      setCurrentPage("pageNo")
-      setPageNoExpired(0)
+      setCurrentPage(() => "pageNo")
+      setPageNoExpired(() => 0)
       console.log("DANG o: " + currentPage);
       console.log("pageNo: " + pageNo);
       console.log("pageSearch: " + pageNoSearch);
@@ -91,7 +106,7 @@ export default function Medicine() {
   useEffect(() => {
 
     if (keyword.trim() === '') {
-      setCurrentPage('pageNo')
+      setCurrentPage(() => 'pageNo')
       loadMedicines()
       return
     }
@@ -106,12 +121,12 @@ export default function Medicine() {
   }, [pageNo])
 
   useEffect(() => {
-    setPageNo(0)
+    setPageNo(() => 0)
     handleLoadExpiredMedicine()
   }, [pageNoExpired])
 
   const changePageType = (type) => {
-    setCurrentPage(type);
+    setCurrentPage(() => type);
   }
 
 
@@ -121,8 +136,8 @@ export default function Medicine() {
 
 
   const handleOnclickSearch = async (e) => {
-
-    setPageNo(0)
+    setCurrentPage(() => 'pageNoSearch')
+    setPageNo(() => 0)
     setPageNoExpired(0)
     try {
       keyword1 = e.target.value
@@ -169,6 +184,7 @@ export default function Medicine() {
 
   }
   const callAPISearch = async () => {
+   
     try {
       const response = await axios.get(`http://localhost:8080/medicine/search/${keyword}?pageNo=${pageNoSearch}&pageSize=${2}`, { withCredentials: true });
       setMedicines(response.data.MEDICINES.content)
@@ -181,29 +197,43 @@ export default function Medicine() {
 
 
   useEffect(() => {
-    setPageNo(0)
+    setPageNo(() => 0)
     callAPISearch()
     // handleOnclickSearch()
 
   }, [pageNoSearch])
 
   useEffect(() => {
-    if (currentPage === 'pageNo') {
-      loadMedicines()
-      setPageNoSearch(0)
-    }
-    if (currentPage === 'pageNoSearch') {
-      // setPageNoSearch(0)
-      // handleOnclickSearch()
-      callAPISearch()
-    }
-    if (currentPage === 'pageNoExpired') {
-      setPageNo(0)
-      handleLoadExpiredMedicine()
+    switch (currentPage) {
+      case 'pageNo':
+        setPageNoSearch(() => 0); // Đặt lại pageNoSearch về 0 khi currentPage là 'pageNo'
+        loadMedicines();
+        break;
+      case 'pageNoSearch':
+        setPageNoSearch(() => 0); // Đặt lại pageNoSearch về 0 khi currentPage là 'pageNoSearch'
+        callAPISearch();
+        break;
+      case 'pageNoExpired':
+        setPageNo(() => 0);
+        handleLoadExpiredMedicine();
+        break;
+      default:
+        break;
     }
   }, [currentPage])
 
-
+  const getCurrentPageNo = () => {
+    switch (currentPage) {
+      case 'pageNo':
+        return pageNo;
+      case 'pageNoSearch':
+        return pageNoSearch;
+      case 'pageNoExpired':
+        return pageNoExpired;
+      default:
+        return 0; // hoặc giá trị mặc định khác nếu cần
+    }
+  };
 
 
 
@@ -263,17 +293,26 @@ export default function Medicine() {
       setSelectedMedicine((prev) => ({ ...prev, mfgDate: e.target.value }))
 
     }
-    else toast.error("The manufacturing date is invalid (must be before or equal current date)!")
+    else {
+      toast.error("The manufacturing date is invalid (must be before or equal current date)!")
+      setMedicine((prev) => ({ ...prev, mfgDate: null }))
+      setSelectedMedicine((prev) => ({ ...prev, mfgDate: null }))
+
+    }
 
   }
   const handleEXPDate = (e) => {
 
     if (e.target.value > today) {
       setMedicine((prev) => ({ ...prev, expDate: e.target.value }))
-      setSelectedMedicine((prev) => ({ ...prev, mfgDate: e.target.value }))
+      setSelectedMedicine((prev) => ({ ...prev, expDate: e.target.value }))
 
     }
-    else toast.error("The expiration date is invalid (must be larger than manufacturing date!)")
+    else {
+      toast.error("The expiration date is invalid (must be larger than manufacturing date!)")
+      setMedicine((prev) => ({ ...prev, expDate: null }))
+      setSelectedMedicine((prev) => ({ ...prev, expDate: null }))
+    }
   }
 
   const callAddMedicineAPI = async () => {
@@ -471,7 +510,7 @@ export default function Medicine() {
             <div className="search-wrapper">
               <SearchIcon onClick={loadMedicines} boxSize={6} style={{ marginRight: '8px', marginLeft: '5px' }} className='search-icon' />
               <input
-                onChange={(value) => { setKeyWord(value.target.value); handleOnclickSearch(value) }}/*(value) => setKeyWord(value.target.value)*/
+                onChange={(value) => {  setCurrentPage(() => 'pageNoSearch');setKeyWord(value.target.value); handleOnclickSearch(value) }}/*(value) => setKeyWord(value.target.value)*/
                 className='rounded text-center fst-italic border-0'
                 style={{ height: '2.5rem', width: '14rem', outline: 'none' }}
                 placeholder='Search medicine'
@@ -502,7 +541,7 @@ export default function Medicine() {
               {
                 medicines?.map((medicine, index) => (
                   <tr className='text-center item'>
-                    <td >{(currentPage === 'pagNo' ? pageNo : pageNoExpired) * pageSize + index + 1}</td>
+                    <td >{getCurrentPageNo() * pageSize + index + 1}</td>
                     <td >{medicine.name}</td>
                     <td >{medicine.description}</td>
                     <td>{medicine.unit}</td>
@@ -568,7 +607,7 @@ export default function Medicine() {
                     Unit
                     <Select placeholder='Choose unit' value={selectedMedicine?.unit} onChange={(e) => { setSelectedMedicine((prev) => ({ ...prev, unit: e.target.value })) }}>
                       <option value='Bottle'>Bottle </option>
-                      <option value='Bottle'>Bottle </option>
+                      <option value='Tube'>Tube</option>
                       <option value='Box'>Box</option>
                       <option value='Blister pack'>Blister pack</option>
                       <option value='Ampoule'>Ampoule</option>
@@ -631,7 +670,7 @@ export default function Medicine() {
       </div>
 
       <div className=''>
-        <ReactPaginate
+        <ReactPaginate style={{background: 'teal'}}
           previousLabel={'Previous'}
           nextLabel={'Next'}
           breakLabel={'...'}

@@ -187,16 +187,23 @@ export default function ViewPet() {
         listPrescriptions: listSelectedMedicines
     };
     const callAPI = async () => {
+        console.log("day ne");
+        console.log(medicalRecord);
         try {
-            if (medicalRecord.diagnosis || medicalRecord.treatment) {
+            if (medicalRecord?.diagnosis || medicalRecord?.treatment) {
                 const response = await axios.post(`http://localhost:8080/medicalRecord/add/${petId}`, medicalRecordRequest, { withCredentials: true })
                 console.log(response.data.MedicalRecord);
                 if (response.data.MedicalRecord === null || response.data.MedicalRecord === undefined) {
                     toast.error("Add new medical record failed!")
+                    
                 } else {
+                    onClose()
+                    setMedicalRecord()
+                    setListSelectedMedicines([])
+                    setPrescription()
                     toast.success("Add new medical record successfully!")
                 }
-
+                
                 loadMedicalRecord()
             }
             else {
@@ -386,9 +393,9 @@ export default function ViewPet() {
                                 {roleId === '1' && (
                                     // <Link className='btn btn-primary col-md-12' to="/listPets">Back</Link>
                                     pet?.hospitalizations?.some(admitPet => admitPet?.status === "pending") ? (
-                                        <Link className='btn btn-warning col-md-12'>Waiting Payment</Link>
+                                        <Link ><Button className='col-md-12' style={{background: 'teal', color: 'white'}}>Waiting Payment</Button></Link>
                                     ) : (
-                                        <Link className='btn btn-primary col-md-12' to="/listPets">Back</Link>
+                                        <Link to="/listPets"><Button className='col-md-12' style={{background: 'teal', color: 'white'}}>Back</Button></Link>
                                     )
                                 )}
                                 {roleId === '3' && (
@@ -586,7 +593,7 @@ export default function ViewPet() {
                                                                     ))}
                                                                 </div> : <></>}
 
-                                                            <FormLabel>Name<Input value={prescription.name} readOnly /></FormLabel>
+                                                            <FormLabel>Name<Input value={prescription?.name} readOnly /></FormLabel>
                                                         </FormControl>
                                                         <FormControl>
 
@@ -595,7 +602,7 @@ export default function ViewPet() {
                                                             <FormLabel>Dosage</FormLabel>
                                                             <NumberInput
                                                                 defaultValue={1}
-                                                                min={1} max={prescription.medicine.quantity}
+                                                                min={1} max={prescription?.medicine.quantity}
                                                                 onChange={(value) => setPrescription((prev) => ({ ...prev, dosage: value }))}
                                                             >
                                                                 <NumberInputField />
@@ -636,7 +643,7 @@ export default function ViewPet() {
 
                                                 </thead>
                                                 <tbody>
-                                                    {listSelectedMedicines.map((medicine, index) => (<>
+                                                    {listSelectedMedicines?.map((medicine, index) => (<>
                                                         <tr key={index} >
                                                             <td >{index + 1}</td>
                                                             <td >{medicine.name}</td>
@@ -730,11 +737,9 @@ export default function ViewPet() {
 
                                                 <div
                                                     className='d-flex align-items-center'>
-                                                    <img src="assets/logoPetCare.png"
-                                                        alt="Logo"
-                                                        className="logo rounded-circle"
-                                                    />
-                                                    <b>Pet Health Care</b>
+                                                  <div className='d-flex align-items-center'><img src="logoApp.svg" alt="Logo" className='logo' /> Pet Health Care</div>
+                                                  
+                                                    
                                                 </div>
 
                                                 <FormControl mt={4} className='d-flex'>
@@ -813,7 +818,7 @@ export default function ViewPet() {
                                                     </table> : <></>}
                                                 <FormControl mt={4}>
                                                     <FormLabel>Note</FormLabel>
-                                                    <Input className='fst-italic' value={medicalRecord.vetNote} />
+                                                    <Input className='fst-italic' value={medicalRecord.vetNote} readOnly/>
                                                 </FormControl>
 
 

@@ -57,3 +57,35 @@ tr .item:hover {
 .search-icon:hover{
     color: teal;
 }
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  list-style: none;
+  padding: 0;
+}
+
+.pagination .page-item {
+  margin: 0 5px;
+}
+
+.pagination .page-link {
+  color: teal;
+  text-decoration: none;
+  border: 1px solid teal;
+  padding: 5px 10px;
+  border-radius: 5px;
+  transition: background-color 0.3s, color 0.3s, transform 0.3s;
+}
+
+.pagination .page-link:hover {
+  background-color: rgb(80, 200, 180);
+  color: white;
+}
+
+.pagination .active .page-link {
+  background-color:  rgb(80, 200, 180);
+  color: white;
+  border-color: teal;
+  transform: scale(1.2); /* Make the active link larger */
+}

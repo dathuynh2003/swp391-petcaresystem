@@ -1,11 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import { Tab, TabList, Tabs, TabPanel, TabPanels, Button } from '@chakra-ui/react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Tab, TabList, Tabs, TabPanel, TabPanels, Button, WrapItem, Avatar, background } from '@chakra-ui/react';
 import axios from 'axios';
 import { CheckIcon } from '@chakra-ui/icons';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer, toast } from 'react-toastify';
-
+import './Booking.css'
+import ReactPaginate from 'react-paginate';
+import { SignalWifiStatusbarConnectedNoInternet4Outlined } from '@mui/icons-material';
 
 
 export default function Booking() {
@@ -18,7 +20,9 @@ export default function Booking() {
   //   }
   // },[])
 
-
+  const [pageNo, setPageNo] = useState(0)
+  const [pageSize, setPageSize] = useState(5)
+  const [totalPages, setTotalPages] = useState(0)
   const location = useLocation();
 
 
@@ -33,15 +37,58 @@ export default function Booking() {
   const [pets, setPets] = useState([]);
   const [selectedPet, setSelectedPet] = useState(null);
 
+
+  const data = location?.state;
+  const isFirstRun = useRef(true);
+  useEffect(() => {
+    loadServices();
+    loadPets();
+    loadShift();
+    // Kiểm tra xem data có tồn tại không và không được trống
+    // const data = location?.state;
+
+  }, []);
+  useEffect(() => {
+    if (isFirstRun.current) {
+      isFirstRun.current = false;
+      return;
+    }
+    if(data){
+      setSelectedServices(prevSelected => [...prevSelected, data]);
+    }
+
+  }, [])
+
+
   const loadServices = async () => {
     try {
-      const response = await axios.get('http://localhost:8080/allServices');
-      setServices(response.data);
+      let size = pageSize
+      if (pageNo === 0 && data) {
+        size = 4
+      }
+      const response = await axios.get(`http://localhost:8080/services?pageNo=${pageNo}&pageSize=${size}`)
+      let list = response.data.content
+      if (data) {
+        list = list.filter(service => service.id !== data.id)
+        if (pageNo === 0) {
+          list = [data, ...list]
+        }
+      }
+      setServices(list)
+      setTotalPages(response.data.totalPages)
+
+
+
+
     } catch (error) {
       console.log(error)
     }
 
   };
+  useEffect(() => {
+    loadServices()
+
+  }, [pageNo])
 
   const loadPets = async () => {
     try {
@@ -61,18 +108,7 @@ export default function Booking() {
     }
   };
 
-  useEffect(() => {
-    loadServices();
-    loadPets();
-    loadShift();
-    // Kiểm tra xem data có tồn tại không và không được trống
-    const data = location?.state;
-    console.log("gui qua");
-    console.log(data);
-    if (data) {
-      setSelectedServices(prevServices => [...prevServices, data]);
-    }
-  }, []);
+
 
 
 
@@ -85,6 +121,10 @@ export default function Booking() {
       }
     });
   };
+
+
+
+
 
   useEffect(() => {
     console.log(booking);
@@ -133,12 +173,19 @@ export default function Booking() {
   };
 
   const formatDate = (date) => {
-    return date.toLocaleDateString("en", { weekday: 'short', month: 'long', day: 'numeric' }); // Định dạng ngày thành dd/mm/yyyy
+    return date?.toLocaleDateString("en", { weekday: 'short', month: 'long', day: 'numeric' }); // Định dạng ngày thành dd/mm/yyyy
   };
 
   const [vets, setVets] = useState([]);
   const [activeDateIndex, setActiveDateIndex] = useState(null);
   const [shifts, setShifts] = useState([]);
+  const handlePageClick = (data) => {
+    setPageNo(data.selected)
+  }
+
+
+
+
   const handleClickDay = async (date, index) => {
     setSelectedVetShift(null);
     setActiveShiftIndex(null);
@@ -188,7 +235,7 @@ export default function Booking() {
     console.log("vs_id: " + selectedVetShift)
   }, [selectedVetShift])
   const [curBooking, setCurrentBooking] = useState()
-  const serviceIds = selectedServices.map(service => service.id);//dùng để gửi mảng id đi
+  const serviceIds = selectedServices?.map(service => service?.id);//dùng để gửi mảng id đi
   const callAPI = async () => {
     console.log('gui ve');
     console.log(selectedPet.petId);
@@ -253,8 +300,8 @@ export default function Booking() {
     <div className="container">
       <div className="row">
         <ToastContainer />
-        <Tabs className="col-8 mt-3 mx-auto shadow p-3 mb-5 bg-body rounded h-100" colorScheme="teal" index={step}>
-          <TabList className="d-flex justify-content-between">
+        <Tabs className="col-8 mt-3 mx-auto shadow p-3 mb-5 bg-body rounded h-100" colorScheme="teal" index={step} >
+          <TabList className="d-flex justify-content-between" >
             <Tab>Services</Tab>
             <Tab >Choose Pet</Tab>
             <Tab >Reason</Tab>
@@ -270,32 +317,35 @@ export default function Booking() {
             <TabPanel>
               <b className="row mx-auto">Our Services</b>
               <div className="container">
-                {services.map((service, index) => (
+                {services?.map((service, index) => (
                   <div
                     key={index}
-                    className="row w-100 shadow m-3 rounded-3"
-                    style={{ height: '85px' }}
+                    className="row w-100 shadow m-3 rounded-3 service-item "
+                    style={{ height: '100px', cursor: 'pointer' }}
                     onClick={() => chooseServices(service)}
+
                   >
-                    <div className="service-info col-7 my-auto mx-3 border h-75">
-                      <h5>{service.nameService}</h5>
-                      <div className="fs-6">{service.description}</div>
+                    <div className="service-info col-7 my-auto mx-3  h-100 d-flex gap-3 align-items-center">
+                      <WrapItem className='mt-2'>
+                        <Avatar size='lg' src={service?.img} />
+                      </WrapItem>
+                      <div className='mt-2 mb-3'>
+                        <h5>{service?.nameService}</h5>
+                        <div className="fs-6 fst-italic">{service?.description}</div>
+                      </div>
                     </div>
-                    <div className="service-price col-2 my-auto mx-3 border h-75 text-center">
-                      <div className="my-3 p-1">{service.price.toLocaleString('vi-VN')} VND</div>
+                    <div className="service-price col-3 my-auto  text-center">
+                      <div className="my-3 p-1 fw-bold">{service?.price?.toLocaleString('vi-VN') + " "}VND</div>
                     </div>
                     <div
-                      className="service-choose col-1 mx-3 my-auto border rounded-circle"
+                      className="service-choose col-1 mx-3 my-auto  rounded-circle"
                       style={{ width: '50px', height: '50px' }}
                     >
-                      {selectedServices.some((selectedService) => selectedService.id === service.id) ? (
-                        <CheckIcon
-                          className="rounded-circle border"
+                      {selectedServices?.some((selectedService) => selectedService?.id === service?.id) ? (
+                        <CheckIcon boxSize={8}
+                          className="rounded-circle"
                           style={{
-                            backgroundColor: '#007DDE',
-                            width: '49px',
-                            height: '49px',
-                            marginLeft: '-12px',
+                            backgroundColor: 'teal',
                             color: 'white',
                           }}
                         />
@@ -307,15 +357,35 @@ export default function Booking() {
                 ))}
 
               </div>
+              <div>
+                <ReactPaginate
+                  previousLabel={'Previous'}
+                  nextLabel={'Next'}
+                  breakLabel={'...'}
+                  breakClassName={'break-me'}
+                  pageCount={totalPages}
+                  marginPagesDisplayed={2}
+                  pageRangeDisplayed={5}
+                  onPageChange={handlePageClick}
+                  containerClassName={'pagination justify-content-center'}
+                  pageClassName={'page-item'}
+                  pageLinkClassName={'page-link'}
+                  previousClassName={'page-item'}
+                  previousLinkClassName={'page-link'}
+                  nextClassName={'page-item'}
+                  nextLinkClassName={'page-link'}
+                  activeClassName={'active'}
+                />
+              </div>
               <div className='text-center'>
-                <div className='btn btn-primary' onClick={() => handleNextClick(selectedServices)}>Next</div>
+                <Button style={{ background: 'teal', color: 'white' }} onClick={() => handleNextClick(selectedServices)}>Next</Button>
               </div>
             </TabPanel>
 
             <TabPanel className="mx-auto">
               Choose <b>Your Pet</b>
               <div className="container">
-                {pets.map((pet, index) => (
+                {pets?.map((pet, index) => (
                   <div
                     key={index}
                     className="row w-100 shadow m-3 rounded-3"
@@ -330,7 +400,7 @@ export default function Booking() {
                       {pet.petType === 'Dog' && (
                         <img
                           className="rounded-circle"
-                          src=""
+                          src={pet.avatar === null ? '' : pet.avatar}
                           alt="DogImg"
                           style={{
                             position: 'absolute',
@@ -341,11 +411,14 @@ export default function Booking() {
                             objectFit: 'cover',
                           }}
                         ></img>
+                        //   <WrapItem className='mt-2'>
+                        //   <Avatar size='lg'  src={pet.img} />
+                        // </WrapItem>
                       )}
                       {pet.petType === 'Cat' && (
                         <img
                           className="rounded-circle"
-                          src=""
+                          src={pet.avatar === null ? '' : pet.avatar}
                           alt="CatImg"
                           style={{
                             position: 'absolute',
@@ -360,7 +433,7 @@ export default function Booking() {
                       {pet.petType === 'Bird' && (
                         <img
                           className="rounded-circle"
-                          src=""
+                          src={pet.avatar === null ? '' : pet.avatar}
                           alt="BirdImg"
                           style={{
                             position: 'absolute',
@@ -373,24 +446,21 @@ export default function Booking() {
                         ></img>
                       )}
                     </div>
-                    <div className="pet-info col-8 border my-2 mx-2">
-                      <h4>{pet.name}</h4>
+                    <div className="pet-info col-8  my-2 mx-2">
+                      <h5>{pet.name}</h5>
                       <div className="fs-6">
                         {pet.petType}. {pet.age} Months. {pet.breed}
                       </div>
                     </div>
                     <div
-                      className="pet-choose col-1 my-auto mx-4 border rounded-circle"
+                      className="pet-choose col-1 my-auto mx-4  rounded-circle"
                       style={{ width: '50px', height: '50px' }}
                     >
                       {pet.petId === selectedPet?.petId ? (
-                        <CheckIcon
-                          className="rounded-circle border"
+                        <CheckIcon boxSize={8}
+                          className="rounded-circle"
                           style={{
-                            backgroundColor: '#007DDE',
-                            width: '49px',
-                            height: '49px',
-                            marginLeft: '-12px',
+                            backgroundColor: 'teal',
                             color: 'white',
                           }}
                         />
@@ -401,9 +471,9 @@ export default function Booking() {
                   </div>
                 ))}
               </div>
-              <div className='text-center'>
-                <div className='btn btn-primary' onClick={() => handleBackClick()}>Back</div>
-                <div className='btn btn-primary' onClick={() => handleNextClick(selectedPet)}>Next</div>
+              <div className='d-flex justify-content-center gap-3'>
+                <Button style={{ background: 'teal', color: 'white' }} onClick={() => handleBackClick()}>Back</Button>
+                <Button style={{ background: 'teal', color: 'white' }} onClick={() => handleNextClick(selectedPet)}>Next</Button>
               </div>
 
             </TabPanel>
@@ -421,9 +491,9 @@ export default function Booking() {
                 <label htmlFor="floatingTextarea2">Eg: My pet hasn't been eating the last few days</label>
               </div>
 
-              <div className='text-center mt-3'>
-                <div className='btn btn-primary' onClick={() => handleBackClick()}>Back</div>
-                <div className='btn btn-primary' onClick={() => handleNextClickDescription()}>Next</div>
+              <div className='d-flex justify-content-center gap-3 mt-3'>
+                <Button style={{ background: 'teal', color: 'white' }} onClick={() => handleBackClick()}>Back</Button>
+                <Button style={{ background: 'teal', color: 'white' }} onClick={() => handleNextClickDescription()}>Next</Button>
 
               </div>
 
@@ -442,7 +512,7 @@ export default function Booking() {
                       </button>
                     </div>
                     <div className='choose-date row'>
-                      {dates.map((date, index) => (
+                      {dates?.map((date, index) => (
                         <Button
                           key={index}
                           className={`mx-auto btn btn-outline-primary fw-normal ${activeDateIndex === index ? 'active' : ''}`}
@@ -454,7 +524,7 @@ export default function Booking() {
                       ))}
                     </div>
                     <div className='choose-vetshift'>
-                      {vets.map((vet, index) => (
+                      {vets?.map((vet, index) => (
                         <div className=''>
                           <h1 className='fs-3'>{vet?.fullName}</h1>
                           <div className='row'>
@@ -488,7 +558,7 @@ export default function Booking() {
             <TabPanel>
               <div className='container row'>
                 <div className='col border rounded-lg p-4 mt-2 shadow p-3 mb-5 bg-body-tertiary rounded '>
-                  <div className='d-flex align-items-center'><img src="assets/logoPetCare.png" alt="Logo" className="logo" /> Pet Health Care</div>
+                  <div className='d-flex align-items-center'><img src="logoApp.svg" alt="Logo" className='logo' /> Pet Health Care</div>
                   <h2 className='text-center mb-3'>
                     Booking Information
                   </h2>
@@ -546,14 +616,14 @@ export default function Booking() {
                         </tr>
                       </thead>
 
-                      {selectedServices.map((service, index) => (
+                      {selectedServices?.map((service, index) => (
 
                         <tbody>
                           <tr className='text-center'>
                             <td>{index + 1}</td>
                             <td>{service?.nameService}</td>
                             <td>{service?.description}</td>
-                            <td>{service?.price.toLocaleString('vi-VN')}</td>
+                            <td>{service?.price?.toLocaleString('vi-VN')}</td>
                           </tr>
                         </tbody>
                       ))
@@ -562,7 +632,7 @@ export default function Booking() {
                     </table>
                   </div>
                   <div className="form-control mb-3 rounded shadow">
-                    <label className="w-50 mb-3 mt-3 mr-3 ml-3"><b >Total amount: </b>{selectedServices.map(service => service.price).reduce((total, price) => total + price, 0).toLocaleString('vi-VN')} VND </label>
+                    <label className="w-50 mb-3 mt-3 mr-3 ml-3"><b >Total amount: </b>{selectedServices?.map(service => service?.price).reduce((total, price) => total + price, 0).toLocaleString('vi-VN')} VND </label>
                     <label className="w-50 "><b>Status: </b>{!(booking?.type) ? 'Pending' : 'Paid'}</label>
                   </div>
                 </div>
