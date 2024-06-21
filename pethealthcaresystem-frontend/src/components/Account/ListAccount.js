@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
-import { Box, Button, Table, Thead, Tbody, Tr, Th, Td, Text, Spinner, useToast, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, FormControl, FormLabel, Select, Switch } from '@chakra-ui/react';
+import { Box, Button, Table, Thead, Tbody, Tr, Th, Td, Text, Spinner, useToast, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, FormControl, FormLabel, Select, Switch, InputGroup, Input, InputRightElement, IconButton } from '@chakra-ui/react';
+import { SearchIcon } from '@chakra-ui/icons';
 
 const ListAccount = () => {
     const [accounts, setAccounts] = useState([]);
@@ -11,31 +12,55 @@ const ListAccount = () => {
     const [totalPages, setTotalPages] = useState(1);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedUser, setSelectedUser] = useState(null);
+    const [searchQuery, setSearchQuery] = useState('');
     const toast = useToast();
 
     useEffect(() => {
-        const fetchAccounts = async () => {
-            setLoading(true);
-            try {
-                const response = await axios.get("http://localhost:8080/get-users-by-id", {
-                    params: {
-                        pageNo: page,
-                        pageSize: 5,
-                    }
-                });
-                const data = response.data.data;
-                setAccounts(data.content);
-                setTotalPages(data.totalPages);
-                setLoading(false);
-            } catch (error) {
-                console.error("Error fetching accounts:", error);
-                setError("Error fetching accounts. Please try again later.");
-                setLoading(false);
-            }
-        };
-
         fetchAccounts();
     }, [page]);
+
+    const fetchAccounts = async () => {
+        setLoading(true);
+        try {
+            const response = await axios.get("http://localhost:8080/get-users-by-id", {
+                params: {
+                    pageNo: page,
+                    pageSize: 5,
+                }
+            });
+            const data = response.data.data;
+            setAccounts(data.content);
+            setTotalPages(data.totalPages);
+            setLoading(false);
+        } catch (error) {
+            console.error("Error fetching accounts:", error);
+            setError("Error fetching accounts. Please try again later.");
+            setLoading(false);
+        }
+    };
+
+    const handleSearch = async () => {
+        if (!searchQuery) {
+            fetchAccounts();
+            return;
+        }
+
+        try {
+            const response = await axios.get("http://localhost:8080/find-user-with-email", {
+                params: { email: searchQuery }
+            });
+            setAccounts([response.data.data]);
+        } catch (error) {
+            console.error("Error searching for user:", error);
+            toast({
+                title: "Error",
+                description: "User not found or there was an error.",
+                status: "error",
+                duration: 5000,
+                isClosable: true,
+            });
+        }
+    };
 
     const handleDelete = async (id) => {
         try {
@@ -79,14 +104,7 @@ const ListAccount = () => {
                 isClosable: true,
             });
             setIsModalOpen(false);
-            // Refresh the accounts list
-            const response = await axios.get("http://localhost:8080/get-users-by-id", {
-                params: {
-                    pageNo: page,
-                    pageSize: 5,
-                }
-            });
-            setAccounts(response.data.data.content);
+            fetchAccounts();
         } catch (error) {
             console.error('Error updating user:', error);
             toast({
@@ -124,6 +142,20 @@ const ListAccount = () => {
 
     return (
         <Box className="container">
+            <InputGroup width="300px" mb={4} float="right">
+                <Input
+                    placeholder="Search by email"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                />
+                <InputRightElement>
+                    <IconButton
+                        aria-label="Search"
+                        icon={<SearchIcon />}
+                        onClick={handleSearch}
+                    />
+                </InputRightElement>
+            </InputGroup>
             <Link to="/account/create">
                 <Button colorScheme="blue" mb={3}>Add New Account</Button>
             </Link>
