@@ -207,4 +207,20 @@ public class UserController {
         }
         throw new Exception("You need login first");
     }
+    @GetMapping("find-user-with-email")
+    public ResponseEntity<ResponseData> findUserWithEmail(@RequestParam String email) {
+        try {
+            User selectedUser = userService.findUserByEmail(email);
+            ResponseData<User> responseData = new ResponseData<>();
+            responseData.setData(selectedUser);
+            responseData.setStatusCode(200);
+            return new ResponseEntity<>(responseData, HttpStatus.OK);
+
+        }catch (Exception e){
+            ResponseData<User> responseData = new ResponseData<>();
+            responseData.setStatusCode(500);
+            responseData.setErrorMessage(e.getMessage());
+            return new ResponseEntity<>(responseData, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }

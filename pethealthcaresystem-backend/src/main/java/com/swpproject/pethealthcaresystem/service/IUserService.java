@@ -23,7 +23,7 @@ public interface IUserService {
     User getUserById(int id);
     @Transactional
     User createUserGoogle(User newUser);
-
+    User findUserByEmail(String email);
     @Transactional
     User createAnonymousUser(String phoneNumber, String fullName, String gender);
 }

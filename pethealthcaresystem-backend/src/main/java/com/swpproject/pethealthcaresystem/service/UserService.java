@@ -209,6 +209,16 @@ public class UserService implements IUserService {
         user.setDob(newUser.getDob());
         return userRepository.save(user);
     }
+
+    @Override
+    public User findUserByEmail(String email) {
+        User selectedUser = userRepository.findByEmail(email);
+        if (selectedUser != null) {
+            return selectedUser;
+        }
+        return null;
+    }
+
     @Override
     public User getUserById(int id) {
         Optional<User> user = userRepository.findById(id);
