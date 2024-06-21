@@ -47,11 +47,12 @@ export default function ListPets() {
 
     <div className='container'>
       <ToastContainer />
-      <Link  to={'/createPet'}><Button className='mt-4' colorScheme='teal'>Add new Pet</Button></Link>
+      <Link to={'/createPet'}><Button className='mt-4' colorScheme='teal'>Add new Pet</Button></Link>
       <table className="table py-4 border-2 shadow  table-hover ">
         <thead className='p-4'>
           <tr >
             <th scope="col" className='p-3 text-center'>No</th>
+            <th scope="col">Avatar</th>
             <th scope="col" className='p-3'>Name</th>
             <th scope="col" className='p-3'>Type</th>
             <th scope="col" className='p-3'>Breed</th>
@@ -67,7 +68,10 @@ export default function ListPets() {
 
             pets.map((pet, index) => (
               <tr key={index} >
-                <td  className='pl-4 text-center'>{index + 1}</td>
+                <td className='pl-4 text-center'>{index + 1}</td>
+                <td className="col-1">
+                  <img src={pet.avatar} alt={pet.name} style={{ width: '50px', height: '50px', borderRadius: '50%' }} />
+                </td>
                 <td className="col-1 p-2">{pet.name}</td>
                 <td className="col-1 p-2">{pet.petType}</td>
                 <td className="col-1 p-2">{pet.breed}</td>
@@ -76,18 +80,18 @@ export default function ListPets() {
                 <td className="col-1 p-2">{pet.isNeutered ? 'Yes' : 'No'}</td>
                 <td className="col-3 p-2">{pet.description}</td>
                 <td className='col-2 text-center p-2'>
-                  <Link  to={`/viewPet/${pet.petId}`}>
-                      <span style={{ marginRight: '20px' }} className='icon-container'>
-                        <ViewIcon style={{ color: 'teal', cursor: 'pointer' }} boxSize={'5'} />
-                        <span className="icon-text">View</span>
-                      </span>
+                  <Link to={`/viewPet/${pet.petId}`}>
+                    <span style={{ marginRight: '20px' }} className='icon-container'>
+                      <ViewIcon style={{ color: 'teal', cursor: 'pointer' }} boxSize={'5'} />
+                      <span className="icon-text">View</span>
+                    </span>
 
                   </Link>
-                  <Link  to={`/editPet/${pet.petId}`}>  
-                      <span style={{ marginRight: '20px' }} className='icon-container'>
-                        <EditIcon style={{ color: 'teal', cursor: 'pointer' }} boxSize={'5'}/>
-                        <span className="icon-text">Edit</span>
-                      </span>
+                  <Link to={`/editPet/${pet.petId}`}>
+                    <span style={{ marginRight: '20px' }} className='icon-container'>
+                      <EditIcon style={{ color: 'teal', cursor: 'pointer' }} boxSize={'5'} />
+                      <span className="icon-text">Edit</span>
+                    </span>
                   </Link>
 
                   <span className='icon-container'>

@@ -5,12 +5,15 @@ import com.swpproject.pethealthcaresystem.model.Pet;
 import com.swpproject.pethealthcaresystem.model.User;
 import com.swpproject.pethealthcaresystem.service.PetService;
 import com.swpproject.pethealthcaresystem.service.UserService;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -81,5 +84,20 @@ public class PetController {
             }
         }
         throw new Exception("You need login first");
+    }
+
+    @PutMapping("/pet/{id}/upload-avatar")
+    public ResponseEntity<Pet> updateAvatar(@PathVariable int id,
+                                            @RequestParam("file") MultipartFile file) {
+        try {
+            Pet updatedPet = petService.updatePetAvatar(id, file);
+            return ResponseEntity.ok(updatedPet);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build(); // Return 404 if pet with given id is not found
+        } catch (IOException e) {
+            return ResponseEntity.badRequest().build(); // Return 400 for bad requests (e.g., empty file, invalid file type)
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 }
