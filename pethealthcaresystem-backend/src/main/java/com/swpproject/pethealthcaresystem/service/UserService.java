@@ -14,9 +14,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
 import java.io.IOException;
 import java.util.*;
-
 
 
 @Service
@@ -166,24 +166,11 @@ public class UserService implements IUserService {
     @Override
     public Page<User> getAllUsers(int pageNo, int pageSize) {
         Pageable pageable = PageRequest.of(pageNo, pageSize);
-            return userRepository.findByIsActiveTrue(pageable);
-    }
-
-    @Override
-    public List<User> getAllUsersByRoleId(int roleId) {
-
-        if (roleId == 0) {
-            List<User> users = userRepository.findByIsActiveTrue();
-            for (User user : users) {
-                user.setVetShiftDetails(null);
-            }
-            return users;
-        }
-        List<User> users = userRepository.findByRoleId(roleId);
-        for (User user : users) {
+        Page<User> pageUsers = userRepository.findAll(pageable);
+        for (User user : pageUsers.getContent()) {
             user.setVetShiftDetails(null);
         }
-        return users;
+        return pageUsers;
     }
 
     public User deleteUser(int id) {

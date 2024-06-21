@@ -1,21 +1,21 @@
 import React, { useState, useEffect, Fragment } from 'react';
 import axios from 'axios';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { 
-  Box, 
-  Heading, 
-  Text, 
-  Container, 
-  Spinner, 
-  Modal, 
-  ModalOverlay, 
-  ModalContent, 
-  ModalHeader, 
-  ModalFooter, 
-  ModalBody, 
-  ModalCloseButton, 
-  Button, 
-  useDisclosure 
+import {
+  Box,
+  Heading,
+  Text,
+  Container,
+  Spinner,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
+  Button,
+  useDisclosure
 } from '@chakra-ui/react';
 import { parseISO, format } from 'date-fns';
 

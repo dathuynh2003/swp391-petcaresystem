@@ -1184,7 +1184,7 @@ export default function ViewPet() {
                                                                 className=''
                                                                 style={{ width: '250px', height: '250px' }}
                                                             >
-                                                                <QRCode value={'00020101021238570010A000000727012700069704220113VQRQ00024ea220208QRIBFTTA530370454067500005802VN62220818Paymentorder116681630403E5'} />
+                                                                <QRCode value={'e9fdc30c7f1488ef04d80e72ba09470f2c41d8a96231b5fe28d0a50fb71e37c3'} />
                                                                 {/* <img
                                                                     src='00020101021238570010A000000727012700069704220113VQRQ00024ea220208QRIBFTTA530370454067500005802VN62220818Paymentorder116681630403E5'
                                                                     alt='qr-code'
