@@ -17,4 +17,6 @@ public interface IBookingService {
     List<Booking> getAllBookings(User currentUser);
     List<BookingDetail> bookingDetail(int bookingId);
     Page<Booking> getBookings(Integer pageNo, Integer pageSize);
+    Page<Booking> getBookingsByPhone(int pageNo, int pageSize,String phoneNumber);
+    Booking createBookingByUser(Booking newBooking, User user, int petId, int vsId, List<Integer> serviceIds);
 }

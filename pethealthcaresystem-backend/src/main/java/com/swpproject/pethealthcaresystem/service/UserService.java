@@ -7,6 +7,9 @@ import com.swpproject.pethealthcaresystem.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -150,12 +153,9 @@ public class UserService implements IUserService {
         return userRepository.save(user);
     }
     @Override
-    public List<User> getAllUsersByRoleId(int roleId) {
-        if(roleId == 0){
-            return userRepository.findByIsActiveTrue();
-        }
-        return userRepository.findByRoleIdAndIsActiveTrue(roleId);
-
+    public Page<User> getAllUsers(int pageNo, int pageSize) {
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
+            return userRepository.findByIsActiveTrue(pageable);
     }
 
     public User deleteUser(int id) {
@@ -213,6 +213,16 @@ public class UserService implements IUserService {
         user.setDob(newUser.getDob());
         return userRepository.save(user);
     }
+
+    @Override
+    public User findUserByEmail(String email) {
+        User selectedUser = userRepository.findByEmail(email);
+        if (selectedUser != null) {
+            return selectedUser;
+        }
+        return null;
+    }
+
     @Override
     public User getUserById(int id) {
         Optional<User> user = userRepository.findById(id);

@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import {
+    Box, Button, Table, Thead, Tbody, Tr, Th, Td, Text, Modal, ModalOverlay, ModalContent,
+    ModalHeader, ModalFooter, ModalBody, ModalCloseButton, Badge, useToast, useDisclosure
+} from '@chakra-ui/react';
 
 const Reservation = () => {
     const [bookings, setBookings] = useState([]);
-    const [selectedBookingId, setSelectedBookingId] = useState(null);
     const [selectedBooking, setSelectedBooking] = useState(null);
-
     const [bookingDetails, setBookingDetails] = useState([]);
-    const [showModal, setShowModal] = useState(false);
+    const { isOpen, onOpen, onClose } = useDisclosure();
+    const toast = useToast();
 
     useEffect(() => {
         const fetchBookings = async () => {
@@ -27,103 +30,94 @@ const Reservation = () => {
             const booking = bookings.find(booking => booking.id === bookingId);
             setSelectedBooking(booking);
             const response = await axios.get(`http://localhost:8080/get-booking/${bookingId}/details`, { withCredentials: true });
-
-            console.log(response.data); // Ensure the response structure matches your expectations
-            setBookingDetails(response.data.data); // Set bookingDetails state with the fetched details
-            setShowModal(true); // Show modal after fetching details
+            setBookingDetails(response.data.data);
+            onOpen();
         } catch (error) {
             console.error(`Error fetching booking details for ID ${bookingId}:`, error);
+            toast({
+                title: "Error",
+                description: `Error fetching booking details for ID ${bookingId}`,
+                status: "error",
+                duration: 5000,
+                isClosable: true,
+            });
         }
     };
 
-    const closeModal = () => {
-        setShowModal(false);
-        setSelectedBookingId(null);
-        setBookingDetails([]);
-    };
-    function formatPrice(price) {
-        // Convert price to a number (in case it's a string or something else)
+    const formatPrice = (price) => {
         price = Number(price);
+        return price.toLocaleString('vi-VN');
+    };
 
-        // Format the price using toLocaleString with options
-        return price.toLocaleString('vi-VN'); // 'vi-VN' is for Vietnamese locale, adjust as needed
-    }
     return (
-        <div className='container'>
-            {/* <h1>Booking List</h1> */}
-            <table className="table py-5">
-                <thead>
-                    <tr>
-                        <th scope="col">BookingID</th>
-                        <th scope="col">Appoinment Date</th>
-                        <th scope="col">Amount</th>
-                        <th scope="col">Status</th>
-                        <th scope="col">Action</th>
-                    </tr>
-                </thead>
-                <tbody className="table-group-divider">
+        <Box p={5}>
+            <Table variant="striped" colorScheme="teal">
+                <Thead>
+                    <Tr>
+                        <Th>Booking ID</Th>
+                        <Th>Appointment Date</Th>
+                        <Th>Amount</Th>
+                        <Th>Status</Th>
+                        <Th>Action</Th>
+                    </Tr>
+                </Thead>
+                <Tbody>
                     {bookings.map((booking, index) => (
-                        <tr key={index}>
-                            <td className="col-1">B{booking.id}</td>
-                            <td className='col-2'>{new Date(booking.vetShiftDetail.date).toLocaleDateString()}</td>
-                            <td className="col-2">{formatPrice(booking.totalAmount)} VND</td>
-                            <td className="col-2"><span class="badge bg-success">PAID</span></td>
-                            <td className='col-3'>
-                                <button type="button" class="btn btn-outline-info btn-sm" onClick={() => viewDetail(booking.id)}>Detail</button>
-                            </td>
-                        </tr>
+                        <Tr key={index}>
+                            <Td><b>B{booking.id}</b></Td>
+                            <Td><b>{new Date(booking.vetShiftDetail.date).toLocaleDateString()}</b></Td>
+                            <Td><b>{formatPrice(booking.totalAmount)} VND</b></Td>
+                            <Td>
+                                <Badge colorScheme="green">PAID</Badge>
+                            </Td>
+                            <Td>
+                                <Button size="sm" colorScheme="blue" onClick={() => viewDetail(booking.id)}>Detail</Button>
+                            </Td>
+                        </Tr>
                     ))}
-                </tbody>
-            </table>
+                </Tbody>
+            </Table>
 
-            {showModal && (
-                <div className="modal" tabIndex="-1" role="dialog" style={{ display: "block", backgroundColor: "rgba(0, 0, 0, 0.5)" }}>
-                    <div className="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
-                        <div className="modal-content">
-                            <div className="modal-header">
-                                <h5 className="modal-title">Booking Details #{selectedBooking.id}</h5>
-                                {/* <button type="button" className="close" onClick={closeModal} aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button> */}
-                            </div>
-                            <div className="modal-body">
-                                <ul>
-                                    {bookingDetails.map((detail, index) => (
-                                        <div key={index}>
-                                            <h4>Customer</h4>
-                                            <div style={{ marginLeft: '20px' }}>
-                                                <p><strong>Name: </strong>{selectedBooking.pet.owner.fullName}</p>
-                                                <p><strong>Phone: </strong>{selectedBooking.pet.owner.phoneNumber}</p>
-                                                <p><strong>Email: </strong>{selectedBooking.pet.owner.email}</p>
-                                                <p><strong>Address: </strong>{selectedBooking.pet.owner.address}</p>
-                                            </div>
+            {selectedBooking && (
+                <Modal isOpen={isOpen} onClose={onClose}>
+                    <ModalOverlay />
+                    <ModalContent>
+                        <ModalHeader>Booking Details #{selectedBooking.id}</ModalHeader>
+                        <ModalCloseButton />
+                        <ModalBody>
+                            {bookingDetails.map((detail, index) => (
+                                <Box key={index} mb={4}>
+                                    <Text fontSize="lg" fontWeight="bold">Customer</Text>
+                                    <Box ml={4}>
+                                        <Text><strong>Name:</strong> {selectedBooking.pet.owner.fullName}</Text>
+                                        <Text><strong>Phone:</strong> {selectedBooking.pet.owner.phoneNumber}</Text>
+                                        <Text><strong>Email:</strong> {selectedBooking.pet.owner.email}</Text>
+                                        <Text><strong>Address:</strong> {selectedBooking.pet.owner.address}</Text>
+                                    </Box>
 
-                                            <h4>Service</h4>
-                                            <div style={{ marginLeft: '20px' }}>
-                                                <p><strong>Name: </strong>{detail.petService.nameService}</p>
-                                                <p><strong>Price: </strong>{formatPrice(detail.petService.price)} VND</p>
-                                            </div>
+                                    <Text fontSize="lg" fontWeight="bold">Service</Text>
+                                    <Box ml={4}>
+                                        <Text><strong>Name:</strong> {detail.petService.nameService}</Text>
+                                        <Text><strong>Price:</strong> {formatPrice(detail.petService.price)} VND</Text>
+                                    </Box>
 
-                                            <h4>Pet</h4>
-                                            <div style={{ marginLeft: '20px' }}>
-                                                <p><strong>Name: </strong>{selectedBooking.pet.name}</p>
-                                                <p><strong>Type: </strong>{selectedBooking.pet.petType}</p>
-                                                <p><strong>Gender: </strong>{selectedBooking.pet.gender}</p>
-                                                <p><strong>Age: </strong>{selectedBooking.pet.age} Year(s)</p>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </ul>
-                            </div>
-                            <div className="modal-footer">
-                                <button type="button" className="btn btn-secondary" onClick={closeModal}>Close</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                                    <Text fontSize="lg" fontWeight="bold">Pet</Text>
+                                    <Box ml={4}>
+                                        <Text><strong>Name:</strong> {selectedBooking.pet.name}</Text>
+                                        <Text><strong>Type:</strong> {selectedBooking.pet.petType}</Text>
+                                        <Text><strong>Gender:</strong> {selectedBooking.pet.gender}</Text>
+                                        <Text><strong>Age:</strong> {selectedBooking.pet.age} Year(s)</Text>
+                                    </Box>
+                                </Box>
+                            ))}
+                        </ModalBody>
+                        <ModalFooter>
+                            <Button variant="ghost" onClick={onClose}>Close</Button>
+                        </ModalFooter>
+                    </ModalContent>
+                </Modal>
             )}
-
-        </div>
+        </Box>
     );
 };
 

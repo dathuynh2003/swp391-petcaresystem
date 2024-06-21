@@ -73,7 +73,7 @@ export default function Medicine() {
       case 'pageNoSearch':
         setPageNo(() => 0)
         setPageNoSearch(() => data.selected);
-        
+
         break;
       case 'pageNoExpired':
         setPageNoExpired(() => data.selected);
@@ -98,10 +98,10 @@ export default function Medicine() {
       console.log(error);
     }
   }
-  console.log("Trang hien tai la: " + currentPage);
-  console.log("pageNo: " + pageNo);
-  console.log("pageNoSearch: " + pageNoSearch);
-  console.log("tong trang: " + totalPages);
+  // console.log("Trang hien tai la: " + currentPage);
+  // console.log("pageNo: " + pageNo);
+  // console.log("pageNoSearch: " + pageNoSearch);
+  // console.log("tong trang: " + totalPages);
 
   useEffect(() => {
 
@@ -184,7 +184,7 @@ export default function Medicine() {
 
   }
   const callAPISearch = async () => {
-   
+
     try {
       const response = await axios.get(`http://localhost:8080/medicine/search/${keyword}?pageNo=${pageNoSearch}&pageSize=${2}`, { withCredentials: true });
       setMedicines(response.data.MEDICINES.content)
@@ -387,11 +387,11 @@ export default function Medicine() {
           loadMedicines()
         }
       }
-      else{
+      else {
         toast.error("Edit medicine failed!")
         for (let index = 0; index < listError.length; index++) {
-        toast.error(listError[index]);
-      }
+          toast.error(listError[index]);
+        }
       }
 
     } catch (error) {
@@ -510,7 +510,7 @@ export default function Medicine() {
             <div className="search-wrapper">
               <SearchIcon onClick={loadMedicines} boxSize={6} style={{ marginRight: '8px', marginLeft: '5px' }} className='search-icon' />
               <input
-                onChange={(value) => {  setCurrentPage(() => 'pageNoSearch');setKeyWord(value.target.value); handleOnclickSearch(value) }}/*(value) => setKeyWord(value.target.value)*/
+                onChange={(value) => { setCurrentPage(() => 'pageNoSearch'); setKeyWord(value.target.value); handleOnclickSearch(value) }}/*(value) => setKeyWord(value.target.value)*/
                 className='rounded text-center fst-italic border-0'
                 style={{ height: '2.5rem', width: '14rem', outline: 'none' }}
                 placeholder='Search medicine'
@@ -670,7 +670,7 @@ export default function Medicine() {
       </div>
 
       <div className=''>
-        <ReactPaginate style={{background: 'teal'}}
+        <ReactPaginate style={{ background: 'teal' }}
           previousLabel={'Previous'}
           nextLabel={'Next'}
           breakLabel={'...'}
