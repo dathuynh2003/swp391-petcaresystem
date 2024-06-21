@@ -98,6 +98,7 @@ export default function ViewPet() {
     }
 
     //Tuần 7 làm!
+    const { isOpen: isOpenHospPayment, onOpen: onOpenHospPayment, onClose: onCloseHospPayment } = useDisclosure();
     const handlePayment = async (hospitalizationId) => {
         try {
             const payment = {
@@ -341,6 +342,29 @@ export default function ViewPet() {
             return time;
         }, {});
     };
+    let amountHosp = null
+    const [qrCode, setQrCode] = useState('')
+    const [checkoutUrl, setCheckoutUrl] = useState('')
+    const displayQrCode = async (hospitalization) => {
+        const payment =
+        {
+            "paymentType": "Credit Card",
+            "amount": amountHosp
+            // "hospitaliztion": hospitalization
+        }
+        try {
+            const response = await axios.post(`http://localhost:8080/hospitalization/payment/create`, payment, { withCredentials: true });
+            if (response.data.message === 'Payment created successfully') {
+                setQrCode(response.data.result.data.qrCode)
+                setCheckoutUrl(response.data.result.data.checkoutUrl)
+                toast.success('Payment created successfully')
+            } else {
+                toast.warning(response.data.message)
+            }
+        } catch (e) {
+            toast.error(e.message)
+        }
+    }
 
     return (
         <div>
@@ -871,7 +895,7 @@ export default function ViewPet() {
                                     if (!localDateTime) return null;  // Kiểm tra nếu localDateTime là null hoặc undefined
                                     const [day, month, yearAndTime] = localDateTime.split('/');
                                     const [year, time] = yearAndTime.split(' ');
-                                    return new Date(`${year}-${month}-${day}T${time}:00`);
+                                    return new Date(`${year}-${month}-${day}T${time}`);
                                 };
 
 
@@ -882,7 +906,12 @@ export default function ViewPet() {
                                 // Tính toán thời gian chênh lệch trong giờ
                                 //Số ms chênh lệch / số ms trong 1h = số giờ
                                 const timeDifference = Math.ceil((dischargeDate - admissionDate) / (1000 * 60 * 60));
+                                console.log(timeDifference)
                                 const hospFee = (timeDifference >= 0) ? timeDifference * hospitalization?.cage?.price : 0
+                                const amount = (hospitalization?.hospitalizationDetails
+                                    ?.reduce((accumulator, curDetail) => accumulator + (curDetail?.price * curDetail?.dosage), 0) + hospFee)
+                                    .toLocaleString('vi-Vn')
+                                hospitalization?.status === 'pending' && (amountHosp = amount)
 
                                 return (
                                     <AccordionItem key={index}>
@@ -1000,6 +1029,39 @@ export default function ViewPet() {
                                                                 </ModalFooter>
                                                             </ModalContent>
                                                         </Modal>
+                                                    </FormControl>
+                                                }
+                                                {hospitalization?.status === 'pending' &&
+                                                    <FormControl className='d-flex justify-content-end'>
+                                                        {roleId === '1' &&
+                                                            <>
+                                                                <Button colorScheme="yellow" onClick={() => { onOpenHospPayment(); displayQrCode(hospitalization) }}>
+                                                                    Payment
+                                                                </Button>
+                                                                <Modal
+                                                                    isOpen={isOpenHospPayment} onClose={onCloseHospPayment}
+                                                                >
+                                                                    <ModalOverlay />
+                                                                    <ModalContent>
+                                                                        <ModalHeader className='text-center'>Please pay using the QR code below</ModalHeader>
+                                                                        <ModalCloseButton />
+                                                                        <ModalBody>
+                                                                            <QRCode
+                                                                                className='mx-auto w-100 h-100'
+                                                                                value={qrCode}
+                                                                            />
+                                                                        </ModalBody>
+
+                                                                        <ModalFooter>
+                                                                            <Button colorScheme='blue' mr={3} onClick={onCloseHospPayment}>
+                                                                                Close
+                                                                            </Button>
+                                                                        </ModalFooter>
+                                                                    </ModalContent>
+                                                                </Modal>
+
+                                                            </>
+                                                        }
                                                     </FormControl>
                                                 }
                                                 <FormControl mt={4} className='d-flex'>
@@ -1154,11 +1216,7 @@ export default function ViewPet() {
                                                     <div className='col-1'></div>
                                                     <div className='col-2 text-end'>Total: </div>
                                                     <div className='col-2 text-end'>
-                                                        {(hospitalization?.hospitalizationDetails
-                                                            ?.reduce((accumulator, curDetail) =>
-                                                                accumulator + (curDetail?.price * curDetail?.dosage), 0) + hospFee)
-                                                            .toLocaleString('vi-Vn')
-                                                        } VND
+                                                        {amount} VND
                                                     </div>
                                                 </FormControl>
                                                 {hospitalization?.status === 'discharged' &&
@@ -1185,12 +1243,6 @@ export default function ViewPet() {
                                                                 style={{ width: '250px', height: '250px' }}
                                                             >
                                                                 <QRCode value={'e9fdc30c7f1488ef04d80e72ba09470f2c41d8a96231b5fe28d0a50fb71e37c3'} />
-                                                                {/* <img
-                                                                    src='00020101021238570010A000000727012700069704220113VQRQ00024ea220208QRIBFTTA530370454067500005802VN62220818Paymentorder116681630403E5'
-                                                                    alt='qr-code'
-                                                                    className='w-100 h-100'
-                                                                    style={{ objectFit: 'cover' }}
-                                                                /> */}
                                                             </div>
                                                         </FormControl>
                                                     </>

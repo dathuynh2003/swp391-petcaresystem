@@ -104,7 +104,7 @@ public class PaymentController {
                     ("https://api-merchant.payos.vn/v2/payment-requests", httpEntity, Map.class);
 
             response.put("message", "Payment created successfully");
-            response.put("payment", result);
+            response.put("result", result);
         } catch (Exception e) {
             response.put("message", e.getMessage());
         }
