@@ -16,6 +16,8 @@ import org.springframework.stereotype.Service;
 import org.json.JSONObject;
 import org.apache.commons.codec.digest.HmacUtils;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Service
@@ -25,13 +27,15 @@ public class PaymentService implements IPaymentService {
     @Autowired
     private BookingRepository bookingRepository;
 
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("ddMMyyyy");
+
     @Override
     public Payment createPayment(Payment payment) {
 //        System.out.println("Payment Booking" + payment.getBooking());
 //        Booking curBooking = bookingRepository.findById(payment.getBooking().getId()).get();
 //        System.out.println(curBooking);
-        Booking curBooking = bookingRepository.findById(payment.getBooking().getId()).orElseThrow(()->
-                                                                            new RuntimeException("Booking not found"));
+        Booking curBooking = bookingRepository.findById(payment.getBooking().getId()).orElseThrow(() ->
+                new RuntimeException("Booking not found"));
         payment.setBooking(curBooking);
         return paymentRepository.save(payment);
     }
@@ -141,20 +145,43 @@ public class PaymentService implements IPaymentService {
 //                    payload.getOrderCode(),
 //                    payload.getReturnUrl());
 //            System.out.println(transaction);
-            String transaction = "amount="+payload.getAmount()+
-                    "&cancelUrl="+payload.getCancelUrl() +
-                    "&description="+ payload.getDescription() +
-                    "&orderCode="+ payload.getOrderCode() +
+            String transaction = "amount=" + payload.getAmount() +
+                    "&cancelUrl=" + payload.getCancelUrl() +
+                    "&description=" + payload.getDescription() +
+                    "&orderCode=" + payload.getOrderCode() +
                     "&returnUrl=" + payload.getReturnUrl();
             String signature = this.createSignaturePayOs(transaction);
             payload.setSignature(signature);
 
             return payload;
-        }catch (Exception error) {
+        } catch (Exception error) {
             throw new Error(error.getMessage());
         }
     }
 
+    //Dùng Map thay vì CreatePaymentPosPayload
+    public Map<String, Object> createPayLoad(Payment payment) throws JSONException {
+        Map<String, Object> payload = new HashMap<>();
+        int orderCode = new Random().nextInt(1000000) + 1;
+
+        payload.put("orderCode", orderCode);
+        payload.put("amount", (int) payment.getAmount());
+        payload.put("description", "Paymentorder" + orderCode);
+
+        payload.put("cancelUrl", "");
+        payload.put("returnUrl", "");
+
+        String transaction = "amount=" + payload.get("amount") +
+                "&cancelUrl=" + payload.get("cancelUrl") +
+                "&description=" + payload.get("description") +
+                "&orderCode=" + payload.get("orderCode") +
+                "&returnUrl=" + payload.get("returnUrl");
+
+        String signature = this.createSignaturePayOs(transaction);
+        payload.put("signature", signature);
+
+        return payload;
+    }
 
 
 }

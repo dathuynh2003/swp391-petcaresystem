@@ -2,7 +2,9 @@ package com.swpproject.pethealthcaresystem.service;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
+import com.swpproject.pethealthcaresystem.model.Booking;
 import com.swpproject.pethealthcaresystem.model.User;
+import com.swpproject.pethealthcaresystem.model.VetShiftDetail;
 import com.swpproject.pethealthcaresystem.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -12,9 +14,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.io.IOException;
 import java.util.*;
+
 
 
 @Service
@@ -31,7 +33,7 @@ public class UserService implements IUserService {
 
     @Transactional
     @Override
-    public String createUser(User newUser){
+    public String createUser(User newUser) {
         User user = userRepository.findByPhoneNumber(newUser.getPhoneNumber());
 
         if (user == null) {
@@ -68,10 +70,11 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public User validateLogin(User user){
+    public User validateLogin(User user) {
         User existUser = userRepository.findByEmail(user.getEmail());
         if (existUser != null && existUser.getPassword().equals(user.getPassword())) {
             existUser.setPassword("");
+            existUser.setVetShiftDetails(null);
             return existUser;
         }
         return null;
@@ -94,7 +97,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public User getUserByEmail(User user){
+    public User getUserByEmail(User user) {
         User existUser = userRepository.findByEmail(user.getEmail());
         if (existUser != null) {
             existUser.setPassword("");
@@ -102,10 +105,17 @@ public class UserService implements IUserService {
         }
         return null;
     }
-  
+
     @Override
     public List<User> getVets() {
-        return userRepository.findByRoleId(3);
+        List<User> vets = userRepository.findByRoleId(3);
+        for (User vet : vets) {
+            for (VetShiftDetail vetShiftDetail : vet.getVetShiftDetails()) {
+                //Chống lặp vô hạn
+                vetShiftDetail.setBookings(null);
+            }
+        }
+        return vets;
     }
 
     @Override
@@ -152,10 +162,28 @@ public class UserService implements IUserService {
         user.setDob(newUser.getDob());
         return userRepository.save(user);
     }
+
     @Override
     public Page<User> getAllUsers(int pageNo, int pageSize) {
         Pageable pageable = PageRequest.of(pageNo, pageSize);
             return userRepository.findByIsActiveTrue(pageable);
+    }
+
+    @Override
+    public List<User> getAllUsersByRoleId(int roleId) {
+
+        if (roleId == 0) {
+            List<User> users = userRepository.findByIsActiveTrue();
+            for (User user : users) {
+                user.setVetShiftDetails(null);
+            }
+            return users;
+        }
+        List<User> users = userRepository.findByRoleId(roleId);
+        for (User user : users) {
+            user.setVetShiftDetails(null);
+        }
+        return users;
     }
 
     public User deleteUser(int id) {
@@ -172,7 +200,7 @@ public class UserService implements IUserService {
     @Override
     public User updateUser(User newUser, int id) {
         User updatedUser = getUserById(id);
-        if(updatedUser != null){
+        if (updatedUser != null) {
 //            updatedUser.setEmail(newUser.getEmail());
 //            updatedUser.setPassword(newUser.getPassword());
 //            updatedUser.setFullName(newUser.getFullName());
@@ -186,6 +214,7 @@ public class UserService implements IUserService {
         }
         return null;
     }
+
     @Transactional
     @Override
     public User createUserGoogle(User newUser) {

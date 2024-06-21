@@ -12,7 +12,12 @@ export default function Sidenav() {
   const getUser = async () => {
     try {
       const result = await axios.get(`http://localhost:8080/getuser`, { withCredentials: true });
-      setUser(result.data);
+      if (result.data !== '') {
+        setUser(result.data);
+      } else {
+        localStorage.removeItem('isLoggedIn');
+        localStorage.removeItem('roleId')
+      }
     } catch (error) {
       localStorage.removeItem('isLoggedIn');
       localStorage.removeItem('roleId')
@@ -33,12 +38,8 @@ export default function Sidenav() {
   };
 
   useEffect(() => {
-    if (isLoggedIn) {
-      getUser();
-    } else {
-      setUser(null);
-    }
-  }, [isLoggedIn]);
+    getUser()
+  }, []);
 
   let links = [];
 

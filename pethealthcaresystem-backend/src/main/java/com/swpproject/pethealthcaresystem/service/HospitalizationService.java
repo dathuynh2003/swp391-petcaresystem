@@ -8,7 +8,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 import java.util.Set;
 
 @Service
@@ -24,7 +23,7 @@ public class HospitalizationService implements IHospitalizationService {
     @Autowired
     private HospitalizationDetailRepository hospitalizationDetailRepository;
 
-    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
 
 
     @Override
@@ -68,8 +67,8 @@ public class HospitalizationService implements IHospitalizationService {
         LocalDateTime now = LocalDateTime.now();
         String dischargeTime = now.format(formatter);
         hospitalization.setDischargeTime(dischargeTime);
-        hospitalization.setStatus("discharged");
-//        hospitalization.setStatus("pending");
+//        hospitalization.setStatus("discharged");
+        hospitalization.setStatus("pending");
 
         Cage cage = hospitalization.getCage();
         if (cage == null) {

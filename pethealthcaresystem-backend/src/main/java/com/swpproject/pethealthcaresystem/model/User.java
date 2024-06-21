@@ -36,9 +36,10 @@ public class User {
     String gender;
     Boolean isActive;
     Date dob;
-    
-//    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-//    Set<VetShiftDetail> vetShiftDetails = new HashSet<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnoreProperties("user")
+    Set<VetShiftDetail> vetShiftDetails = new HashSet<>();
 //
 //    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
 //    Set<Cage> cages = new HashSet<>();

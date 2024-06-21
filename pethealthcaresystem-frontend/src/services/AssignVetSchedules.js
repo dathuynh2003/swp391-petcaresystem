@@ -12,7 +12,7 @@ export default function AssignVetSchedules() {
 
   useEffect(() => {
     axios.get('http://localhost:8080/vets', { withCredentials: true })
-      .then(response => setVets(response.data))
+      .then(response => setVets(response.data.vets))
       .catch(error => console.error('Error fetching vets:', error));
 
     axios.get('http://localhost:8080/shifts/all', { withCredentials: true })
