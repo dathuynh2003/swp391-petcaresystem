@@ -24,5 +24,5 @@ public interface IUserService {
     User createUserGoogle(User newUser);
 
     @Transactional
-    User createAnonymousUser(String phoneNumber, String fullName, String gender);
+    User createOrGetAnonymousUser(String phoneNumber, String fullName);
 }

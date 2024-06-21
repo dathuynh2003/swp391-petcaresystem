@@ -1,15 +1,17 @@
 package com.swpproject.pethealthcaresystem.service;
 
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 import com.swpproject.pethealthcaresystem.model.User;
 import com.swpproject.pethealthcaresystem.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.List;
-import java.util.Optional;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.util.*;
 
 
 @Service
@@ -21,6 +23,8 @@ public class UserService implements IUserService {
     private UserRepository userRepository;
     @Autowired
     private VerifyCodeService verifyCodeService;
+    @Autowired
+    private Cloudinary cloudinary;
 
     @Transactional
     @Override
@@ -49,7 +53,7 @@ public class UserService implements IUserService {
         user.setPhoneNumber(newUser.getPhoneNumber());
         user.setAddress(newUser.getAddress());
         user.setRoleId(1);
-        user.setAvatar("");
+        user.setAvatar("https://res.cloudinary.com/dinklulzk/image/upload/v1718952303/avatarDefault_vl6wzt.jpg");
         user.setGender(newUser.getGender());
         user.setIsActive(false); // Đặt là không hoạt động cho đến khi xác thực
         user.setDob(newUser.getDob());
@@ -139,7 +143,7 @@ public class UserService implements IUserService {
         user.setPhoneNumber(newUser.getPhoneNumber());
         user.setAddress(newUser.getAddress());
         user.setRoleId(newUser.getRoleId());
-        user.setAvatar("");
+        user.setAvatar("https://res.cloudinary.com/dinklulzk/image/upload/v1718952303/avatarDefault_vl6wzt.jpg");
         user.setGender(newUser.getGender());
         user.setIsActive(true);
         user.setDob(newUser.getDob());
@@ -217,18 +221,40 @@ public class UserService implements IUserService {
 
     @Transactional
     @Override
-    public User createAnonymousUser(String phoneNumber, String fullName, String gender) {
-        if (userRepository.existsByPhoneNumber(phoneNumber)) {
-            throw new Error("Phone number is already in use");
+    public User createOrGetAnonymousUser(String phoneNumber, String fullName) {
+        User user = userRepository.findByPhoneNumber(phoneNumber);
+        if (user == null) {
+            user = User.builder()
+                    .phoneNumber(phoneNumber)
+                    .fullName(fullName)
+                    .isActive(true)
+                    .roleId(1)
+                    .build();
+            user = userRepository.save(user);
+        }
+        return user;
+    }
+
+    public String saveAvatar(MultipartFile file, int userId) throws IOException {
+        if (file.isEmpty()) {
+            throw new IOException("File is empty");
         }
 
-        User user = User.builder()
-                .phoneNumber(phoneNumber)
-                .fullName(fullName)
-                .gender(gender)
-                .isActive(true)
-                .build();
+        // Check file type
+        String contentType = file.getContentType();
+        if (!contentType.startsWith("image/")) {
+            throw new IOException("Invalid file type. Only image files are allowed.");
+        }
 
-        return userRepository.save(user);
+        // Upload file to Cloudinary
+        Map uploadResult = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.emptyMap());
+        String imageUrl = uploadResult.get("url").toString();
+
+        // Update user's avatar URL in the database
+        User user = getUserById(userId);
+        user.setAvatar(imageUrl);
+        userRepository.save(user);
+
+        return imageUrl;
     }
 }

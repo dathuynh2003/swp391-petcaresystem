@@ -1,6 +1,8 @@
 package com.swpproject.pethealthcaresystem.service;
 
 
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 import com.swpproject.pethealthcaresystem.model.Hospitalization;
 import com.swpproject.pethealthcaresystem.model.HospitalizationDetail;
 import com.swpproject.pethealthcaresystem.model.Pet;
@@ -9,12 +11,13 @@ import com.swpproject.pethealthcaresystem.repository.HospitalizationDetailReposi
 import com.swpproject.pethealthcaresystem.repository.HospitalizationRepository;
 import com.swpproject.pethealthcaresystem.repository.PetRepository;
 import com.swpproject.pethealthcaresystem.repository.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.io.IOException;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -27,12 +30,23 @@ public class PetService implements IPetService {
     private UserRepository userRepository;
     @Autowired
     private HospitalizationDetailRepository hospitalizationDetailRepository;
+    @Autowired
+    private UserService userService;
+    @Autowired
+    private Cloudinary cloudinary;
 
     @Override
     public Pet createPet(Pet newPet, User curUser) {
 
         newPet.setOwner(curUser);
         newPet.setIsDeceased(false);
+        if (newPet.getPetType().equals("Dog")) {
+            newPet.setAvatar("https://res.cloudinary.com/dinklulzk/image/upload/v1718952304/avatarDogDefault.png");
+        } else if (newPet.getPetType().equals("Cat")) {
+            newPet.setAvatar("https://res.cloudinary.com/dinklulzk/image/upload/v1718952303/avatarCatDefault_zvuixh.png");
+        } else if (newPet.getPetType().equals("Bird")) {
+            newPet.setAvatar("https://res.cloudinary.com/dinklulzk/image/upload/v1718952303/avatarBirdDefault_kgw2pt.png");
+        }
         return petRepository.save(newPet);
     }
 
@@ -111,13 +125,41 @@ public class PetService implements IPetService {
 
     @Override
     public Pet createPetForAnonymousUser(Pet newPet, String phoneNumber) {
-        User anonymousUser = userRepository.findByPhoneNumber(phoneNumber);
-        if (anonymousUser == null) {
-            throw new RuntimeException("Anonymous user not found");
-        }
+        User anonymousUser = userService.createOrGetAnonymousUser(phoneNumber, newPet.getOwner().getFullName());
 
         newPet.setOwner(anonymousUser);
         newPet.setIsDeceased(false);
+        if (newPet.getPetType().equals("Dog")) {
+            newPet.setAvatar("https://res.cloudinary.com/dinklulzk/image/upload/v1718952304/avatarDogDefault.png");
+        } else if (newPet.getPetType().equals("Cat")) {
+            newPet.setAvatar("https://res.cloudinary.com/dinklulzk/image/upload/v1718952303/avatarCatDefault_zvuixh.png");
+        } else if (newPet.getPetType().equals("Bird")) {
+            newPet.setAvatar("https://res.cloudinary.com/dinklulzk/image/upload/v1718952303/avatarBirdDefault_kgw2pt.png");
+        }
         return petRepository.save(newPet);
+    }
+
+    public Pet updatePetAvatar(int id, MultipartFile file) throws IOException {
+        Pet pet = petRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Pet not found with id: " + id));
+
+        if (file.isEmpty()) {
+            throw new IOException("File is empty");
+        }
+
+        // Check file type
+        String contentType = file.getContentType();
+        if (!contentType.startsWith("image/")) {
+            throw new IOException("Invalid file type. Only image files are allowed.");
+        }
+
+        Map uploadResult = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.emptyMap());
+        String imageUrl = uploadResult.get("url").toString();
+
+        // Update pet's avatar
+        pet.setAvatar(imageUrl);
+
+        // Save updated pet
+        return petRepository.save(pet);
     }
 }

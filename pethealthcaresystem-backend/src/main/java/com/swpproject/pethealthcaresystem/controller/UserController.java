@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.HashMap;
 import java.util.List;
@@ -188,13 +189,18 @@ public class UserController {
         throw new Exception("You need login first");
     }
 
-    @PostMapping("/createAnonymousUserByStaff")
-    public ResponseEntity<User> createAnonymousUser(@RequestBody User newUser, HttpSession session) throws Exception {
-        User curUser = (User) session.getAttribute("user");
-        if (curUser != null) {
-            User user = userService.createAnonymousUser(newUser.getPhoneNumber(), newUser.getFullName(), newUser.getGender());
-            return ResponseEntity.ok(user);
+    @PostMapping("/upload-avatar")
+    public ResponseEntity<String> uploadAvatar(@RequestParam("file") MultipartFile file, HttpSession session) {
+        User currentUser = (User) session.getAttribute("user");
+        if (currentUser == null) {
+            return new ResponseEntity<>("User not logged in", HttpStatus.UNAUTHORIZED);
         }
-        throw new Exception("You need login first");
+
+        try {
+            String avatarUrl = userService.saveAvatar(file, currentUser.getUserId());
+            return new ResponseEntity<>(avatarUrl, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }

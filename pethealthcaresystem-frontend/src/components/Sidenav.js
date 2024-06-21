@@ -70,7 +70,7 @@ export default function Sidenav() {
         { name: 'Cages', path: '/cages', icon: 'fas fa-warehouse' },
         { name: 'Booking Appointments', path: '/staffBooking', icon: 'fas fa-calendar-check' },
         { name: 'Assign Vet\'s Work Schedules', path: '/assign-schedules', icon: 'fas fa-clipboard-list' },
-        { name: 'Anomyous User', path: '/create-anomyous-user', icon: 'fa-solid fa-user' },
+        { name: 'Pet For Customer', path: '/create-pet-by-staff', icon: 'fas fa-paw' },
         { name: 'Booking History', path: 'booking-history', icon: 'fa fa-history' },
         { name: 'Medicine', path: '/medicine', icon: 'fas fa-clipboard-list' },
         { name: 'Logout', path: '/login', icon: 'fas fa-sign-out-alt', onClick: handleLogout },
