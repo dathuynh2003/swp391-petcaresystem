@@ -246,6 +246,7 @@ export default function Booking() {
       //toast.success('Payment initiated successfully!');
       if (data && data.data && data.data.checkoutUrl) {
         window.location.href = data.data.checkoutUrl;
+        console.log(data.data.checkoutUrl)
       }
     } catch (error) {
       toast.error('Payment failed!');

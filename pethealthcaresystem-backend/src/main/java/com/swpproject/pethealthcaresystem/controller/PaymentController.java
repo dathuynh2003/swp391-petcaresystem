@@ -4,7 +4,10 @@ import com.swpproject.pethealthcaresystem.common.ResponseData;
 import com.swpproject.pethealthcaresystem.dto.payment.CreatePaymentPosPayload;
 import com.swpproject.pethealthcaresystem.dto.payment.PayOsDTO;
 import com.swpproject.pethealthcaresystem.model.Payment;
+import com.swpproject.pethealthcaresystem.model.User;
 import com.swpproject.pethealthcaresystem.service.PaymentService;
+import jakarta.servlet.http.HttpSession;
+import org.apache.catalina.util.ParameterMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -13,7 +16,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
@@ -78,5 +83,31 @@ public class PaymentController {
             data.setStatusCode(404);
             return new ResponseEntity<>(data, HttpStatus.BAD_REQUEST);
         }
+    }
+
+    @PostMapping("/hospitalization/payment/create")
+    public Map<String, Object> createHospitalizationPayment(@RequestBody Payment payment, HttpSession session) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            User curUser = (User) session.getAttribute("user");
+            if (curUser == null) {
+                throw new Exception("You need login first");
+            }
+
+            RestTemplate restTemplate = new RestTemplate();
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("x-client-id", PaymentService.clientId);
+            headers.set("x-api-key", PaymentService.apiKey);
+            Map<String, Object> payload = paymentService.createPayLoad(payment);
+            HttpEntity<Map<String, Object>> httpEntity = new HttpEntity<>(payload, headers);
+            var result = restTemplate.postForObject
+                    ("https://api-merchant.payos.vn/v2/payment-requests", httpEntity, Map.class);
+
+            response.put("message", "Payment created successfully");
+            response.put("payment", result);
+        } catch (Exception e) {
+            response.put("message", e.getMessage());
+        }
+        return response;
     }
 }

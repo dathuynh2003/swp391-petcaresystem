@@ -4,7 +4,8 @@ import { Tab, TabList, Tabs, TabPanel, TabPanels, Button, Textarea } from '@chak
 import axios from 'axios'
 import { ToastContainer, toast } from 'react-toastify';
 import {
-    Accordion, AccordionItem, AccordionButton, AccordionIcon, AccordionPanel, Box, useDisclosure, Input, FormControl, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader,
+    Accordion, AccordionItem, AccordionButton, AccordionIcon, AccordionPanel, Box,
+    useDisclosure, Input, FormControl, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader,
     ModalOverlay, FormLabel
 } from '@chakra-ui/react';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -16,6 +17,7 @@ import {
     NumberIncrementStepper,
     NumberDecrementStepper,
 } from '@chakra-ui/react'
+import QRCode from 'qrcode.react';
 
 
 export default function ViewPet() {
@@ -98,21 +100,32 @@ export default function ViewPet() {
     //Tuần 7 làm!
     const handlePayment = async (hospitalizationId) => {
         try {
-            const response = await axios.put(`http://localhost:8080/hospitalization/payment/${hospitalizationId}`, {}, { withCredentials: true })
-            if (response.data.message === 'Discharged pet successfully') {
-                toast.success(response.data.message)
-                setTimeout(() => {
-                    window.location.reload()
-                }, 2000);
-            } else {
-                toast.warning(response.data.message)
-            }
+            const payment = {
+                paymentType: 'Credit Card',
+                amount: null,
+                paymentDate: "",
+                status: 'Pending'
+            };
+
         } catch (e) {
             toast.error(e.message)
-            setTimeout(() => {
-                navigate('/404page')
-            }, 2000);
         }
+        // try {
+        //     const response = await axios.put(`http://localhost:8080/hospitalization/payment/${hospitalizationId}`, {}, { withCredentials: true })
+        //     if (response.data.message === 'Discharged pet successfully') {
+        //         toast.success(response.data.message)
+        //         setTimeout(() => {
+        //             window.location.reload()
+        //         }, 2000);
+        //     } else {
+        //         toast.warning(response.data.message)
+        //     }
+        // } catch (e) {
+        //     toast.error(e.message)
+        //     setTimeout(() => {
+        //         navigate('/404page')
+        //     }, 2000);
+        // }
     }
 
     useEffect(() => {
@@ -390,7 +403,13 @@ export default function ViewPet() {
                                 {roleId === '1' && (
                                     // <Link className='btn btn-primary col-md-12' to="/listPets">Back</Link>
                                     pet?.hospitalizations?.some(admitPet => admitPet?.status === "pending") ? (
-                                        <Link className='btn btn-warning col-md-12'>Waiting Payment</Link>
+                                        <Link
+                                            className='btn btn-warning col-md-12'
+                                            onClick={() => handlePayment(hospitalizations
+                                                .find(hospitalization => hospitalization.status === "admitted").id)}
+                                        >
+                                            Payment
+                                        </Link>
                                     ) : (
                                         <Link className='btn btn-primary col-md-12' to="/listPets">Back</Link>
                                     )
@@ -917,7 +936,7 @@ export default function ViewPet() {
                                                                             <div className='col-4'>Medical Name</div>
                                                                             <div className='col-1 text-center'>Dosage</div>
                                                                             <div className='col-1'>Unit</div>
-                                                                            <div className='col-2'>Price</div>
+                                                                            <div className='col-2'>Amount</div>
                                                                         </FormControl>
                                                                     }
                                                                     {hospitalizationDetails?.map((hospitalizationDetail, index) => (
@@ -978,43 +997,85 @@ export default function ViewPet() {
                                                         </Modal>
                                                     </FormControl>
                                                 }
-                                                {hospitalization?.status === 'discharged' &&
-                                                    <FormControl className='d-flex justify-content-end'>
-                                                        <div width={'13%'} className='text-center text-danger fw-bold'>Discharged</div>
-                                                    </FormControl>
-                                                }
                                                 <FormControl mt={4} className='d-flex'>
-                                                    <FormLabel className='w-50'>Pet's owner  <Input readOnly ref={initialRef} value={pet?.owner?.fullName} /></FormLabel>
-                                                    <FormLabel className='w-50'>Phone number <Input readOnly value={pet?.owner?.phoneNumber} /></FormLabel>
+                                                    <FormLabel className='w-50'>
+                                                        Date
+                                                        <Input
+                                                            readOnly ref={initialRef}
+                                                            value={hospitalization?.admissionTime
+                                                                ?.split(' ')[0]}
+                                                        />
+                                                    </FormLabel>
+                                                    <FormLabel className='w-50'>
+                                                        Vet
+                                                        <Input readOnly value={hospitalization?.user?.fullName} />
+                                                    </FormLabel>
                                                 </FormControl>
-                                                <FormControl className='d-flex'>
-                                                    <FormLabel className='w-50'>Pet's name <Input readOnly ref={initialRef} value={pet.name} /></FormLabel>
-                                                    <FormLabel className='w-50'>Pet's type <Input readOnly value={pet.petType} /></FormLabel>
+                                                <FormControl className='d-flex mt-0'>
+                                                    <FormLabel className='w-50'>
+                                                        Cage
+                                                        <Input readOnly ref={initialRef} value={hospitalization?.cage?.name} />
+                                                    </FormLabel>
+                                                    <FormLabel className='w-50'>
+                                                        Price(hour)
+                                                        <Input readOnly value={hospitalization?.cage?.price.toLocaleString('vi-VN') + " VND"} />
+                                                    </FormLabel>
                                                 </FormControl>
-                                                <FormControl className='d-flex justify-content-between'>
-                                                    <FormLabel>Pet's breed <Input readOnly ref={initialRef} value={pet.breed} /></FormLabel>
-                                                    <FormLabel>Pet's sex <Input readOnly value={pet.gender} /></FormLabel>
-                                                    <FormLabel>Pet's age <Input readOnly value={pet.age} /></FormLabel>
+                                                <FormControl className='d-flex mt-0'>
+                                                    <FormLabel className='w-50'>
+                                                        Admission Time
+                                                        <Input
+                                                            readOnly ref={initialRef}
+                                                            value={hospitalization?.admissionTime
+                                                                ?.split(' ')[1]}
+                                                        />
+                                                    </FormLabel>
+                                                    <FormLabel className='w-50'>
+                                                        Discharged Time
+                                                        <Input
+                                                            readOnly
+                                                            value={hospitalization?.dischargeTime ? hospitalization.dischargeTime.split(' ')[1] : "N/A"}
+                                                        />
+                                                    </FormLabel>
                                                 </FormControl>
                                                 {(groupedHospDetailsByTime.length !== 0) &&
                                                     <FormControl
                                                         className='d-flex justify-content-between fw-bold mt-3 mb-1 border border-top-0 border-end-0 border-start-0'>
                                                         <div className='col-2'>Time</div>
-                                                        <div className='col-4'>Medical Name</div>
-                                                        <div className='col-1 text-center'>Dosage</div>
+                                                        <div className='col-3'>Medical Name</div>
                                                         <div className='col-1'>Unit</div>
-                                                        <div className='col-2'>Price</div>
+                                                        <div className='col-1'>Unit Price</div>
+                                                        <div className='col-1 text-center'>Dosage</div>
+                                                        <div className='col-1'>Amount</div>
                                                     </FormControl>
                                                 }
                                                 {groupedHospDetailsByTime?.map((hospitalizationDetail) => (
                                                     <div className=''>
                                                         <FormControl className='d-flex justify-content-between mt-3 mb-1'>
                                                             <div className='col-2 fw-medium text-success'>{hospitalizationDetail.time.slice(0, -3)}</div>
-                                                            <div className='col-4'>
+                                                            <div className='col-3'>
                                                                 {hospitalizationDetail?.details?.map((detail) => (
                                                                     <>
                                                                         {detail?.dosage !== 0 ?
                                                                             <div>{detail?.medicine?.name}</div> : ''
+                                                                        }
+                                                                    </>
+                                                                ))}
+                                                            </div>
+                                                            <div className='col-1'>
+                                                                {hospitalizationDetail?.details.map((detail, index) => (
+                                                                    <>
+                                                                        {detail?.dosage !== 0 ?
+                                                                            <div>{detail?.medicine?.unit}</div> : ''
+                                                                        }
+                                                                    </>
+                                                                ))}
+                                                            </div>
+                                                            <div className='col-1 text-center'>
+                                                                {hospitalizationDetail?.details.map((detail, index) => (
+                                                                    <>
+                                                                        {detail?.dosage !== 0 ?
+                                                                            <div>{detail?.price.toLocaleString('vi-VN')}</div> : ''
                                                                         }
                                                                     </>
                                                                 ))}
@@ -1032,17 +1093,8 @@ export default function ViewPet() {
                                                                 {hospitalizationDetail?.details.map((detail, index) => (
                                                                     <>
                                                                         {detail?.dosage !== 0 ?
-                                                                            <div>{detail?.medicine?.unit}</div> : ''
-                                                                        }
-                                                                    </>
-                                                                ))}
-                                                            </div>
-                                                            <div className='col-2'>
-                                                                {hospitalizationDetail?.details.map((detail, index) => (
-                                                                    <>
-                                                                        {detail?.dosage !== 0 ?
                                                                             <div>
-                                                                                {detail?.price.toLocaleString('vi-VN')} VND
+                                                                                {(detail?.price * detail?.dosage).toLocaleString('vi-VN')}
                                                                             </div> : ''
                                                                         }
 
@@ -1051,15 +1103,19 @@ export default function ViewPet() {
                                                             </div>
                                                         </FormControl>
                                                         <FormControl className='d-flex border border-top-0 border-end-0 border-start-0'>
-                                                            <div className='col-2 text-end fw-medium'>Vet Note:</div>
-                                                            <div className='col-10 text-start mx-5 text-info fw-bold'>
+                                                            <div
+                                                                className='col-3 text-end fw-bold fst-italic text-decoration-underline'
+                                                            >
+                                                                Vet Note:
+                                                            </div>
+                                                            <div className='col-9 text-start mx-2 fw-medium fst-italic'>
                                                                 {hospitalizationDetail?.details[0].description}
                                                             </div>
                                                         </FormControl>
                                                     </div>
                                                 ))}
                                                 <FormControl
-                                                    className='d-flex justify-content-between mt-3 mb-1 rounded'
+                                                    className='d-flex mt-3 mb-1 rounded'
                                                     bg='gray.50'
                                                 >
                                                     <div className='col-4'>
@@ -1074,37 +1130,71 @@ export default function ViewPet() {
                                                             </span>
                                                         </div>
                                                     </div>
-                                                    <div className='col-2 my-auto'>
-                                                        <span className='fw-bold'>Toal Time: </span>
-                                                        <span>{timeDifference > 0 ? timeDifference + " hour(s)" : "N/A"}</span>
-
-                                                    </div>
-                                                    <div className='col-4 my-auto'>
-                                                        <span className='col-6 fw-bold'>Hospitalization fee: </span>
-                                                        <span className='col-6'>
-                                                            {hospFee > 0 ? hospFee.toLocaleString('vi-VN') + " VND" : "Hospitalizing..."}
-                                                        </span>
+                                                    <div className='col-1'></div>
+                                                    <div className='fw-bold col-1 text-end my-auto'>Toal Time: </div>
+                                                    <div className='col-1 my-auto text-center'>{timeDifference > 0 ? timeDifference + " hour(s)" : "N/A"}</div>
+                                                    <div className='col-1'></div>
+                                                    <div className='col-2 fw-bold text-end my-auto'>Hospitalization fee: </div>
+                                                    <div className='col-2 text-center my-auto mx-4'>
+                                                        {hospFee > 0 ? hospFee.toLocaleString('vi-VN') : "Hospitalizing..."}
                                                     </div>
                                                 </FormControl>
                                                 <FormControl
-                                                    className='d-flex justify-content-between fw-bold mt-3 mb-1 border border-top-0 border-end-0 border-start-0'
+                                                    className='d-flex fw-bold mt-3 mb-1 border border-top-0 border-end-0 border-start-0'
                                                 >
                                                     <div className='col-2'></div>
-                                                    <div className='col-4'></div>
+                                                    <div className='col-3'></div>
                                                     <div className='col-1'></div>
-                                                    <div className='col-1'>Total: </div>
-                                                    <div className='col-2'>
+                                                    <div className='col-1'></div>
+                                                    <div className='col-1'></div>
+                                                    <div className='col-2 text-end'>Total: </div>
+                                                    <div className='col-2 text-end'>
                                                         {(hospitalization?.hospitalizationDetails
-                                                            ?.reduce((accumulator, curDetail) => accumulator + curDetail?.price, 0) + hospFee)
+                                                            ?.reduce((accumulator, curDetail) =>
+                                                                accumulator + (curDetail?.price * curDetail?.dosage), 0) + hospFee)
                                                             .toLocaleString('vi-Vn')
                                                         } VND
                                                     </div>
                                                 </FormControl>
-
+                                                {hospitalization?.status === 'discharged' &&
+                                                    <>
+                                                        <FormControl className='mt-5 d-flex justify-content-around'>
+                                                            <div className='col-4'></div>
+                                                            <div className='fw-bold'>Please pay using the QR code below</div>
+                                                        </FormControl>
+                                                        <FormControl className='mb-3 d-flex justify-content-around'>
+                                                            {/* <div width={'13%'} className='text-center text-danger fw-bold'>Discharged</div> */}
+                                                            <div
+                                                                className='my-auto'
+                                                                style={{ width: '250px', height: '100px' }}
+                                                            >
+                                                                <img
+                                                                    src='https://thumbs.dreamstime.com/b/discharged-grunge-rubber-stamp-white-background-vector-illustration-discharged-grunge-rubber-stamp-281786398.jpg'
+                                                                    alt='discharged'
+                                                                    className='w-100 h-100'
+                                                                    style={{ objectFit: 'cover' }}
+                                                                />
+                                                            </div>
+                                                            <div
+                                                                className=''
+                                                                style={{ width: '250px', height: '250px' }}
+                                                            >
+                                                                <QRCode value={'00020101021238570010A000000727012700069704220113VQRQ00024ea220208QRIBFTTA530370454067500005802VN62220818Paymentorder116681630403E5'} />
+                                                                {/* <img
+                                                                    src='00020101021238570010A000000727012700069704220113VQRQ00024ea220208QRIBFTTA530370454067500005802VN62220818Paymentorder116681630403E5'
+                                                                    alt='qr-code'
+                                                                    className='w-100 h-100'
+                                                                    style={{ objectFit: 'cover' }}
+                                                                /> */}
+                                                            </div>
+                                                        </FormControl>
+                                                    </>
+                                                }
                                             </div>
                                         </AccordionPanel>
                                     </AccordionItem>
                                 )
+
                             })}
                         </Accordion>
                     </TabPanel >
