@@ -235,6 +235,11 @@ public class UserService implements IUserService {
         }
         return null;
     }
+//
+//    @Override
+//    public User createAnonymousUser(String phoneNumber, String fullName, String gender) {
+//        return null;
+//    }
 
     @Override
     public User getUserById(int id) {
