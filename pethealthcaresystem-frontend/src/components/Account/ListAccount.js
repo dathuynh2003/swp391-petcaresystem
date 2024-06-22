@@ -1,7 +1,34 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Link } from 'react-router-dom';
-import { Box, Button, Table, Thead, Tbody, Tr, Th, Td, Text, Spinner, useToast, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, FormControl, FormLabel, Select, Switch, InputGroup, Input, InputRightElement, IconButton } from '@chakra-ui/react';
+import {
+    Box,
+    Button,
+    Table,
+    Thead,
+    Tbody,
+    Tr,
+    Th,
+    Td,
+    Spinner,
+    useToast,
+    Modal,
+    ModalOverlay,
+    ModalContent,
+    ModalHeader,
+    ModalFooter,
+    ModalBody,
+    ModalCloseButton,
+    FormControl,
+    FormLabel,
+    Select,
+    Switch,
+    InputGroup,
+    Input,
+    InputRightElement,
+    IconButton,
+    HStack,
+    Flex
+} from '@chakra-ui/react';
 import { SearchIcon } from '@chakra-ui/icons';
 
 const ListAccount = () => {
@@ -13,25 +40,23 @@ const ListAccount = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedUser, setSelectedUser] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
+    const [roleFilter, setRoleFilter] = useState(0); // Default role filter value is 0 for All
     const toast = useToast();
 
     useEffect(() => {
         fetchAccounts();
-    }, [page]);
+    }, [page, roleFilter]); // Trigger fetchAccounts() when page or roleFilter changes
 
     const fetchAccounts = async () => {
         setLoading(true);
         try {
-            const response = await axios.get("http://localhost:8080/get-users-by-id", {
-                params: {
-                    pageNo: page,
-                    pageSize: 5,
-                }
-            });
+            let url = `http://localhost:8080/get-users-by-id/${roleFilter}?pageNo=${page}&pageSize=5`;
+            const response = await axios.get(url);
             const data = response.data.data;
             setAccounts(data.content);
             setTotalPages(data.totalPages);
             setLoading(false);
+            setError(null); // Clear any previous errors
         } catch (error) {
             console.error("Error fetching accounts:", error);
             setError("Error fetching accounts. Please try again later.");
@@ -142,23 +167,36 @@ const ListAccount = () => {
 
     return (
         <Box className="container">
-            <InputGroup width="300px" mb={4} float="right">
-                <Input
-                    placeholder="Search by email"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                />
-                <InputRightElement>
-                    <IconButton
-                        aria-label="Search"
-                        icon={<SearchIcon />}
-                        onClick={handleSearch}
+            <Flex mb={4} justify="space-between" align="center">
+                <Box>
+                    <FormControl>
+                        <Select
+                            id="roleFilter"
+                            value={roleFilter}
+                            onChange={(e) => setRoleFilter(parseInt(e.target.value))}
+                        >
+                            <option value={0}>All</option>
+                            <option value={1}>Customer</option>
+                            <option value={2}>Vet</option>
+                            <option value={3}>Staff</option>
+                        </Select>
+                    </FormControl>
+                </Box>
+                <InputGroup width="300px">
+                    <Input
+                        placeholder="Search by email"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
                     />
-                </InputRightElement>
-            </InputGroup>
-            <Link to="/account/create">
-                <Button colorScheme="blue" mb={3}>Add New Account</Button>
-            </Link>
+                    <InputRightElement>
+                        <IconButton
+                            aria-label="Search"
+                            icon={<SearchIcon />}
+                            onClick={handleSearch}
+                        />
+                    </InputRightElement>
+                </InputGroup>
+            </Flex>
             <Table variant="striped" colorScheme="teal">
                 <Thead>
                     <Tr>
