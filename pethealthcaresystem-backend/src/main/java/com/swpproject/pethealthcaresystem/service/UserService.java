@@ -149,9 +149,9 @@ public class UserService implements IUserService {
         return userRepository.save(user);
     }
     @Override
-    public Page<User> getAllUsers(int pageNo, int pageSize) {
+    public Page<User> getAllUsersByRoleId(int pageNo, int pageSize, int roleId) {
         Pageable pageable = PageRequest.of(pageNo, pageSize);
-            return userRepository.findByIsActiveTrue(pageable);
+            return userRepository.findUsersByRoleId(pageable, roleId);
     }
 
     public User deleteUser(int id) {
@@ -240,5 +240,11 @@ public class UserService implements IUserService {
                 .build();
 
         return userRepository.save(user);
+    }
+
+    @Override
+    public Page<User> getAllUsers(int pageNo, int pageSize) {
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
+        return userRepository.findAll(pageable);
     }
 }

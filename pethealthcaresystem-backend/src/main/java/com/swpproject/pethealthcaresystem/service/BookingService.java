@@ -25,7 +25,7 @@ public class BookingService implements IBookingService {
     @Autowired
     private BookingDetailRepository bookingDetailRepository;
     @Autowired
-    UserRepository userRepository;
+    private UserRepository userRepository;
 
 
     @Override
@@ -101,7 +101,7 @@ public class BookingService implements IBookingService {
     }
 
     public Page<Booking> getBookingsByPhone(int pageNo, int pageSize, String phoneNumber) {
-        User selectedUser = userRepository.findByPhoneNumber(phoneNumber);
+        User selectedUser = userRepository.findUserByPhoneNumber(phoneNumber);
         if (selectedUser == null) {
             throw new RuntimeException("User not found");
         }

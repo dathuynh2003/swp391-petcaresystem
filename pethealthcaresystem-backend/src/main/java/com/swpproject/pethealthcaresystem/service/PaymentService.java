@@ -31,7 +31,7 @@ public class PaymentService implements IPaymentService {
 //        Booking curBooking = bookingRepository.findById(payment.getBooking().getId()).get();
 //        System.out.println(curBooking);
         Booking curBooking = bookingRepository.findById(payment.getBooking().getId()).orElseThrow(()->
-                                                                            new RuntimeException("Booking not found"));
+                new RuntimeException("Booking not found"));
         payment.setBooking(curBooking);
         return paymentRepository.save(payment);
     }
@@ -95,15 +95,6 @@ public class PaymentService implements IPaymentService {
         return signature;
     }
 
-    private static Iterator<String> sortedIterator(Iterator<?> it, Comparator<String> comparator) {
-        List<String> list = new ArrayList<String>();
-        while (it.hasNext()) {
-            list.add((String) it.next());
-        }
-
-        Collections.sort(list, comparator);
-        return list.iterator();
-    }
 
     public CreatePaymentPosPayload createPaymentOs(Payment payment) {
         try {
