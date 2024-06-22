@@ -164,13 +164,10 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public Page<User> getAllUsers(int pageNo, int pageSize) {
+    public Page<User> getAllUsersByRoleId(int pageNo, int pageSize, int roleId) {
         Pageable pageable = PageRequest.of(pageNo, pageSize);
-        Page<User> pageUsers = userRepository.findAll(pageable);
-        for (User user : pageUsers.getContent()) {
-            user.setVetShiftDetails(null);
-        }
-        return pageUsers;
+            return userRepository.findUsersByRoleId(pageable, roleId);
+
     }
 
     public User deleteUser(int id) {
@@ -282,5 +279,11 @@ public class UserService implements IUserService {
         userRepository.save(user);
 
         return imageUrl;
+    }
+
+    @Override
+    public Page<User> getAllUsers(int pageNo, int pageSize) {
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
+        return userRepository.findAll(pageable);
     }
 }

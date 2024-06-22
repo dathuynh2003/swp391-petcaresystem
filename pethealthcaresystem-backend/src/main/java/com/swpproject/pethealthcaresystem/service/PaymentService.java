@@ -99,15 +99,6 @@ public class PaymentService implements IPaymentService {
         return signature;
     }
 
-    private static Iterator<String> sortedIterator(Iterator<?> it, Comparator<String> comparator) {
-        List<String> list = new ArrayList<String>();
-        while (it.hasNext()) {
-            list.add((String) it.next());
-        }
-
-        Collections.sort(list, comparator);
-        return list.iterator();
-    }
 
     public CreatePaymentPosPayload createPaymentOs(Payment payment) {
         try {

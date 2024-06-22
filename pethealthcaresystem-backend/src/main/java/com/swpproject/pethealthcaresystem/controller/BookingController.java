@@ -45,24 +45,15 @@ public class BookingController {
             HttpSession session) {
         ResponseData<Booking> responseData = new ResponseData<>();
         try {
-            System.out.println("Received booking request:");
-            System.out.println("Pet ID: " + petId);
-            System.out.println("Vet Shift ID: " + vsId);
-            System.out.println("Service IDs: " + serviceIds);
-            System.out.println("Booking Data: " + booking);
-
             User user = (User) session.getAttribute("user");
             if (user == null) {
                 return new ResponseEntity<>(responseData, HttpStatus.UNAUTHORIZED);
             }
-
             Booking createdBooking = bookingService.createBookingByUser(booking, user, petId, vsId, serviceIds);
-            System.out.println("Created Booking: " + createdBooking);
             responseData.setData(createdBooking);
             responseData.setStatusCode(200);
             return new ResponseEntity<>(responseData, HttpStatus.OK);
         } catch (Exception e) {
-            System.out.println("Error creating booking: " + e.getMessage());
             responseData.setStatusCode(404);
             responseData.setErrorMessage(e.getMessage());
             return new ResponseEntity<>(responseData, HttpStatus.BAD_REQUEST);
@@ -143,11 +134,8 @@ public class BookingController {
             if (currentUser != null) {
                 ResponseData<Page<Booking>> responseData = new ResponseData<>();
                 Page<Booking> bookings;
-                if (phoneNumber != null && !phoneNumber.isEmpty()) {
-                    System.out.println(phoneNumber);
-                    System.out.println("toi day chua?");
+                if (phoneNumber != null) {
                     bookings = bookingService.getBookingsByPhone(pageNo, pageSize, phoneNumber);
-                    System.out.println("test" + bookings);
                 } else {
                     bookings = bookingService.getBookings(pageNo, pageSize);
                 }
