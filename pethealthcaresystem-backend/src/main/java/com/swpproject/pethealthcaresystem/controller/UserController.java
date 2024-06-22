@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.HashMap;
 import java.util.List;
@@ -57,6 +58,7 @@ public class UserController {
         }
 
     }
+
     @PostMapping("/register-gg")
     public ResponseEntity<ResponseData> registerWithGG(@RequestBody User user, HttpSession session) {
         try {
@@ -75,6 +77,7 @@ public class UserController {
 
         }
     }
+
     @PutMapping("/update-user-by-admin/{id}")
     public ResponseEntity<ResponseData> updateUserByAdmin(@RequestBody User user, @PathVariable int id) {
         User updateUser = userService.updateUser(user, id);
@@ -88,6 +91,7 @@ public class UserController {
         responseData.setStatusCode(200);
         return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
+
     @PutMapping("/delete-user-by-admin/{id}")
     public ResponseEntity<ResponseData<User>> deleteUserByAdmin(@PathVariable(name = "id") int id) {
         ResponseData<User> responseData = new ResponseData<>();
@@ -169,6 +173,13 @@ public class UserController {
     @GetMapping("/getuser")
     public User getUser(HttpSession session) {
         User curUser = (User) session.getAttribute("user");
+        try {
+            if (curUser == null) {
+                throw new Exception("You need login first");
+            }
+        } catch (Exception e) {
+            return null;
+        }
         return userService.getUserByEmail(curUser);
     }
 
@@ -189,8 +200,20 @@ public class UserController {
     }
 
     @GetMapping("/vets")
-    public List<User> getVets() {
-        return userService.getVets();
+    public Map<String, Object> getVets(HttpSession session) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            User curUser = (User) session.getAttribute("user");
+            if (curUser == null) {
+                throw new Exception("You need login first");
+            }
+            List<User> vets = userService.getVets();
+            response.put("vets", vets);
+            response.put("message", "Successfully");
+        } catch (Exception e) {
+            response.put("message", e.getMessage());
+        }
+        return response;
     }
 
     @PutMapping("/updateuser")
@@ -198,19 +221,24 @@ public class UserController {
         User curUser = (User) session.getAttribute("user");
         if (curUser != null) {
             session.setAttribute("user", curUser);
-           return userService.updateUser(curUser.getEmail(), newUserProfile);
+            return userService.updateUser(curUser.getEmail(), newUserProfile);
         }
         throw new Exception("You need login first");
     }
 
-    @PostMapping("/createAnonymousUserByStaff")
-    public ResponseEntity<User> createAnonymousUser(@RequestBody User newUser, HttpSession session) throws Exception {
-        User curUser = (User) session.getAttribute("user");
-        if (curUser != null) {
-            User user = userService.createAnonymousUser(newUser.getPhoneNumber(), newUser.getFullName(), newUser.getGender());
-            return ResponseEntity.ok(user);
+    @PostMapping("/upload-avatar")
+    public ResponseEntity<String> uploadAvatar(@RequestParam("file") MultipartFile file, HttpSession session) {
+        User currentUser = (User) session.getAttribute("user");
+        if (currentUser == null) {
+            return new ResponseEntity<>("User not logged in", HttpStatus.UNAUTHORIZED);
         }
-        throw new Exception("You need login first");
+
+        try {
+            String avatarUrl = userService.saveAvatar(file, currentUser.getUserId());
+            return new ResponseEntity<>(avatarUrl, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
     @GetMapping("find-user-with-email")
     public ResponseEntity<ResponseData> findUserWithEmail(@RequestParam String email) {

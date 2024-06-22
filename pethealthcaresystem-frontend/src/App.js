@@ -18,7 +18,6 @@ import Dashboard from './services/Dashboard';
 import Verify from './services/Verify';
 import CreateShift from './services/CreateShift';
 // import CreateAccount from './services/CreateAccount';
-import CreateAccountByStaff from './services/CreateAccountByStaff';
 import CreatePetByStaff from './services/CreatePetByStaff';
 // import ListAccount from './services/ListAccount';
 // import EditAccount from './services/EditAccount';
@@ -29,7 +28,6 @@ import EditCage from './services/EditCage';
 import PaymentResult from './services/Booking/PaymentResult';
 import StaffBooking from './services/Booking/StaffBooking';
 import ViewHospitalization from './services/ViewHospitalization';
-import UserAnonymous from './services/UserAnomyous';
 import Reservation from './services/Booking/Reservation';
 import AccountPage from './pages/Account';
 import BookingHistory from './services/Booking/BookingHistory'
@@ -73,9 +71,7 @@ function App() {
               <Route path="/assign-schedules" element={<AssignVetSchedules />} />
               <Route path='/payment-result' element={<PaymentResult />} />
               <Route path="/hospitalization-detail/:id" element={<ViewHospitalization />} />
-              <Route path="/create-account-by-staff" element={<CreateAccountByStaff />} />
               <Route path="/create-pet-by-staff" element={<CreatePetByStaff />} />
-              <Route path="/create-anomyous-user" element={<UserAnonymous />} />
               <Route path="/reservation" element={<Reservation />} />
               <Route path='/booking-history' element={<BookingHistory />} />
               <Route path="/medicine" element={<Medicine />} />

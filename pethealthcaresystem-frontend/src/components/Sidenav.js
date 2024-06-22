@@ -12,7 +12,12 @@ export default function Sidenav() {
   const getUser = async () => {
     try {
       const result = await axios.get(`http://localhost:8080/getuser`, { withCredentials: true });
-      setUser(result.data);
+      if (result.data !== '') {
+        setUser(result.data);
+      } else {
+        localStorage.removeItem('isLoggedIn');
+        localStorage.removeItem('roleId')
+      }
     } catch (error) {
       localStorage.removeItem('isLoggedIn');
       localStorage.removeItem('roleId')
@@ -33,12 +38,8 @@ export default function Sidenav() {
   };
 
   useEffect(() => {
-    if (isLoggedIn) {
-      getUser();
-    } else {
-      setUser(null);
-    }
-  }, [isLoggedIn]);
+    getUser()
+  }, []);
 
   let links = [];
 
@@ -70,7 +71,7 @@ export default function Sidenav() {
         { name: 'Cages', path: '/cages', icon: 'fas fa-warehouse' },
         { name: 'Booking Appointments', path: '/staffBooking', icon: 'fas fa-calendar-check' },
         { name: 'Assign Vet\'s Work Schedules', path: '/assign-schedules', icon: 'fas fa-clipboard-list' },
-        { name: 'Anomyous User', path: '/create-anomyous-user', icon: 'fa-solid fa-user' },
+        { name: 'Pet For Customer', path: '/create-pet-by-staff', icon: 'fas fa-paw' },
         { name: 'Booking History', path: 'booking-history', icon: 'fa fa-history' },
         { name: 'Medicine', path: '/medicine', icon: 'fas fa-clipboard-list' },
         { name: 'Logout', path: '/login', icon: 'fas fa-sign-out-alt', onClick: handleLogout },
@@ -98,7 +99,7 @@ export default function Sidenav() {
   return (
     <div className="sidenav" style={{ background: 'teal' }}>
       <div className="sidenav-header">
-        <img src="assets/logoPetCare.png" alt="Logo" className="logo rounded-circle " />
+        <img src="logoApp.svg" alt="Logo" className="logo rounded-circle " style={{background: 'white'}}/>
         <h5 style={{ color: 'white' }}>Pet Health Care</h5>
       </div>
       <ul>

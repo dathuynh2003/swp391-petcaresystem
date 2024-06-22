@@ -28,4 +28,5 @@ public interface IUserService {
     @Transactional
     User createAnonymousUser(String phoneNumber, String fullName, String gender);
     Page<User> getAllUsers(int pageNo, int pageSize);
+    User createOrGetAnonymousUser(String phoneNumber, String fullName);
 }

@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -27,7 +28,15 @@ public class ShiftService implements IShiftService {
     @Override
     @Transactional(readOnly = true)
     public List<Shift> getAllShifts() {
-        return shiftRepository.findAll();
+        List<Shift> shifts = shiftRepository.findAll();
+        for (Shift shift : shifts) {
+            Set<VetShiftDetail> vetShiftDetails = shift.getVetShiftDetails();
+            if (vetShiftDetails != null)
+                for (VetShiftDetail vetShiftDetail : vetShiftDetails) {
+                    vetShiftDetail.setBookings(null);
+                }
+        }
+        return shifts;
     }
 
     @Override
@@ -45,7 +54,11 @@ public class ShiftService implements IShiftService {
     @Override
     @Transactional(readOnly = true)
     public List<VetShiftDetail> getAllShiftDetails() {
-        return vetShiftDetailRepository.findAll();
+        List<VetShiftDetail> vetShiftDetails = vetShiftDetailRepository.findAll();
+        for (VetShiftDetail vetShiftDetail : vetShiftDetails) {
+            vetShiftDetail.setBookings(null);
+        }
+        return vetShiftDetails;
     }
 
     @Override

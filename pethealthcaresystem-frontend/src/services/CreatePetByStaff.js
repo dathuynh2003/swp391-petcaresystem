@@ -28,21 +28,23 @@ export default function CreatePetByStaff() {
         isNeutered: '',
         description: '',
         owner: {
-            phoneNumber: ''
+            phoneNumber: '',
+            fullName: '',
+            gender: ''
         }
     });
 
     const callAPI = async () => {
         try {
-            const request = { ...pet };
-            if (request.name === '' || request.petType === '' || request.gender === '') {
-                toast.info("Please enter Pet's name, type, gender required");
+            const petRequest = { ...pet };
+
+            if (petRequest.owner.fullName === '' || petRequest.name === '' || petRequest.petType === '' || petRequest.gender === '') {
+                toast.info("Please enter required fields for both account and pet.");
                 return;
             }
-            console.log(request);
-            const response = await axios.post('http://localhost:8080/createForAnonymous', request, { withCredentials: true });
-            console.log(response.data);
-            toast.success('Add new pet successfully!', 2000);
+
+            const response = await axios.post('http://localhost:8080/createForAnonymous', petRequest, { withCredentials: true });
+            toast.success('Add new pet and account successfully!', 2000);
 
             setTimeout(() => {
                 navigate('/');
@@ -50,7 +52,7 @@ export default function CreatePetByStaff() {
         } catch (error) {
             if (error.response) {
                 console.error('Error response from server:', error.response.data);
-                alert(error.response.data.message); // Hiển thị thông điệp lỗi từ phía backend
+                alert(error.response.data.message); // Display error message from backend
             } else {
                 console.error('Error calling API:', error);
             }
@@ -68,10 +70,11 @@ export default function CreatePetByStaff() {
         setPet((prev) => ({ ...prev, breed: select }));
     };
 
-    const handleOwnerInputChange = (e) => {
+    const handlePetInputChange = (e) => {
         const { name, value } = e.target;
         setPet((prev) => ({
             ...prev,
+            [name]: value,
             owner: {
                 ...prev.owner,
                 [name]: value
@@ -85,32 +88,45 @@ export default function CreatePetByStaff() {
 
     return (
         <div>
-
             <div className="container">
                 <div className="col-md-6 offset-md-3 border rounded p-4 mt-2 shadow">
-                    <h2 className="text-center m-4">Add new Pet</h2>
-                    {/* <form > */}
-
-                    <input
-                        value={pet.owner.phoneNumber}
-                        onChange={handleOwnerInputChange}
-                        type="text"
-                        className="form-control"
-                        id="phoneNumber"
-                        name="phoneNumber"
-                        placeholder="Enter Owner's Phone Number"
-                        required
-                    />
+                    <h2 className="text-center m-4">Add new Pet for Customer</h2>
 
                     <div className="form-floating mb-3">
                         <input
-                            value={pet?.name}
-                            onChange={(e) => {
-                                setPet((prev) => ({ ...prev, name: e.target.value }));
-                            }}
+                            value={pet.owner.fullName}
+                            onChange={handlePetInputChange}
+                            type="text"
+                            className="form-control"
+                            id="fullName"
+                            name="fullName"
+                            placeholder="Enter Full Name"
+                            required
+                        />
+                        <label htmlFor="fullName">Enter Customer's name</label>
+                    </div>
+                    <div className="form-floating mb-3">
+                        <input
+                            value={pet.owner.phoneNumber}
+                            onChange={handlePetInputChange}
+                            type="text"
+                            className="form-control"
+                            id="phoneNumber"
+                            name="phoneNumber"
+                            placeholder="Enter Owner's Phone Number"
+                            required
+                        />
+                        <label htmlFor="fullName">Enter Customer's phone number</label>
+                    </div>
+
+                    <div className="form-floating mb-3">
+                        <input
+                            value={pet.name}
+                            onChange={handlePetInputChange}
                             type="text"
                             className="form-control"
                             id="name"
+                            name="name"
                             placeholder="Enter Pet's name"
                             required
                         />
@@ -142,7 +158,7 @@ export default function CreatePetByStaff() {
 
                     <div className="mb-3" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                         <div>
-                            <p className="">Sex</p>
+                            {/* <p className="">Sex</p> */}
                             <RadioCard
                                 options={['Male', 'Female']}
                                 bg={'green'}
@@ -191,20 +207,19 @@ export default function CreatePetByStaff() {
 
                     <div className="form-floating mb-3">
                         <input
-                            value={pet?.description}
-                            onChange={(e) => {
-                                setPet((prev) => ({ ...prev, description: e.target.value }));
-                            }}
+                            value={pet.description}
+                            onChange={handlePetInputChange}
                             type="text"
                             className="form-control"
                             id="description"
+                            name="description"
                             placeholder="Enter Pet's description"
                         />
                         <label htmlFor="description">Enter Pet's description</label>
                     </div>
                     <ToastContainer />
                     <div className="text-center">
-                        <button className="btn btn-outline-primary" onClick={() => callAPI()}>
+                        <button className="btn btn-outline-primary" onClick={callAPI}>
                             Save
                         </button>
 
@@ -212,8 +227,6 @@ export default function CreatePetByStaff() {
                             Cancel
                         </Link>
                     </div>
-
-                    {/* </form> */}
                 </div>
             </div>
         </div>

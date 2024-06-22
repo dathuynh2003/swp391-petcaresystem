@@ -57,9 +57,9 @@ export default function Services() {
 
 
   return (
-    <div className='container'>
-      <h2 className='text-center mb-4 mt-4'><b>Our services</b></h2>
-      <div className='row mx-auto mb-3'>
+    <div className='container' style={{marginBottom: '0px !important'}}>
+      <h2 className='text-center mb-9 mt-4'><b>Our services</b></h2>
+      <div className='row mx-auto mb-3 mt-4' style={{marginBottom: '0px'}}>
         {
           services?.map((service, index) => (
             <div key={index} className="col-md-3 mb-4 focus-ring"
@@ -79,8 +79,8 @@ export default function Services() {
       </div>
 
 
-      <div className=''>
-        <ReactPaginate
+      <div className='mt-4 mb-0' style={{marginBottom: '0px'}}>
+        <ReactPaginate className=''
           previousLabel={'Previous'}
           nextLabel={'Next'}
           breakLabel={'...'}

@@ -9,6 +9,7 @@
 
 .sidenav {
   width: 200px;
+  
   background-color: #f8f9fa;
   padding: 20px;
   height: 100vh;
@@ -57,6 +58,9 @@
 }
 
 .navbar {
+
+/* moi sua */
+
   width: calc(100% - 200px);
 
   background-color: rgb(80, 200, 180); /* Ensure the background color is consistent */
@@ -82,6 +86,9 @@
 .content {
  /* Adjust width to avoid overflow */
  width: calc(100% - 120px); 
+ /* moi sua */
+  
+
 
   margin-left: 120px; 
   /* Accounts for the sidebar width */

@@ -340,6 +340,7 @@ export default function Booking() {
                                         className="col-6 mx-auto my-3"
                                         placeholder="Enter owner's phone number"
                                         value={phone}
+                                        type='number'
                                         onChange={(e) => setPhone(e.target.value)}
                                     />
                                     <Button className="col-3 mx-auto my-3" colorScheme="teal" onClick={loadPets}>
@@ -362,7 +363,7 @@ export default function Booking() {
                                                 {pet.petType === 'Dog' && (
                                                     <img
                                                         className="rounded-circle"
-                                                        src=""
+                                                        src={`http://localhost:8080${pet.avatar}`}
                                                         alt="DogImg"
                                                         style={{
                                                             position: 'absolute',
