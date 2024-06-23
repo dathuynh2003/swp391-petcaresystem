@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { Tab, TabList, Tabs, TabPanel, TabPanels, Button, Textarea } from '@chakra-ui/react';
 import axios from 'axios'
 import { ToastContainer, toast } from 'react-toastify';
@@ -45,11 +45,7 @@ export default function ViewPet() {
         setPet(response.data)
         setMedicalRecord((prev) => ({ ...prev, pet: response.data }))
         setHospitalizations(response.data.hospitalizations)
-        console.log(response.data)
-    }
-
-    const handleViewHospitalization = async (id) => {
-        navigate(`/hospitalization-detail/${id}`)
+        // console.log(response.data)
     }
 
     const handleHospitalize = async () => {
@@ -67,7 +63,7 @@ export default function ViewPet() {
                 }, 2000);
             } else {
                 toast.warning(response.data.message)
-                console.log(response.data.message)
+                // console.log(response.data.message)
             }
         } catch (e) {
             toast.error(e.message)
@@ -95,38 +91,6 @@ export default function ViewPet() {
                 navigate('/404page')
             }, 2000);
         }
-    }
-
-    //Tuần 7 làm!
-    const { isOpen: isOpenHospPayment, onOpen: onOpenHospPayment, onClose: onCloseHospPayment } = useDisclosure();
-    const handlePayment = async (hospitalizationId) => {
-        try {
-            const payment = {
-                paymentType: 'Credit Card',
-                amount: null,
-                paymentDate: "",
-                status: 'Pending'
-            };
-
-        } catch (e) {
-            toast.error(e.message)
-        }
-        // try {
-        //     const response = await axios.put(`http://localhost:8080/hospitalization/payment/${hospitalizationId}`, {}, { withCredentials: true })
-        //     if (response.data.message === 'Discharged pet successfully') {
-        //         toast.success(response.data.message)
-        //         setTimeout(() => {
-        //             window.location.reload()
-        //         }, 2000);
-        //     } else {
-        //         toast.warning(response.data.message)
-        //     }
-        // } catch (e) {
-        //     toast.error(e.message)
-        //     setTimeout(() => {
-        //         navigate('/404page')
-        //     }, 2000);
-        // }
     }
 
     useEffect(() => {
@@ -173,9 +137,9 @@ export default function ViewPet() {
         vetNote: '',
         quantity: 0
     })
-    console.log(prescription);
-    console.log("list chọn");
-    console.log(listSelectedMedicines);
+    // console.log(prescription);
+    // console.log("list chọn");
+    // console.log(listSelectedMedicines);
     const [displayMapMedicine, setDisplayMapMedicine] = useState(false)
     const [medicalRecord, setMedicalRecord] = useState({
         pet: {},
@@ -232,7 +196,7 @@ export default function ViewPet() {
     const [medicalRecords, setMedicalRecords] = useState([])
     const loadMedicalRecord = async () => {
         const response = await axios.get(`http://localhost:8080/medicalRecord/getById/${petId}`, { withCredentials: true })
-        console.log(response.data);
+        // console.log(response.data);
         response.data.sort((a, b) => new Date(b.date) - new Date(a.date))
         setMedicalRecords(response.data)
     }
@@ -343,28 +307,62 @@ export default function ViewPet() {
         }, {});
     };
     let amountHosp = null
-    const [qrCode, setQrCode] = useState('')
-    const [checkoutUrl, setCheckoutUrl] = useState('')
-    const displayQrCode = async (hospitalization) => {
+    const handleHospPayment = async (hospitalization) => {
         const payment =
         {
-            "paymentType": "Credit Card",
-            "amount": amountHosp
-            // "hospitaliztion": hospitalization
+            paymentType: "Credit Card",
+            amount: amountHosp
         }
+
         try {
-            const response = await axios.post(`http://localhost:8080/hospitalization/payment/create`, payment, { withCredentials: true });
-            if (response.data.message === 'Payment created successfully') {
-                setQrCode(response.data.result.data.qrCode)
-                setCheckoutUrl(response.data.result.data.checkoutUrl)
-                toast.success('Payment created successfully')
+            const response = await axios.post(`http://localhost:8080/generate-payment/hospitalization/${hospitalization.id}`, payment, { withCredentials: true });
+            if (response.data.result.desc === 'success') {
+                const checkoutURL = response.data.result.data.checkoutUrl
+                window.location.href = checkoutURL
             } else {
-                toast.warning(response.data.message)
+                toast.warning("Cannot generate payment")
             }
         } catch (e) {
             toast.error(e.message)
         }
     }
+    function useQuery() {
+        const { search } = useLocation();
+        return React.useMemo(() => new URLSearchParams(search), [search]);
+    }
+    const location = useLocation();
+    let query = useQuery();
+    let status = query.get("status");
+    let orderCode = query.get("orderCode");
+
+    useEffect(() => {
+        const handleHospPaymentUpdate = async () => {
+            try {
+                if (status === 'CANCELLED') {
+                    const petId = location.pathname.split('/').pop(); //Lấy petId từ URL
+                    navigate(`/viewPet/${petId}`)//Navigate lại để ẩn thông tin trả về của PayOs
+                    toast.info("Payment failed");
+                }
+                if (status === "PAID") {
+                    const paymentType = "Credit Card"
+                    const response = await axios.put(`http://localhost:8080/update-payment/${orderCode}`, { paymentType, status }, { withCredentials: true });
+                    if (response.data.message === 'Payment updated successfully') {
+                        const petId = location.pathname.split('/').pop(); //Lấy petId từ URL
+                        navigate(`/viewPet/${petId}`)//Navigate lại để ẩn thông tin trả về của PayOs
+                        toast.success("Payment success");
+                    }
+                }
+            } catch (error) {
+                console.error('Error updating payment:', error);
+                toast.error('Error updating payment');
+            }
+        };
+
+        if (status && orderCode) {
+            handleHospPaymentUpdate();
+        }
+
+    }, [status, orderCode]); // Đặt dependency là status để useEffect chạy lại khi status thay đổi
 
     return (
         <div>
@@ -436,8 +434,10 @@ export default function ViewPet() {
                                     pet?.hospitalizations?.some(admitPet => admitPet?.status === "pending") ? (
                                         <Link
                                             className='btn btn-warning col-md-12'
-                                            onClick={() => handlePayment(hospitalizations
-                                                .find(hospitalization => hospitalization.status === "admitted").id)}
+                                            onClick={() => {
+                                                handleHospPayment(hospitalizations
+                                                    .find(hospitalization => hospitalization.status === "pending"))
+                                            }}
                                         >
                                             Payment
                                         </Link>
@@ -458,8 +458,8 @@ export default function ViewPet() {
                                         pet?.hospitalizations?.some(admitPet => admitPet?.status === "pending") ? (
                                             <Link
                                                 className='btn btn-warning col-md-12'
-                                                onClick={() => handlePayment(hospitalizations
-                                                    .find(hospitalization => hospitalization.status === "admitted").id)}
+                                                onClick={() => handleHospPayment(hospitalizations
+                                                    .find(hospitalization => hospitalization.status === "pending"))}
                                             >
                                                 Waiting Payment
                                             </Link>
@@ -906,11 +906,9 @@ export default function ViewPet() {
                                 // Tính toán thời gian chênh lệch trong giờ
                                 //Số ms chênh lệch / số ms trong 1h = số giờ
                                 const timeDifference = Math.ceil((dischargeDate - admissionDate) / (1000 * 60 * 60));
-                                console.log(timeDifference)
                                 const hospFee = (timeDifference >= 0) ? timeDifference * hospitalization?.cage?.price : 0
                                 const amount = (hospitalization?.hospitalizationDetails
                                     ?.reduce((accumulator, curDetail) => accumulator + (curDetail?.price * curDetail?.dosage), 0) + hospFee)
-                                    .toLocaleString('vi-Vn')
                                 hospitalization?.status === 'pending' && (amountHosp = amount)
 
                                 return (
@@ -1031,36 +1029,15 @@ export default function ViewPet() {
                                                         </Modal>
                                                     </FormControl>
                                                 }
-                                                {hospitalization?.status === 'pending' &&
+                                                {hospitalization.status === 'pending' &&
                                                     <FormControl className='d-flex justify-content-end'>
                                                         {roleId === '1' &&
-                                                            <>
-                                                                <Button colorScheme="yellow" onClick={() => { onOpenHospPayment(); displayQrCode(hospitalization) }}>
-                                                                    Payment
-                                                                </Button>
-                                                                <Modal
-                                                                    isOpen={isOpenHospPayment} onClose={onCloseHospPayment}
-                                                                >
-                                                                    <ModalOverlay />
-                                                                    <ModalContent>
-                                                                        <ModalHeader className='text-center'>Please pay using the QR code below</ModalHeader>
-                                                                        <ModalCloseButton />
-                                                                        <ModalBody>
-                                                                            <QRCode
-                                                                                className='mx-auto w-100 h-100'
-                                                                                value={qrCode}
-                                                                            />
-                                                                        </ModalBody>
-
-                                                                        <ModalFooter>
-                                                                            <Button colorScheme='blue' mr={3} onClick={onCloseHospPayment}>
-                                                                                Close
-                                                                            </Button>
-                                                                        </ModalFooter>
-                                                                    </ModalContent>
-                                                                </Modal>
-
-                                                            </>
+                                                            <Button
+                                                                colorScheme="yellow"
+                                                                onClick={() => { handleHospPayment(hospitalization) }}
+                                                            >
+                                                                Payment
+                                                            </Button>
                                                         }
                                                     </FormControl>
                                                 }
@@ -1216,37 +1193,9 @@ export default function ViewPet() {
                                                     <div className='col-1'></div>
                                                     <div className='col-2 text-end'>Total: </div>
                                                     <div className='col-2 text-end'>
-                                                        {amount} VND
+                                                        {amount.toLocaleString('vi-Vn')} VND
                                                     </div>
                                                 </FormControl>
-                                                {hospitalization?.status === 'discharged' &&
-                                                    <>
-                                                        <FormControl className='mt-5 d-flex justify-content-around'>
-                                                            <div className='col-4'></div>
-                                                            <div className='fw-bold'>Please pay using the QR code below</div>
-                                                        </FormControl>
-                                                        <FormControl className='mb-3 d-flex justify-content-around'>
-                                                            {/* <div width={'13%'} className='text-center text-danger fw-bold'>Discharged</div> */}
-                                                            <div
-                                                                className='my-auto'
-                                                                style={{ width: '250px', height: '100px' }}
-                                                            >
-                                                                <img
-                                                                    src='https://thumbs.dreamstime.com/b/discharged-grunge-rubber-stamp-white-background-vector-illustration-discharged-grunge-rubber-stamp-281786398.jpg'
-                                                                    alt='discharged'
-                                                                    className='w-100 h-100'
-                                                                    style={{ objectFit: 'cover' }}
-                                                                />
-                                                            </div>
-                                                            <div
-                                                                className=''
-                                                                style={{ width: '250px', height: '250px' }}
-                                                            >
-                                                                <QRCode value={'e9fdc30c7f1488ef04d80e72ba09470f2c41d8a96231b5fe28d0a50fb71e37c3'} />
-                                                            </div>
-                                                        </FormControl>
-                                                    </>
-                                                }
                                             </div>
                                         </AccordionPanel>
                                     </AccordionItem>
