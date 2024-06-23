@@ -15,7 +15,14 @@ import {
   ModalBody,
   ModalCloseButton,
   Button,
-  useDisclosure
+  Table,
+  Tbody,
+  Tr,
+  Td,
+  useDisclosure,
+  Flex,
+  Grid,
+  GridItem
 } from '@chakra-ui/react';
 import { parseISO, format } from 'date-fns';
 
@@ -94,41 +101,74 @@ export default function PaymentResult() {
   };
 
   const renderBookingInfo = (booking) => {
-    console.log('Booking Amount:', booking.amount); // Log booking.amount before formatting
+    console.log('Booking Amount:', booking.totalAmount); // Log booking.amount before formatting
 
     return (
-      <Box>
-        <Text mb={3}><b>Booking ID:</b> {booking.id}</Text>
-        <Text mb={3}><b>Booking Date:</b> {formatDateTime(booking.bookingDate)}</Text>
-        <Text mb={3}><b>Appointment Date:</b> {formatDateTime(booking.vetShiftDetail.date)} ({booking.vetShiftDetail.shift.from_time} - {booking.vetShiftDetail.shift.to_time})</Text>
-        <Text mb={3}><b>Status:</b> {booking.status}</Text>
-        <Text mb={3}><b>Total Amount:</b> {formatCurrency(booking.totalAmount)}</Text>
-        <Text mb={3}><b>Description:</b> {booking.description}</Text>
-
-        <Heading as="h4" size="md" mt={4} mb={3}>User Information</Heading>
-        <Text mb={3}><b>Full Name:</b> {booking.user.fullName}</Text>
-        <Text mb={3}><b>Email:</b> {booking.user.email}</Text>
-        <Text mb={3}><b>Phone Number:</b> {booking.user.phoneNumber}</Text>
-        <Text mb={3}><b>Address:</b> {booking.user.address}</Text>
-
-        <Heading as="h4" size="md" mt={4} mb={3}>Pet Information</Heading>
-        <Text mb={3}><b>Pet Name:</b> {booking.pet.name}</Text>
-      </Box>
+      <Grid templateColumns="repeat(2, 1fr)" gap={6}>
+        <GridItem>
+          <Heading as="h4" size="md" mb={4} >Booking Information</Heading>
+          <Box mb={3}>
+            <Text fontWeight="bold">Booking ID: {booking.id}</Text>
+            {/* <Text>{booking.id}</Text> */}
+          </Box>
+          <Box mb={3}>
+            <Text fontWeight="bold">Booking Date: {formatDateTime(booking.bookingDate)}</Text>
+          </Box>
+          <Box mb={3}>
+            <Text fontWeight="bold">Appointment Date: {formatDateTime(booking.vetShiftDetail.date)}</Text>
+            <Text fontWeight="bold"> Slot: {booking.vetShiftDetail.shift.from_time} - {booking.vetShiftDetail.shift.to_time}</Text>
+          </Box>
+          <Box mb={3}>
+          
+            <Text fontWeight="bold"
+            color={booking.status === 'CANCELLED' ? 'red.500' : booking.status === 'PAID' ? 'green.500' : 'black'}>
+              Status: {booking.status}
+            </Text>
+            {/* <Text>{booking.status}</Text> */}
+          </Box>
+          <Box mb={3}>
+            <Text fontWeight="bold">Total Amount: {formatCurrency(booking.totalAmount)}</Text>
+          </Box>
+          <Box mb={3}>
+            <Text fontWeight="bold">Description:</Text>
+            <Text>{booking.description}</Text>
+          </Box>
+        </GridItem>
+        <GridItem>
+          <Heading as="h4" size="md" mb={4}>User Information</Heading>
+          <Box mb={3}>
+            <Text fontWeight="bold">Full Name: {booking.user.fullName}</Text>
+          </Box>
+          <Box mb={3}>
+            <Text fontWeight="bold">Email: {booking.user.email}</Text>
+          </Box>
+          <Box mb={3}>
+            <Text fontWeight="bold">Phone Number: {booking.user.phoneNumber}</Text>
+          </Box>
+          <Box mb={3}>
+            <Text fontWeight="bold">Address: {booking.user.address}</Text>
+          </Box>
+          <Heading as="h4" size="md" mt={6} mb={4}>Pet Information</Heading>
+          <Box mb={3}>
+            <Text fontWeight="bold">Pet Name: {booking.pet.name}</Text>
+          </Box>
+        </GridItem>
+      </Grid>
     );
   };
 
   return (
     <Fragment>
       {payment && (
-        <Modal isOpen={isOpen} onClose={handleClose} size="xl">
+        <Modal isOpen={isOpen} onClose={handleClose} size="2xl">
           <ModalOverlay />
           <ModalContent>
             <ModalHeader>
               {payment.status === 'CANCELLED' && (
-                <Text color="red.500">Payment CANCELLED</Text>
+                <Text color="red.500" textAlign="center">Payment CANCELLED</Text>
               )}
               {payment.status === 'PAID' && (
-                <Text color="green.500">Payment PAID</Text>
+                <Text color="green.500" textAlign="center">Payment PAID</Text>
               )}
             </ModalHeader>
             <ModalCloseButton />

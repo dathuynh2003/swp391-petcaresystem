@@ -28,7 +28,13 @@ import {
     useDisclosure,
     VStack,
     Badge,
+    Select,
+    Flex
 } from '@chakra-ui/react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { format, parseISO } from 'date-fns';
+
+import { faUser, faPaw, faXRay } from '@fortawesome/free-solid-svg-icons';
 import { SearchIcon } from '@chakra-ui/icons';
 
 const BookingHistory = () => {
@@ -40,6 +46,9 @@ const BookingHistory = () => {
     const [totalPages, setTotalPages] = useState(1);
     const [phoneNumber, setPhoneNumber] = useState('');
     const [loading, setLoading] = useState(false);
+    const [status, setStatus] = useState('');
+    const [fromDate, setFromDate] = useState('');
+    const [toDate, setToDate] = useState('');
 
     const { isOpen, onOpen, onClose } = useDisclosure();
 
@@ -47,7 +56,7 @@ const BookingHistory = () => {
 
     useEffect(() => {
         fetchBookings();
-    }, [currentPage]);
+    }, [currentPage, fromDate, toDate, status]);
 
     const fetchBookings = async () => {
         setLoading(true);
@@ -56,11 +65,19 @@ const BookingHistory = () => {
             if (phoneNumber) {
                 url += `&phoneNumber=${phoneNumber}`;
             }
+            if (status) {
+                url = `http://localhost:8080/staff-bookings-status/${status}?pageNo=${currentPage}&pageSize=${pageSize}`;
+            }
+            if (fromDate && toDate) {
+                console.log(fromDate)
+                console.log(toDate)
+                url = 
+                `http://localhost:8080/staff-bookings-date?fromDate=${fromDate}&toDate=${toDate}&pageNo=${currentPage}&pageSize=${pageSize}`;
+            }
             const response = await axios.get(url, { withCredentials: true });
             const { content, totalPages } = response.data.data;
             setBookings(content);
             setTotalPages(totalPages);
-            setError(null);
         } catch (error) {
             console.error("Error fetching bookings:", error);
             setError("Error fetching bookings. Please try again later.");
@@ -107,13 +124,21 @@ const BookingHistory = () => {
     const formatPrice = (price) => {
         return Number(price).toLocaleString('vi-VN');
     };
+    const formatDateTime = (dateString) => {
+        try {
+            const date = parseISO(dateString);
+            return format(date, 'dd/MM/yyyy');
+        } catch (error) {
+            console.error('Invalid date:', dateString);
+            return 'Invalid Date';
+        }
+    };
 
     return (
         <Container maxW="container.xl" py={6}>
             {error && <Text color="red.500" mb={4}>{error}</Text>}
-
-            <VStack spacing={4} mb={6} alignItems="flex-end">
-                <FormControl>
+            <Flex justify="space-between" mb={6}>
+                <FormControl width="100px" mr={2}>
                     <InputGroup width="300px"> {/* Điều chỉnh độ rộng ở đây */}
                         <Input
                             id="phoneNumber"
@@ -130,15 +155,69 @@ const BookingHistory = () => {
                         </InputRightElement>
                     </InputGroup>
                 </FormControl>
-                {loading && <Spinner size="lg" />}
-            </VStack>
 
+                {loading && <Spinner size="lg" />}
+            </Flex>
+            <FormControl width="150px" mb={2}>
+                <Flex justify="space-between">
+                    <Flex flexDirection="column">
+                        <FormLabel htmlFor="fromDate" mt={2}>From</FormLabel>
+                        <Input
+                            type="date"
+                            id="fromDate"
+                            value={fromDate}
+                            onChange={(e) => setFromDate(e.target.value)}
+                        />
+                    </Flex>
+                    <Flex flexDirection="column">
+                        <FormLabel htmlFor="toDate" mt={2}>To</FormLabel>
+                        <Input
+                            type="date"
+                            id="toDate"
+                            value={toDate}
+                            onChange={(e) => setToDate(e.target.value)}
+                        />
+                    </Flex>
+                </Flex>
+            </FormControl>
+            <FormControl width="150px" marginTop="10px" mr={2}>
+                <Select placeholder="Status" value={status} onChange={(e) => setStatus(e.target.value)}>
+                    <option value="PENDING">Pending</option>
+                    <option value="CANCELLED">Cancelled</option>
+                    <option value="PAID">Paid</option>
+                </Select>
+            </FormControl>
+
+            {/* <FormControl width="150px" marginTop="10px">
+                <Select placeholder="Select status" value={status} onChange={(e) => setStatus(e.target.value)}>
+                    <option value="PENDING">Pending</option>
+                    <option value="CANCELLED">Cancelled</option>
+                    <option value="PAID">Paid</option>
+                </Select>
+            </FormControl> */}
+            {/* <FormControl width="150px" mb={4}>
+                <FormLabel htmlFor="fromDate">From Date</FormLabel>
+                <Input
+                    type="date"
+                    id="fromDate"
+                    value={fromDate}
+                    onChange={(e) => setFromDate(e.target.value)}
+                />
+                <FormLabel htmlFor="toDate" mt={2}>To Date</FormLabel>
+                <Input
+                    type="date"
+                    id="toDate"
+                    value={toDate}
+                    onChange={(e) => setToDate(e.target.value)}
+                />
+            </FormControl> */}
 
             <Table variant="simple">
                 <Thead>
                     <Tr>
                         <Th>BookingID</Th>
                         <Th>Appointment Date</Th>
+                        <Th>Booking Date</Th>
                         <Th>Amount</Th>
                         <Th>Status</Th>
                         <Th>Action</Th>
@@ -149,6 +228,7 @@ const BookingHistory = () => {
                         <Tr key={booking.id}>
                             <Td>B{booking.id}</Td>
                             <Td>{new Date(booking.vetShiftDetail.date).toLocaleDateString()}</Td>
+                            <Td>{formatDateTime(booking.bookingDate)}</Td>
                             <Td>{formatPrice(booking.totalAmount)} VND</Td>
                             <Td>
                                 <Badge colorScheme={
@@ -173,30 +253,42 @@ const BookingHistory = () => {
             </Box>
 
             {selectedBooking && (
-                <Modal isOpen={isOpen} onClose={closeModal}>
+                <Modal isOpen={isOpen} onClose={closeModal} size='xl'>
                     <ModalOverlay />
                     <ModalContent>
                         <ModalHeader>Booking Details #{selectedBooking.id}</ModalHeader>
                         <ModalCloseButton />
                         <ModalBody>
                             <Box mb={4}>
-                                <Text fontSize="lg" fontWeight="bold">Customer</Text>
+                                <Text fontSize="lg" fontWeight="bold">
+                                    <FontAwesomeIcon icon={faUser} style={{ marginRight: '8px' }} /> Customer
+                                </Text>
+                            </Box>
+                            <Box ml={4}>
                                 <Text><strong>Name:</strong> {selectedBooking.pet.owner.fullName}</Text>
                                 <Text><strong>Phone:</strong> {selectedBooking.pet.owner.phoneNumber}</Text>
                                 <Text><strong>Email:</strong> {selectedBooking.pet.owner.email}</Text>
                                 <Text><strong>Address:</strong> {selectedBooking.pet.owner.address}</Text>
                             </Box>
                             <Box mb={4}>
-                                <Text fontSize="lg" fontWeight="bold">Service</Text>
+                                <Text fontSize="lg" fontWeight="bold">
+                                    <FontAwesomeIcon icon={faXRay} style={{ marginRight: '8px' }} /> Service
+                                </Text>
                                 {bookingDetails.map((detail, index) => (
                                     <Box key={index} ml={4}>
                                         <Text><strong>Name:</strong> {detail.petService.nameService}</Text>
+                                        <Text><strong>Description:</strong> {detail.petService.description}</Text>
                                         <Text><strong>Price:</strong> {formatPrice(detail.petService.price)} VND</Text>
                                     </Box>
                                 ))}
                             </Box>
-                            <Box>
-                                <Text fontSize="lg" fontWeight="bold">Pet</Text>
+                            <Box mb={4}>
+                                <Text fontSize="lg" fontWeight="bold">
+                                    <FontAwesomeIcon icon={faPaw} style={{ marginRight: '8px' }} /> Pet
+                                </Text>
+                            </Box>
+                            <Box ml={4}>
+
                                 <Text><strong>Name:</strong> {selectedBooking.pet.name}</Text>
                                 <Text><strong>Type:</strong> {selectedBooking.pet.petType}</Text>
                                 <Text><strong>Gender:</strong> {selectedBooking.pet.gender}</Text>
