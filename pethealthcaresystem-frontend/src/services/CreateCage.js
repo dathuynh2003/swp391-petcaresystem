@@ -37,8 +37,11 @@ export default function CreateCage() {
         try {
             const respone = await axios.post('http://localhost:8080/createCage', cage, { withCredentials: true })
             if (respone.data.message === 'Cage created') {
-                toast.success('Add new cage successfully!', 2000);
-                navigate('/cages')
+                toast.success('Add new cage successfully!');
+                setTimeout(() => {
+                    navigate('/cages');
+                }, 2000);
+
             } else {
                 toast.warning(respone.data.message)
             }

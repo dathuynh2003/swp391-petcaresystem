@@ -40,7 +40,7 @@ const Cages = () => {
       </div>
       <div className='list-cage container'>
         {cages?.map((cage, index) => (
-          <div className='cage-index row border shadow w-100 mx-auto'  >
+          <div className='cage-index row border shadow w-100 mx-auto' key={index} >
             <div
               className="cage-avatar border border-dark my-auto mx-4 rounded-circle col-4"
               style={{ height: '65px', width: '65px', overflow: 'hidden', position: 'relative' }}
@@ -86,7 +86,7 @@ const Cages = () => {
               </div>
 
               <div
-                className="fs-6 row mt-0 w-50"
+                className="fs-6 row mt-0 w-50 fst-italic fw-medum"
                 style={{
                   whiteSpace: 'nowrap',
                   overflow: 'hidden',

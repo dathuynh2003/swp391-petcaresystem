@@ -1,17 +1,22 @@
 package com.swpproject.pethealthcaresystem.service;
 
 import com.swpproject.pethealthcaresystem.model.Cage;
+import com.swpproject.pethealthcaresystem.model.Hospitalization;
 import com.swpproject.pethealthcaresystem.model.User;
 import com.swpproject.pethealthcaresystem.repository.CageRepository;
+import com.swpproject.pethealthcaresystem.repository.HospitalizationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class CageService implements ICageService {
     @Autowired
     private CageRepository cageRepository;
+    @Autowired
+    private HospitalizationRepository hospitalizationRepository;
 
 
     @Override
@@ -64,7 +69,13 @@ public class CageService implements ICageService {
 
     @Override
     public Cage findCageById(int id) throws IllegalArgumentException {
-        return cageRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Cage not found with id:" + id));
+        Cage cage = cageRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Cage not found with id:" + id));
+        Set<Hospitalization> hospitalizations = hospitalizationRepository.findByCageOrderByIdDesc(cage);
+        for (Hospitalization hospitalization : hospitalizations) {
+            hospitalization.setCage(null);
+        }
+        cage.setHospitalizations(hospitalizations);
+        return cage;
     }
 
     @Override
