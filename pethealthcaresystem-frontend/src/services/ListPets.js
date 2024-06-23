@@ -52,7 +52,7 @@ export default function ListPets() {
         <thead className='p-4'>
           <tr >
             <th scope="col" className='p-3 text-center'>No</th>
-            <th scope="col">Avatar</th>
+            <th scope="col" className='p-3'>Avatar</th>
             <th scope="col" className='p-3'>Name</th>
             <th scope="col" className='p-3'>Type</th>
             <th scope="col" className='p-3'>Breed</th>
@@ -69,7 +69,7 @@ export default function ListPets() {
             pets.map((pet, index) => (
               <tr key={index} >
                 <td className='pl-4 text-center'>{index + 1}</td>
-                <td className="col-1">
+                <td className="col-1 p-2">
                   <img src={pet.avatar} alt={pet.name} style={{ width: '50px', height: '50px', borderRadius: '50%' }} />
                 </td>
                 <td className="col-1 p-2">{pet.name}</td>
@@ -78,7 +78,7 @@ export default function ListPets() {
                 <td className="col-1 p-2">{pet.gender}</td>
                 <td className="col-1 p-2">{pet.age}</td>
                 <td className="col-1 p-2">{pet.isNeutered ? 'Yes' : 'No'}</td>
-                <td className="col-3 p-2">{pet.description}</td>
+                <td className="col-2 p-2">{pet.description}</td>
                 <td className='col-2 text-center p-2'>
                   <Link to={`/viewPet/${pet.petId}`}>
                     <span style={{ marginRight: '20px' }} className='icon-container'>

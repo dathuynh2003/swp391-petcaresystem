@@ -1,5 +1,6 @@
 import axios from "axios";
 import React, { useState, useEffect } from "react";
+import { ToastContainer, toast } from 'react-toastify';
 
 export default function AssignVetSchedules() {
   const [vets, setVets] = useState([]);
@@ -51,12 +52,16 @@ export default function AssignVetSchedules() {
     const previousWeek = new Date(currentWeek);
     previousWeek.setDate(currentWeek.getDate() - 7);
     setCurrentWeek(previousWeek);
+    setSelectAll(false); // Reset selectAll state
+    setSelectedShifts([]); // Clear selected shifts
   };
 
   const handleNextWeek = () => {
     const nextWeek = new Date(currentWeek);
     nextWeek.setDate(currentWeek.getDate() + 7);
     setCurrentWeek(nextWeek);
+    setSelectAll(false); // Reset selectAll state
+    setSelectedShifts([]); // Clear selected shifts
   };
 
   const handleShiftChange = () => {
@@ -74,13 +79,13 @@ export default function AssignVetSchedules() {
 
     axios.put('http://localhost:8080/shifts/assign-vet', vetShiftDetails, { withCredentials: true })
       .then(response => {
-        alert('Shifts assigned successfully!');
+        toast.success('Shifts assigned successfully!');
         setSelectedShifts([]);
         fetchShiftDetails();
       })
       .catch(error => {
         console.error('Error assigning shifts:', error);
-        alert('Error assigning shifts. Please try again.');
+        toast.error('Error assigning shifts. Please try again.');
       });
   };
 
@@ -127,12 +132,12 @@ export default function AssignVetSchedules() {
       withCredentials: true
     })
       .then(response => {
-        alert('Shift unassigned successfully!');
+        toast.success('Shift unassigned successfully!');
         fetchShiftDetails();
       })
       .catch(error => {
         console.error('Error unassigning shift:', error);
-        alert('Error unassigning shift. Please try again.');
+        toast.error('Error unassigning shift. Please try again.');
       });
   };
 
@@ -154,7 +159,6 @@ export default function AssignVetSchedules() {
     <div className="container">
       <div className="row">
         <div className="col-md-12 border rounded p-4 mt-2 shadow">
-          <h2 className="text-center m-4">Assign Vet Schedules</h2>
           <div className="form-group">
             <div className="vet-selection">
               <h4 style={{ marginBottom: '10px' }}>Select Vet:</h4>
@@ -260,6 +264,9 @@ export default function AssignVetSchedules() {
                         {isPast && !isAssigned && (
                           <span className="text-muted">-</span>
                         )}
+                        {isPast && isAssigned && (
+                          <span className="text-muted">-</span>
+                        )}
                       </td>
                     );
                   })}
@@ -269,6 +276,18 @@ export default function AssignVetSchedules() {
           </table>
         </div>
       </div>
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
     </div>
   );
 }

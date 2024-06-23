@@ -169,23 +169,6 @@ public class UserService implements IUserService {
             return userRepository.findByIsActiveTrue(pageable);
     }
 
-    @Override
-    public List<User> getAllUsersByRoleId(int roleId) {
-
-        if (roleId == 0) {
-            List<User> users = userRepository.findByIsActiveTrue();
-            for (User user : users) {
-                user.setVetShiftDetails(null);
-            }
-            return users;
-        }
-        List<User> users = userRepository.findByRoleId(roleId);
-        for (User user : users) {
-            user.setVetShiftDetails(null);
-        }
-        return users;
-    }
-
     public User deleteUser(int id) {
         Optional<User> userOptional = userRepository.findById(id);
         if (userOptional.isPresent()) {

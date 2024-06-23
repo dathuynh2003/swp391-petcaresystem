@@ -13,25 +13,21 @@ import axios from 'axios';
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer, toast } from 'react-toastify';
 import { Menu, MenuButton, MenuList, MenuItemOption, MenuOptionGroup, Button } from '@chakra-ui/react';
+import { EditIcon } from '@chakra-ui/icons';
 
 export default function EditPet() {
-
-
-  let navigate = useNavigate()
+  let navigate = useNavigate();
   useEffect(() => {
     if (!localStorage.getItem('isLoggedIn')) {
-      navigate('/login')
+      navigate('/login');
     }
-    const roleId = localStorage.getItem('roleId')
+    const roleId = localStorage.getItem('roleId');
     if (roleId === 3 || roleId === 4) {
-      navigate('/404page')
+      navigate('/404page');
     }
-
-  }, [])
-
+  }, []);
 
   const { petId } = useParams();
-
 
   const [pet, setPet] = useState({
     name: '',
@@ -60,33 +56,6 @@ export default function EditPet() {
 
   const callAPI = async () => {
     try {
-      if (avatarFile) {
-        const formData = new FormData();
-        formData.append('file', avatarFile);
-
-        if (!avatarFile.type.startsWith('image/')) {
-          toast.error('Invalid file type. Please upload an image.');
-          return;
-        }
-
-        if (avatarFile.size > 10 * 1024 * 1024) { // 10MB limit
-          toast.error('File size exceeds the 10MB limit.');
-          return;
-        }
-
-        try {
-          const uploadResponse = await axios.put(`${URL}/pet/${petId}/upload-avatar`, formData, {
-            headers: {
-              'Content-Type': 'multipart/form-data',
-            },
-          });
-          pet.avatar = uploadResponse.data.avatar;
-        } catch (error) {
-          console.error('Error uploading avatar:', error);
-          return;
-        }
-      }
-
       const request = { ...pet };
       console.log(request);
       const response = await axios.put(`${URL}/pet/${petId}`, request);
@@ -102,8 +71,36 @@ export default function EditPet() {
     }
   };
 
-  const handleFileChange = (e) => {
-    setAvatarFile(e.target.files[0]);
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    setAvatarFile(file);
+
+    if (file) {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      if (!file.type.startsWith('image/')) {
+        toast.error('Invalid file type. Please upload an image.');
+        return;
+      }
+
+      if (file.size > 10 * 1024 * 1024) { // 10MB limit
+        toast.error('File size exceeds the 10MB limit.');
+        return;
+      }
+
+      try {
+        const uploadResponse = await axios.put(`${URL}/pet/${petId}/upload-avatar`, formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+        setPet((prev) => ({ ...prev, avatar: uploadResponse.data.avatar }));
+      } catch (error) {
+        console.error('Error uploading avatar:', error);
+        toast.error('Error uploading avatar.');
+      }
+    }
   };
 
   const [listBreed, setListBreed] = useState([]);
@@ -121,8 +118,18 @@ export default function EditPet() {
     <div>
       <div className="container">
         <div className="col-md-6 offset-md-3 border rounded p-4 mt-2 shadow">
-          <div className="mb-3" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-evenly' }}>
-            {avatar && <img src={pet.avatar} alt={pet.name} style={{ width: '50px', height: '50px', borderRadius: '50%' }} />}
+          <div className="mb-3" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-evenly', position: 'relative' }}>
+            {avatar && (
+              <div style={{ position: 'relative' }}>
+                <img src={pet.avatar} alt={pet.name} style={{ width: '100px', height: '100px', borderRadius: '50%' }} />
+                <div style={{ position: 'absolute', bottom: '0', right: '0', cursor: 'pointer', backgroundColor: 'white', borderRadius: '50%', padding: '5px' }}>
+                  <label htmlFor="avatar" style={{ cursor: 'pointer', color: '#000' }}>
+                    <EditIcon />
+                  </label>
+                </div>
+              </div>
+            )}
+            <input type="file" id="avatar" style={{ display: 'none' }} onChange={handleFileChange} />
             <h2 className="text-center m-4">Edit Pet's Information</h2>
           </div>
 
@@ -227,11 +234,6 @@ export default function EditPet() {
             <label htmlFor="description">Enter Pet's description</label>
           </div>
 
-          <div className="form-floating mb-3">
-            <input type="file" className="form-control" id="avatar" onChange={handleFileChange} />
-            <label htmlFor="avatar">Upload Pet's Avatar</label>
-          </div>
-
           <ToastContainer />
           <div className="text-center">
             <Button style={{ background: 'teal', color: 'white' }} onClick={() => callAPI()}>
@@ -243,6 +245,6 @@ export default function EditPet() {
           </div>
         </div>
       </div>
-    </div >
+    </div>
   );
 }

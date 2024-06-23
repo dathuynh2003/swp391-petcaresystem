@@ -77,7 +77,7 @@ function App() {
               <Route path="/medicine" element={<Medicine />} />
             </Routes >
 
-            {/* <AccountPage /> */}
+            <AccountPage />
 
 
           </Fragment>
