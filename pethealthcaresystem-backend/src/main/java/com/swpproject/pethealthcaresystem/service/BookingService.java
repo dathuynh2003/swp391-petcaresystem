@@ -92,7 +92,7 @@ public class BookingService implements IBookingService {
 
     @Override
     public Page<Booking> getBookings(Integer pageNo, Integer pageSize) {
-        Pageable pageable = PageRequest.of(pageNo - 1, pageSize);
+        Pageable pageable = PageRequest.of(pageNo - 1, pageSize, Sort.by("id").descending());
         Page<Booking> bookings = bookingRepository.findAll(pageable);
         if (bookings.isEmpty()) {
             throw new RuntimeException("Booking not found");
@@ -196,5 +196,23 @@ public class BookingService implements IBookingService {
         updatedBooking = bookingRepository.save(updatedBooking);
         return updatedBooking;
     }
+    @Override
+    public Page<Booking> getBookingsByUserAndStatus(int userId, String status, int pageNo, int pageSize) {
+        Pageable pageable = PageRequest.of(pageNo - 1, pageSize, Sort.by("id").descending());
+        return bookingRepository.findByUserUserIdAndStatus(userId, status, pageable);
+    }
 
+    @Override
+    public Page<Booking> getBookingsByStatus(String status, int pageNo, int pageSize) {
+        Pageable pageable = PageRequest.of(pageNo - 1, pageSize, Sort.by("id").descending());
+        Page<Booking> bookings = bookingRepository.findByStatus(status, pageable);
+        return bookings;
+    }
+
+    @Override
+    public Page<Booking> getBookingByBookingDate(Date fromDate,Date toDate, int pageNo, int pageSize) {
+        Pageable pageable = PageRequest.of(pageNo - 1, pageSize, Sort.by("id").descending());
+        Page<Booking> bookings = bookingRepository.findByBookingDateBetween(fromDate, toDate, pageable);
+        return bookings;
+    }
 }
