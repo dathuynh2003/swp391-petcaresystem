@@ -2,18 +2,20 @@
 
 .App {
   display: flex;
-  flex-direction: column; /* Đặt navbar nằm trên cùng */
+
+  flex-direction: column;
+  /* Đặt navbar nằm trên cùng */
   min-height: 100vh;
   overflow: hidden;
 }
 
 .sidenav {
   width: 200px;
-  
+
   background-color: #f8f9fa;
   padding: 20px;
   height: 100vh;
-  box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -54,12 +56,11 @@
 }
 
 .sidenav a:hover {
-  color:rgb(79, 209, 197);
+  color: rgb(79, 209, 197);
 }
 
 .navbar {
-
-/* moi sua */
+  /* moi sua */
 
   width: calc(100% - 200px);
 
@@ -69,7 +70,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   position: fixed;
   top: 0;
   left: 200px;
@@ -84,31 +85,30 @@
 }
 
 .content {
- /* Adjust width to avoid overflow */
- width: calc(100% - 120px); 
- /* moi sua */
-  
+  /* Adjust width to avoid overflow */
+  width: calc(100% - 120px);
+  /* moi sua */
 
-
-  margin-left: 120px; 
+  margin-left: 120px;
   /* Accounts for the sidebar width */
   box-sizing: border-box;
-  overflow-y: auto; 
-  height: calc(100vh - 60px); /* Makes the content take full viewport height minus navbar */
-  background-color: #f1f1f1;
+  overflow-y: auto;
+  /* height: calc(100vh - 60px); moi suaaa*/
+  /* Makes the content take full viewport height minus navbar */
+  /* background-color: #f1f1f1; */
+  /* background-color: red; */
+  /* height: 100%; */
 }
 
-.content1.full-screen {
+.content.full-screen {
   margin-left: 0; /* Remove the margin when sidenav is hidden */
   width: 100%; /* Adjust width to full when sidenav is hidden */
-  padding-top: 20px; /* Adjust padding for the content */
-  height: 100%; 
-  
-}
-
-
-.Home1 {
-  width: 100%;
+  /* padding-top: 20px;  */
+  /* Adjust padding for the content */
   height: 100%;
 }
 
+.Home {
+  width: 100%;
+  height: 100%;
+}

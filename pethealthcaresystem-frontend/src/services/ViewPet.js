@@ -180,7 +180,7 @@ export default function ViewPet() {
         pet: {},
         diagnosis: '',
         treatment: '',
-        vet_note: '',
+        vetNote: '',
     })
 
 
@@ -201,10 +201,13 @@ export default function ViewPet() {
     };
     const callAPI = async () => {
         console.log("day ne");
-        console.log(medicalRecord);
+        console.log(medicalRecordRequest);
         try {
+            console.log(medicalRecordRequest);
             if (medicalRecord?.diagnosis || medicalRecord?.treatment) {
+                console.log(medicalRecordRequest);
                 const response = await axios.post(`http://localhost:8080/medicalRecord/add/${petId}`, medicalRecordRequest, { withCredentials: true })
+                console.log("loi o day");
                 console.log(response.data.MedicalRecord);
                 if (response.data.MedicalRecord === null || response.data.MedicalRecord === undefined) {
                     toast.error("Add new medical record failed!")
@@ -224,7 +227,7 @@ export default function ViewPet() {
             }
 
         } catch (error) {
-            console.log(error);
+            console.log(error.message);
         }
     }
 
