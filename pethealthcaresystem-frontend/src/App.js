@@ -33,6 +33,8 @@ import AccountPage from './pages/Account';
 import BookingHistory from './services/Booking/BookingHistory'
 import { Fragment } from 'react';
 import Medicine from './services/Medicine/Medicine';
+import AuthProvider from './context/auth.context';
+import PaymentPage from './pages/Payment';
 function App() {
 
   const location = useLocation();
@@ -69,7 +71,11 @@ function App() {
               {/* <Route path='/list-account' element={<ListAccount />} /> */}
               {/* <Route path="/edit-account/:userId" element={<EditAccount />} /> */}
               <Route path="/assign-schedules" element={<AssignVetSchedules />} />
-              <Route path='/payment-result' element={<PaymentResult />} />
+              {/* <AuthProvider>
+                <Routes>
+                <Route path='/payment-result' element={<PaymentResult />} />
+                </Routes>
+              </AuthProvider> */}
               <Route path="/hospitalization-detail/:id" element={<ViewHospitalization />} />
               <Route path="/create-pet-by-staff" element={<CreatePetByStaff />} />
               <Route path="/reservation" element={<Reservation />} />
@@ -78,7 +84,7 @@ function App() {
             </Routes >
 
             <AccountPage />
-
+            <PaymentPage/>
 
           </Fragment>
         </div >

@@ -31,7 +31,7 @@ export default function PaymentResult() {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [payment, setPayment] = useState(undefined);
   const [isLoading, setIsLoading] = useState(true);
-  const navigate = useNavigate(); // useNavigate hook
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (status && orderCode) {
@@ -58,7 +58,7 @@ export default function PaymentResult() {
 
   const handleClose = () => {
     onClose();
-    navigate('/'); // Navigate to the booking page
+    navigate('/');
   };
 
   if (isLoading) {
@@ -73,32 +73,49 @@ export default function PaymentResult() {
   const formatDateTime = (dateString) => {
     try {
       const date = parseISO(dateString);
-      return format(date, 'PPPpp');
+      return format(date, 'dd/MM/yyyy');
     } catch (error) {
       console.error('Invalid date:', dateString);
       return 'Invalid Date';
     }
   };
 
-  const renderBookingInfo = (booking) => (
-    <Box>
-      <Text mb={3}><b>Booking ID:</b> {booking.id}</Text>
-      <Text mb={3}><b>Booking Date:</b> {formatDateTime(booking.bookingDate)}</Text>
-      <Text mb={3}><b>Appointment Date:</b> {formatDateTime(booking.appointmentDate)}</Text>
-      <Text mb={3}><b>Status:</b> {booking.status}</Text>
-      <Text mb={3}><b>Total Amount:</b> {booking.totalAmount.toFixed(2)} VND</Text>
-      <Text mb={3}><b>Description:</b> {booking.description}</Text>
+  const formatCurrency = (amount) => {
+    if (isNaN(amount)) {
+      console.error('Invalid amount:', amount);
+      return 'Invalid Amount';
+    }
 
-      <Heading as="h4" size="md" mt={4} mb={3}>User Information</Heading>
-      <Text mb={3}><b>Full Name:</b> {booking.user.fullName}</Text>
-      <Text mb={3}><b>Email:</b> {booking.user.email}</Text>
-      <Text mb={3}><b>Phone Number:</b> {booking.user.phoneNumber}</Text>
-      <Text mb={3}><b>Address:</b> {booking.user.address}</Text>
+    return new Intl.NumberFormat('vi-VN', {
+      style: 'currency',
+      currency: 'VND',
+      minimumFractionDigits: 0,
+    }).format(amount).replace(/\s₫$/, ' ₫');
+  };
 
-      <Heading as="h4" size="md" mt={4} mb={3}>Pet Information</Heading>
-      <Text mb={3}><b>Pet Name:</b> {booking.pet.name}</Text>
-    </Box>
-  );
+  const renderBookingInfo = (booking) => {
+    console.log('Booking Amount:', booking.amount); // Log booking.amount before formatting
+
+    return (
+      <Box>
+        <Text mb={3}><b>Booking ID:</b> {booking.id}</Text>
+        <Text mb={3}><b>Booking Date:</b> {formatDateTime(booking.bookingDate)}</Text>
+        <Text mb={3}><b>Appointment Date:</b> {formatDateTime(booking.vetShiftDetail.date)} ({booking.vetShiftDetail.shift.from_time} - {booking.vetShiftDetail.shift.to_time})</Text>
+        <Text mb={3}><b>Status:</b> {booking.status}</Text>
+        <Text mb={3}><b>Total Amount:</b> {formatCurrency(booking.totalAmount)}</Text>
+        <Text mb={3}><b>Description:</b> {booking.description}</Text>
+
+        <Heading as="h4" size="md" mt={4} mb={3}>User Information</Heading>
+        <Text mb={3}><b>Full Name:</b> {booking.user.fullName}</Text>
+        <Text mb={3}><b>Email:</b> {booking.user.email}</Text>
+        <Text mb={3}><b>Phone Number:</b> {booking.user.phoneNumber}</Text>
+        <Text mb={3}><b>Address:</b> {booking.user.address}</Text>
+
+        <Heading as="h4" size="md" mt={4} mb={3}>Pet Information</Heading>
+        <Text mb={3}><b>Pet Name:</b> {booking.pet.name}</Text>
+      </Box>
+    );
+  };
 
   return (
     <Fragment>
