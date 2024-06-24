@@ -112,14 +112,19 @@ public class UserController {
         }
     }
 
-    @GetMapping("/get-users-by-id")
-    public ResponseEntity<ResponseData<Page<User>>> getUsersById(
+    @GetMapping("/get-users-by-id/{roleId}")
+    public ResponseEntity<ResponseData<Page<User>>> getUsersByRoleId(
             @RequestParam(defaultValue = "0") int pageNo,
-            @RequestParam(defaultValue = "10") int pageSize) {
+            @RequestParam(defaultValue = "10") int pageSize,
+            @PathVariable int roleId) {
 
         try {
-            Page<User> users = userService.getAllUsers(pageNo, pageSize);
-
+            Page<User> users;
+            if (roleId == 0) {
+                users = userService.getAllUsers(pageNo, pageSize); // Assume this method exists
+            } else {
+                users = userService.getAllUsersByRoleId(pageNo, pageSize, roleId);
+            }
             ResponseData<Page<User>> responseData = new ResponseData<>();
             responseData.setData(users);
             responseData.setStatusCode(HttpStatus.OK.value());

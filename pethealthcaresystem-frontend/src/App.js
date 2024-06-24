@@ -3,7 +3,7 @@ import "../node_modules/bootstrap/dist/css/bootstrap.min.css";
 import { BrowserRouter as Router, Route, Routes, useLocation, useMatch } from 'react-router-dom';
 import Login from './services/Login';
 import Home from './pages/Home';
-import Register from './services/Register';
+import Register from './services/Register/Register';
 import Sidenav from './components/Sidenav';
 import Navbar from './components/Navbar';
 import Services from './services/PetServices/Services';
@@ -33,6 +33,9 @@ import AccountPage from './pages/Account';
 import BookingHistory from './services/Booking/BookingHistory'
 import { Fragment } from 'react';
 import Medicine from './services/Medicine/Medicine';
+import AuthProvider from './context/auth.context';
+import PaymentPage from './pages/Payment';
+import SystemConfig from './services/SystemConfig/SystemConfig';
 function App() {
 
   const location = useLocation();
@@ -52,7 +55,7 @@ function App() {
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route path="/booking" element={<Booking />} />
-              <Route path="/staffBooking" element={<StaffBooking />} />
+              <Route path="/staff-booking" element={<StaffBooking />} />
               <Route path="/createPet" element={<CreatePet />} />
               <Route path="/viewPet/:petId" element={<ViewPet />} />
               <Route path="/listPets" element={<ListPets />} />
@@ -69,16 +72,21 @@ function App() {
               {/* <Route path='/list-account' element={<ListAccount />} /> */}
               {/* <Route path="/edit-account/:userId" element={<EditAccount />} /> */}
               <Route path="/assign-schedules" element={<AssignVetSchedules />} />
-              <Route path='/payment-result' element={<PaymentResult />} />
+              {/* <AuthProvider>
+                <Routes>
+                <Route path='/payment-result' element={<PaymentResult />} />
+                </Routes>
+              </AuthProvider> */}
               <Route path="/hospitalization-detail/:id" element={<ViewHospitalization />} />
               <Route path="/create-pet-by-staff" element={<CreatePetByStaff />} />
               <Route path="/reservation" element={<Reservation />} />
               <Route path='/booking-history' element={<BookingHistory />} />
               <Route path="/medicine" element={<Medicine />} />
+              <Route path="/configuration" element={<SystemConfig />} />
             </Routes >
 
             <AccountPage />
-
+            <PaymentPage/>
 
           </Fragment>
         </div >

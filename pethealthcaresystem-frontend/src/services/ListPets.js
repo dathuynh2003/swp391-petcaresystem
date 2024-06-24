@@ -15,8 +15,6 @@ import {
 } from '@chakra-ui/react'
 import { ToastContainer, toast } from 'react-toastify'
 
-
-
 export default function ListPets() {
   const { isOpen, onOpen, onClose } = useDisclosure()
   const [pets, setPets] = useState([])
@@ -30,21 +28,16 @@ export default function ListPets() {
     loadPets()
   }, [])
 
-
-
-
   const deletePet = async (petId) => {
     try {
       const response = await axios.put(`http://localhost:8080/deletePet/${petId}`)
     } catch (error) {
       toast.error(error)
     }
-
     loadPets()
   }
 
   return (
-
     <div className='container'>
       <ToastContainer />
       <Link to={'/createPet'}><Button className='mt-4' colorScheme='teal'>Add new Pet</Button></Link>
@@ -52,7 +45,7 @@ export default function ListPets() {
         <thead className='p-4'>
           <tr >
             <th scope="col" className='p-3 text-center'>No</th>
-            <th scope="col">Avatar</th>
+            <th scope="col" className='p-3'>Avatar</th>
             <th scope="col" className='p-3'>Name</th>
             <th scope="col" className='p-3'>Type</th>
             <th scope="col" className='p-3'>Breed</th>
@@ -65,11 +58,10 @@ export default function ListPets() {
         </thead>
         <tbody className="table-group-divider p-4">
           {
-
             pets.map((pet, index) => (
               <tr key={index} >
                 <td className='pl-4 text-center'>{index + 1}</td>
-                <td className="col-1">
+                <td className="col-1 p-2">
                   <img src={pet.avatar} alt={pet.name} style={{ width: '50px', height: '50px', borderRadius: '50%' }} />
                 </td>
                 <td className="col-1 p-2">{pet.name}</td>
@@ -78,14 +70,13 @@ export default function ListPets() {
                 <td className="col-1 p-2">{pet.gender}</td>
                 <td className="col-1 p-2">{pet.age}</td>
                 <td className="col-1 p-2">{pet.isNeutered ? 'Yes' : 'No'}</td>
-                <td className="col-3 p-2">{pet.description}</td>
+                <td className="col-2 p-2">{pet.description}</td>
                 <td className='col-2 text-center p-2'>
                   <Link to={`/viewPet/${pet.petId}`}>
                     <span style={{ marginRight: '20px' }} className='icon-container'>
                       <ViewIcon style={{ color: 'teal', cursor: 'pointer' }} boxSize={'5'} />
                       <span className="icon-text">View</span>
                     </span>
-
                   </Link>
                   <Link to={`/editPet/${pet.petId}`}>
                     <span style={{ marginRight: '20px' }} className='icon-container'>
@@ -93,7 +84,6 @@ export default function ListPets() {
                       <span className="icon-text">Edit</span>
                     </span>
                   </Link>
-
                   <span className='icon-container'>
                     <DeleteIcon style={{ color: 'red', cursor: 'pointer' }} boxSize={'5'} onClick={onOpen} />
                     <span className="icon-text">Delete</span>
@@ -106,7 +96,6 @@ export default function ListPets() {
                       <ModalBody pb={6}>
                         Are you sure delete this pet?
                       </ModalBody>
-
                       <ModalFooter>
                         <Button colorScheme='red' mr={3} onClick={() => deletePet(pet.petId)}>
                           Delete
@@ -117,16 +106,13 @@ export default function ListPets() {
                   </Modal>
                 </td>
               </tr>
-
             ))
-
-
-
           }
         </tbody>
       </table>
-
-
     </div>
   )
 }
+
+
+

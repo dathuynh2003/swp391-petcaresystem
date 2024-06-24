@@ -15,8 +15,9 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     List<User> findByRoleId(int roleId);
 //    List<User> findByIsActiveTrue();
 //    List<User> findByRoleIdAndIsActiveTrue(int roleId);
-    Page<User> findByIsActiveTrue(Pageable pageable);
-    Page<User> findByRoleIdAndIsActiveTrue(int roleId, Pageable pageable);
+    Page<User> findUsersByRoleId(Pageable pageable, int roleId);
     Boolean existsByPhoneNumber(String phoneNumber);
     User findByPhoneNumber(String phoneNumber);
+    User findUserByPhoneNumber(String phoneNumber);
+
 }

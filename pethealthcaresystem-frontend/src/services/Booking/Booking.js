@@ -316,7 +316,6 @@ export default function Booking() {
     else toast.warn('Please input required information!')
   }
   const handlePaymentClick = async () => {
-    console.log(curBooking)
     const payment = {
       orderCode: booking.orderCode,
       paymentType: 'Credit Card',  // You can modify this as per your requirement
@@ -327,6 +326,7 @@ export default function Booking() {
       user: selectedPet.owner,
       booking: curBooking
     };
+    console.log(payment)
 
     try {
       const response = await axios.post('http://localhost:8080/api/payment/create', payment, { withCredentials: true });
@@ -397,7 +397,7 @@ export default function Booking() {
     <div className="container">
       <div className="row">
         <ToastContainer />
-        <Tabs className="col-8 mt-3 mx-auto shadow p-3 mb-5 bg-body rounded h-100" colorScheme="teal" index={step} >
+        <Tabs className="col-11 mt-3 mx-auto shadow p-3 mb-5 bg-body rounded h-100" colorScheme="teal" index={step} >
           <TabList className="d-flex justify-content-between" >
             <Tab>Services</Tab>
             <Tab >Choose Pet</Tab>
@@ -596,12 +596,12 @@ export default function Booking() {
             </TabPanel>
 
             <TabPanel>
-              <Tabs variant='soft-rounded' colorScheme='blue'>
-                <TabList className=''>
+              <Tabs variant='soft-rounded' colorScheme='teal'>
+                <TabList className='d-flex justify-content-center text-center'>
                   <Tab
-                    className='col-4 mx-5'
-                    _selected={{ bg: '#0D6EFD', color: 'white' }}
-                    _hover={{ bg: 'blue.600' }}
+                    className='col-4 mx-5 mt-3'
+                    _selected={{ bg: 'teal', color: 'white' }}
+                    _hover={{ bg: 'teal', color: 'white' }}
                     onClick={() => {
                       setSelectedVetShift(null);
                       setActiveShiftIndex(null);
@@ -614,9 +614,9 @@ export default function Booking() {
                     Choose Date First
                   </Tab>
                   <Tab
-                    className='col-4 mx-5'
-                    _selected={{ bg: '#0D6EFD', color: 'white' }}
-                    _hover={{ bg: 'blue.600' }}
+                    className='col-4 mx-5 mt-3'
+                    _selected={{ bg: 'teal', color: 'white' }}
+                    _hover={{ bg: 'teal', color: 'white' }}
                     onClick={() => {
                       setSelectedVetShift(null)
                       setActiveShiftIndex(null)
@@ -636,34 +636,36 @@ export default function Booking() {
                       <div className="row">
                         <div className="col-md-12 border rounded p-4 mt-2 shadow">
                           <div className="d-flex justify-content-between mb-3">
-                            <button className="btn btn-primary" onClick={handlePreviousWeek}>
+                            <Button onClick={handlePreviousWeek} style={{ background: 'teal', color: 'white' }}>
                               Previous Week
-                            </button>
-                            <button className="btn btn-primary" onClick={handleNextWeek}>
+                            </Button>
+                            <Button onClick={handleNextWeek} style={{ background: 'teal', color: 'white' }}>
                               Next Week
-                            </button>
+                            </Button>
                           </div>
-                          <div className='choose-date row'>
+                          <div className='choose-date row mt-3'>
                             {dates.map((date, index) => (
                               <Button
                                 key={index}
-                                className={`mx-auto btn btn-outline-primary fw-normal ${activeDateIndex === index ? 'active' : ''}`}
-                                style={{ width: '12%' }}
+                                className='mx-auto btn  fw-normal'
+                                style={{ width: '12%', color: activeDateIndex === index ? 'white' : '', background: activeDateIndex === index ? ' rgb(80, 200, 180)' : '' }}
                                 onClick={() => handleClickDay(date, index)}
                               >{`${formatDate(date)}`} <br /> </Button>
                             ))}
                           </div>
-                          <div className='choose-vetshift'>
+                          <div className='choose-vetshift mt-3'>
                             {vets.map((vet, index) => (
-                              <div className=''>
+                              <div className=' text-center' >
                                 <h1 className='fs-3'>{vet?.fullName}</h1>
-                                <div className='row'>
+                                <div className='row  mr-3 mx-2 ' >
                                   {vet?.workSchedule?.map((workSchedule, workScheduleIndex) => (
                                     <>
                                       <button
-                                        className={`col-2 mx-4 my-2 btn btn-outline-primary text-black ${activeShiftIndex === workSchedule?.vs_id ? 'active' : ''}`}
+                                        className='col-2 mt-3 mx-3 my-2 btn'
+                                        style={{ width: '12%', color: activeShiftIndex === workSchedule?.vs_id ? 'white' : '', background: activeShiftIndex === workSchedule?.vs_id ? ' rgb(80, 200, 180)' : '' }}
                                         disabled={workSchedule?.status !== "Available"}
                                         onClick={() => chooseShift(workSchedule?.vs_id, workSchedule?.vs_id, vet?.fullName, workSchedule?.shift.from_time + ' - ' + workSchedule?.shift.to_time)}
+                                        _hover={{ background: 'teal', color: 'white' }}
                                       >
                                         {workSchedule?.shift?.from_time} - {workSchedule?.shift?.to_time}
                                       </button>
@@ -676,9 +678,9 @@ export default function Booking() {
                         </div>
                       </div>
                     </div>
-                    <div className='text-center mt-3'>
-                      <div className='btn btn-primary' onClick={() => handleBackClick()}>Back</div>
-                      <div className='btn btn-primary' onClick={() => handleClickAPI(selectedVetShift)}>Next</div>
+                    <div className='text-center mt-3 d-flex d-flex justify-content-center gap-3 text-center'>
+                      <Button onClick={() => handleBackClick()} style={{ background: 'teal', color: 'white' }}>Back</Button>
+                      <Button onClick={() => handleClickAPI(selectedVetShift)} style={{ background: 'teal', color: 'white' }}>Next</Button>
                     </div>
                   </TabPanel>
                   <TabPanel>
@@ -698,19 +700,19 @@ export default function Booking() {
                         {selectedVet !== '' &&
                           <div className='col-12 my-2'>
                             <div className="d-flex justify-content-between mb-3">
-                              <button className="btn btn-primary" onClick={handlePreviousWeek}>
+                              <Button onClick={handlePreviousWeek} style={{ background: 'teal', color: 'white' }}>
                                 Previous Week
-                              </button>
-                              <button className="btn btn-primary" onClick={handleNextWeek}>
+                              </Button>
+                              <Button onClick={handleNextWeek} style={{ background: 'teal', color: 'white' }}>
                                 Next Week
-                              </button>
+                              </Button>
                             </div>
                             <div className='choose-date row'>
                               {dates.map((date, index) => (
                                 <Button
                                   key={index}
-                                  className={`mx-auto btn btn-outline-primary fw-normal ${activeDateIndex === index ? 'active' : ''}`}
-                                  style={{ width: '12%' }}
+                                  className='mx-auto btn  fw-normal'
+                                  style={{ width: '12%', color: activeDateIndex === index ? 'white' : '', background: activeDateIndex === index ? ' rgb(80, 200, 180)' : '' }}
                                   onClick={() => handleClickDay2(date, index)}
                                   isDisabled={!groupedVetShiftDetailsArray.some(detail => detail.date === new Date(date).toLocaleDateString('en-CA'))}
                                 >{`${formatDate(date)}`} <br /> </Button>
@@ -723,7 +725,8 @@ export default function Booking() {
                                   <div className='row'>
                                     {vetShiftDetail?.details?.map((detail, detailIndex) => (
                                       <button
-                                        className={`col-2 mx-4 my-2 btn btn-outline-primary text-black ${activeShiftIndex === detail?.vs_id ? 'active' : ''}`}
+                                        className='col-2 mt-3 mx-3 my-2 btn'
+                                        style={{ width: '12%', color: activeShiftIndex === detail?.vs_id ? 'white' : '', background: activeShiftIndex === detail?.vs_id ? ' rgb(80, 200, 180)' : '' }}
                                         disabled={detail?.status !== "Available"}
                                         onClick={() => chooseShift(detail?.vs_id, detail?.vs_id, selectedVet.fullName, detail?.shift.from_time + ' - ' + detail?.shift.to_time)}
                                       >
@@ -738,9 +741,9 @@ export default function Booking() {
 
                       </div>
                     </div>
-                    <div className='text-center mt-3'>
-                      <div className='btn btn-primary' onClick={() => handleBackClick()}>Back</div>
-                      <div className='btn btn-primary' onClick={() => handleClickAPI(selectedVetShift)}>Next</div>
+                    <div className='text-center mt-3 d-flex d-flex justify-content-center gap-3 text-center'>
+                      <Button onClick={() => handleBackClick()} style={{ background: 'teal', color: 'white' }}>Back</Button>
+                      <Button onClick={() => handleClickAPI(selectedVetShift)} style={{ background: 'teal', color: 'white' }}>Next</Button>
                     </div>
                   </TabPanel>
                 </TabPanels>
@@ -756,37 +759,55 @@ export default function Booking() {
                   <Text as='h2' textAlign='center' mb={3}>
                     Booking Information
                   </Text>
-                  <Box p={3} mb={5} bg='gray.100' borderRadius='lg'>
-                    <Box borderBottom='1px' borderColor='gray.200' mb={3}>
-                      <Text width='50%'><b>Booking ID: </b>{booking.id}</Text>
-                      <Text width='50%'><b>Date: </b>{new Date().toLocaleDateString("en-GB", { month: 'numeric', day: 'numeric', year: 'numeric' })}</Text>
-                    </Box>
-                    <Box borderBottom='1px' borderColor='gray.200' mb={3}>
-                      <Text width='50%'><b>Pet's owner: </b> {selectedPet?.owner?.fullName}</Text>
-                      <Text width='50%'><b>Phone number: </b>{selectedPet?.owner?.phoneNumber}</Text>
-                      <Text width='50%'><b>Pet's name: </b> {selectedPet?.name}</Text>
-                      <Text width='50%'><b>Pet's type: </b> {selectedPet?.petType}</Text>
-                      <Text><b>Pet's breed: </b> {selectedPet?.breed}</Text>
-                      <Text><b>Pet's sex: </b> {selectedPet?.gender}</Text>
-                      <Text><b>Pet's age: </b> {selectedPet?.age} month(s)</Text>
-                    </Box>
+                  <div className="mb-3 d-flex justify-content-end">
+                    {/* <label className="w-50 "><b>Booking ID: </b>Chưa xử lí</label> */}
+                  </div>
+                  <div className='shadow p-3 mb-5 bg-body-tertiary rounded'>
 
-                  </Box>
 
-                  <Text as='h4' textAlign='center' mb={3} mt={3} fontWeight='normal'>
-                    My appointment date
-                  </Text>
+                    <div className="d-flex border-bottom mb-3">
+                      <label className="w-50 "><b>Date: </b>{new Date().toLocaleDateString("en-Gb", { month: 'numeric', day: 'numeric', year: 'numeric' })} </label>
+                      <div className='w-50'>
+                        <label className="w-50"><b >Pet's name: </b> {selectedPet?.name}</label>
+                        <label className="w-50" ><b>Pet's type: </b> {selectedPet?.petType}</label>
 
-                  <Box p={3} mb={5} bg='gray.100' borderRadius='lg'>
-                    <Box mb={1} display='flex' justifyContent='space-between'>
-                      <Text><b>Appointment date: </b> {selectedDisplayDate}</Text>
-                      <Text><b>Time: </b> {time}</Text>
-                      <Text><b>Vet: </b>{vetName}</Text>
-                    </Box>
-                    {/* <Box borderTop='1px' borderColor='gray.200' mt={2}>
-                      <Text><b>Description: </b>{booking?.description}</Text>
-                    </Box> */}
-                  </Box>
+                      </div>
+
+                    </div>
+
+
+                    <div className="d-flex border-bottom mb-3 ">
+                      <label className="w-50"><b>Pet's owner: </b> {selectedPet?.owner?.fullName}</label>
+                      <div className='w-50'>
+                        <label className="w-50"><b>Pet's breed: </b> {selectedPet?.breed}</label>
+                        <label className='w-50'><b >Pet's sex: </b> {selectedPet?.gender}</label>
+
+                      </div>
+
+                    </div>
+                    <div className="border-bottom mb-3 ">
+
+                      <label className="w-50"><b>Phone number: </b>{selectedPet?.owner?.phoneNumber}</label>
+                      <label className='w-50'><b>Pet's age: </b> {selectedPet?.age} month(s)</label>
+
+
+                    </div>
+
+                  </div>
+                  <h4 className='text-center mb-3 mt-3 font-weight-bold fw-normal'>
+                    My appoinment date
+                  </h4>
+
+                  <div className='shadow p-3 mb-5 bg-body-tertiary rounded'>
+                    <div className="mb-1 d-flex justify-content-between">
+                      <label ><b>Appointment date: </b> {selectedDisplayDate}</label>
+                      <label ><b>Time: </b> {time}</label>
+                      <label ><b>Vet: </b>{vetName}</label>
+                    </div>
+                    <div className="border-top mt-2">
+                      <label ><b>Description:  </b>{booking?.description}</label>
+                    </div>
+                  </div>
 
                   <Text as='h4' textAlign='center' mb={1} mt={3} fontWeight='normal'>
                     Services' Information

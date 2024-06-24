@@ -164,15 +164,12 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public Page<User> getAllUsers(int pageNo, int pageSize) {
+    public Page<User> getAllUsersByRoleId(int pageNo, int pageSize, int roleId) {
         Pageable pageable = PageRequest.of(pageNo, pageSize);
-        Page<User> pageUsers = userRepository.findAll(pageable);
-        for (User user : pageUsers.getContent()) {
-            user.setVetShiftDetails(null);
-        }
-        return pageUsers;
+        return userRepository.findUsersByRoleId(pageable, roleId);
     }
 
+    @Override
     public User deleteUser(int id) {
         Optional<User> userOptional = userRepository.findById(id);
         if (userOptional.isPresent()) {
@@ -238,6 +235,11 @@ public class UserService implements IUserService {
         }
         return null;
     }
+//
+//    @Override
+//    public User createAnonymousUser(String phoneNumber, String fullName, String gender) {
+//        return null;
+//    }
 
     @Override
     public User getUserById(int id) {
@@ -261,6 +263,7 @@ public class UserService implements IUserService {
         return user;
     }
 
+    @Override
     public String saveAvatar(MultipartFile file, int userId) throws IOException {
         if (file.isEmpty()) {
             throw new IOException("File is empty");
@@ -282,5 +285,11 @@ public class UserService implements IUserService {
         userRepository.save(user);
 
         return imageUrl;
+    }
+
+    @Override
+    public Page<User> getAllUsers(int pageNo, int pageSize) {
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
+        return userRepository.findAll(pageable);
     }
 }

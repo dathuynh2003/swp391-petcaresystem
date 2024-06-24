@@ -65,7 +65,10 @@ public class CageController {
     }
 
     @GetMapping("/cage/search/{name}")
-    public Map<String, Object> getCageByName(@PathVariable String name, HttpSession session) {
+    public Map<String, Object> getCageByName(@PathVariable String name,
+                                             @RequestParam(defaultValue = "0") int page,
+                                             @RequestParam(defaultValue = "5") int size,
+                                             HttpSession session) {
         Map<String, Object> response = new HashMap<>();
         try {
             User curUser = (User) session.getAttribute("user");
@@ -77,7 +80,7 @@ public class CageController {
             }
 
             response.put("message", "Cage found");
-            response.put("cages", cageService.findCageByName(name));
+            response.put("cages", cageService.findCageByName(page, size, name));
 
         } catch (IllegalArgumentException e) {
             response.put("message", e.getMessage());
@@ -90,7 +93,9 @@ public class CageController {
     }
 
     @GetMapping("/cage/search/")
-    public Map<String, Object> getAllCageByName(HttpSession session) {
+    public Map<String, Object> getAllCageByName(HttpSession session,
+                                                @RequestParam(defaultValue = "0") int page,
+                                                @RequestParam(defaultValue = "5") int size) {
         Map<String, Object> response = new HashMap<>();
         try {
             String name = null;
@@ -102,7 +107,7 @@ public class CageController {
                 throw new IllegalArgumentException("You don't have permission to do this");
             }
             response.put("message", "Cage found");
-            response.put("cages", cageService.findCageByName(name));
+            response.put("cages", cageService.findCageByName(page, size, name));
 
         } catch (IllegalArgumentException e) {
             response.put("message", e.getMessage());
