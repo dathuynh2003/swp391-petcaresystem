@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import {
     Box,
@@ -28,10 +28,18 @@ import {
     useDisclosure,
     VStack,
     Badge,
+    Select,
+    Flex
 } from '@chakra-ui/react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { format, parseISO } from 'date-fns';
+
+import { faUser, faPaw, faXRay } from '@fortawesome/free-solid-svg-icons';
 import { SearchIcon } from '@chakra-ui/icons';
+import { South } from '@mui/icons-material';
 
 const BookingHistory = () => {
+    const [originalBookings, setOriginalBookings] = useState([]);
     const [bookings, setBookings] = useState([]);
     const [selectedBooking, setSelectedBooking] = useState(null);
     const [bookingDetails, setBookingDetails] = useState([]);
@@ -40,34 +48,111 @@ const BookingHistory = () => {
     const [totalPages, setTotalPages] = useState(1);
     const [phoneNumber, setPhoneNumber] = useState('');
     const [loading, setLoading] = useState(false);
+    const [status, setStatus] = useState('');
+    const [fromDate, setFromDate] = useState('');
+    const [toDate, setToDate] = useState('');
+    const [isSearchByPhone, setIsSearchByPhone] = useState(false); // State để theo dõi trạng thái tìm kiếm
+    const [isFilteredSearch, setIsFilteredSearch] = useState(false); // State để theo dõi tìm kiếm có lọc
+
+
 
     const { isOpen, onOpen, onClose } = useDisclosure();
 
     const pageSize = 5;
 
     useEffect(() => {
-        fetchBookings();
-    }, [currentPage]);
+        if (isSearchByPhone) {
+            fetchBookingsByPhoneNumber();
+        }
+        else if (isFilteredSearch) {
+            fetchFilteredBookings();
+        }
+        else {
+            fetchAllBookings();
 
-    const fetchBookings = async () => {
+        }
+    }, [currentPage, isSearchByPhone, isFilteredSearch]);
+
+
+    const fetchAllBookings = async () => {
         setLoading(true);
         try {
-            let url = `http://localhost:8080/bookings-staff?pageNo=${currentPage}&pageSize=${pageSize}`;
-            if (phoneNumber) {
-                url += `&phoneNumber=${phoneNumber}`;
-            }
-            const response = await axios.get(url, { withCredentials: true });
+            const response = await axios.get(`http://localhost:8080/all-bookings?pageNo=${currentPage}&pageSize=${pageSize}`, { withCredentials: true });
             const { content, totalPages } = response.data.data;
+            setOriginalBookings(content);
             setBookings(content);
             setTotalPages(totalPages);
             setError(null);
         } catch (error) {
             console.error("Error fetching bookings:", error);
             setError("Error fetching bookings. Please try again later.");
+            setBookings([]);
+            setTotalPages(0);
         } finally {
             setLoading(false);
         }
     };
+
+    const fetchFilteredBookings = async () => {
+        setLoading(true);
+        try {
+            let url = `http://localhost:8080/staff-booking-date-status?` + `pageNo=${currentPage}&pageSize=${pageSize}`;
+
+            if (status) {
+                console.log(status)
+                url += `&status=${status}`;
+            }
+            if (fromDate) {
+                console.log(fromDate)
+                url += `&fromDate=${fromDate}`;
+            }
+            if (toDate) {
+                console.log(toDate)
+                url += `&toDate=${toDate}`;
+            }
+            const response = await axios.get(url, { withCredentials: true });
+            const { content, totalPages } = response.data.data;
+            setBookings(content);
+            setTotalPages(totalPages);
+
+        } catch (error) {
+            console.error("Error fetching bookings:", error);
+            setError("Error fetching bookings. Please try again later.");
+            setBookings([]);
+            setTotalPages(0);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const fetchBookingsByPhoneNumber = async () => {
+        setLoading(true);
+        try {
+            const response = await axios.get(`http://localhost:8080/bookings-staff?pageNo=${currentPage}&pageSize=${pageSize}&phoneNumber=${phoneNumber}`, { withCredentials: true });
+            const { content, totalPages } = response.data.data;
+            setBookings(content);
+            setTotalPages(totalPages);
+            setError(null); // Clear any previous errors
+
+        } catch (error) {
+            console.error("Error fetching bookings by phone number:", error);
+            setError("Error fetching bookings. Please try again later.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // useEffect(() => {
+    //     if (phoneNumber) {
+    //         fetchBookingsByPhoneNumber();
+    //     }
+    //     else {
+    //         fetchAllBookings();
+    //     }
+
+
+    // }, [phoneNumber, fetchBookingsByPhoneNumber]);
+
 
     const viewDetail = async (bookingId) => {
         try {
@@ -101,19 +186,44 @@ const BookingHistory = () => {
 
     const handleSearch = () => {
         setCurrentPage(1);
-        fetchBookings();
+        setIsSearchByPhone(true);
+        fetchBookingsByPhoneNumber();
+    };
+    const handleFilterSearch = () => {
+        setCurrentPage(1);
+        setIsSearchByPhone(false);
+        setIsFilteredSearch(true);
+
+    };
+    const clearFilters = () => {
+        setPhoneNumber('');
+        setStatus('');
+        setFromDate('');
+        setToDate('');
+        setBookings(originalBookings);
+        setCurrentPage(1);
+        setIsSearchByPhone(false);
+        setIsFilteredSearch(false);
     };
 
     const formatPrice = (price) => {
         return Number(price).toLocaleString('vi-VN');
     };
+    const formatDateTime = (dateString) => {
+        try {
+            const date = parseISO(dateString);
+            return format(date, 'dd/MM/yyyy');
+        } catch (error) {
+            console.error('Invalid date:', dateString);
+            return 'Invalid Date';
+        }
+    };
 
     return (
         <Container maxW="container.xl" py={6}>
             {error && <Text color="red.500" mb={4}>{error}</Text>}
-
-            <VStack spacing={4} mb={6} alignItems="flex-end">
-                <FormControl>
+            <Flex justify="space-between" mb={6}>
+                <FormControl width="100px" mr={2}>
                     <InputGroup width="300px"> {/* Điều chỉnh độ rộng ở đây */}
                         <Input
                             id="phoneNumber"
@@ -130,15 +240,74 @@ const BookingHistory = () => {
                         </InputRightElement>
                     </InputGroup>
                 </FormControl>
-                {loading && <Spinner size="lg" />}
-            </VStack>
 
+                {loading && <Spinner size="lg" />}
+            </Flex>
+            <FormControl width="150px" mb={2}>
+                <Flex justify="space-between">
+                    <Flex flexDirection="column">
+                        <FormLabel htmlFor="fromDate" mt={2}>From</FormLabel>
+                        <Input
+                            type="date"
+                            id="fromDate"
+                            value={fromDate}
+                            onChange={(e) => setFromDate(e.target.value)}
+                        />
+                    </Flex>
+                    <Flex flexDirection="column">
+                        <FormLabel htmlFor="toDate" mt={2}>To</FormLabel>
+                        <Input
+                            type="date"
+                            id="toDate"
+                            value={toDate}
+                            onChange={(e) => setToDate(e.target.value)}
+                        />
+                    </Flex>
+
+
+                </Flex>
+            </FormControl>
+            <FormControl width="150px" marginTop="10px" mr={2}>
+                <Select placeholder="Status" value={status} onChange={(e) => setStatus(e.target.value)}>
+                    <option value="PENDING">Pending</option>
+                    <option value="CANCELLED">Cancelled</option>
+                    <option value="PAID">Paid</option>
+                </Select>
+            </FormControl>
+            <Button onClick={handleFilterSearch} mb={4}>Search</Button>
+            <Button onClick={clearFilters} mb={4}>Clear Filters</Button>
+
+
+            {/* <FormControl width="150px" marginTop="10px">
+                <Select placeholder="Select status" value={status} onChange={(e) => setStatus(e.target.value)}>
+                    <option value="PENDING">Pending</option>
+                    <option value="CANCELLED">Cancelled</option>
+                    <option value="PAID">Paid</option>
+                </Select>
+            </FormControl> */}
+            {/* <FormControl width="150px" mb={4}>
+                <FormLabel htmlFor="fromDate">From Date</FormLabel>
+                <Input
+                    type="date"
+                    id="fromDate"
+                    value={fromDate}
+                    onChange={(e) => setFromDate(e.target.value)}
+                />
+                <FormLabel htmlFor="toDate" mt={2}>To Date</FormLabel>
+                <Input
+                    type="date"
+                    id="toDate"
+                    value={toDate}
+                    onChange={(e) => setToDate(e.target.value)}
+                />
+            </FormControl> */}
 
             <Table variant="simple">
                 <Thead>
                     <Tr>
                         <Th>BookingID</Th>
                         <Th>Appointment Date</Th>
+                        <Th>Booking Date</Th>
                         <Th>Amount</Th>
                         <Th>Status</Th>
                         <Th>Action</Th>
@@ -149,6 +318,7 @@ const BookingHistory = () => {
                         <Tr key={booking.id}>
                             <Td>B{booking.id}</Td>
                             <Td>{new Date(booking.vetShiftDetail.date).toLocaleDateString()}</Td>
+                            <Td>{formatDateTime(booking.bookingDate)}</Td>
                             <Td>{formatPrice(booking.totalAmount)} VND</Td>
                             <Td>
                                 <Badge colorScheme={
@@ -167,36 +337,54 @@ const BookingHistory = () => {
             </Table>
 
             <Box mt={4} display="flex" justifyContent="space-between">
-                <Button onClick={handlePreviousPage} isDisabled={currentPage === 1}>Previous</Button>
-                <Text>Page {currentPage} of {totalPages}</Text>
-                <Button onClick={handleNextPage} isDisabled={currentPage === totalPages}>Next</Button>
+                {totalPages > 0 ? (
+                    <>
+                        <Button onClick={handlePreviousPage} isDisabled={currentPage === 1}>Previous</Button>
+                        <Text>Page {currentPage} of {totalPages}</Text>
+                        <Button onClick={handleNextPage} isDisabled={currentPage === totalPages}>Next</Button>
+                    </>
+                ) : (
+                    <Text textColor="red" fontWeight="bold">No bookings found</Text>
+                )}
             </Box>
 
             {selectedBooking && (
-                <Modal isOpen={isOpen} onClose={closeModal}>
+                <Modal isOpen={isOpen} onClose={closeModal} size='xl'>
                     <ModalOverlay />
                     <ModalContent>
                         <ModalHeader>Booking Details #{selectedBooking.id}</ModalHeader>
                         <ModalCloseButton />
                         <ModalBody>
                             <Box mb={4}>
-                                <Text fontSize="lg" fontWeight="bold">Customer</Text>
+                                <Text fontSize="lg" fontWeight="bold">
+                                    <FontAwesomeIcon icon={faUser} style={{ marginRight: '8px' }} /> Customer
+                                </Text>
+                            </Box>
+                            <Box ml={4}>
                                 <Text><strong>Name:</strong> {selectedBooking.pet.owner.fullName}</Text>
                                 <Text><strong>Phone:</strong> {selectedBooking.pet.owner.phoneNumber}</Text>
                                 <Text><strong>Email:</strong> {selectedBooking.pet.owner.email}</Text>
                                 <Text><strong>Address:</strong> {selectedBooking.pet.owner.address}</Text>
                             </Box>
                             <Box mb={4}>
-                                <Text fontSize="lg" fontWeight="bold">Service</Text>
+                                <Text fontSize="lg" fontWeight="bold">
+                                    <FontAwesomeIcon icon={faXRay} style={{ marginRight: '8px' }} /> Service
+                                </Text>
                                 {bookingDetails.map((detail, index) => (
                                     <Box key={index} ml={4}>
                                         <Text><strong>Name:</strong> {detail.petService.nameService}</Text>
+                                        <Text><strong>Description:</strong> {detail.petService.description}</Text>
                                         <Text><strong>Price:</strong> {formatPrice(detail.petService.price)} VND</Text>
                                     </Box>
                                 ))}
                             </Box>
-                            <Box>
-                                <Text fontSize="lg" fontWeight="bold">Pet</Text>
+                            <Box mb={4}>
+                                <Text fontSize="lg" fontWeight="bold">
+                                    <FontAwesomeIcon icon={faPaw} style={{ marginRight: '8px' }} /> Pet
+                                </Text>
+                            </Box>
+                            <Box ml={4}>
+
                                 <Text><strong>Name:</strong> {selectedBooking.pet.name}</Text>
                                 <Text><strong>Type:</strong> {selectedBooking.pet.petType}</Text>
                                 <Text><strong>Gender:</strong> {selectedBooking.pet.gender}</Text>

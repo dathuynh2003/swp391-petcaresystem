@@ -26,7 +26,7 @@ public interface IUserService {
     User createUserGoogle(User newUser);
     User findUserByEmail(String email);
     @Transactional
-    User createAnonymousUser(String phoneNumber, String fullName, String gender);
+//    User createAnonymousUser(String phoneNumber, String fullName, String gender);
     Page<User> getAllUsers(int pageNo, int pageSize);
     User createOrGetAnonymousUser(String phoneNumber, String fullName);
 }
