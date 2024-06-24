@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import {
     Box,
@@ -36,8 +36,10 @@ import { format, parseISO } from 'date-fns';
 
 import { faUser, faPaw, faXRay } from '@fortawesome/free-solid-svg-icons';
 import { SearchIcon } from '@chakra-ui/icons';
+import { South } from '@mui/icons-material';
 
 const BookingHistory = () => {
+    const [originalBookings, setOriginalBookings] = useState([]);
     const [bookings, setBookings] = useState([]);
     const [selectedBooking, setSelectedBooking] = useState(null);
     const [bookingDetails, setBookingDetails] = useState([]);
@@ -49,42 +51,108 @@ const BookingHistory = () => {
     const [status, setStatus] = useState('');
     const [fromDate, setFromDate] = useState('');
     const [toDate, setToDate] = useState('');
+    const [isSearchByPhone, setIsSearchByPhone] = useState(false); // State để theo dõi trạng thái tìm kiếm
+    const [isFilteredSearch, setIsFilteredSearch] = useState(false); // State để theo dõi tìm kiếm có lọc
+
+
 
     const { isOpen, onOpen, onClose } = useDisclosure();
 
     const pageSize = 5;
 
     useEffect(() => {
-        fetchBookings();
-    }, [currentPage, fromDate, toDate, status]);
+        if (isSearchByPhone) {
+            fetchBookingsByPhoneNumber();
+        }
+        else if (isFilteredSearch) {
+            fetchFilteredBookings();
+        }
+        else {
+            fetchAllBookings();
 
-    const fetchBookings = async () => {
+        }
+    }, [currentPage, isSearchByPhone, isFilteredSearch]);
+
+
+    const fetchAllBookings = async () => {
         setLoading(true);
         try {
-            let url = `http://localhost:8080/bookings-staff?pageNo=${currentPage}&pageSize=${pageSize}`;
-            if (phoneNumber) {
-                url += `&phoneNumber=${phoneNumber}`;
-            }
+            const response = await axios.get(`http://localhost:8080/all-bookings?pageNo=${currentPage}&pageSize=${pageSize}`, { withCredentials: true });
+            const { content, totalPages } = response.data.data;
+            setOriginalBookings(content);
+            setBookings(content);
+            setTotalPages(totalPages);
+            setError(null);
+        } catch (error) {
+            console.error("Error fetching bookings:", error);
+            setError("Error fetching bookings. Please try again later.");
+            setBookings([]);
+            setTotalPages(0);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const fetchFilteredBookings = async () => {
+        setLoading(true);
+        try {
+            let url = `http://localhost:8080/staff-booking-date-status?` + `pageNo=${currentPage}&pageSize=${pageSize}`;
+
             if (status) {
-                url = `http://localhost:8080/staff-bookings-status/${status}?pageNo=${currentPage}&pageSize=${pageSize}`;
+                console.log(status)
+                url += `&status=${status}`;
             }
-            if (fromDate && toDate) {
+            if (fromDate) {
                 console.log(fromDate)
+                url += `&fromDate=${fromDate}`;
+            }
+            if (toDate) {
                 console.log(toDate)
-                url = 
-                `http://localhost:8080/staff-bookings-date?fromDate=${fromDate}&toDate=${toDate}&pageNo=${currentPage}&pageSize=${pageSize}`;
+                url += `&toDate=${toDate}`;
             }
             const response = await axios.get(url, { withCredentials: true });
             const { content, totalPages } = response.data.data;
             setBookings(content);
             setTotalPages(totalPages);
+
         } catch (error) {
             console.error("Error fetching bookings:", error);
+            setError("Error fetching bookings. Please try again later.");
+            setBookings([]);
+            setTotalPages(0);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const fetchBookingsByPhoneNumber = async () => {
+        setLoading(true);
+        try {
+            const response = await axios.get(`http://localhost:8080/bookings-staff?pageNo=${currentPage}&pageSize=${pageSize}&phoneNumber=${phoneNumber}`, { withCredentials: true });
+            const { content, totalPages } = response.data.data;
+            setBookings(content);
+            setTotalPages(totalPages);
+            setError(null); // Clear any previous errors
+
+        } catch (error) {
+            console.error("Error fetching bookings by phone number:", error);
             setError("Error fetching bookings. Please try again later.");
         } finally {
             setLoading(false);
         }
     };
+
+    // useEffect(() => {
+    //     if (phoneNumber) {
+    //         fetchBookingsByPhoneNumber();
+    //     }
+    //     else {
+    //         fetchAllBookings();
+    //     }
+
+
+    // }, [phoneNumber, fetchBookingsByPhoneNumber]);
+
 
     const viewDetail = async (bookingId) => {
         try {
@@ -118,7 +186,24 @@ const BookingHistory = () => {
 
     const handleSearch = () => {
         setCurrentPage(1);
-        fetchBookings();
+        setIsSearchByPhone(true);
+        fetchBookingsByPhoneNumber();
+    };
+    const handleFilterSearch = () => {
+        setCurrentPage(1);
+        setIsSearchByPhone(false);
+        setIsFilteredSearch(true);
+
+    };
+    const clearFilters = () => {
+        setPhoneNumber('');
+        setStatus('');
+        setFromDate('');
+        setToDate('');
+        setBookings(originalBookings);
+        setCurrentPage(1);
+        setIsSearchByPhone(false);
+        setIsFilteredSearch(false);
     };
 
     const formatPrice = (price) => {
@@ -178,6 +263,8 @@ const BookingHistory = () => {
                             onChange={(e) => setToDate(e.target.value)}
                         />
                     </Flex>
+
+
                 </Flex>
             </FormControl>
             <FormControl width="150px" marginTop="10px" mr={2}>
@@ -187,6 +274,9 @@ const BookingHistory = () => {
                     <option value="PAID">Paid</option>
                 </Select>
             </FormControl>
+            <Button onClick={handleFilterSearch} mb={4}>Search</Button>
+            <Button onClick={clearFilters} mb={4}>Clear Filters</Button>
+
 
             {/* <FormControl width="150px" marginTop="10px">
                 <Select placeholder="Select status" value={status} onChange={(e) => setStatus(e.target.value)}>
@@ -247,9 +337,15 @@ const BookingHistory = () => {
             </Table>
 
             <Box mt={4} display="flex" justifyContent="space-between">
-                <Button onClick={handlePreviousPage} isDisabled={currentPage === 1}>Previous</Button>
-                <Text>Page {currentPage} of {totalPages}</Text>
-                <Button onClick={handleNextPage} isDisabled={currentPage === totalPages}>Next</Button>
+                {totalPages > 0 ? (
+                    <>
+                        <Button onClick={handlePreviousPage} isDisabled={currentPage === 1}>Previous</Button>
+                        <Text>Page {currentPage} of {totalPages}</Text>
+                        <Button onClick={handleNextPage} isDisabled={currentPage === totalPages}>Next</Button>
+                    </>
+                ) : (
+                    <Text textColor="red" fontWeight="bold">No bookings found</Text>
+                )}
             </Box>
 
             {selectedBooking && (
