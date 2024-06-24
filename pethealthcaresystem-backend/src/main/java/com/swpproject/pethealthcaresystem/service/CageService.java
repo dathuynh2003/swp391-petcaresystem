@@ -6,6 +6,9 @@ import com.swpproject.pethealthcaresystem.model.User;
 import com.swpproject.pethealthcaresystem.repository.CageRepository;
 import com.swpproject.pethealthcaresystem.repository.HospitalizationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -58,13 +61,13 @@ public class CageService implements ICageService {
     }
 
     @Override
-    public List<Cage> findCageByName(String cageName) throws IllegalArgumentException {
-
+    public Page<Cage> findCageByName(int page, int size, String cageName) throws IllegalArgumentException {
+        Pageable pageable = PageRequest.of(page, size);
         if (cageName == null || cageName.isEmpty()) {
-            return cageRepository.findAll();
+            return cageRepository.findAll(pageable);
         }
 
-        return cageRepository.findByNameContaining(cageName);
+        return cageRepository.findByNameContaining(cageName, pageable);
     }
 
     @Override

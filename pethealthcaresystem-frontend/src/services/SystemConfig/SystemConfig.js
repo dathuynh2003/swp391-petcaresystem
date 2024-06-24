@@ -17,24 +17,6 @@ export default function SystemConfig() {
     const [totalPages, setTotalPages] = useState(0)
     const pageSize = 10
 
-    // const fetchConfiguration = async (page) => {
-    //     try {
-    //         // console.log("test")
-    //         const response = await axios.get(`http://localhost:8080/configurations?page=${page}&size=${pageSize}`, { withCredentials: true })
-    //         if (response.data.message === 'Successfully') {
-    //             setConfigurations(response.data.configurations.content)
-    //             setTotalPages(response.data.configurations.totalPages)
-    //         } else {
-    //             toast.info(response.data.message)
-    //         }
-    //     } catch (error) {
-    //         navigate('/404page')
-    //     }
-    // }
-    // useEffect(() => {
-    //     fetchConfiguration(currentPage);
-    // }, [currentPage])
-
     const handlePageClick = (data) => {
         // console.log(data.selected)
         setCurrentPage(data.selected)

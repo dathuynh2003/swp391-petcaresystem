@@ -564,7 +564,7 @@ export default function Medicine() {
                     <td>{medicine.quantity}</td>
                     <td>{new Date(medicine.mfgDate).toLocaleString("en-GB", { day: 'numeric', month: 'numeric', year: 'numeric' })}</td>
                     <td>{new Date(medicine.expDate).toLocaleString("en-GB", { day: 'numeric', month: 'numeric', year: 'numeric' })}</td>
-                    <td>{medicine.price.toLocaleString('vi-VN')}</td>
+                    <td>{medicine.price.toLocaleString('vi-VN')} VND</td>
                     <td className=''>
                       <span style={{ marginRight: '16px' }} className='icon-container'>
                         <EditIcon style={{ color: 'teal', cursor: 'pointer' }} onClick={() => handleClickEditMedicine(medicine)} />
