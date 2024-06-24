@@ -14,9 +14,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
 import java.io.IOException;
 import java.util.*;
-
 
 
 @Service
@@ -164,9 +164,9 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public Page<User> getAllUsers(int pageNo, int pageSize) {
+    public Page<User> getAllUsersByRoleId(int pageNo, int pageSize, int roleId) {
         Pageable pageable = PageRequest.of(pageNo, pageSize);
-            return userRepository.findByIsActiveTrue(pageable);
+            return userRepository.findUsersByRoleId(pageable, roleId);
     }
 
     public User deleteUser(int id) {
@@ -234,6 +234,11 @@ public class UserService implements IUserService {
         }
         return null;
     }
+//
+//    @Override
+//    public User createAnonymousUser(String phoneNumber, String fullName, String gender) {
+//        return null;
+//    }
 
     @Override
     public User getUserById(int id) {
@@ -278,5 +283,11 @@ public class UserService implements IUserService {
         userRepository.save(user);
 
         return imageUrl;
+    }
+
+    @Override
+    public Page<User> getAllUsers(int pageNo, int pageSize) {
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
+        return userRepository.findAll(pageable);
     }
 }

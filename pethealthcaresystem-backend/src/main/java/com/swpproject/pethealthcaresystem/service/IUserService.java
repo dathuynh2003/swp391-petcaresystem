@@ -3,6 +3,7 @@ package com.swpproject.pethealthcaresystem.service;
 import com.swpproject.pethealthcaresystem.model.User;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -17,7 +18,7 @@ public interface IUserService {
     User createUserByAdmin(User newUser);
 
     public User updateUser(String email, User newUser);
-    public Page<User> getAllUsers(int pageNo, int pageSize);
+    public Page<User> getAllUsersByRoleId(int pageNo, int pageSize, int roleId);
     public User deleteUser(int id);
     User updateUser(User newUser, int id);
     User getUserById(int id);
@@ -25,5 +26,7 @@ public interface IUserService {
     User createUserGoogle(User newUser);
     User findUserByEmail(String email);
     @Transactional
+//    User createAnonymousUser(String phoneNumber, String fullName, String gender);
+    Page<User> getAllUsers(int pageNo, int pageSize);
     User createOrGetAnonymousUser(String phoneNumber, String fullName);
 }

@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Set;
@@ -22,6 +23,8 @@ public class HospitalizationService implements IHospitalizationService {
     private CageRepository cageRepository;
     @Autowired
     private HospitalizationDetailRepository hospitalizationDetailRepository;
+    @Autowired
+    private PaymentRepository paymentRepository;
 
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
 
@@ -70,6 +73,30 @@ public class HospitalizationService implements IHospitalizationService {
 //        hospitalization.setStatus("discharged");
         hospitalization.setStatus("pending");
 
+        LocalDateTime endTime = LocalDateTime.parse(dischargeTime, formatter);
+        LocalDateTime startTime = LocalDateTime.parse(hospitalization.getAdmissionTime(), formatter);
+        Duration duration = Duration.between(startTime, endTime);
+        // Lấy số giờ làm tròn lên
+        int hours = (int) Math.ceil((double) duration.toMillis() / (60 * 60 * 1000));
+        int totalAmout = (int) (hours * hospitalization.getPrice());
+        System.out.println("hours: " + hours);
+        System.out.println("price: " + hospitalization.getPrice());
+        Set<HospitalizationDetail> hospDetails = (Set<HospitalizationDetail>) hospitalizationDetailRepository.findByHospitalizationOrderByTimeAsc(hospitalization);
+        if (hospDetails.size() == 0) System.out.println(":<");
+        for (HospitalizationDetail hospDetail : hospDetails) {
+            totalAmout += (int) (hospDetail.getPrice() * hospDetail.getDosage());
+            System.out.println("TotalAmout Detail: " + totalAmout);
+
+        }
+        System.out.println("TotalAmout: " + totalAmout);
+        //Tạo payment ở trạng thái pending.
+        Payment payment = new Payment();
+        payment.setHospitalization(hospitalization);
+        payment.setAmount(totalAmout);
+        payment.setStatus("Pending");
+        payment.setUser(hospitalization.getPet().getOwner());
+        paymentRepository.save(payment);
+
         Cage cage = hospitalization.getCage();
         if (cage == null) {
             throw new RuntimeException("Cage not found");
@@ -84,7 +111,7 @@ public class HospitalizationService implements IHospitalizationService {
     public Hospitalization getHospitalizationById(int id) {
         Hospitalization hospitalization = hospitalizationRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Hospitalization not found"));
-        Set<HospitalizationDetail> hospDetails = hospitalizationDetailRepository.findByHospitalizationOrderByTimeAsc(hospitalization);
+        Set<HospitalizationDetail> hospDetails = (Set<HospitalizationDetail>) hospitalizationDetailRepository.findByHospitalizationOrderByTimeAsc(hospitalization);
         hospitalization.setHospitalizationDetails(hospDetails);
         return hospitalization;
     }

@@ -35,8 +35,21 @@ export default function Medicine() {
     if (roleId !== '2') {
       navigate('/404page')
     }
-
+    fetchMedicineUnit()
   }, [])
+
+  const [medicineUnits, setMedicineUnits] = useState([])
+  const fetchMedicineUnit = async () => {
+    const configKey = "medicineUnit"
+    try {
+      const respone = await axios.get(`http://localhost:8080/configurations/${configKey}`, { withCredentials: true })
+      if (respone.data.message === 'Successfully') {
+        setMedicineUnits(respone.data.configurations)
+      }
+    } catch (e) {
+      navigate('404page')
+    }
+  }
 
 
 
@@ -458,12 +471,15 @@ export default function Medicine() {
                     <div>
                       Unit
                       <Select placeholder='Choose unit' onChange={(e) => { setMedicine((prev) => ({ ...prev, unit: e.target.value })) }}>
-                        <option value='Bottle'>Bottle </option>
+                        {/* <option value='Bottle'>Bottle </option>
                         <option value='Bottle'>Bottle </option>
                         <option value='Box'>Box</option>
                         <option value='Blister pack'>Blister pack</option>
                         <option value='Ampoule'>Ampoule</option>
-                        <option value='Sachet'>Sachet</option>
+                        <option value='Sachet'>Sachet</option> */}
+                        {medicineUnits?.map((unit, index) => (
+                          <option key={index} value={unit.configValue}>{unit.configValue}</option>
+                        ))}
                       </Select>
                     </div>
                     <div >
@@ -548,7 +564,7 @@ export default function Medicine() {
                     <td>{medicine.quantity}</td>
                     <td>{new Date(medicine.mfgDate).toLocaleString("en-GB", { day: 'numeric', month: 'numeric', year: 'numeric' })}</td>
                     <td>{new Date(medicine.expDate).toLocaleString("en-GB", { day: 'numeric', month: 'numeric', year: 'numeric' })}</td>
-                    <td>{medicine.price.toLocaleString('vi-VN')}</td>
+                    <td>{medicine.price.toLocaleString('vi-VN')} VND</td>
                     <td className=''>
                       <span style={{ marginRight: '16px' }} className='icon-container'>
                         <EditIcon style={{ color: 'teal', cursor: 'pointer' }} onClick={() => handleClickEditMedicine(medicine)} />
@@ -606,12 +622,15 @@ export default function Medicine() {
                   <div>
                     Unit
                     <Select placeholder='Choose unit' value={selectedMedicine?.unit} onChange={(e) => { setSelectedMedicine((prev) => ({ ...prev, unit: e.target.value })) }}>
-                      <option value='Bottle'>Bottle </option>
+                      {/* <option value='Bottle'>Bottle </option>
                       <option value='Tube'>Tube</option>
                       <option value='Box'>Box</option>
                       <option value='Blister pack'>Blister pack</option>
                       <option value='Ampoule'>Ampoule</option>
-                      <option value='Sachet'>Sachet</option>
+                      <option value='Sachet'>Sachet</option> */}
+                      {medicineUnits?.map((unit, index) => (
+                        <option key={index} value={unit.configValue}>{unit.configValue}</option>
+                      ))}
                     </Select>
                   </div>
                   <div >

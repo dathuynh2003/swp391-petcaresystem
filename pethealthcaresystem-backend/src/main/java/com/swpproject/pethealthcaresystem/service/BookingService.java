@@ -25,7 +25,7 @@ public class BookingService implements IBookingService {
     @Autowired
     private BookingDetailRepository bookingDetailRepository;
     @Autowired
-    UserRepository userRepository;
+    private UserRepository userRepository;
 
 
     @Override
@@ -92,7 +92,7 @@ public class BookingService implements IBookingService {
 
     @Override
     public Page<Booking> getBookings(Integer pageNo, Integer pageSize) {
-        Pageable pageable = PageRequest.of(pageNo - 1, pageSize);
+        Pageable pageable = PageRequest.of(pageNo - 1, pageSize, Sort.by("id").descending());
         Page<Booking> bookings = bookingRepository.findAll(pageable);
         if (bookings.isEmpty()) {
             throw new RuntimeException("Booking not found");
@@ -101,7 +101,7 @@ public class BookingService implements IBookingService {
     }
 
     public Page<Booking> getBookingsByPhone(int pageNo, int pageSize, String phoneNumber) {
-        User selectedUser = userRepository.findByPhoneNumber(phoneNumber);
+        User selectedUser = userRepository.findUserByPhoneNumber(phoneNumber);
         if (selectedUser == null) {
             throw new RuntimeException("User not found");
         }
@@ -196,5 +196,44 @@ public class BookingService implements IBookingService {
         updatedBooking = bookingRepository.save(updatedBooking);
         return updatedBooking;
     }
+    @Override
+    public Page<Booking> getBookingsByUserAndStatus(int userId, String status, int pageNo, int pageSize) {
+        Pageable pageable = PageRequest.of(pageNo - 1, pageSize, Sort.by("id").descending());
+        return bookingRepository.findByUserUserIdAndStatus(userId, status, pageable);
+    }
 
+    @Override
+    public Page<Booking> getBookingsByStatus(String status, int pageNo, int pageSize) {
+        Pageable pageable = PageRequest.of(pageNo - 1, pageSize, Sort.by("id").descending());
+        Page<Booking> bookings = bookingRepository.findByStatus(status, pageable);
+        return bookings;
+    }
+
+    @Override
+    public Page<Booking> getBookingByBookingDate(Date fromDate,Date toDate, int pageNo, int pageSize) {
+        Pageable pageable = PageRequest.of(pageNo - 1, pageSize, Sort.by("id").descending());
+        Page<Booking> bookings = bookingRepository.findByBookingDateBetween(fromDate, toDate, pageable);
+        return bookings;
+    }
+
+    @Override
+    public Page<Booking> getBookingByStatusAndDate(String status, Date fromDate, Date toDate, int pageNo, int pageSize) {
+        Pageable pageable = PageRequest.of(pageNo - 1, pageSize, Sort.by("id").descending());
+        Page<Booking> bookings = bookingRepository.findByBookingDateBetweenAndStatus(fromDate, toDate, status, pageable);
+        return bookings;
+    }
+
+//    @Override
+//    public Page<Booking> getBookingByDateAndStatus
+//            (Date fromDate, Date toDate, String status, String phoneNumber, int pageNo, int pageSize) {
+//        System.out.println("Entry here");
+//        Pageable pageable = PageRequest.of(pageNo - 1, pageSize, Sort.by("id").descending());
+//        Page<Booking> bookings =
+//                bookingRepository.findByStatusAndBookingDateBetweenAndUserPhoneNumber
+//                        (status, fromDate, toDate, phoneNumber, pageable);
+//        return bookings;
+//
+//
+//
+//    }
 }
