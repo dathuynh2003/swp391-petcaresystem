@@ -6,7 +6,13 @@ import { ToastContainer, toast } from 'react-toastify'
 export default function EditCage() {
     let navigate = useNavigate()
     const { cageId } = useParams()
-    const [cage, setCage] = useState()
+    const [cage, setCage] = useState({
+        name: '',
+        price: '',
+        size: '',
+        type: '',
+        description: '',
+    })
 
     useEffect(() => {
         const loadCage = async () => {
@@ -14,7 +20,6 @@ export default function EditCage() {
                 const response = await axios.get(`http://localhost:8080/cage/${cageId}`, { withCredentials: true })
                 if (response.data.message === "Cage found") {
                     setCage(response.data.cage)
-                    console.log(response.data.cage)
                 } else {
                     toast.warning(response.data.message)
                 }
@@ -28,7 +33,6 @@ export default function EditCage() {
 
     const onInputChange = (e) => {
         setCage({ ...cage, [e.target.name]: e.target.value })
-        console.log(cage)
     }
 
     const handleEditCage = async () => {
@@ -45,7 +49,17 @@ export default function EditCage() {
             return
         }
         try {
-            const respone = await axios.put(`http://localhost:8080/updateCage/${cageId}`, cage, { withCredentials: true })
+            const respone = await axios.put(`http://localhost:8080/updateCage/${cageId}`,
+                {
+                    name: cage.name,
+                    price: cage.price,
+                    size: cage.size,
+                    type: cage.type,
+                    status: 'available',
+                    description: cage.description
+                },
+                { withCredentials: true }
+            )
             if (respone.data.message === 'Cage updated') {
                 toast.success('Updated Cage Successfully!', 2000);
                 navigate('/cages')
@@ -53,7 +67,7 @@ export default function EditCage() {
                 toast.warning(respone.data.message)
             }
         } catch (e) {
-            navigate('/404page')
+            toast.error(e.message)
         }
     }
 

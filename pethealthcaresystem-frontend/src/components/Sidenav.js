@@ -89,6 +89,7 @@ export default function Sidenav() {
       links = [
         { name: 'Dashboard', path: '/dashboard', icon: 'fas fa-tachometer-alt' },
         { name: 'Account', path: '/account', icon: 'fa-solid fa-user' },
+        { name: 'System Config', path: '/configuration', icon: 'fa fa-cog' },
         { name: 'Logout', path: '', icon: 'fas fa-sign-out-alt', onClick: handleLogout },
       ];
       break;
@@ -99,7 +100,7 @@ export default function Sidenav() {
   return (
     <div className="sidenav" style={{ background: 'teal' }}>
       <div className="sidenav-header">
-        <img src="logoApp.svg" alt="Logo" className="logo rounded-circle " style={{background: 'white'}}/>
+        <img src="logoApp.svg" alt="Logo" className="logo rounded-circle " style={{ background: 'white' }} />
         <h5 style={{ color: 'white' }}>Pet Health Care</h5>
       </div>
       <ul>

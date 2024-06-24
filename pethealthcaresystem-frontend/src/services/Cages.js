@@ -1,35 +1,47 @@
+import { EditIcon } from '@chakra-ui/icons';
+import { Button } from '@chakra-ui/react';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import ReactPaginate from 'react-paginate';
+import { Link, useNavigate } from 'react-router-dom';
 
 const Cages = () => {
 
+  const navigate = useNavigate()
+  const [currentPage, setCurrentPage] = useState(0)
+  const [totalPages, setTotalPages] = useState(0)
+  const pageSize = 5
+
   const [cages, setCages] = useState()
-  const [cageName, setCageName] = useState()
+  const [cageName, setCageName] = useState("")
 
   // const [nameCage, setNameCage] = useState("")
 
-  const loadCage = async (name) => {
-    const response = await axios.get(`http://localhost:8080/cage/search/${name}`, { withCredentials: true })
+  const loadCage = async (name, page) => {
+    const response = await axios.get(`http://localhost:8080/cage/search/${name}?page=${page}&size=${pageSize}`, { withCredentials: true })
     if (response.data.message === "Cage found") {
-      setCages(response.data.cages)
+      setCages(response.data.cages.content)
+      setTotalPages(response.data.cages.totalPages)
     }
   }
 
   useEffect(() => {
-    loadCage("");
-  }, [])
+    loadCage(cageName, currentPage);
+  }, [currentPage, cageName])
 
   const handleInputChange = (e) => {
     const value = e.target.value;
     setCageName(value);
-    loadCage(value);
+  }
+
+  const handlePageClick = (data) => {
+    setCurrentPage(data.selected)
   }
 
   return (
     <div className='container'>
-      <div className='row my-3 w-100'>
-        <Link className='add-cage btn btn-primary col-2' to={'/create-cage'}>Add New Cage</Link>
+      <div className='row my-2 w-100'>
+        <Button className='add-cage col-2' colorScheme='teal' onClick={() => navigate('/create-cage')}>Add New Cage</Button>
         <input
           className="search-cage col-7 shadow mx-auto rounded-pill fs-5"
           type="text"
@@ -40,7 +52,7 @@ const Cages = () => {
       </div>
       <div className='list-cage container'>
         {cages?.map((cage, index) => (
-          <div className='cage-index row border shadow w-100 mx-auto'  >
+          <div className='cage-index row border shadow w-100 mx-auto' key={index} >
             <div
               className="cage-avatar border border-dark my-auto mx-4 rounded-circle col-4"
               style={{ height: '65px', width: '65px', overflow: 'hidden', position: 'relative' }}
@@ -59,7 +71,7 @@ const Cages = () => {
                 }}
               ></img>
             </div>
-            <div className="cage-info col-8 row border border-dark my-2 mx-2 mx-auto ">
+            <div className="cage-info col-8 row my-1 mx-2 mx-auto ">
               <div className='d-flex justify-content-between row'>
                 <h4 className='fs-5 my-0 col-6'>Cage: {cage?.name}</h4>
                 <div className='col-6 text-center my-1 border border-dark bg-success-subtle w-25'>
@@ -67,7 +79,7 @@ const Cages = () => {
                 </div>
               </div>
 
-              <div className='row d-flex justify-content-around'>
+              <div className='row d-flex justify-content-around mx-5' style={{ marginTop: '-1%' }} >
                 <div className='d-flex flex-column col-6 w-25'>
                   <div className='text-start'>
                     Size: {cage?.size}
@@ -86,11 +98,16 @@ const Cages = () => {
               </div>
 
               <div
-                className="fs-6 row mt-0 w-50"
+                className="fs-6 row mt-1 fst-italic fw-medium"
                 style={{
-                  whiteSpace: 'nowrap',
+                  display: '-webkit-box',
+                  WebkitBoxOrient: 'vertical',
                   overflow: 'hidden',
-                  textOverflow: 'clip'
+                  textOverflow: 'ellipsis',
+                  WebkitLineClamp: 1,
+                  maxHeight: 'calc(1.2em * 1)',
+                  lineHeight: '1.2em',
+                  whiteSpace: 'normal'
                 }}
               >
                 {cage?.description}
@@ -98,13 +115,37 @@ const Cages = () => {
 
             </div>
             {/* Button */}
-            <div className='col-2 row m-auto'>
-              <Link className='border border-dark col-4 mx-auto btn btn-primary'>View</Link>
-              <Link className='border border-dark col-4 mx-auto btn btn-outline-primary' to={`/edit-cage/${cage?.id}`}>Edit</Link>
+            < div className='col-2 row mx-auto my-auto' >
+              {/* <Link className='border border-dark col-4 mx-auto btn btn-primary'>View</Link> */}
+              {/* <Link className='border border-dark col-4 mx-auto btn btn-outline-primary' to={`/edit-cage/${cage?.id}`}>Edit</Link> */}
+              < span style={{ marginRight: '16px' }} className='icon-container'>
+                <EditIcon style={{ color: 'teal', cursor: 'pointer' }} onClick={() => navigate(`/edit-cage/${cage?.id}`)} />
+                <span className="icon-text">Edit</span>
+              </span>
             </div>
-          </div>
+          </div >
         ))}
 
+      </div >
+      <div className='mt-3'>
+        <ReactPaginate style={{ background: 'teal' }}
+          previousLabel={'Previous'}
+          nextLabel={'Next'}
+          breakLabel={'...'}
+          breakClassName={'break-me'}
+          pageCount={totalPages}
+          marginPagesDisplayed={2}
+          pageRangeDisplayed={5}
+          onPageChange={handlePageClick}
+          containerClassName={'pagination justify-content-center'}
+          pageClassName={'page-item'}
+          pageLinkClassName={'page-link'}
+          previousClassName={'page-item'}
+          previousLinkClassName={'page-link'}
+          nextClassName={'page-item'}
+          nextLinkClassName={'page-link'}
+          activeClassName={'active'}
+        />
       </div>
     </div >
   );

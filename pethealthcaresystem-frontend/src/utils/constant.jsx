@@ -64,6 +64,9 @@ export const LIST_BREED = {
         'Poicephalus Parrot',
         'Rosella',
         'Cockatiel'
+    ],
+    Other: [
+        'Other'
     ]
 }
 
