@@ -196,26 +196,31 @@ public class BookingController {
         }
     }
 
-    //    @GetMapping("/booking/{phoneNumber}")
-//    public ResponseEntity<ResponseData> getBookingByPhoneNumber(@PathVariable(name = "phoneNumber") String phoneNumber) {
-//        try {
-//            ResponseData<List<Booking>> responseData = new ResponseData<>();
-//            List<Booking> bookings = bookingService.getBookingsByPhone(phoneNumber);
-//            responseData.setData(bookings);
-//            responseData.setStatusCode(200);
-//            return new ResponseEntity<>(responseData, HttpStatus.OK);
-//        }catch(RuntimeException e){
-//            ResponseData<Booking> responseData = new ResponseData<>();
-//            responseData.setStatusCode(400);
-//            responseData.setErrorMessage(e.getMessage());
-//            return new ResponseEntity<>(responseData, HttpStatus.BAD_REQUEST);
-//        }
-//    }
+    @GetMapping("all-bookings")
+    public ResponseEntity<ResponseData> getAllBookings(
+            HttpSession session,
+            @RequestParam(defaultValue = "1") Integer pageNo,
+            @RequestParam Integer pageSize
+    ) {
+        try {
+            ResponseData<Page<Booking>> responseData = new ResponseData<>();
+            Page<Booking> bookings = bookingService.getBookings(pageNo, pageSize);
+            responseData.setData(bookings);
+            responseData.setStatusCode(200);
+            return new ResponseEntity<>(responseData, HttpStatus.OK);
+        } catch (RuntimeException e) {
+            ResponseData<Page<Booking>> responseData = new ResponseData<>();
+            responseData.setStatusCode(400);
+            responseData.setErrorMessage(e.getMessage());
+            return new ResponseEntity<>(responseData, HttpStatus.BAD_REQUEST);
+        }
+    }
+
     @GetMapping("/reservations")
     public ResponseEntity<ResponseData> getBookingsByUserAndStatus(
             HttpSession session,
             @RequestParam(defaultValue = "1") Integer pageNo,
-            @RequestParam Integer  pageSize) {
+            @RequestParam Integer pageSize) {
         try {
             User currentUser = (User) session.getAttribute("user");
             if (currentUser != null) {
@@ -233,13 +238,14 @@ public class BookingController {
             return new ResponseEntity<>(responseData, HttpStatus.BAD_REQUEST);
         }
     }
+
     @GetMapping("staff-bookings-status/{status}")
     public ResponseEntity<ResponseData> getBookingsByStaffAndStatus(
             @PathVariable String status,
             @RequestParam(defaultValue = "1") Integer pageNo,
             @RequestParam Integer pageSize,
             HttpSession session) {
-        try{
+        try {
             User currentUser = (User) session.getAttribute("user");
             if (currentUser != null) {
                 ResponseData<Page<Booking>> responseData = new ResponseData<>();
@@ -250,7 +256,7 @@ public class BookingController {
                 return new ResponseEntity<>(responseData, HttpStatus.OK);
             }
             return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
-        }catch (Exception e){
+        } catch (Exception e) {
             ResponseData<Page<Booking>> responseData = new ResponseData<>();
             responseData.setStatusCode(400);
             responseData.setErrorMessage(e.getMessage());
@@ -258,38 +264,69 @@ public class BookingController {
 
         }
     }
+
     @GetMapping("staff-bookings-date")
-    public ResponseEntity<ResponseData> getBookingsByStaffAndDate(
+    public ResponseEntity<ResponseData> getBookingsByStaffWithDate(
             HttpSession session,
             @RequestParam String fromDate,
             @RequestParam String toDate,
             @RequestParam(defaultValue = "1") Integer pageNo,
-            @RequestParam Integer pageSize){
+            @RequestParam Integer pageSize) {
         try {
             User currentUser = (User) session.getAttribute("user");
             if (currentUser != null) {
                 ResponseData<Page<Booking>> responseData = new ResponseData<>();
                 Page<Booking> bookings;
-                System.out.println("here test ------------");
-                System.out.println(fromDate);
-                System.out.println(toDate);
                 Date from = SystemUtils.endOfDay(SystemUtils.parseStringToDate(fromDate));
                 Date to = SystemUtils.endOfDay(SystemUtils.parseStringToDate(toDate));
-                System.out.println(from);
-                System.out.println(to);
-                bookings = bookingService.getBookingByBookingDate(from,to,pageNo, pageSize);
+                bookings = bookingService.getBookingByBookingDate(from, to, pageNo, pageSize);
                 responseData.setData(bookings);
                 responseData.setStatusCode(200);
                 return new ResponseEntity<>(responseData, HttpStatus.OK);
             }
             return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
 
-        }catch (Exception e){
+        } catch (Exception e) {
             ResponseData<Page<Booking>> responseData = new ResponseData<>();
             responseData.setStatusCode(400);
             responseData.setErrorMessage(e.getMessage());
             return new ResponseEntity<>(responseData, HttpStatus.BAD_REQUEST);
 
         }
+    }
+
+    @GetMapping("staff-booking-date-status")
+    public ResponseEntity<ResponseData> getBookingsByStaffWithDateStatusPhoneNumber(
+            HttpSession session,
+            @RequestParam(defaultValue = "1") Integer pageNo,
+            @RequestParam Integer pageSize,
+            @RequestParam String fromDate,
+            @RequestParam String toDate,
+            @RequestParam String status
+    ) {
+        try {
+            User currentUser = (User) session.getAttribute("user");
+            if (currentUser != null) {
+                ResponseData<Page<Booking>> responseData = new ResponseData<>();
+                Page<Booking> bookings;
+                Date from = SystemUtils.endOfDay(SystemUtils.parseStringToDate(fromDate));
+                Date to = SystemUtils.endOfDay(SystemUtils.parseStringToDate(toDate));
+                System.out.println(from);
+                System.out.println(to);
+                System.out.println(status);
+                bookings = bookingService.getBookingByStatusAndDate(status, from, to, pageNo, pageSize);
+                System.out.println(bookings);
+                responseData.setData(bookings);
+                responseData.setStatusCode(200);
+                return new ResponseEntity<>(responseData, HttpStatus.OK);
+            }
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            ResponseData<Page<Booking>> responseData = new ResponseData<>();
+            responseData.setStatusCode(400);
+            responseData.setErrorMessage(e.getMessage());
+            return new ResponseEntity<>(responseData, HttpStatus.BAD_REQUEST);
+        }
+
     }
 }

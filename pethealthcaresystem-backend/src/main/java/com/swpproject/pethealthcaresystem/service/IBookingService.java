@@ -23,4 +23,6 @@ public interface IBookingService {
     Page<Booking> getBookingsByUserAndStatus(int userId, String status, int pageNo, int pageSize);
     Page<Booking> getBookingsByStatus(String status, int pageNo, int pageSize);
     Page<Booking> getBookingByBookingDate(Date fromDate, Date toDate, int pageNo, int pageSize);
+    Page<Booking> getBookingByStatusAndDate(String status, Date fromDate, Date toDate, int pageNo, int pageSize);
+//    Page<Booking> getBookingByDateAndStatusAndPhoneNumber(Date fromDate,Date toDate, String status, String phoneNumber, int pageNo, int pageSize);
 }

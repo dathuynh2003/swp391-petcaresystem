@@ -215,4 +215,25 @@ public class BookingService implements IBookingService {
         Page<Booking> bookings = bookingRepository.findByBookingDateBetween(fromDate, toDate, pageable);
         return bookings;
     }
+
+    @Override
+    public Page<Booking> getBookingByStatusAndDate(String status, Date fromDate, Date toDate, int pageNo, int pageSize) {
+        Pageable pageable = PageRequest.of(pageNo - 1, pageSize, Sort.by("id").descending());
+        Page<Booking> bookings = bookingRepository.findByBookingDateBetweenAndStatus(fromDate, toDate, status, pageable);
+        return bookings;
+    }
+
+//    @Override
+//    public Page<Booking> getBookingByDateAndStatus
+//            (Date fromDate, Date toDate, String status, String phoneNumber, int pageNo, int pageSize) {
+//        System.out.println("Entry here");
+//        Pageable pageable = PageRequest.of(pageNo - 1, pageSize, Sort.by("id").descending());
+//        Page<Booking> bookings =
+//                bookingRepository.findByStatusAndBookingDateBetweenAndUserPhoneNumber
+//                        (status, fromDate, toDate, phoneNumber, pageable);
+//        return bookings;
+//
+//
+//
+//    }
 }
