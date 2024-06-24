@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { Tab, TabList, Tabs, TabPanel, TabPanels, Button, Input } from '@chakra-ui/react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Tab, TabList, Tabs, TabPanel, TabPanels, Button, WrapItem, Avatar, background, Select, Input } from '@chakra-ui/react';
 import axios from 'axios';
 import { CheckIcon } from '@chakra-ui/icons';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer, toast } from 'react-toastify';
+import ReactPaginate from 'react-paginate';
+import { Box, Image, Table, Tbody, Td, Text, Th, Thead, Tr } from '@chakra-ui/react';
 
 
 
@@ -18,7 +20,9 @@ export default function Booking() {
     //   }
     // },[])
 
-
+    const [pageNo, setPageNo] = useState(0)
+    const [pageSize, setPageSize] = useState(5)
+    const [totalPages, setTotalPages] = useState(0)
     const location = useLocation();
 
 
@@ -34,10 +38,55 @@ export default function Booking() {
     const [pets, setPets] = useState([]);
     const [selectedPet, setSelectedPet] = useState(null);
 
+    const data = location?.state;
+    const isFirstRun = useRef(true);
+    useEffect(() => {
+        loadServices();
+        loadShift();
+        // Kiểm tra xem data có tồn tại không và không được trống
+        // const data = location?.state;
+
+    }, []);
+    useEffect(() => {
+        if (isFirstRun.current) {
+            isFirstRun.current = false;
+            return;
+        }
+        if (data) {
+            setSelectedServices(prevSelected => [...prevSelected, data]);
+        }
+
+    }, [])
+
     const loadServices = async () => {
-        const response = await axios.get('http://localhost:8080/allServices');
-        setServices(response.data);
+        try {
+            let size = pageSize
+            if (pageNo === 0 && data) {
+                size = 4
+            }
+            const response = await axios.get(`http://localhost:8080/services?pageNo=${pageNo}&pageSize=${size}`)
+            let list = response.data.content
+            if (data) {
+                list = list.filter(service => service.id !== data.id)
+                if (pageNo === 0) {
+                    list = [data, ...list]
+                }
+            }
+            setServices(list)
+            setTotalPages(response.data.totalPages)
+
+
+
+
+        } catch (error) {
+            console.log(error)
+        }
+
     };
+    useEffect(() => {
+        loadServices()
+
+    }, [pageNo])
 
     const loadPets = async () => {
         if (!phone) {
@@ -59,21 +108,14 @@ export default function Booking() {
     };
 
     const loadShift = async () => {
-        const response = await axios.get('http://localhost:8080/shifts/details', { withCredentials: true });
-        setShifts(response.data);
+        try {
+            const response = await axios.get('http://localhost:8080/shifts/details', { withCredentials: true });
+            setShifts(response.data);
+        } catch (error) {
+            console.log(error)
+        }
     };
 
-    useEffect(() => {
-        loadServices();
-        loadShift();
-        // Kiểm tra xem data có tồn tại không và không được trống
-        const data = location?.state;
-        console.log("gui qua");
-        console.log(data);
-        if (data) {
-            setSelectedServices(prevServices => [...prevServices, data]);
-        }
-    }, []);
 
 
 
@@ -134,12 +176,17 @@ export default function Booking() {
     };
 
     const formatDate = (date) => {
-        return date.toLocaleDateString("en", { weekday: 'short', month: 'long', day: 'numeric' }); // Định dạng ngày thành dd/mm/yyyy
+        return date?.toLocaleDateString("en", { weekday: 'short', month: 'long', day: 'numeric' }); // Định dạng ngày thành dd/mm/yyyy
     };
 
     const [vets, setVets] = useState([]);
     const [activeDateIndex, setActiveDateIndex] = useState(null);
     const [shifts, setShifts] = useState([]);
+    const handlePageClick = (data) => {
+        setPageNo(data.selected)
+    }
+
+
     const handleClickDay = async (date, index) => {
         setSelectedVetShift(null);
         setActiveShiftIndex(null);
@@ -254,6 +301,24 @@ export default function Booking() {
         } catch (error) {
             console.error('Error updating booking to PAID:', error);
         }
+
+        const payment = {
+            paymentType: 'Cash',  // You can modify this as per your requirement
+            amount: curBooking.totalAmount,
+            paymentDate: new Date().toISOString(),
+            status: 'PAID',
+            description: curBooking.description,
+            user: selectedPet.owner,
+            booking: curBooking
+        };
+
+        try {
+            const response = await axios.post('http://localhost:8080/api/payment/create', payment, { withCredentials: true });
+        } catch (error) {
+            toast.error('Payment failed!');
+            console.error(error);
+        }
+
         setStep(step + 1)
         toast.done('Book Appointment Successfully!')
     }
@@ -270,6 +335,55 @@ export default function Booking() {
         toast.done('Cancel Book Appointment Successfully!')
     }
 
+    const [vetList, setVetList] = useState([]);
+    const handleGetVets = async () => {
+        try {
+            const respone = await axios.get('http://localhost:8080/vets', { withCredentials: true })
+            if (respone.data.message === "Successfully") {
+                setVetList(respone.data.vets);
+            }
+        } catch (e) {
+            toast.error(e.message);
+        }
+    }
+    const [selectedVet, setSelectedVet] = useState('');
+    const [groupedVetShiftDetails, setGroupedVetShiftDetails] = useState({});
+    // Hàm để nhóm các đối tượng theo ngày
+    const groupByDate = (vetShiftDetails) => {
+        return vetShiftDetails.reduce((acc, detail) => {
+            if (!acc[detail.date]) {
+                acc[detail.date] = []
+            }
+            acc[detail.date].push(detail)
+            return acc;
+        }, {})
+    }
+
+    const handleVetChange = (e) => {
+        const userId = parseInt(e.target.value, 10)
+        const vet = vetList.find(vet => vet.userId === userId);
+        setSelectedVet(vet);
+        if (vet) {
+            const grouped = groupByDate(vet.vetShiftDetails)
+            setGroupedVetShiftDetails(grouped)
+        }
+    }
+
+    // Chuyển đổi đối tượng groupedVetShiftDetails thành mảng
+    const groupedVetShiftDetailsArray = Object.keys(groupedVetShiftDetails).map(date => ({
+        date,
+        details: groupedVetShiftDetails[date]
+    }));
+
+    const [selectedDate, setSelectedDate] = useState()
+    const handleClickDay2 = async (date, index) => {
+        setSelectedVetShift(null);
+        setActiveShiftIndex(null);
+        setDisplaySelectedDate(date.toLocaleDateString("en-Gb", { month: 'numeric', day: 'numeric', year: 'numeric' }))
+        setActiveDateIndex(index)
+        setSelectedDate(new Date(date).toLocaleDateString('en-CA'))
+    };
+
     return (
         <div className="container">
             <div className="row">
@@ -279,7 +393,6 @@ export default function Booking() {
                         <Tab>Services</Tab>
                         <Tab >Choose Pet</Tab>
                         <Tab >Reason</Tab>
-                        {/* isDisabled={booking?.description === '' || selectedServices.length === 0} */}
                         <Tab >Time</Tab>
                         <Tab>Payment</Tab>
                         {/* <Tab>Get Ready</Tab> */}
@@ -291,32 +404,35 @@ export default function Booking() {
                         <TabPanel>
                             <b className="row mx-auto">Our Services</b>
                             <div className="container">
-                                {services.map((service, index) => (
+                                {services?.map((service, index) => (
                                     <div
                                         key={index}
-                                        className="row w-100 shadow m-3 rounded-3"
-                                        style={{ height: '85px' }}
+                                        className="row w-100 shadow m-3 rounded-3 service-item "
+                                        style={{ height: '100px', cursor: 'pointer' }}
                                         onClick={() => chooseServices(service)}
+
                                     >
-                                        <div className="service-info col-7 my-auto mx-3 border h-75">
-                                            <h5>{service.nameService}</h5>
-                                            <div className="fs-6">{service.description}</div>
+                                        <div className="service-info col-7 my-auto mx-3  h-100 d-flex gap-3 align-items-center">
+                                            <WrapItem className='mt-2'>
+                                                <Avatar size='lg' src={service?.img} />
+                                            </WrapItem>
+                                            <div className='mt-2 mb-3'>
+                                                <h5>{service?.nameService}</h5>
+                                                <div className="fs-6 fst-italic">{service?.description}</div>
+                                            </div>
                                         </div>
-                                        <div className="service-price col-2 my-auto mx-3 border h-75 text-center">
-                                            <div className="my-3 p-1">{service.price.toLocaleString('vi-VN')} VND</div>
+                                        <div className="service-price col-3 my-auto  text-center">
+                                            <div className="my-3 p-1 fw-bold">{service?.price?.toLocaleString('vi-VN') + " "}VND</div>
                                         </div>
                                         <div
-                                            className="service-choose col-1 mx-3 my-auto border rounded-circle"
+                                            className="service-choose col-1 mx-3 my-auto  rounded-circle"
                                             style={{ width: '50px', height: '50px' }}
                                         >
-                                            {selectedServices.some((selectedService) => selectedService.id === service.id) ? (
-                                                <CheckIcon
-                                                    className="rounded-circle border"
+                                            {selectedServices?.some((selectedService) => selectedService?.id === service?.id) ? (
+                                                <CheckIcon boxSize={8}
+                                                    className="rounded-circle"
                                                     style={{
-                                                        backgroundColor: '#007DDE',
-                                                        width: '49px',
-                                                        height: '49px',
-                                                        marginLeft: '-12px',
+                                                        backgroundColor: 'teal',
                                                         color: 'white',
                                                     }}
                                                 />
@@ -328,12 +444,32 @@ export default function Booking() {
                                 ))}
 
                             </div>
+                            <div>
+                                <ReactPaginate
+                                    previousLabel={'Previous'}
+                                    nextLabel={'Next'}
+                                    breakLabel={'...'}
+                                    breakClassName={'break-me'}
+                                    pageCount={totalPages}
+                                    marginPagesDisplayed={2}
+                                    pageRangeDisplayed={5}
+                                    onPageChange={handlePageClick}
+                                    containerClassName={'pagination justify-content-center'}
+                                    pageClassName={'page-item'}
+                                    pageLinkClassName={'page-link'}
+                                    previousClassName={'page-item'}
+                                    previousLinkClassName={'page-link'}
+                                    nextClassName={'page-item'}
+                                    nextLinkClassName={'page-link'}
+                                    activeClassName={'active'}
+                                />
+                            </div>
                             <div className='text-center'>
-                                <div className='btn btn-primary' onClick={() => handleNextClick(selectedServices)}>Next</div>
+                                <Button style={{ background: 'teal', color: 'white' }} onClick={() => handleNextClick(selectedServices)}>Next</Button>
                             </div>
                         </TabPanel>
 
-                        <TabPanel>
+                        <TabPanel className="mx-auto">
                             <div className="container">
                                 <div className="row">
                                     <Input
@@ -348,7 +484,7 @@ export default function Booking() {
                                     </Button>
                                 </div>
                                 <div className="container">
-                                    {pets.map((pet, index) => (
+                                    {pets?.map((pet, index) => (
                                         <div
                                             key={index}
                                             className="row w-100 shadow m-3 rounded-3"
@@ -363,7 +499,7 @@ export default function Booking() {
                                                 {pet.petType === 'Dog' && (
                                                     <img
                                                         className="rounded-circle"
-                                                        src={`http://localhost:8080${pet.avatar}`}
+                                                        src={pet.avatar === null ? '' : pet.avatar}
                                                         alt="DogImg"
                                                         style={{
                                                             position: 'absolute',
@@ -374,11 +510,14 @@ export default function Booking() {
                                                             objectFit: 'cover',
                                                         }}
                                                     ></img>
+                                                    //   <WrapItem className='mt-2'>
+                                                    //   <Avatar size='lg'  src={pet.img} />
+                                                    // </WrapItem>
                                                 )}
                                                 {pet.petType === 'Cat' && (
                                                     <img
                                                         className="rounded-circle"
-                                                        src=""
+                                                        src={pet.avatar === null ? '' : pet.avatar}
                                                         alt="CatImg"
                                                         style={{
                                                             position: 'absolute',
@@ -393,7 +532,7 @@ export default function Booking() {
                                                 {pet.petType === 'Bird' && (
                                                     <img
                                                         className="rounded-circle"
-                                                        src=""
+                                                        src={pet.avatar === null ? '' : pet.avatar}
                                                         alt="BirdImg"
                                                         style={{
                                                             position: 'absolute',
@@ -406,24 +545,21 @@ export default function Booking() {
                                                     ></img>
                                                 )}
                                             </div>
-                                            <div className="pet-info col-8 border my-2 mx-2">
-                                                <h4>{pet.name}</h4>
+                                            <div className="pet-info col-8  my-2 mx-2">
+                                                <h5>{pet.name}</h5>
                                                 <div className="fs-6">
                                                     {pet.petType}. {pet.age} Months. {pet.breed}
                                                 </div>
                                             </div>
                                             <div
-                                                className="pet-choose col-1 my-auto mx-4 border rounded-circle"
+                                                className="pet-choose col-1 my-auto mx-4  rounded-circle"
                                                 style={{ width: '50px', height: '50px' }}
                                             >
                                                 {pet.petId === selectedPet?.petId ? (
-                                                    <CheckIcon
-                                                        className="rounded-circle border"
+                                                    <CheckIcon boxSize={8}
+                                                        className="rounded-circle"
                                                         style={{
-                                                            backgroundColor: '#007DDE',
-                                                            width: '49px',
-                                                            height: '49px',
-                                                            marginLeft: '-12px',
+                                                            backgroundColor: 'teal',
                                                             color: 'white',
                                                         }}
                                                     />
@@ -435,9 +571,9 @@ export default function Booking() {
                                     ))}
                                 </div>
                             </div>
-                            <div className='text-center'>
-                                <div className='btn btn-primary' onClick={() => handleBackClick()}>Back</div>
-                                <div className='btn btn-primary' onClick={() => handleNextClick(selectedPet)}>Next</div>
+                            <div className='d-flex justify-content-center gap-3'>
+                                <Button style={{ background: 'teal', color: 'white' }} onClick={() => handleBackClick()}>Back</Button>
+                                <Button style={{ background: 'teal', color: 'white' }} onClick={() => handleNextClick(selectedPet)}>Next</Button>
                             </div>
                         </TabPanel>
 
@@ -454,95 +590,209 @@ export default function Booking() {
                                 <label htmlFor="floatingTextarea2">Eg: My pet hasn't been eating the last few days</label>
                             </div>
 
-                            <div className='text-center mt-3'>
-                                <div className='btn btn-primary' onClick={() => handleBackClick()}>Back</div>
-                                <div className='btn btn-primary' onClick={() => handleNextClickDescription()}>Next</div>
+                            <div className='d-flex justify-content-center gap-3 mt-3'>
+                                <Button style={{ background: 'teal', color: 'white' }} onClick={() => handleBackClick()}>Back</Button>
+                                <Button style={{ background: 'teal', color: 'white' }} onClick={() => handleNextClickDescription()}>Next</Button>
 
                             </div>
 
                         </TabPanel>
 
                         <TabPanel>
-                            <div className="container">
-                                <div className="row">
-                                    <div className="col-md-12 border rounded p-4 mt-2 shadow">
-                                        <div className="d-flex justify-content-between mb-3">
-                                            <button className="btn btn-primary" onClick={handlePreviousWeek}>
-                                                Previous Week
-                                            </button>
-                                            <button className="btn btn-primary" onClick={handleNextWeek}>
-                                                Next Week
-                                            </button>
-                                        </div>
-                                        <div className='choose-date row'>
-                                            {dates.map((date, index) => (
-                                                <Button
-                                                    key={index}
-                                                    className={`mx-auto btn btn-outline-primary fw-normal ${activeDateIndex === index ? 'active' : ''}`}
-                                                    style={{ width: '12%' }}
-                                                    onClick={() => handleClickDay(date, index)}
-                                                >{`${formatDate(date)}`} <br /> </Button>
-                                                // {`(${formatDay(date)})`}  
-
-                                            ))}
-                                        </div>
-                                        <div className='choose-vetshift'>
-                                            {vets.map((vet, index) => (
-                                                <div className=''>
-                                                    <h1 className='fs-3'>{vet?.fullName}</h1>
-                                                    <div className='row'>
-                                                        {vet?.workSchedule?.map((workSchedule, workScheduleIndex) => (
-                                                            <button
-                                                                className={`col-2 mx-4 my-2 btn btn-outline-primary ${activeShiftIndex === workSchedule?.vs_id ? 'active' : ''}`}
-                                                                disabled={workSchedule?.status !== "Available"}
-                                                                onClick={() => chooseShift(workSchedule?.vs_id, workSchedule?.vs_id, vet?.fullName, workSchedule?.shift.from_time + ' - ' + workSchedule?.shift.to_time)}
-                                                            >
-                                                                {workSchedule?.shift?.from_time} - {workSchedule?.shift?.to_time}
-                                                            </button>
+                            <Tabs variant='soft-rounded' colorScheme='teal'>
+                                <TabList className='d-flex justify-content-center text-center'>
+                                    <Tab
+                                        className='col-4 mx-5 mt-3'
+                                        _selected={{ bg: 'teal', color: 'white' }}
+                                        _hover={{ bg: 'teal', color: 'white' }}
+                                        onClick={() => {
+                                            setSelectedVetShift(null);
+                                            setActiveShiftIndex(null);
+                                            setActiveDateIndex(null)
+                                            setVets([])
+                                            setVetName('');
+                                            setTime('')
+                                        }}
+                                    >
+                                        Choose Date First
+                                    </Tab>
+                                    <Tab
+                                        className='col-4 mx-5 mt-3'
+                                        _selected={{ bg: 'teal', color: 'white' }}
+                                        _hover={{ bg: 'teal', color: 'white' }}
+                                        onClick={() => {
+                                            setSelectedVetShift(null)
+                                            setActiveShiftIndex(null)
+                                            setActiveDateIndex(null)
+                                            setSelectedDate(null)
+                                            setVetName('')
+                                            setTime('')
+                                            handleGetVets();
+                                        }}
+                                    >
+                                        Choose Vet First
+                                    </Tab>
+                                </TabList>
+                                <TabPanels>
+                                    <TabPanel>
+                                        <div className="container">
+                                            <div className="row">
+                                                <div className="col-md-12 border rounded p-4 mt-2 shadow">
+                                                    <div className="d-flex justify-content-between mb-3">
+                                                        <Button onClick={handlePreviousWeek} style={{ background: 'teal', color: 'white' }}>
+                                                            Previous Week
+                                                        </Button>
+                                                        <Button onClick={handleNextWeek} style={{ background: 'teal', color: 'white' }}>
+                                                            Next Week
+                                                        </Button>
+                                                    </div>
+                                                    <div className='choose-date row mt-3'>
+                                                        {dates.map((date, index) => (
+                                                            <Button
+                                                                key={index}
+                                                                className='mx-auto btn  fw-normal'
+                                                                style={{ width: '12%', color: activeDateIndex === index ? 'white' : '', background: activeDateIndex === index ? ' rgb(80, 200, 180)' : '' }}
+                                                                onClick={() => handleClickDay(date, index)}
+                                                            >{`${formatDate(date)}`} <br /> </Button>
+                                                        ))}
+                                                    </div>
+                                                    <div className='choose-vetshift mt-3'>
+                                                        {vets.map((vet, index) => (
+                                                            <div className=' text-center' >
+                                                                <h1 className='fs-3'>{vet?.fullName}</h1>
+                                                                <div className='row  mr-3 mx-2 ' >
+                                                                    {vet?.workSchedule?.map((workSchedule, workScheduleIndex) => (
+                                                                        <>
+                                                                            <button
+                                                                                className='col-2 mt-3 mx-3 my-2 btn'
+                                                                                style={{ width: '12%', color: activeShiftIndex === workSchedule?.vs_id ? 'white' : '', background: activeShiftIndex === workSchedule?.vs_id ? ' rgb(80, 200, 180)' : '' }}
+                                                                                disabled={workSchedule?.status !== "Available"}
+                                                                                onClick={() => chooseShift(workSchedule?.vs_id, workSchedule?.vs_id, vet?.fullName, workSchedule?.shift.from_time + ' - ' + workSchedule?.shift.to_time)}
+                                                                                _hover={{ background: 'teal', color: 'white' }}
+                                                                            >
+                                                                                {workSchedule?.shift?.from_time} - {workSchedule?.shift?.to_time}
+                                                                            </button>
+                                                                        </>
+                                                                    ))}
+                                                                </div>
+                                                            </div>
                                                         ))}
                                                     </div>
                                                 </div>
-                                            ))}
+                                            </div>
                                         </div>
-                                    </div>
-                                    {/* <div className='btn btn-primary' onClick={() => callAPI()}>
-                    Choose
-                  </div> */}
+                                        <div className='text-center mt-3 d-flex d-flex justify-content-center gap-3 text-center'>
+                                            <Button onClick={() => handleBackClick()} style={{ background: 'teal', color: 'white' }}>Back</Button>
+                                            <Button onClick={() => handleClickAPI(selectedVetShift)} style={{ background: 'teal', color: 'white' }}>Next</Button>
+                                        </div>
+                                    </TabPanel>
+                                    <TabPanel>
+                                        <div className="container">
+                                            <div className="row border rounded p-4 mt-2 shadow">
+                                                <div className='d-flex justify-content-center'>
+                                                    <Select
+                                                        placeholder='Select Vet'
+                                                        width={'50%'}
+                                                        onChange={handleVetChange}
+                                                    >
+                                                        {vetList?.map((vet, index) => (
+                                                            <option value={vet?.userId}>{vet?.fullName}</option>
+                                                        ))}
+                                                    </Select>
+                                                </div>
+                                                {selectedVet !== '' &&
+                                                    <div className='col-12 my-2'>
+                                                        <div className="d-flex justify-content-between mb-3">
+                                                            <Button onClick={handlePreviousWeek} style={{ background: 'teal', color: 'white' }}>
+                                                                Previous Week
+                                                            </Button>
+                                                            <Button onClick={handleNextWeek} style={{ background: 'teal', color: 'white' }}>
+                                                                Next Week
+                                                            </Button>
+                                                        </div>
+                                                        <div className='choose-date row'>
+                                                            {dates.map((date, index) => (
+                                                                <Button
+                                                                    key={index}
+                                                                    className='mx-auto btn  fw-normal'
+                                                                    style={{ width: '12%', color: activeDateIndex === index ? 'white' : '', background: activeDateIndex === index ? ' rgb(80, 200, 180)' : '' }}
+                                                                    onClick={() => handleClickDay2(date, index)}
+                                                                    isDisabled={!groupedVetShiftDetailsArray.some(detail => detail.date === new Date(date).toLocaleDateString('en-CA'))}
+                                                                >{`${formatDate(date)}`} <br /> </Button>
+                                                            ))}
+                                                        </div>
+                                                        <div className='choose-vetshift'>
+                                                            {groupedVetShiftDetailsArray
+                                                                .filter(detail => detail.date === selectedDate)
+                                                                .map((vetShiftDetail, index) => (
+                                                                    <div className='row'>
+                                                                        {vetShiftDetail?.details?.map((detail, detailIndex) => (
+                                                                            <button
+                                                                                className='col-2 mt-3 mx-3 my-2 btn'
+                                                                                style={{ width: '12%', color: activeShiftIndex === detail?.vs_id ? 'white' : '', background: activeShiftIndex === detail?.vs_id ? ' rgb(80, 200, 180)' : '' }}
+                                                                                disabled={detail?.status !== "Available"}
+                                                                                onClick={() => chooseShift(detail?.vs_id, detail?.vs_id, selectedVet.fullName, detail?.shift.from_time + ' - ' + detail?.shift.to_time)}
+                                                                            >
+                                                                                {detail?.shift?.from_time} - {detail?.shift?.to_time}
+                                                                            </button>
+                                                                        ))}
+                                                                    </div>
+                                                                ))}
+                                                        </div>
+                                                    </div>
+                                                }
 
-                                </div>
-                            </div>
-                            <div className='text-center mt-3'>
-                                <div className='btn btn-primary' onClick={() => handleBackClick()}>Back</div>
-                                <div className='btn btn-primary' onClick={() => handleClickAPI(selectedVetShift)}>Next</div>
-                            </div>
+                                            </div>
+                                        </div>
+                                        <div className='text-center mt-3 d-flex d-flex justify-content-center gap-3 text-center'>
+                                            <Button onClick={() => handleBackClick()} style={{ background: 'teal', color: 'white' }}>Back</Button>
+                                            <Button onClick={() => handleClickAPI(selectedVetShift)} style={{ background: 'teal', color: 'white' }}>Next</Button>
+                                        </div>
+                                    </TabPanel>
+                                </TabPanels>
+                            </Tabs>
                         </TabPanel>
                         <TabPanel>
-                            <div className='container row'>
-                                <div className='col border rounded-lg p-4 mt-2 shadow p-3 mb-5 bg-body-tertiary rounded '>
-                                    <div className='d-flex align-items-center'><img src="assets/logoPetCare.png" alt="Logo" className="logo" /> Pet Health Care</div>
-                                    <h2 className='text-center mb-3'>
+                            <Box className='container row'>
+                                <Box className='col border rounded-lg p-4 mt-2 shadow p-3 mb-5 bg-body-tertiary rounded'>
+                                    <Box display='flex' alignItems='center'>
+                                        <Image src="logoApp.svg" alt="Logo" className="logo" /> Pet Health Care
+                                    </Box>
+                                    <Text as='h2' textAlign='center' mb={3}>
                                         Booking Information
-                                    </h2>
+                                    </Text>
+                                    <div className="mb-3 d-flex justify-content-end">
+                                        {/* <label className="w-50 "><b>Booking ID: </b>Chưa xử lí</label> */}
+                                    </div>
                                     <div className='shadow p-3 mb-5 bg-body-tertiary rounded'>
-                                        <div className="border-bottom mb-3">
-                                            <label className="w-50 "><b>Booking ID: </b>Chưa xử lí</label>
+
+
+                                        <div className="d-flex border-bottom mb-3">
                                             <label className="w-50 "><b>Date: </b>{new Date().toLocaleDateString("en-Gb", { month: 'numeric', day: 'numeric', year: 'numeric' })} </label>
+                                            <div className='w-50'>
+                                                <label className="w-50"><b >Pet's name: </b> {selectedPet?.name}</label>
+                                                <label className="w-50" ><b>Pet's type: </b> {selectedPet?.petType}</label>
+
+                                            </div>
+
                                         </div>
 
-                                        <div className="border-bottom mb-3">
+
+                                        <div className="d-flex border-bottom mb-3 ">
                                             <label className="w-50"><b>Pet's owner: </b> {selectedPet?.owner?.fullName}</label>
-                                            <label className="w-50"><b>Phone number: </b>{selectedPet?.owner?.phone}</label>
+                                            <div className='w-50'>
+                                                <label className="w-50"><b>Pet's breed: </b> {selectedPet?.breed}</label>
+                                                <label className='w-50'><b >Pet's sex: </b> {selectedPet?.gender}</label>
+
+                                            </div>
+
                                         </div>
-
-
                                         <div className="border-bottom mb-3 ">
-                                            <label className="w-50"><b >Pet's name: </b> {selectedPet?.name}</label>
-                                            <label className="w-50" ><b>Pet's type: </b> {selectedPet?.petType}</label>
-                                        </div>
-                                        <div className="d-flex justify-content-between">
-                                            <label ><b>Pet's breed: </b> {selectedPet?.breed}</label>
-                                            <label ><b >Pet's sex: </b> {selectedPet?.gender}</label>
-                                            <label ><b>Pet's age: </b> {selectedPet?.age} month(s)</label>
+
+                                            <label className="w-50"><b>Phone number: </b>{selectedPet?.owner?.phoneNumber}</label>
+                                            <label className='w-50'><b>Pet's age: </b> {selectedPet?.age} month(s)</label>
+
+
                                         </div>
 
                                     </div>
@@ -561,47 +811,43 @@ export default function Booking() {
                                         </div>
                                     </div>
 
+                                    <Text as='h4' textAlign='center' mb={1} mt={3} fontWeight='normal'>
+                                        Services' Information
+                                    </Text>
+                                    <Box mb={5} bg='gray.100' borderRadius='lg'>
+                                        <Table variant='simple'>
+                                            <Thead bg='gray.200'>
+                                                <Tr textAlign='center'>
+                                                    <Th>No</Th>
+                                                    <Th>Name</Th>
+                                                    <Th>Description</Th>
+                                                    <Th>Price</Th>
+                                                </Tr>
+                                            </Thead>
+                                            <Tbody>
+                                                {selectedServices.map((service, index) => (
+                                                    <Tr key={index} textAlign='center'>
+                                                        <Td>{index + 1}</Td>
+                                                        <Td>{service?.nameService}</Td>
+                                                        <Td>{service?.description}</Td>
+                                                        <Td>{service?.price.toLocaleString('vi-VN')}</Td>
+                                                    </Tr>
+                                                ))}
+                                            </Tbody>
+                                        </Table>
 
-
-                                    <h4 className='text-center mb-1 mt-3 font-weight-bold fw-normal'>
-                                        Services's Information
-                                    </h4>
-                                    <div className='shadow  mb-5 bg-body-tertiary rounded'>
-                                        <table className="table">
-                                            <thead className="table-light">
-                                                <tr className='text-center'>
-                                                    <th scope="col">No</th>
-                                                    <th scope="col">Name</th>
-                                                    <th scope="col">Description</th>
-                                                    <th scope="col">Price</th>
-                                                </tr>
-                                            </thead>
-
-                                            {selectedServices.map((service, index) => (
-
-                                                <tbody>
-                                                    <tr className='text-center'>
-                                                        <td>{index + 1}</td>
-                                                        <td>{service?.nameService}</td>
-                                                        <td>{service?.description}</td>
-                                                        <td>{service?.price.toLocaleString('vi-VN')}</td>
-                                                    </tr>
-                                                </tbody>
-                                            ))
-
-                                            }
-                                        </table>
-                                    </div>
-                                    <div className="form-control mb-3 rounded shadow">
-                                        <label className="w-50 mb-3 mt-3 mr-3 ml-3"><b >Total amount: </b>{selectedServices.map(service => service.price).reduce((total, price) => total + price, 0).toLocaleString('vi-VN')} VND </label>
-                                        <label className="w-50 "><b>Status: </b>{!(booking?.type) ? 'Pending' : 'Paid'}</label>
-                                    </div>
+                                    </Box>
+                                    <Box display="flex" justifyContent="flex-end" alignItems="center" className="form-control mb-3">
+                                        <Text width="50%" mb={3} mt={3} mr={3} ml={3} textAlign="right">
+                                            <b>Total: </b>{selectedServices.map(service => service.price).reduce((total, price) => total + price, 0).toLocaleString('vi-VN')} VND
+                                        </Text>
+                                    </Box>
+                                </Box>
+                                <div className='d-flex justify-content-center gap-3 mt-3'>
+                                    <Button style={{ background: 'gray', color: 'white' }} onClick={() => handleCancelClick()}>Cancel</Button>
+                                    <Button style={{ background: 'teal', color: 'white' }} onClick={() => handleConfirmClick()}>Confirm PAID</Button>
                                 </div>
-                                <div className='text-center mt-3'>
-                                    <div className='btn btn-danger' onClick={() => handleCancelClick()}>Cancel</div>
-                                    <div className='btn btn-primary' onClick={() => handleConfirmClick()}>Confirm PAID</div>
-                                </div>
-                            </div>
+                            </Box>
                         </TabPanel>
 
                         <TabPanel>
@@ -618,42 +864,95 @@ export default function Booking() {
                                         </div>
                                     )}
                                 </div>
-                                <h3 className="text-center">Booking Information</h3>
-                                <div className="mb-3">
-                                    <label className="form-label"><b>Booking ID:</b> {booking.id}</label>
-                                </div>
-                                <div className="mb-3">
-                                    <label className="form-label"><b>Booking Date:</b> {new Date(booking.bookingDate).toLocaleString()}</label>
-                                </div>
-                                <div className="mb-3">
-                                    <label className="form-label"><b>Appointment Date:</b> {new Date(booking.appointmentDate).toLocaleString()}</label>
-                                </div>
-                                <div className="mb-3">
-                                    <label className="form-label"><b>Status:</b> {booking.status}</label>
-                                </div>
-                                <div className="mb-3">
-                                    <label className="form-label"><b>Total Amount:</b> {booking?.totalAmount?.toFixed(2)} VND</label>
-                                </div>
-                                <div className="mb-3">
-                                    <label className="form-label"><b>Description:</b> {booking?.description}</label>
-                                </div>
-                                <h4 className="text-center">User Information</h4>
-                                <div className="mb-3">
-                                    <label className="form-label"><b>Full Name:</b> {booking?.user?.fullName}</label>
-                                </div>
-                                <div className="mb-3">
-                                    <label className="form-label"><b>Email:</b> {booking?.user?.email}</label>
-                                </div>
-                                <div className="mb-3">
-                                    <label className="form-label"><b>Phone Number:</b> {booking?.user?.phoneNumber}</label>
-                                </div>
-                                <div className="mb-3">
-                                    <label className="form-label"><b>Address:</b> {booking?.user?.address}</label>
-                                </div>
-                                <h4 className="text-center">Pet Information</h4>
-                                <div className="mb-3">
-                                    <label className="form-label"><b>Pet Name:</b> {booking?.pet?.name}</label>
-                                </div>
+                                <Box className='col border rounded-lg p-4 mt-2 shadow p-3 mb-5 bg-body-tertiary rounded'>
+                                    <Box display='flex' alignItems='center'>
+                                        <Image src="logoApp.svg" alt="Logo" className="logo" /> Pet Health Care
+                                    </Box>
+                                    <Text as='h2' textAlign='center' mb={3}>
+                                        Booking Information
+                                    </Text>
+                                    <div className="mb-3 d-flex justify-content-end">
+                                        {/* <label className="w-50 "><b>Booking ID: </b>Chưa xử lí</label> */}
+                                    </div>
+                                    <div className='shadow p-3 mb-5 bg-body-tertiary rounded'>
+
+
+                                        <div className="d-flex border-bottom mb-3">
+                                            <label className="w-50 "><b>Date: </b>{new Date().toLocaleDateString("en-Gb", { month: 'numeric', day: 'numeric', year: 'numeric' })} </label>
+                                            <div className='w-50'>
+                                                <label className="w-50"><b >Pet's name: </b> {selectedPet?.name}</label>
+                                                <label className="w-50" ><b>Pet's type: </b> {selectedPet?.petType}</label>
+
+                                            </div>
+
+                                        </div>
+
+
+                                        <div className="d-flex border-bottom mb-3 ">
+                                            <label className="w-50"><b>Pet's owner: </b> {selectedPet?.owner?.fullName}</label>
+                                            <div className='w-50'>
+                                                <label className="w-50"><b>Pet's breed: </b> {selectedPet?.breed}</label>
+                                                <label className='w-50'><b >Pet's sex: </b> {selectedPet?.gender}</label>
+
+                                            </div>
+
+                                        </div>
+                                        <div className="border-bottom mb-3 ">
+
+                                            <label className="w-50"><b>Phone number: </b>{selectedPet?.owner?.phoneNumber}</label>
+                                            <label className='w-50'><b>Pet's age: </b> {selectedPet?.age} month(s)</label>
+
+
+                                        </div>
+
+                                    </div>
+                                    <h4 className='text-center mb-3 mt-3 font-weight-bold fw-normal'>
+                                        My appoinment date
+                                    </h4>
+
+                                    <div className='shadow p-3 mb-5 bg-body-tertiary rounded'>
+                                        <div className="mb-1 d-flex justify-content-between">
+                                            <label ><b>Appointment date: </b> {selectedDisplayDate}</label>
+                                            <label ><b>Time: </b> {time}</label>
+                                            <label ><b>Vet: </b>{vetName}</label>
+                                        </div>
+                                        <div className="border-top mt-2">
+                                            <label ><b>Description:  </b>{booking?.description}</label>
+                                        </div>
+                                    </div>
+
+                                    <Text as='h4' textAlign='center' mb={1} mt={3} fontWeight='normal'>
+                                        Services' Information
+                                    </Text>
+                                    <Box mb={5} bg='gray.100' borderRadius='lg'>
+                                        <Table variant='simple'>
+                                            <Thead bg='gray.200'>
+                                                <Tr textAlign='center'>
+                                                    <Th>No</Th>
+                                                    <Th>Name</Th>
+                                                    <Th>Description</Th>
+                                                    <Th>Price</Th>
+                                                </Tr>
+                                            </Thead>
+                                            <Tbody>
+                                                {selectedServices.map((service, index) => (
+                                                    <Tr key={index} textAlign='center'>
+                                                        <Td>{index + 1}</Td>
+                                                        <Td>{service?.nameService}</Td>
+                                                        <Td>{service?.description}</Td>
+                                                        <Td>{service?.price.toLocaleString('vi-VN')}</Td>
+                                                    </Tr>
+                                                ))}
+                                            </Tbody>
+                                        </Table>
+
+                                    </Box>
+                                    <Box display="flex" justifyContent="flex-end" alignItems="center" className="form-control mb-3">
+                                        <Text width="50%" mb={3} mt={3} mr={3} ml={3} textAlign="right">
+                                            <b>Total: </b>{selectedServices.map(service => service.price).reduce((total, price) => total + price, 0).toLocaleString('vi-VN')} VND
+                                        </Text>
+                                    </Box>
+                                </Box>
                             </div>
                         </TabPanel>
                     </TabPanels>

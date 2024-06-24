@@ -173,68 +173,58 @@ const ListAccount = () => {
     );
   }
 
-  return (
-    <Box className="container">
-      <InputGroup width="400px" mb={4} float="right">
-        <Select
-          placeholder="Filter by role"
-          value={filterRole}
-          onChange={(e) => setFilterRole(e.target.value)}
-          width="150px"
-        >
-          <option value="">All</option>
-          <option value="1">Customer</option>
-          <option value="2">Vet</option>
-          <option value="3">Staff</option>
-        </Select>
-        <Input
-          placeholder="Search by email"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-        />
-        <InputRightElement>
-          <IconButton
-            aria-label="Search"
-            icon={<SearchIcon />}
-            onClick={handleSearch}
-          />
-        </InputRightElement>
-      </InputGroup>
-      <Link to="/account/create">
-        <Button colorScheme="blue" mb={3}>Add New Account</Button>
-      </Link>
-      <Table variant="striped" colorScheme="teal">
-        <Thead>
-          <Tr>
-            <Th>#</Th>
-            <Th>Full Name</Th>
-            <Th>Role ID</Th>
-            <Th>Status</Th>
-            <Th>Actions</Th>
-          </Tr>
-        </Thead>
-        <Tbody>
-          {accounts.map((account, index) => (
-            <Tr key={index}>
-              <Td><b>{index + 1}</b></Td>
-              <Td><b>{account.fullName}</b></Td>
-              <Td><b>{account.roleId}</b></Td>
-              <Td>
-                <Button
-                  colorScheme={account.isActive ? 'green' : 'red'}
-                  variant="outline"
-                  borderColor={account.isActive ? 'green.500' : 'red.500'}
-                  bg={account.isActive ? 'green.100' : 'red.100'}
-                  size="sm"
-                >
-                  {account.isActive ? "Active" : "Inactive"}
-                </Button>
-              </Td>
-              <Td className='col-2 text-center p-2'>
-                <Link to={`/viewUser/${account.userId}`}>
-                  <span style={{ marginRight: '20px' }} className='icon-container'>
-                    <ViewIcon style={{ color: 'teal', cursor: 'pointer' }} boxSize={'5'} />
-                    <span className="icon-text">View</span>
+    <div className='container'>
+      <ToastContainer />
+      <Link to={'/createPet'}><Button className='mt-4' colorScheme='teal'>Add new Pet</Button></Link>
+      <table className="table py-4 border-2 shadow  table-hover ">
+        <thead className='p-4'>
+          <tr >
+            <th scope="col" className='p-3 text-center'>No</th>
+            <th scope="col" className='p-3'>Avatar</th>
+            <th scope="col" className='p-3'>Name</th>
+            <th scope="col" className='p-3'>Type</th>
+            <th scope="col" className='p-3'>Breed</th>
+            <th scope="col" className='p-3'>Sex</th>
+            <th scope="col" className='p-3'>Age</th>
+            <th scope="col" className='p-3'>Neutered</th>
+            <th scope="col" className='p-3'>Description</th>
+            <th scope="col" className='col-2 text-center'>Action</th>
+          </tr>
+        </thead>
+        <tbody className="table-group-divider p-4">
+          {
+
+            pets.map((pet, index) => (
+              <tr key={index} >
+                <td className='pl-4 text-center'>{index + 1}</td>
+                <td className="col-1 p-2">
+                  <img src={pet.avatar} alt={pet.name} style={{ width: '50px', height: '50px', borderRadius: '50%' }} />
+                </td>
+                <td className="col-1 p-2">{pet.name}</td>
+                <td className="col-1 p-2">{pet.petType}</td>
+                <td className="col-1 p-2">{pet.breed}</td>
+                <td className="col-1 p-2">{pet.gender}</td>
+                <td className="col-1 p-2">{pet.age}</td>
+                <td className="col-1 p-2">{pet.isNeutered ? 'Yes' : 'No'}</td>
+                <td className="col-2 p-2">{pet.description}</td>
+                <td className='col-2 text-center p-2'>
+                  <Link to={`/viewPet/${pet.petId}`}>
+                    <span style={{ marginRight: '20px' }} className='icon-container'>
+                      <ViewIcon style={{ color: 'teal', cursor: 'pointer' }} boxSize={'5'} />
+                      <span className="icon-text">View</span>
+                    </span>
+
+                  </Link>
+                  <Link to={`/editPet/${pet.petId}`}>
+                    <span style={{ marginRight: '20px' }} className='icon-container'>
+                      <EditIcon style={{ color: 'teal', cursor: 'pointer' }} boxSize={'5'} />
+                      <span className="icon-text">Edit</span>
+                    </span>
+                  </Link>
+
+                  <span className='icon-container'>
+                    <DeleteIcon style={{ color: 'red', cursor: 'pointer' }} boxSize={'5'} onClick={onOpen} />
+                    <span className="icon-text">Delete</span>
                   </span>
                 </Link>
                 <span style={{ marginRight: '20px' }} className='icon-container'>

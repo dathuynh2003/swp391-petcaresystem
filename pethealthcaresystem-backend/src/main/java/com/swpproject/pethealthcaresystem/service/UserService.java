@@ -167,7 +167,6 @@ public class UserService implements IUserService {
     public Page<User> getAllUsersByRoleId(int pageNo, int pageSize, int roleId) {
         Pageable pageable = PageRequest.of(pageNo, pageSize);
             return userRepository.findUsersByRoleId(pageable, roleId);
-
     }
 
     public User deleteUser(int id) {
