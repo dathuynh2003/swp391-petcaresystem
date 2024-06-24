@@ -51,7 +51,7 @@ const ViewAccount = () => {
                         Back to Accounts
                     </Button>
                 </Link>
-                <Heading as="h3" size="lg" ml={4}>
+                <Heading textAlign="center" as="h3" size="lg" ml={4}>
                     User Details
                 </Heading>
             </Flex>

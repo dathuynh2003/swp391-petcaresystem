@@ -71,7 +71,7 @@ const BookingHistory = () => {
             fetchAllBookings();
 
         }
-    }, [currentPage, isSearchByPhone, isFilteredSearch]);
+    }, [currentPage, isSearchByPhone, isFilteredSearch,status]);
 
 
     const fetchAllBookings = async () => {
