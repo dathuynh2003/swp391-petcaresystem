@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Link } from 'react-router-dom';
-import { Modal, Button } from 'react-bootstrap';
+import { Modal } from 'react-bootstrap';
+import { Button } from '@chakra-ui/react';
 
 export default function VetWorkSchedules() {
   const [shifts, setShifts] = useState([]);
@@ -103,12 +104,12 @@ export default function VetWorkSchedules() {
       <div className="row">
         <div className="col-md-12 border rounded p-4 mt-2 shadow">
           <div className="d-flex justify-content-between mb-3">
-            <button className="btn btn-primary" onClick={handlePreviousWeek}>
+            <Button onClick={handlePreviousWeek} style={{ background: 'teal', color: 'white' }}>
               Previous Week
-            </button>
-            <button className="btn btn-primary" onClick={handleNextWeek}>
+            </Button>
+            <Button onClick={handleNextWeek} style={{ background: 'teal', color: 'white' }}>
               Next Week
-            </button>
+            </Button>
           </div>
           <table className="table table-bordered">
             <thead>

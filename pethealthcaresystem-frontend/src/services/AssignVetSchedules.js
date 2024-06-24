@@ -1,6 +1,8 @@
 import axios from "axios";
 import React, { useState, useEffect } from "react";
 import { ToastContainer, toast } from 'react-toastify';
+import { Button } from '@chakra-ui/react';
+import { CheckCircleIcon, CheckIcon, DeleteIcon } from "@chakra-ui/icons";
 
 export default function AssignVetSchedules() {
   const [vets, setVets] = useState([]);
@@ -169,13 +171,13 @@ export default function AssignVetSchedules() {
                 marginBottom: '10px'
               }}>
                 {vets.map(vet => (
-                  <button
+                  <Button
                     key={vet.userId}
                     style={{
                       padding: '10px',
-                      backgroundColor: selectedVet === vet.userId ? '#007bff' : 'transparent',
+                      backgroundColor: selectedVet === vet.userId ? '#008080' : 'transparent',
                       color: selectedVet === vet.userId ? '#fff' : '#000',
-                      border: '1px solid #007bff',
+                      border: '1px solid #008080',
                       borderRadius: '5px',
                       cursor: 'pointer',
                       transition: 'background-color 0.3s, color 0.3s'
@@ -183,19 +185,26 @@ export default function AssignVetSchedules() {
                     onClick={() => setSelectedVet(vet.userId)}
                   >
                     {vet.fullName}
-                  </button>
+                  </Button>
                 ))}
               </div>
             </div>
           </div>
           <div className="d-flex justify-content-between mb-3">
-            <button className="btn btn-primary" onClick={handlePreviousWeek}>Previous Week</button>
-            <button className="btn btn-primary" onClick={handleNextWeek}>Next Week</button>
+            <Button onClick={handlePreviousWeek} style={{ background: 'teal', color: 'white' }}>
+              Previous Week
+            </Button>
+            <Button onClick={handleNextWeek} style={{ background: 'teal', color: 'white' }}>
+              Next Week
+            </Button>
           </div>
-          <button className="btn btn-outline-primary mb-3" onClick={handleSelectAll}>
+          <Button onClick={handleSelectAll} style={{ background: 'teal', color: 'white' }}>
             {selectAll ? "Unselect All" : "Select All"}
-          </button>
-          <button className="btn btn-primary mb-3 ml-3" onClick={handleShiftChange} disabled={!selectedVet || selectedShifts.length === 0}>Assign</button>
+          </Button>
+          <Button onClick={handleShiftChange} disabled={!selectedVet || selectedShifts.length === 0}
+            style={{ background: 'teal', color: 'white' }} className="mx-3">
+            Assign
+          </Button>
           <table className="table table-bordered">
             <thead>
               <th>Work Shift</th>
@@ -219,7 +228,7 @@ export default function AssignVetSchedules() {
                     return (
                       <td
                         key={dateIndex}
-                        className={`align-middle text-center ${isAssigned ? 'bg-success text-white' : ''}`}
+                        className={`align-middle text-center ${isAssigned ? '' : ''}`}
                         style={{ position: 'relative', height: '40px' }}
                         onMouseEnter={(e) => {
                           const button = e.currentTarget.querySelector('.delete-btn');
@@ -238,6 +247,7 @@ export default function AssignVetSchedules() {
                               cursor: 'pointer',
                               width: '20px',
                               height: '20px',
+                              backgroundColor: 'teal',
                             }}
                             onChange={() => handleToggleShift(shift.shiftId, date)}
                             checked={selectedShifts.some(item => item.shiftId === shift.shiftId && item.date === date.toISOString().split('T')[0])}
@@ -257,8 +267,9 @@ export default function AssignVetSchedules() {
                               className="btn btn-danger delete-btn"
                               onClick={() => handleDeleteAssignment(shift.shiftId, date)}
                             >
-                              Delete
+                              <DeleteIcon />
                             </button>
+                            <CheckIcon style={{ color: "teal" }} />
                           </div>
                         )}
                         {isPast && !isAssigned && (

@@ -44,7 +44,7 @@ const Navbar = () => {
       {user && (
         <div style={{ display: 'flex', alignItems: 'center', color: '#fff' }}>
           <img src={user.avatar} alt="Avatar" className="avatar" style={{ width: '40px', height: '40px', borderRadius: '50%', marginRight: '10px' }} />
-          <div style={{ color: '#cc3333', marginRight: '5px' }}>{getRoleName(user.roleId)}</div>
+          <div style={{ color: '#cc3333', marginRight: '3px' }}>{getRoleName(user.roleId)}</div>
           {user.fullName}
 
         </div>
