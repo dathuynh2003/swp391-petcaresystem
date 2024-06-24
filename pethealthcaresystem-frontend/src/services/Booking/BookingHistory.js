@@ -33,7 +33,7 @@ import {
 } from '@chakra-ui/react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { format, parseISO } from 'date-fns';
-
+import moment from 'moment'
 import { faUser, faPaw, faXRay } from '@fortawesome/free-solid-svg-icons';
 import { SearchIcon } from '@chakra-ui/icons';
 import { South } from '@mui/icons-material';
@@ -69,9 +69,15 @@ const BookingHistory = () => {
         }
         else {
             fetchAllBookings();
-
         }
-    }, [currentPage, isSearchByPhone, isFilteredSearch,status]);
+    }, [currentPage, isSearchByPhone, isFilteredSearch]);
+
+
+    useEffect(() => {
+        fetchFilteredBookings(1);
+    }, [status, fromDate, toDate])
+
+
 
 
     const fetchAllBookings = async () => {
@@ -93,10 +99,13 @@ const BookingHistory = () => {
         }
     };
 
-    const fetchFilteredBookings = async () => {
+    const fetchFilteredBookings = async (page) => {
         setLoading(true);
+
+        const pageNo = page ?? currentPage
+
         try {
-            let url = `http://localhost:8080/staff-booking-date-status?` + `pageNo=${currentPage}&pageSize=${pageSize}`;
+            let url = `http://localhost:8080/staff-booking-date-status?` + `pageNo=${pageNo}&pageSize=${pageSize}`;
 
             if (status) {
                 console.log(status)
@@ -106,10 +115,8 @@ const BookingHistory = () => {
                 console.log(fromDate)
                 url += `&fromDate=${fromDate}`;
             }
-            if (toDate) {
-                console.log(toDate)
-                url += `&toDate=${toDate}`;
-            }
+            url += ('&toDate=' + toDate.length == 0 ? moment(new Date()).format('yyyy-MM-dd') : toDate)
+            console.log('&toDate=' + toDate.length == 0 ? moment(new Date()).format('yyyy-MM-dd') : toDate)
             const response = await axios.get(url, { withCredentials: true });
             const { content, totalPages } = response.data.data;
             setBookings(content);
@@ -189,12 +196,14 @@ const BookingHistory = () => {
         setIsSearchByPhone(true);
         fetchBookingsByPhoneNumber();
     };
-    const handleFilterSearch = () => {
-        setCurrentPage(1);
-        setIsSearchByPhone(false);
-        setIsFilteredSearch(true);
 
-    };
+    // const handleFilterSearch = () => {
+    //     setCurrentPage(1);
+    //     setIsSearchByPhone(false);
+    //     setIsFilteredSearch(true);
+    // };
+
+
     const clearFilters = () => {
         setPhoneNumber('');
         setStatus('');
@@ -274,7 +283,7 @@ const BookingHistory = () => {
                     <option value="PAID">Paid</option>
                 </Select>
             </FormControl>
-            <Button onClick={handleFilterSearch} mb={4}>Search</Button>
+            {/* <Button onClick={handleFilterSearch} mb={4}>Search</Button> */}
             <Button onClick={clearFilters} mb={4}>Clear Filters</Button>
 
 
