@@ -13,24 +13,120 @@ export default function SystemConfig() {
     const { isOpen: isOpenAddConfig, onOpen: onOpenAddConfig, onClose: onCloseAddConfig } = useDisclosure()
 
     const [configurations, setConfigurations] = useState([])
+    const [currentPage, setCurrentPage] = useState(0)
+    const [totalPages, setTotalPages] = useState(0)
+    const pageSize = 10
+
+    // const fetchConfiguration = async (page) => {
+    //     try {
+    //         // console.log("test")
+    //         const response = await axios.get(`http://localhost:8080/configurations?page=${page}&size=${pageSize}`, { withCredentials: true })
+    //         if (response.data.message === 'Successfully') {
+    //             setConfigurations(response.data.configurations.content)
+    //             setTotalPages(response.data.configurations.totalPages)
+    //         } else {
+    //             toast.info(response.data.message)
+    //         }
+    //     } catch (error) {
+    //         navigate('/404page')
+    //     }
+    // }
+    // useEffect(() => {
+    //     fetchConfiguration(currentPage);
+    // }, [currentPage])
+
+    const handlePageClick = (data) => {
+        // console.log(data.selected)
+        setCurrentPage(data.selected)
+    }
+
+    const [configuration, setConfiguration] = useState({
+        configKey: '',
+        configValue: '',
+    })
+    const addConfig = async () => {
+        try {
+            const response = await axios.post(`http://localhost:8080/configuration/add`, configuration, { withCredentials: true })
+            if (response.data.message === 'Successfully') {
+                toast.success('Add config success')
+            } else {
+                toast.warning(response.data.message)
+            }
+        } catch (e) {
+            // console.log(e)
+            navigate('/404page')
+        }
+    }
+
+    const [configKeys, setConfigkeys] = useState([])
+    const fetchConfigKey = async () => {
+        try {
+            const response = await axios.get(`http://localhost:8080/configuration/configKeys`, { withCredentials: true })
+            if (response.data.message === 'Successfully') {
+                setConfigkeys(response.data.configKeys)
+                // console.log("Keys:")
+                // console.log(response.data.configKeys)
+            } else {
+                toast.info(response.data.message)
+            }
+        } catch (error) {
+            navigate('/404page')
+        }
+    }
     useEffect(() => {
-        //Lấy all configurations lên để hiển thị
-        const fetchConfiguration = async () => {
+        fetchConfigKey()
+    }, [])
+
+    const [selectedKey, setSelectedKey] = useState("All")
+    useEffect(() => {
+        const fetchConfigurationsByKey = async (key, page) => {
             try {
-                const respone = await axios.get('http://localhost:8080/configurations', { withCredentials: true })
-                console.log(respone.data)
-                if (respone.data.message === 'Successfully') {
-                    setConfigurations(respone.data.configurations)
+                const response = await axios.get(`http://localhost:8080/configuration/search/${key}?page=${page}&size=${pageSize}`, { withCredentials: true })
+                if (response.data.message === 'Successfully') {
+                    setConfigurations(response.data.configurations.content)
+                    setTotalPages(response.data.configurations.totalPages)
                 } else {
-                    toast.info(respone.data.message)
+                    toast.warning(response.data.message)
                 }
-            } catch (error) {
-                console.log(error)
-                // navigate('/404page')
+            } catch (e) {
+                navigate('/404page')
             }
         }
-        fetchConfiguration();
-    }, [])
+        fetchConfigurationsByKey(selectedKey, currentPage)
+    }, [selectedKey, currentPage])
+
+    const [selectedConfig, setSelectedConfig] = useState()
+    const { isOpen: isOpenEditConfig, onOpen: onOpenEditConfig, onClose: onCloseEditConfig } = useDisclosure()
+    const hanldeEditSConfig = async (config) => {
+        try {
+            const response = await axios.put(`http://localhost:8080/configuration/update/${config?.id}`, config, { withCredentials: true })
+            if (response.data.message === 'Successfully') {
+                toast.success("Updated Successs")
+                window.location.reload()
+            } else {
+                toast.warning(response.data.message)
+            }
+        } catch (e) {
+            // console.log(e)
+            navigate('/404page')
+        }
+    }
+
+    const handleDeleteSConfig = async (config) => {
+        try {
+            const response = await axios.delete(`http://localhost:8080/configuration/${config?.id}`, { withCredentials: true })
+            if (response.data.message === 'Deleted') {
+                toast.success("Delete Successs")
+                window.location.reload()
+            } else {
+                toast.warning(response.data.message)
+            }
+        } catch (e) {
+            // console.log(e)
+            navigate('/404page')
+        }
+    }
+
     return (
         <div className='container'>
             <div className='row'>
@@ -40,30 +136,36 @@ export default function SystemConfig() {
                         <Modal isOpen={isOpenAddConfig} onClose={onCloseAddConfig} size={'xl'}>
                             <ModalOverlay />
                             <ModalContent>
-                                <ModalHeader>Add New Configuration</ModalHeader>
+                                <ModalHeader className='fw-bold text-center my-3 justify-content-center fs-5'>Add New Configuration</ModalHeader>
                                 <ModalCloseButton />
                                 <ModalBody pb={6} >
-
+                                    <div className="form-floating mb-3 mx-3">
+                                        <input type="text" className="form-control" id="configKey"
+                                            onChange={(e) => setConfiguration((prev) => ({ ...prev, configKey: e.target.value }))} required />
+                                        <label htmlFor="configKey">Enter Config Key</label>
+                                    </div>
+                                    <div className="form-floating mb-3 mx-3">
+                                        <input type="text" className="form-control" id="configValue"
+                                            onChange={(e) => setConfiguration((prev) => ({ ...prev, configValue: e.target.value }))} required />
+                                        <label htmlFor="configValue">Enter Config value</label>
+                                    </div>
                                 </ModalBody>
                                 <ModalFooter>
-
+                                    <Button colorScheme='teal' mr={3} onClick={addConfig} mb={3}>
+                                        Save
+                                    </Button>
                                 </ModalFooter>
                             </ModalContent>
                         </Modal>
                         <FormControl className='rounded shadow w-50'>
-                            <Select placeholder='Find By Key'>
+                            <Select placeholder='Find By Key' onChange={(e) => {
+                                setSelectedKey(e.target.value ? e.target.value : "All")
+                            }}>
+                                {configKeys?.map((configKey, index) => (
+                                    <option key={index} value={configKey}>{configKey}</option>
+                                ))}
                             </Select>
                         </FormControl>
-                    </div>
-                    <div className="search-container rounded shadow">
-                        <div className="search-wrapper">
-                            <SearchIcon boxSize={6} style={{ marginRight: '8px', marginLeft: '5px' }} className='search-icon' />
-                            <input
-                                className='rounded text-center fst-italic border-0'
-                                style={{ height: '2rem', width: '14rem', outline: 'none' }}
-                                placeholder='Search medicine'
-                            />
-                        </div>
                     </div>
                 </div>
 
@@ -79,18 +181,20 @@ export default function SystemConfig() {
                         </thead>
                         <tbody>
                             {configurations?.map((configuration, index) => (
-                                <tr className='text-center item'>
+                                <tr key={index} className='text-center item'>
                                     <td>{index + 1}</td>
                                     <td>{configuration.configKey}</td>
                                     <td>{configuration.configValue}</td>
                                     <td className=''>
                                         <span style={{ marginRight: '16px' }} className='icon-container'>
-                                            <EditIcon style={{ color: 'teal', cursor: 'pointer' }} />
+                                            <EditIcon style={{ color: 'teal', cursor: 'pointer' }} onClick={() => {
+                                                onOpenEditConfig()
+                                                setSelectedConfig(configuration)
+                                            }} />
                                             <span className="icon-text">Edit</span>
-
                                         </span>
                                         <span className='icon-container'>
-                                            <DeleteIcon style={{ color: 'red', cursor: 'pointer' }} />
+                                            <DeleteIcon style={{ color: 'red', cursor: 'pointer' }} onClick={() => handleDeleteSConfig(configuration)} />
                                             <span className="icon-text">Delete</span>
                                         </span>
                                     </td>
@@ -98,6 +202,35 @@ export default function SystemConfig() {
                             ))}
                         </tbody>
                     </table>
+                    <Modal isOpen={isOpenEditConfig} onClose={onCloseEditConfig} size={'xl'}>
+                        <ModalOverlay />
+                        <ModalContent>
+                            <ModalHeader className='fw-bold text-center my-3 justify-content-center fs-5'>Edit Configuration</ModalHeader>
+                            <ModalCloseButton />
+                            <ModalBody pb={6} >
+                                <div className="form-floating mb-3 mx-3">
+                                    <input type="text" className="form-control" id="configKey"
+                                        value={selectedConfig?.configKey}
+                                        onChange={(e) => setSelectedConfig((prev) => ({ ...prev, configKey: e.target.value }))} required />
+                                    <label htmlFor="configKey">Enter Config value</label>
+                                </div>
+                                <div className="form-floating mb-3 mx-3">
+                                    <input type="text" className="form-control" id="configValue"
+                                        value={selectedConfig?.configValue}
+                                        onChange={(e) => setSelectedConfig((prev) => ({ ...prev, configValue: e.target.value }))} required />
+                                    <label htmlFor="configValue">Enter Config value</label>
+                                </div>
+                            </ModalBody>
+                            <ModalFooter>
+                                <Button colorScheme='teal' mr={3} onClick={() => {
+                                    onCloseEditConfig();
+                                    hanldeEditSConfig(selectedConfig)
+                                }} mb={3}>
+                                    Save
+                                </Button>
+                            </ModalFooter>
+                        </ModalContent>
+                    </Modal>
                 </div>
             </div>
             <div className=''>
@@ -106,11 +239,10 @@ export default function SystemConfig() {
                     nextLabel={'Next'}
                     breakLabel={'...'}
                     breakClassName={'break-me'}
-                    // pageCount={totalPages}
-                    pageCount={2}   //Test
+                    pageCount={totalPages}
                     marginPagesDisplayed={2}
                     pageRangeDisplayed={5}
-                    // onPageChange={handlePageClick}
+                    onPageChange={handlePageClick}
                     containerClassName={'pagination justify-content-center'}
                     pageClassName={'page-item'}
                     pageLinkClassName={'page-link'}

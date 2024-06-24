@@ -5,6 +5,7 @@ import com.swpproject.pethealthcaresystem.model.User;
 import com.swpproject.pethealthcaresystem.service.SystemConfigService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -18,7 +19,9 @@ public class SystemConfigController {
     private SystemConfigService systemConfigService;
 
     @GetMapping("/configurations")
-    public Map<String, Object> getAllConfigurations(HttpSession session) {
+    public Map<String, Object> getAllConfigurations(HttpSession session,
+                                                    @RequestParam(defaultValue = "0") int page,
+                                                    @RequestParam(defaultValue = "10") int size) {
         Map<String, Object> response = new HashMap<>();
         try {
             User curUser = (User) session.getAttribute("user");
@@ -28,7 +31,7 @@ public class SystemConfigController {
             if (curUser.getRoleId() != 4) {
                 throw new Exception("Can not get configurations");
             }
-            List<SystemConfiguration> configurations = systemConfigService.getSystemConfigurations();
+            Page<SystemConfiguration> configurations = systemConfigService.getSystemConfigurations(page, size);
             response.put("message", "Successfully");
             response.put("configurations", configurations);
         } catch (Exception e) {
@@ -110,6 +113,47 @@ public class SystemConfigController {
             }
             systemConfigService.deleteSystemConfiguration(id);
             response.put("message", "Deleted");
+        } catch (Exception e) {
+            response.put("message", e.getMessage());
+        }
+        return response;
+    }
+
+    @GetMapping("/configuration/configKeys")
+    public Map<String, Object> getAllConfigKey(HttpSession session) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            User curUser = (User) session.getAttribute("user");
+            if (curUser == null) {
+                throw new Exception("You need login first");
+            }
+            if (curUser.getRoleId() != 4) {
+                throw new Exception("Can not get configurations");
+            }
+            response.put("message", "Successfully");
+            response.put("configKeys", systemConfigService.findALlConfigKey());
+        } catch (Exception e) {
+            response.put("message", e.getMessage());
+        }
+        return response;
+    }
+
+    @GetMapping("/configuration/search/{key}")
+    public Map<String, Object> getConfigByKey(@PathVariable String key,
+                                              @RequestParam(defaultValue = "0") int page,
+                                              @RequestParam(defaultValue = "10") int size,
+                                              HttpSession session) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            User curUser = (User) session.getAttribute("user");
+            if (curUser == null) {
+                throw new Exception("You need login first");
+            }
+            if (curUser.getRoleId() != 4) {
+                throw new Exception("Can not get configurations");
+            }
+            response.put("message", "Successfully");
+            response.put("configurations", systemConfigService.findAllSConfigurationsByKey(page, size, key));
         } catch (Exception e) {
             response.put("message", e.getMessage());
         }

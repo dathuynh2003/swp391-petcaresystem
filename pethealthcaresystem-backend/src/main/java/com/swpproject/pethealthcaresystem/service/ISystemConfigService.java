@@ -1,11 +1,13 @@
 package com.swpproject.pethealthcaresystem.service;
 
 import com.swpproject.pethealthcaresystem.model.SystemConfiguration;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
 public interface ISystemConfigService {
-    List<SystemConfiguration> getSystemConfigurations();
+
+    Page<SystemConfiguration> getSystemConfigurations(int page, int size);
 
     SystemConfiguration getSystemConfigurationById(int id) throws Exception;
 
@@ -14,4 +16,8 @@ public interface ISystemConfigService {
     SystemConfiguration updateSystemConfiguration(int id, SystemConfiguration config) throws Exception;
 
     void deleteSystemConfiguration(int id);
+
+    List<String> findALlConfigKey();
+
+    Page<SystemConfiguration> findAllSConfigurationsByKey(int page, int size, String key);
 }

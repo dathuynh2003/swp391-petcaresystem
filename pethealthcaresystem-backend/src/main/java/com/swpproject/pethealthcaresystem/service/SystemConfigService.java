@@ -3,6 +3,9 @@ package com.swpproject.pethealthcaresystem.service;
 import com.swpproject.pethealthcaresystem.model.SystemConfiguration;
 import com.swpproject.pethealthcaresystem.repository.SystemConfigurationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,8 +16,9 @@ public class SystemConfigService implements ISystemConfigService {
     private SystemConfigurationRepository systemConfigRepository;
 
     @Override
-    public List<SystemConfiguration> getSystemConfigurations() {
-        return systemConfigRepository.findAll();
+    public Page<SystemConfiguration> getSystemConfigurations(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return systemConfigRepository.findAll(pageable);
     }
 
     @Override
@@ -45,6 +49,20 @@ public class SystemConfigService implements ISystemConfigService {
     @Override
     public void deleteSystemConfiguration(int id) {
         systemConfigRepository.deleteById(id);
+    }
+
+    @Override
+    public List<String> findALlConfigKey() {
+        return systemConfigRepository.findDistinctConfigKeys();
+    }
+
+    @Override
+    public Page<SystemConfiguration> findAllSConfigurationsByKey(int page, int size, String key) {
+        Pageable pageable = PageRequest.of(page, size);
+        if (key.equals("All")) {
+            return systemConfigRepository.findAll(pageable);
+        }
+        return systemConfigRepository.findByConfigKeyContainingIgnoreCase(key, pageable);
     }
 
 
