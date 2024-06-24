@@ -51,8 +51,9 @@ const BookingHistory = () => {
     const [status, setStatus] = useState('');
     const [fromDate, setFromDate] = useState('');
     const [toDate, setToDate] = useState('');
-    const [isSearchByPhone, setIsSearchByPhone] = useState(false); // State để theo dõi trạng thái tìm kiếm
-    const [isFilteredSearch, setIsFilteredSearch] = useState(false); // State để theo dõi tìm kiếm có lọc
+    const [isSearchByPhone, setIsSearchByPhone] = useState(false); 
+    const [isFilteredSearch, setIsFilteredSearch] = useState(false); 
+    const [searchType, setSearchType] = useState('all'); 
 
 
 
@@ -61,21 +62,24 @@ const BookingHistory = () => {
     const pageSize = 5;
 
     useEffect(() => {
-        if (isSearchByPhone) {
-            fetchBookingsByPhoneNumber();
+        if (searchType === 'phone') {
+            fetchBookingsByPhoneNumber(currentPage);
         }
-        else if (isFilteredSearch) {
-            fetchFilteredBookings();
+        else if (searchType === 'filter') {
+            fetchFilteredBookings(currentPage);
         }
         else {
-            fetchAllBookings();
+            fetchAllBookings(currentPage);
         }
-    }, [currentPage, isSearchByPhone, isFilteredSearch]);
+    }, [currentPage, searchType]);
 
 
     useEffect(() => {
-        fetchFilteredBookings(1);
-    }, [status, fromDate, toDate])
+        if (status || fromDate || toDate) {
+            setSearchType('filter');
+            fetchFilteredBookings(1);
+        }
+    }, [status, fromDate, toDate]);
 
 
 
@@ -115,7 +119,8 @@ const BookingHistory = () => {
                 console.log(fromDate)
                 url += `&fromDate=${fromDate}`;
             }
-            url += ('&toDate=' + toDate.length == 0 ? moment(new Date()).format('yyyy-MM-dd') : toDate)
+            url += `&toDate=${toDate.length == 0 ? moment(new Date()).format("YYYY-MM-DD") : toDate}`;
+            console.log(url)
             console.log('&toDate=' + toDate.length == 0 ? moment(new Date()).format('yyyy-MM-dd') : toDate)
             const response = await axios.get(url, { withCredentials: true });
             const { content, totalPages } = response.data.data;
@@ -193,8 +198,9 @@ const BookingHistory = () => {
 
     const handleSearch = () => {
         setCurrentPage(1);
-        setIsSearchByPhone(true);
-        fetchBookingsByPhoneNumber();
+        // setIsSearchByPhone(true);
+        setSearchType('phone');
+        fetchBookingsByPhoneNumber(1);
     };
 
     // const handleFilterSearch = () => {
@@ -213,6 +219,7 @@ const BookingHistory = () => {
         setCurrentPage(1);
         setIsSearchByPhone(false);
         setIsFilteredSearch(false);
+        fetchAllBookings(1);
     };
 
     const formatPrice = (price) => {
@@ -326,7 +333,7 @@ const BookingHistory = () => {
                     {bookings.map((booking) => (
                         <Tr key={booking.id}>
                             <Td>B{booking.id}</Td>
-                            <Td>{new Date(booking.vetShiftDetail.date).toLocaleDateString()}</Td>
+                            <Td>{formatDateTime(booking.vetShiftDetail.date)}</Td>
                             <Td>{formatDateTime(booking.bookingDate)}</Td>
                             <Td>{formatPrice(booking.totalAmount)} VND</Td>
                             <Td>
@@ -397,7 +404,7 @@ const BookingHistory = () => {
                                 <Text><strong>Name:</strong> {selectedBooking.pet.name}</Text>
                                 <Text><strong>Type:</strong> {selectedBooking.pet.petType}</Text>
                                 <Text><strong>Gender:</strong> {selectedBooking.pet.gender}</Text>
-                                <Text><strong>Age:</strong> {selectedBooking.pet.age} Year(s)</Text>
+                                <Text><strong>Age:</strong> {selectedBooking.pet.age} Month(s)</Text>
                             </Box>
                         </ModalBody>
                         <ModalFooter>
