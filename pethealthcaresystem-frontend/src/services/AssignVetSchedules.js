@@ -244,7 +244,7 @@ export default function AssignVetSchedules() {
                             disabled={!selectedVet}
                           />
                         )}
-                        {isAssigned && (
+                        {isAssigned && !isPast && (
                           <div style={{ position: 'relative', height: '100%' }}>
                             <button
                               style={{
@@ -262,9 +262,6 @@ export default function AssignVetSchedules() {
                           </div>
                         )}
                         {isPast && !isAssigned && (
-                          <span className="text-muted">-</span>
-                        )}
-                        {isPast && isAssigned && (
                           <span className="text-muted">-</span>
                         )}
                       </td>

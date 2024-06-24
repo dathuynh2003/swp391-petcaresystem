@@ -69,7 +69,7 @@ export default function Sidenav() {
       links = [
         { name: 'Home', path: '/', icon: 'fas fa-home' },
         { name: 'Cages', path: '/cages', icon: 'fas fa-warehouse' },
-        { name: 'Booking Appointments', path: '/staffBooking', icon: 'fas fa-calendar-check' },
+        { name: 'Booking Appointments', path: '/staff-booking', icon: 'fas fa-calendar-check' },
         { name: 'Assign Vet\'s Work Schedules', path: '/assign-schedules', icon: 'fas fa-clipboard-list' },
         { name: 'Pet For Customer', path: '/create-pet-by-staff', icon: 'fas fa-paw' },
         { name: 'Booking History', path: 'booking-history', icon: 'fa fa-history' },
@@ -99,7 +99,7 @@ export default function Sidenav() {
   return (
     <div className="sidenav" style={{ background: 'teal' }}>
       <div className="sidenav-header">
-        <img src="logoApp.svg" alt="Logo" className="logo rounded-circle " style={{background: 'white'}}/>
+        <img src="logoApp.svg" alt="Logo" className="logo rounded-circle " style={{ background: 'white' }} />
         <h5 style={{ color: 'white' }}>Pet Health Care</h5>
       </div>
       <ul>

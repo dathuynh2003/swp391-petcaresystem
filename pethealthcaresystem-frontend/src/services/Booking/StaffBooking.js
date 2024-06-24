@@ -469,7 +469,7 @@ export default function Booking() {
                             </div>
                         </TabPanel>
 
-                        <TabPanel>
+                        <TabPanel className="mx-auto">
                             <div className="container">
                                 <div className="row">
                                     <Input
@@ -485,7 +485,6 @@ export default function Booking() {
                                 </div>
                                 <div className="container">
                                     {pets?.map((pet, index) => (
-
                                         <div
                                             key={index}
                                             className="row w-100 shadow m-3 rounded-3"
@@ -600,12 +599,12 @@ export default function Booking() {
                         </TabPanel>
 
                         <TabPanel>
-                            <Tabs variant='soft-rounded' colorScheme='blue'>
-                                <TabList className=''>
+                            <Tabs variant='soft-rounded' colorScheme='teal'>
+                                <TabList className='d-flex justify-content-center text-center'>
                                     <Tab
-                                        className='col-4 mx-5'
-                                        _selected={{ bg: '#0D6EFD', color: 'white' }}
-                                        _hover={{ bg: 'blue.600' }}
+                                        className='col-4 mx-5 mt-3'
+                                        _selected={{ bg: 'teal', color: 'white' }}
+                                        _hover={{ bg: 'teal', color: 'white' }}
                                         onClick={() => {
                                             setSelectedVetShift(null);
                                             setActiveShiftIndex(null);
@@ -618,9 +617,9 @@ export default function Booking() {
                                         Choose Date First
                                     </Tab>
                                     <Tab
-                                        className='col-4 mx-5'
-                                        _selected={{ bg: '#0D6EFD', color: 'white' }}
-                                        _hover={{ bg: 'blue.600' }}
+                                        className='col-4 mx-5 mt-3'
+                                        _selected={{ bg: 'teal', color: 'white' }}
+                                        _hover={{ bg: 'teal', color: 'white' }}
                                         onClick={() => {
                                             setSelectedVetShift(null)
                                             setActiveShiftIndex(null)
@@ -640,34 +639,36 @@ export default function Booking() {
                                             <div className="row">
                                                 <div className="col-md-12 border rounded p-4 mt-2 shadow">
                                                     <div className="d-flex justify-content-between mb-3">
-                                                        <button className="btn btn-primary" onClick={handlePreviousWeek}>
+                                                        <Button onClick={handlePreviousWeek} style={{ background: 'teal', color: 'white' }}>
                                                             Previous Week
-                                                        </button>
-                                                        <button className="btn btn-primary" onClick={handleNextWeek}>
+                                                        </Button>
+                                                        <Button onClick={handleNextWeek} style={{ background: 'teal', color: 'white' }}>
                                                             Next Week
-                                                        </button>
+                                                        </Button>
                                                     </div>
-                                                    <div className='choose-date row'>
+                                                    <div className='choose-date row mt-3'>
                                                         {dates.map((date, index) => (
                                                             <Button
                                                                 key={index}
-                                                                className={`mx-auto btn btn-outline-primary fw-normal ${activeDateIndex === index ? 'active' : ''}`}
-                                                                style={{ width: '12%' }}
+                                                                className='mx-auto btn  fw-normal'
+                                                                style={{ width: '12%', color: activeDateIndex === index ? 'white' : '', background: activeDateIndex === index ? ' rgb(80, 200, 180)' : '' }}
                                                                 onClick={() => handleClickDay(date, index)}
                                                             >{`${formatDate(date)}`} <br /> </Button>
                                                         ))}
                                                     </div>
-                                                    <div className='choose-vetshift'>
+                                                    <div className='choose-vetshift mt-3'>
                                                         {vets.map((vet, index) => (
-                                                            <div className=''>
+                                                            <div className=' text-center' >
                                                                 <h1 className='fs-3'>{vet?.fullName}</h1>
-                                                                <div className='row'>
+                                                                <div className='row  mr-3 mx-2 ' >
                                                                     {vet?.workSchedule?.map((workSchedule, workScheduleIndex) => (
                                                                         <>
                                                                             <button
-                                                                                className={`col-2 mx-4 my-2 btn btn-outline-primary text-black ${activeShiftIndex === workSchedule?.vs_id ? 'active' : ''}`}
+                                                                                className='col-2 mt-3 mx-3 my-2 btn'
+                                                                                style={{ width: '12%', color: activeShiftIndex === workSchedule?.vs_id ? 'white' : '', background: activeShiftIndex === workSchedule?.vs_id ? ' rgb(80, 200, 180)' : '' }}
                                                                                 disabled={workSchedule?.status !== "Available"}
                                                                                 onClick={() => chooseShift(workSchedule?.vs_id, workSchedule?.vs_id, vet?.fullName, workSchedule?.shift.from_time + ' - ' + workSchedule?.shift.to_time)}
+                                                                                _hover={{ background: 'teal', color: 'white' }}
                                                                             >
                                                                                 {workSchedule?.shift?.from_time} - {workSchedule?.shift?.to_time}
                                                                             </button>
@@ -680,9 +681,9 @@ export default function Booking() {
                                                 </div>
                                             </div>
                                         </div>
-                                        <div className='text-center mt-3'>
-                                            <div className='btn btn-primary' onClick={() => handleBackClick()}>Back</div>
-                                            <div className='btn btn-primary' onClick={() => handleClickAPI(selectedVetShift)}>Next</div>
+                                        <div className='text-center mt-3 d-flex d-flex justify-content-center gap-3 text-center'>
+                                            <Button onClick={() => handleBackClick()} style={{ background: 'teal', color: 'white' }}>Back</Button>
+                                            <Button onClick={() => handleClickAPI(selectedVetShift)} style={{ background: 'teal', color: 'white' }}>Next</Button>
                                         </div>
                                     </TabPanel>
                                     <TabPanel>
@@ -702,19 +703,19 @@ export default function Booking() {
                                                 {selectedVet !== '' &&
                                                     <div className='col-12 my-2'>
                                                         <div className="d-flex justify-content-between mb-3">
-                                                            <button className="btn btn-primary" onClick={handlePreviousWeek}>
+                                                            <Button onClick={handlePreviousWeek} style={{ background: 'teal', color: 'white' }}>
                                                                 Previous Week
-                                                            </button>
-                                                            <button className="btn btn-primary" onClick={handleNextWeek}>
+                                                            </Button>
+                                                            <Button onClick={handleNextWeek} style={{ background: 'teal', color: 'white' }}>
                                                                 Next Week
-                                                            </button>
+                                                            </Button>
                                                         </div>
                                                         <div className='choose-date row'>
                                                             {dates.map((date, index) => (
                                                                 <Button
                                                                     key={index}
-                                                                    className={`mx-auto btn btn-outline-primary fw-normal ${activeDateIndex === index ? 'active' : ''}`}
-                                                                    style={{ width: '12%' }}
+                                                                    className='mx-auto btn  fw-normal'
+                                                                    style={{ width: '12%', color: activeDateIndex === index ? 'white' : '', background: activeDateIndex === index ? ' rgb(80, 200, 180)' : '' }}
                                                                     onClick={() => handleClickDay2(date, index)}
                                                                     isDisabled={!groupedVetShiftDetailsArray.some(detail => detail.date === new Date(date).toLocaleDateString('en-CA'))}
                                                                 >{`${formatDate(date)}`} <br /> </Button>
@@ -727,7 +728,8 @@ export default function Booking() {
                                                                     <div className='row'>
                                                                         {vetShiftDetail?.details?.map((detail, detailIndex) => (
                                                                             <button
-                                                                                className={`col-2 mx-4 my-2 btn btn-outline-primary text-black ${activeShiftIndex === detail?.vs_id ? 'active' : ''}`}
+                                                                                className='col-2 mt-3 mx-3 my-2 btn'
+                                                                                style={{ width: '12%', color: activeShiftIndex === detail?.vs_id ? 'white' : '', background: activeShiftIndex === detail?.vs_id ? ' rgb(80, 200, 180)' : '' }}
                                                                                 disabled={detail?.status !== "Available"}
                                                                                 onClick={() => chooseShift(detail?.vs_id, detail?.vs_id, selectedVet.fullName, detail?.shift.from_time + ' - ' + detail?.shift.to_time)}
                                                                             >
@@ -742,41 +744,55 @@ export default function Booking() {
 
                                             </div>
                                         </div>
-                                        <div className='text-center mt-3'>
-                                            <div className='btn btn-primary' onClick={() => handleBackClick()}>Back</div>
-                                            <div className='btn btn-primary' onClick={() => handleClickAPI(selectedVetShift)}>Next</div>
+                                        <div className='text-center mt-3 d-flex d-flex justify-content-center gap-3 text-center'>
+                                            <Button onClick={() => handleBackClick()} style={{ background: 'teal', color: 'white' }}>Back</Button>
+                                            <Button onClick={() => handleClickAPI(selectedVetShift)} style={{ background: 'teal', color: 'white' }}>Next</Button>
                                         </div>
                                     </TabPanel>
                                 </TabPanels>
                             </Tabs>
                         </TabPanel>
                         <TabPanel>
-                            <div className='container row'>
-                                <div className='col border rounded-lg p-4 mt-2 shadow p-3 mb-5 bg-body-tertiary rounded '>
-                                    <div className='d-flex align-items-center'><img src="assets/logoPetCare.png" alt="Logo" className="logo" /> Pet Health Care</div>
-                                    <h2 className='text-center mb-3'>
+                            <Box className='container row'>
+                                <Box className='col border rounded-lg p-4 mt-2 shadow p-3 mb-5 bg-body-tertiary rounded'>
+                                    <Box display='flex' alignItems='center'>
+                                        <Image src="logoApp.svg" alt="Logo" className="logo" /> Pet Health Care
+                                    </Box>
+                                    <Text as='h2' textAlign='center' mb={3}>
                                         Booking Information
-                                    </h2>
+                                    </Text>
+                                    <div className="mb-3 d-flex justify-content-end">
+                                        {/* <label className="w-50 "><b>Booking ID: </b>Chưa xử lí</label> */}
+                                    </div>
                                     <div className='shadow p-3 mb-5 bg-body-tertiary rounded'>
-                                        <div className="border-bottom mb-3">
-                                            <label className="w-50 "><b>Booking ID: </b>Chưa xử lí</label>
+
+
+                                        <div className="d-flex border-bottom mb-3">
                                             <label className="w-50 "><b>Date: </b>{new Date().toLocaleDateString("en-Gb", { month: 'numeric', day: 'numeric', year: 'numeric' })} </label>
+                                            <div className='w-50'>
+                                                <label className="w-50"><b >Pet's name: </b> {selectedPet?.name}</label>
+                                                <label className="w-50" ><b>Pet's type: </b> {selectedPet?.petType}</label>
+
+                                            </div>
+
                                         </div>
 
-                                        <div className="border-bottom mb-3">
+
+                                        <div className="d-flex border-bottom mb-3 ">
                                             <label className="w-50"><b>Pet's owner: </b> {selectedPet?.owner?.fullName}</label>
-                                            <label className="w-50"><b>Phone number: </b>{selectedPet?.owner?.phone}</label>
+                                            <div className='w-50'>
+                                                <label className="w-50"><b>Pet's breed: </b> {selectedPet?.breed}</label>
+                                                <label className='w-50'><b >Pet's sex: </b> {selectedPet?.gender}</label>
+
+                                            </div>
+
                                         </div>
-
-
                                         <div className="border-bottom mb-3 ">
-                                            <label className="w-50"><b >Pet's name: </b> {selectedPet?.name}</label>
-                                            <label className="w-50" ><b>Pet's type: </b> {selectedPet?.petType}</label>
-                                        </div>
-                                        <div className="d-flex justify-content-between">
-                                            <label ><b>Pet's breed: </b> {selectedPet?.breed}</label>
-                                            <label ><b >Pet's sex: </b> {selectedPet?.gender}</label>
-                                            <label ><b>Pet's age: </b> {selectedPet?.age} month(s)</label>
+
+                                            <label className="w-50"><b>Phone number: </b>{selectedPet?.owner?.phoneNumber}</label>
+                                            <label className='w-50'><b>Pet's age: </b> {selectedPet?.age} month(s)</label>
+
+
                                         </div>
 
                                     </div>
@@ -795,47 +811,43 @@ export default function Booking() {
                                         </div>
                                     </div>
 
+                                    <Text as='h4' textAlign='center' mb={1} mt={3} fontWeight='normal'>
+                                        Services' Information
+                                    </Text>
+                                    <Box mb={5} bg='gray.100' borderRadius='lg'>
+                                        <Table variant='simple'>
+                                            <Thead bg='gray.200'>
+                                                <Tr textAlign='center'>
+                                                    <Th>No</Th>
+                                                    <Th>Name</Th>
+                                                    <Th>Description</Th>
+                                                    <Th>Price</Th>
+                                                </Tr>
+                                            </Thead>
+                                            <Tbody>
+                                                {selectedServices.map((service, index) => (
+                                                    <Tr key={index} textAlign='center'>
+                                                        <Td>{index + 1}</Td>
+                                                        <Td>{service?.nameService}</Td>
+                                                        <Td>{service?.description}</Td>
+                                                        <Td>{service?.price.toLocaleString('vi-VN')}</Td>
+                                                    </Tr>
+                                                ))}
+                                            </Tbody>
+                                        </Table>
 
-
-                                    <h4 className='text-center mb-1 mt-3 font-weight-bold fw-normal'>
-                                        Services's Information
-                                    </h4>
-                                    <div className='shadow  mb-5 bg-body-tertiary rounded'>
-                                        <table className="table">
-                                            <thead className="table-light">
-                                                <tr className='text-center'>
-                                                    <th scope="col">No</th>
-                                                    <th scope="col">Name</th>
-                                                    <th scope="col">Description</th>
-                                                    <th scope="col">Price</th>
-                                                </tr>
-                                            </thead>
-
-                                            {selectedServices.map((service, index) => (
-
-                                                <tbody>
-                                                    <tr className='text-center'>
-                                                        <td>{index + 1}</td>
-                                                        <td>{service?.nameService}</td>
-                                                        <td>{service?.description}</td>
-                                                        <td>{service?.price.toLocaleString('vi-VN')}</td>
-                                                    </tr>
-                                                </tbody>
-                                            ))
-
-                                            }
-                                        </table>
-                                    </div>
-                                    <div className="form-control mb-3 rounded shadow">
-                                        <label className="w-50 mb-3 mt-3 mr-3 ml-3"><b >Total amount: </b>{selectedServices.map(service => service.price).reduce((total, price) => total + price, 0).toLocaleString('vi-VN')} VND </label>
-                                        <label className="w-50 "><b>Status: </b>{!(booking?.type) ? 'Pending' : 'Paid'}</label>
-                                    </div>
+                                    </Box>
+                                    <Box display="flex" justifyContent="flex-end" alignItems="center" className="form-control mb-3">
+                                        <Text width="50%" mb={3} mt={3} mr={3} ml={3} textAlign="right">
+                                            <b>Total: </b>{selectedServices.map(service => service.price).reduce((total, price) => total + price, 0).toLocaleString('vi-VN')} VND
+                                        </Text>
+                                    </Box>
+                                </Box>
+                                <div className='d-flex justify-content-center gap-3 mt-3'>
+                                    <Button style={{ background: 'gray', color: 'white' }} onClick={() => handleCancelClick()}>Cancel</Button>
+                                    <Button style={{ background: 'teal', color: 'white' }} onClick={() => handleConfirmClick()}>Confirm PAID</Button>
                                 </div>
-                                <div className='text-center mt-3'>
-                                    <div className='btn btn-danger' onClick={() => handleCancelClick()}>Cancel</div>
-                                    <div className='btn btn-primary' onClick={() => handleConfirmClick()}>Confirm PAID</div>
-                                </div>
-                            </div>
+                            </Box>
                         </TabPanel>
 
                         <TabPanel>
@@ -852,42 +864,95 @@ export default function Booking() {
                                         </div>
                                     )}
                                 </div>
-                                <h3 className="text-center">Booking Information</h3>
-                                <div className="mb-3">
-                                    <label className="form-label"><b>Booking ID:</b> {booking.id}</label>
-                                </div>
-                                <div className="mb-3">
-                                    <label className="form-label"><b>Booking Date:</b> {new Date(booking.bookingDate).toLocaleString()}</label>
-                                </div>
-                                <div className="mb-3">
-                                    <label className="form-label"><b>Appointment Date:</b> {new Date(booking.appointmentDate).toLocaleString()}</label>
-                                </div>
-                                <div className="mb-3">
-                                    <label className="form-label"><b>Status:</b> {booking.status}</label>
-                                </div>
-                                <div className="mb-3">
-                                    <label className="form-label"><b>Total Amount:</b> {booking?.totalAmount?.toFixed(2)} VND</label>
-                                </div>
-                                <div className="mb-3">
-                                    <label className="form-label"><b>Description:</b> {booking?.description}</label>
-                                </div>
-                                <h4 className="text-center">User Information</h4>
-                                <div className="mb-3">
-                                    <label className="form-label"><b>Full Name:</b> {booking?.user?.fullName}</label>
-                                </div>
-                                <div className="mb-3">
-                                    <label className="form-label"><b>Email:</b> {booking?.user?.email}</label>
-                                </div>
-                                <div className="mb-3">
-                                    <label className="form-label"><b>Phone Number:</b> {booking?.user?.phoneNumber}</label>
-                                </div>
-                                <div className="mb-3">
-                                    <label className="form-label"><b>Address:</b> {booking?.user?.address}</label>
-                                </div>
-                                <h4 className="text-center">Pet Information</h4>
-                                <div className="mb-3">
-                                    <label className="form-label"><b>Pet Name:</b> {booking?.pet?.name}</label>
-                                </div>
+                                <Box className='col border rounded-lg p-4 mt-2 shadow p-3 mb-5 bg-body-tertiary rounded'>
+                                    <Box display='flex' alignItems='center'>
+                                        <Image src="logoApp.svg" alt="Logo" className="logo" /> Pet Health Care
+                                    </Box>
+                                    <Text as='h2' textAlign='center' mb={3}>
+                                        Booking Information
+                                    </Text>
+                                    <div className="mb-3 d-flex justify-content-end">
+                                        {/* <label className="w-50 "><b>Booking ID: </b>Chưa xử lí</label> */}
+                                    </div>
+                                    <div className='shadow p-3 mb-5 bg-body-tertiary rounded'>
+
+
+                                        <div className="d-flex border-bottom mb-3">
+                                            <label className="w-50 "><b>Date: </b>{new Date().toLocaleDateString("en-Gb", { month: 'numeric', day: 'numeric', year: 'numeric' })} </label>
+                                            <div className='w-50'>
+                                                <label className="w-50"><b >Pet's name: </b> {selectedPet?.name}</label>
+                                                <label className="w-50" ><b>Pet's type: </b> {selectedPet?.petType}</label>
+
+                                            </div>
+
+                                        </div>
+
+
+                                        <div className="d-flex border-bottom mb-3 ">
+                                            <label className="w-50"><b>Pet's owner: </b> {selectedPet?.owner?.fullName}</label>
+                                            <div className='w-50'>
+                                                <label className="w-50"><b>Pet's breed: </b> {selectedPet?.breed}</label>
+                                                <label className='w-50'><b >Pet's sex: </b> {selectedPet?.gender}</label>
+
+                                            </div>
+
+                                        </div>
+                                        <div className="border-bottom mb-3 ">
+
+                                            <label className="w-50"><b>Phone number: </b>{selectedPet?.owner?.phoneNumber}</label>
+                                            <label className='w-50'><b>Pet's age: </b> {selectedPet?.age} month(s)</label>
+
+
+                                        </div>
+
+                                    </div>
+                                    <h4 className='text-center mb-3 mt-3 font-weight-bold fw-normal'>
+                                        My appoinment date
+                                    </h4>
+
+                                    <div className='shadow p-3 mb-5 bg-body-tertiary rounded'>
+                                        <div className="mb-1 d-flex justify-content-between">
+                                            <label ><b>Appointment date: </b> {selectedDisplayDate}</label>
+                                            <label ><b>Time: </b> {time}</label>
+                                            <label ><b>Vet: </b>{vetName}</label>
+                                        </div>
+                                        <div className="border-top mt-2">
+                                            <label ><b>Description:  </b>{booking?.description}</label>
+                                        </div>
+                                    </div>
+
+                                    <Text as='h4' textAlign='center' mb={1} mt={3} fontWeight='normal'>
+                                        Services' Information
+                                    </Text>
+                                    <Box mb={5} bg='gray.100' borderRadius='lg'>
+                                        <Table variant='simple'>
+                                            <Thead bg='gray.200'>
+                                                <Tr textAlign='center'>
+                                                    <Th>No</Th>
+                                                    <Th>Name</Th>
+                                                    <Th>Description</Th>
+                                                    <Th>Price</Th>
+                                                </Tr>
+                                            </Thead>
+                                            <Tbody>
+                                                {selectedServices.map((service, index) => (
+                                                    <Tr key={index} textAlign='center'>
+                                                        <Td>{index + 1}</Td>
+                                                        <Td>{service?.nameService}</Td>
+                                                        <Td>{service?.description}</Td>
+                                                        <Td>{service?.price.toLocaleString('vi-VN')}</Td>
+                                                    </Tr>
+                                                ))}
+                                            </Tbody>
+                                        </Table>
+
+                                    </Box>
+                                    <Box display="flex" justifyContent="flex-end" alignItems="center" className="form-control mb-3">
+                                        <Text width="50%" mb={3} mt={3} mr={3} ml={3} textAlign="right">
+                                            <b>Total: </b>{selectedServices.map(service => service.price).reduce((total, price) => total + price, 0).toLocaleString('vi-VN')} VND
+                                        </Text>
+                                    </Box>
+                                </Box>
                             </div>
                         </TabPanel>
                     </TabPanels>
