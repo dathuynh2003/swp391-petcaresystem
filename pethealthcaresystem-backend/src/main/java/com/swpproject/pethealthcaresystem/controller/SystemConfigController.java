@@ -159,4 +159,20 @@ public class SystemConfigController {
         }
         return response;
     }
+
+    @GetMapping("/configurations/{configKey}")
+    public Map<String, Object> getAllSConfigByKey(@PathVariable String configKey, HttpSession session) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            User curUser = (User) session.getAttribute("user");
+            if (curUser == null) {
+                throw new Exception("You need login first");
+            }
+            response.put("message", "Successfully");
+            response.put("configurations", systemConfigService.findAllSConfigByKey(configKey));
+        } catch (Exception e) {
+            response.put("message", e.getMessage());
+        }
+        return response;
+    }
 }

@@ -17,4 +17,6 @@ public interface SystemConfigurationRepository extends JpaRepository<SystemConfi
     List<String> findDistinctConfigKeys();
 
     Page<SystemConfiguration> findByConfigKeyContainingIgnoreCase(String configKey, Pageable pageable);
+
+    List<SystemConfiguration> findAllByConfigKey(String configKey);
 }

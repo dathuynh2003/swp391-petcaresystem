@@ -20,4 +20,6 @@ public interface ISystemConfigService {
     List<String> findALlConfigKey();
 
     Page<SystemConfiguration> findAllSConfigurationsByKey(int page, int size, String key);
+
+    List<SystemConfiguration> findAllSConfigByKey(String key);
 }

@@ -65,5 +65,10 @@ public class SystemConfigService implements ISystemConfigService {
         return systemConfigRepository.findByConfigKeyContainingIgnoreCase(key, pageable);
     }
 
+    @Override
+    public List<SystemConfiguration> findAllSConfigByKey(String key) {
+        return systemConfigRepository.findAllByConfigKey(key);
+    }
+
 
 }
