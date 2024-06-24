@@ -4,7 +4,9 @@ import com.swpproject.pethealthcaresystem.model.User;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 public interface IUserService {
@@ -29,4 +31,6 @@ public interface IUserService {
 //    User createAnonymousUser(String phoneNumber, String fullName, String gender);
     Page<User> getAllUsers(int pageNo, int pageSize);
     User createOrGetAnonymousUser(String phoneNumber, String fullName);
+
+    String saveAvatar(MultipartFile file, int userId) throws IOException;
 }

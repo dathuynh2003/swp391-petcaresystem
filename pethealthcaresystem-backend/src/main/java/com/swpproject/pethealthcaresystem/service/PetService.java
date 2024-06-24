@@ -143,6 +143,7 @@ public class PetService implements IPetService {
     }
 
     @Transactional
+    @Override
     public Pet updatePetAvatar(int id, MultipartFile file) throws IOException {
         Pet pet = petRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Pet not found with id: " + id));
