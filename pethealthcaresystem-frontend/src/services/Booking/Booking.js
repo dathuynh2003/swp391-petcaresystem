@@ -316,7 +316,6 @@ export default function Booking() {
     else toast.warn('Please input required information!')
   }
   const handlePaymentClick = async () => {
-    console.log(curBooking)
     const payment = {
       orderCode: booking.orderCode,
       paymentType: 'Credit Card',  // You can modify this as per your requirement
@@ -327,6 +326,7 @@ export default function Booking() {
       user: selectedPet.owner,
       booking: curBooking
     };
+    console.log(payment)
 
     try {
       const response = await axios.post('http://localhost:8080/api/payment/create', payment, { withCredentials: true });

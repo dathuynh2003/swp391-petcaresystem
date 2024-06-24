@@ -33,6 +33,7 @@ import AccountPage from './pages/Account';
 import BookingHistory from './services/Booking/BookingHistory'
 import { Fragment } from 'react';
 import Medicine from './services/Medicine/Medicine';
+import SystemConfig from './services/SystemConfig/SystemConfig';
 function App() {
 
   const location = useLocation();
@@ -75,6 +76,7 @@ function App() {
               <Route path="/reservation" element={<Reservation />} />
               <Route path='/booking-history' element={<BookingHistory />} />
               <Route path="/medicine" element={<Medicine />} />
+              <Route path="/configuration" element={<SystemConfig />} />
             </Routes >
 
             <AccountPage />
