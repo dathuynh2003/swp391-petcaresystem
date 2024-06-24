@@ -145,7 +145,7 @@ export default function ViewPet() {
         pet: {},
         diagnosis: '',
         treatment: '',
-        vet_note: '',
+        vetNote: ''
     })
 
 
@@ -159,17 +159,41 @@ export default function ViewPet() {
 
 
 
-    const medicalRecordRequest = {
+    // const medicalRecordRequest = {
 
-        medicalRecord: medicalRecord,
-        listPrescriptions: listSelectedMedicines
+    //     medicalRecord: medicalRecord,
+    //     listPrescriptions: listSelectedMedicines
+    // };
+    const medicalRecordRequest = {
+        medicalRecord: {
+            diagnosis: medicalRecord?.diagnosis,
+            treatment: medicalRecord?.treatment,
+            vetNote: medicalRecord?.vetNote
+        },
+        listPrescriptions: listSelectedMedicines.map(prescription => ({
+            dosage: prescription?.dosage,
+            frequency: prescription?.frequency,
+            unit: prescription?.unit,
+            price: prescription?.price,
+            medicine: {
+                id: prescription?.medicine_id
+            }
+        }))
     };
+    
     const callAPI = async () => {
         console.log("day ne");
-        console.log(medicalRecord);
+        console.log(medicalRecordRequest);
+        console.log(JSON.stringify(medicalRecordRequest, null, 2))
         try {
+            
+            console.log(medicalRecordRequest)
             if (medicalRecord?.diagnosis || medicalRecord?.treatment) {
-                const response = await axios.post(`http://localhost:8080/medicalRecord/add/${petId}`, medicalRecordRequest, { withCredentials: true })
+                console.log(medicalRecordRequest)
+                console.log(petId)
+                const response = await axios.post(`http://localhost:8080/medicalRecord/add/${petId}`,  medicalRecordRequest, { withCredentials: true });
+                console.log("loi o day");
+                console.log(response);
                 console.log(response.data.MedicalRecord);
                 if (response.data.MedicalRecord === null || response.data.MedicalRecord === undefined) {
                     toast.error("Add new medical record failed!")
@@ -189,7 +213,7 @@ export default function ViewPet() {
             }
 
         } catch (error) {
-            console.log(error);
+            console.log(error.message);
         }
     }
 

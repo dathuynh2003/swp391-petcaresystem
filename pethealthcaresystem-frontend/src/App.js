@@ -3,7 +3,7 @@ import "../node_modules/bootstrap/dist/css/bootstrap.min.css";
 import { BrowserRouter as Router, Route, Routes, useLocation, useMatch } from 'react-router-dom';
 import Login from './services/Login';
 import Home from './pages/Home';
-import Register from './services/Register';
+import Register from './services/Register/Register';
 import Sidenav from './components/Sidenav';
 import Navbar from './components/Navbar';
 import Services from './services/PetServices/Services';

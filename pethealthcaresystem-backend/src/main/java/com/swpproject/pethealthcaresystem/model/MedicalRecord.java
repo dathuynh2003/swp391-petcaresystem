@@ -18,6 +18,7 @@ import java.util.Set;
 @Data
 @Entity
 @EqualsAndHashCode(exclude = "prescriptions")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class MedicalRecord {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
