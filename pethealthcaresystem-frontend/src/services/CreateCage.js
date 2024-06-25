@@ -1,5 +1,6 @@
+import { Button, Select } from '@chakra-ui/react'
 import axios from 'axios'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { ToastContainer, toast } from 'react-toastify'
 
@@ -37,8 +38,11 @@ export default function CreateCage() {
         try {
             const respone = await axios.post('http://localhost:8080/createCage', cage, { withCredentials: true })
             if (respone.data.message === 'Cage created') {
-                toast.success('Add new cage successfully!', 2000);
-                navigate('/cages')
+                toast.success('Add new cage successfully!');
+                setTimeout(() => {
+                    navigate('/cages');
+                }, 2000);
+
             } else {
                 toast.warning(respone.data.message)
             }
@@ -48,6 +52,23 @@ export default function CreateCage() {
 
     }
 
+    const [petTypes, setPetTypes] = useState([])
+    const fetchPetType = async () => {
+        const configKey = "petType"
+        try {
+            const respone = await axios.get(`http://localhost:8080/configurations/${configKey}`, { withCredentials: true })
+            if (respone.data.message === 'Successfully') {
+                setPetTypes(respone.data.configurations)
+            }
+        } catch (e) {
+            // console.log(e)
+            navigate('/404page')
+        }
+    }
+
+    useEffect(() => {
+        fetchPetType()
+    }, [])
     return (
         <div className='container my-3'>
             <div className='new-cage row w-100 mx-auto my-5'>
@@ -67,30 +88,36 @@ export default function CreateCage() {
                     placeholder="Enter the new cage's price...."
                     onChange={(e) => onInputChange(e)}
                 />
-                <div className='w-75 mx-auto mt-3 px-0'>
-                    <label htmlFor='size' className='col-6 px-2'>Select Size: </label>
-                    <label htmlFor='type' className='col-6 px-2'>Cage's Type: </label>
-                    <div className='d-flex justify-content-between'>
-                        <select
-                            className='border border-dark mb-3 fs-4 col-5'
+                <div className='d-flex justify-content-between w-75 mx-auto'>
+                    <div className='w-50' style={{ marginRight: '5%' }}>
+                        <label htmlFor='size' className='col-6 px-2'>Select Size: </label>
+                        <Select
+                            className='border border-dark col-5'
                             name='size'
                             onChange={onInputChange}
+                            placeholder='Select Size'
                         >
-                            <option className='fs-6' value="">Select size</option>
                             <option className='fs-6' value="Small">Small</option>
                             <option className='fs-6' value="Medium">Medium</option>
                             <option className='fs-6' value="Large">Large</option>
-                        </select>
-                        <select
-                            className='border border-dark mb-3 fs-4 col-6'
+                        </Select>
+                    </div>
+                    <div className='w-50' style={{ marginLeft: '5%' }}>
+                        <label htmlFor='type' className='col-6 px-2'>Cage's Type: </label>
+                        <Select
+                            className='border border-dark col-6'
                             name='type'
                             onChange={onInputChange}
+                            placeholder='Select Type'
                         >
-                            <option className='fs-6' value="">Select type</option>
+                            {petTypes?.map((petType, index) => (
+                                <option className='fs-6' value={petType.configValue}>{petType.configValue}</option>
+                            ))}
+                            {/* <option className='fs-6' value="">Select type</option>
                             <option className='fs-6' value="Dog">Dog</option>
                             <option className='fs-6' value="Cat">Cat</option>
-                            <option className='fs-6' value="Bird">Bird</option>
-                        </select>
+                            <option className='fs-6' value="Bird">Bird</option> */}
+                        </Select>
                     </div>
                 </div>
                 <label htmlFor='description' className='w-75 mx-auto mt-3'>Cage Description: </label>
@@ -104,8 +131,8 @@ export default function CreateCage() {
                 />
             </div>
             <div className='row w-50 mx-auto text-center'>
-                <Link className='btn btn-danger col-3 mx-auto' to={'/cages'}>Cancel</Link>
-                <Link className='btn btn-primary col-3 mx-auto' onClick={handleCreateCage}>Create</Link>
+                <Button className='col-3 mx-auto' colorScheme='red' onClick={() => navigate('/cages')}>Cancel</Button>
+                <Button className='col-3 mx-auto' colorScheme='teal' onClick={handleCreateCage}>Create</Button>
             </div>
             <ToastContainer
                 position="top-right"

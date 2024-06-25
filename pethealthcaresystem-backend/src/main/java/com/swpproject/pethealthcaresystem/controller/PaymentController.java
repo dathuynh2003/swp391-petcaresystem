@@ -9,10 +9,7 @@ import com.swpproject.pethealthcaresystem.service.PaymentService;
 import jakarta.servlet.http.HttpSession;
 import org.apache.catalina.util.ParameterMap;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
@@ -92,8 +89,8 @@ public class PaymentController {
         }
     }
 
-    @PostMapping("/hospitalization/payment/create")
-    public Map<String, Object> createHospitalizationPayment(@RequestBody Payment payment, HttpSession session) {
+    @PostMapping("/generate-payment/hospitalization/{hospId}")
+    public Map<String, Object> createHospitalizationPayment(@RequestBody Payment payment, @PathVariable int hospId, HttpSession session) {
         Map<String, Object> response = new HashMap<>();
         try {
             User curUser = (User) session.getAttribute("user");
@@ -105,16 +102,62 @@ public class PaymentController {
             HttpHeaders headers = new HttpHeaders();
             headers.set("x-client-id", PaymentService.clientId);
             headers.set("x-api-key", PaymentService.apiKey);
-            Map<String, Object> payload = paymentService.createPayLoad(payment);
+            Map<String, Object> payload = paymentService.createPayLoad(payment, hospId);
             HttpEntity<Map<String, Object>> httpEntity = new HttpEntity<>(payload, headers);
             var result = restTemplate.postForObject
                     ("https://api-merchant.payos.vn/v2/payment-requests", httpEntity, Map.class);
 
             response.put("message", "Payment created successfully");
-            response.put("payment", result);
+            response.put("result", result);
         } catch (Exception e) {
             response.put("message", e.getMessage());
         }
         return response;
     }
+
+    //Chưa biết dùng làm gì. Chỉ get ra để test ở PostMan
+    @GetMapping("/payment/info/{orderCode}")
+    public Map<String, Object> getPaymentByOrderCode(@PathVariable int orderCode, HttpSession session) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            User curUser = (User) session.getAttribute("user");
+            if (curUser == null) {
+                throw new Exception("You need login first");
+            }
+            RestTemplate restTemplate = new RestTemplate();
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("x-client-id", PaymentService.clientId);
+            headers.set("x-api-key", PaymentService.apiKey);
+            HttpEntity<String> httpEntity = new HttpEntity<>(headers);
+            var result = restTemplate.exchange
+                    ("https://api-merchant.payos.vn/v2/payment-requests/" + orderCode, HttpMethod.GET, httpEntity, Map.class);
+
+            // Thêm kết quả vào response
+            response.put("message", "Payment information retrieved successfully");
+            response.put("result", result.getBody());
+        } catch (Exception e) {
+            response.put("message", e.getMessage());
+        }
+        return response;
+    }
+
+    @PutMapping("/update-payment/{orderCode}")
+    public Map<String, Object> updatePayment(@PathVariable int orderCode, @RequestBody Payment payment, HttpSession session) {
+        Map<String, Object> response = new HashMap<>();
+        System.out.println("Payment:" + payment);
+        try {
+            User curUser = (User) session.getAttribute("user");
+            if (curUser == null) {
+                throw new Exception("You need login first");
+            }
+            Payment updatedPayment = paymentService.updatePayment(orderCode, payment);
+            response.put("payment", updatedPayment);
+            response.put("message", "Payment updated successfully");
+        } catch (Exception e) {
+            response.put("message", e.getMessage());
+        }
+        return response;
+    }
+
+
 }

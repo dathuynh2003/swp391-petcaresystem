@@ -10,6 +10,7 @@ import com.swpproject.pethealthcaresystem.repository.PetRepository;
 import com.swpproject.pethealthcaresystem.repository.PrescriptionRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.ssl.SslAutoConfiguration;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -26,6 +27,9 @@ public class MedicalRecordService implements IMedicalRecordService {
     private PrescriptionRepository prescriptionRepository;
     @Autowired
     private MedicineRepository medicineRepository;
+
+    @Autowired
+    private SslAutoConfiguration sslAutoConfiguration;
 
     @Override
     public Set<MedicalRecord> getMedicalRecordByPetId(int petId) {
@@ -65,7 +69,9 @@ public class MedicalRecordService implements IMedicalRecordService {
             prescriptionRepository.save(prescription);
         }
         savedRecord.setPrescriptions(listPrescriptions);
-
+        Set<MedicalRecord> petMedicalRecords = pet.getMedicalRecords();
+        petMedicalRecords.add(savedRecord);
+        pet.setMedicalRecords(petMedicalRecords);
         return savedRecord;
 
     }

@@ -12,6 +12,7 @@ import com.swpproject.pethealthcaresystem.repository.HospitalizationRepository;
 import com.swpproject.pethealthcaresystem.repository.PetRepository;
 import com.swpproject.pethealthcaresystem.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -141,6 +142,8 @@ public class PetService implements IPetService {
         return petRepository.save(newPet);
     }
 
+    @Transactional
+    @Override
     public Pet updatePetAvatar(int id, MultipartFile file) throws IOException {
         Pet pet = petRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Pet not found with id: " + id));

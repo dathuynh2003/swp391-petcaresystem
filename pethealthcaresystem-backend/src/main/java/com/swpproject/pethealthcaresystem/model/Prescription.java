@@ -13,6 +13,8 @@ import lombok.experimental.FieldDefaults;
 @Data
 @Entity
 @EqualsAndHashCode(exclude = {"medicalRecord", "medicine"})
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+
 public class Prescription {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

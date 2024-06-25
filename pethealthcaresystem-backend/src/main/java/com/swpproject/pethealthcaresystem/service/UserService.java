@@ -166,10 +166,10 @@ public class UserService implements IUserService {
     @Override
     public Page<User> getAllUsersByRoleId(int pageNo, int pageSize, int roleId) {
         Pageable pageable = PageRequest.of(pageNo, pageSize);
-            return userRepository.findUsersByRoleId(pageable, roleId);
-
+        return userRepository.findUsersByRoleId(pageable, roleId);
     }
 
+    @Override
     public User deleteUser(int id) {
         Optional<User> userOptional = userRepository.findById(id);
         if (userOptional.isPresent()) {
@@ -263,6 +263,7 @@ public class UserService implements IUserService {
         return user;
     }
 
+    @Override
     public String saveAvatar(MultipartFile file, int userId) throws IOException {
         if (file.isEmpty()) {
             throw new IOException("File is empty");

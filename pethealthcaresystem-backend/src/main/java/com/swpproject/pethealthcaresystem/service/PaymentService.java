@@ -1,20 +1,16 @@
 package com.swpproject.pethealthcaresystem.service;
 
-import com.fasterxml.jackson.core.io.JsonEOFException;
-import com.fasterxml.jackson.databind.util.JSONPObject;
 import com.swpproject.pethealthcaresystem.dto.payment.CreatePaymentPosPayload;
-import com.swpproject.pethealthcaresystem.dto.payment.PayOsDTO;
-import com.swpproject.pethealthcaresystem.model.Booking;
-import com.swpproject.pethealthcaresystem.model.BookingDetail;
-import com.swpproject.pethealthcaresystem.model.Payment;
-import com.swpproject.pethealthcaresystem.model.VetShiftDetail;
+import com.swpproject.pethealthcaresystem.model.*;
 import com.swpproject.pethealthcaresystem.repository.BookingRepository;
+import com.swpproject.pethealthcaresystem.repository.HospitalizationRepository;
 import com.swpproject.pethealthcaresystem.repository.PaymentRepository;
+import com.swpproject.pethealthcaresystem.repository.PetRepository;
 import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.json.JSONObject;
 import org.apache.commons.codec.digest.HmacUtils;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -26,8 +22,12 @@ public class PaymentService implements IPaymentService {
     private PaymentRepository paymentRepository;
     @Autowired
     private BookingRepository bookingRepository;
+    @Autowired
+    private PetRepository petRepository;
+    @Autowired
+    private HospitalizationRepository hospitalizationRepository;
 
-    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("ddMMyyyy");
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     @Override
     public Payment createPayment(Payment payment) {
@@ -151,16 +151,28 @@ public class PaymentService implements IPaymentService {
     }
 
     //Dùng Map thay vì CreatePaymentPosPayload
-    public Map<String, Object> createPayLoad(Payment payment) throws JSONException {
+    @Override
+    @Transactional
+    public Map<String, Object> createPayLoad(Payment payment, int hospId) throws Exception {
         Map<String, Object> payload = new HashMap<>();
         int orderCode = new Random().nextInt(1000000) + 1;
 
         payload.put("orderCode", orderCode);
         payload.put("amount", (int) payment.getAmount());
         payload.put("description", "Paymentorder" + orderCode);
+        Hospitalization hosp = hospitalizationRepository.findById(hospId)
+                .orElseThrow(() -> new Exception("Hospitalzation not found"));
+        payload.put("cancelUrl", "http://localhost:3000/viewPet/" + hosp.getPet().getPetId());
+        System.out.println("http://localhost:3000/viewPet/" + hosp.getPet().getPetId());
+        payload.put("returnUrl", "http://localhost:3000/viewPet/" + hosp.getPet().getPetId());
 
-        payload.put("cancelUrl", "");
-        payload.put("returnUrl", "");
+        Payment updatePayment = paymentRepository.findByHospitalization(hosp);
+        if (updatePayment == null) {
+            throw new Exception("Cannot find payment info match with hospitalization");
+        }
+        updatePayment.setOrderCode(orderCode);
+        updatePayment.setAmount(payment.getAmount());
+        paymentRepository.save(updatePayment);
 
         String transaction = "amount=" + payload.get("amount") +
                 "&cancelUrl=" + payload.get("cancelUrl") +
@@ -172,6 +184,27 @@ public class PaymentService implements IPaymentService {
         payload.put("signature", signature);
 
         return payload;
+    }
+
+    @Override
+    @Transactional
+    public Payment updatePayment(int orderCode, Payment payment) throws Exception {
+        Payment updatePayment = paymentRepository.findByOrderCode(orderCode);
+        System.out.println("Payment info: " + payment);
+        if (payment == null) {
+            throw new Error("Cannot find payment info match with orderCode");
+        }
+        updatePayment.setStatus(payment.getStatus());
+        updatePayment.setPaymentType(payment.getPaymentType());
+        LocalDateTime now = LocalDateTime.now();
+        String dateTime = now.format(formatter);
+        updatePayment.setPaymentDate(dateTime);
+        paymentRepository.save(updatePayment);
+        Hospitalization hosp = hospitalizationRepository.findById(updatePayment.getHospitalization().getId())
+                .orElseThrow(() -> new Exception("Unable to update pet's hospitalization status"));
+        hosp.setStatus("discharged");
+
+        return updatePayment;
     }
 
 

@@ -5,6 +5,9 @@ import { Button, FormControl } from '@chakra-ui/react';
 import axios from 'axios';
 import { Bounce, ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { Margin } from '@mui/icons-material';
+import { width } from '@mui/system';
+import { EditIcon } from '@chakra-ui/icons';
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -107,11 +110,12 @@ const Profile = () => {
           className=''
           src='https://nordic.allianzgi.com/-/media/allianzgi/eu/regional-content/images/pets/1920x980-tiergesundheit.jpg?rev=-1'
           alt='Mô tả hình ảnh'
-          style={{ maxWidth: '100%', maxHeight: '100%', height: 'auto', width: 'auto', objectFit: 'cover' }}
+          style={{ height: '100%', width: '100%', objectFit: 'cover' }}
         />
       </div>
       <div className='row m-4' style={{ position: 'relative' }}>
         <div className='avatar col-4 my-4'>
+
           <img
             className='rounded-circle my-3 mx-5'
             src={profile?.avatar}
@@ -221,7 +225,7 @@ const Profile = () => {
               </form>
             </div>
             <div className='row mt-3'>
-              <Link  to={"/"}><Button className='col-12 mx-auto' style={{background: 'teal', color: 'white'}} >Back to home</Button></Link>
+              <Link to={"/"}><Button className='col-12 mx-auto' style={{ background: 'teal', color: 'white' }} >Back to home</Button></Link>
             </div>
           </div>
         </div>
@@ -238,7 +242,7 @@ const Profile = () => {
         pauseOnHover
         theme='light'
       />
-    </div>
+    </div >
   );
 };
 
