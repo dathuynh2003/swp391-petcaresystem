@@ -196,7 +196,7 @@ const Reservation = () => {
 
 
             {selectedBooking && (
-                <Modal isOpen={isOpen} onClose={onClose} size='full'>
+                <Modal isOpen={isOpen} onClose={onClose} size='6xl'>
                     <ModalOverlay />
                     <ModalContent>
                         <ModalHeader>Booking Details #{selectedBooking.id}</ModalHeader>
@@ -230,8 +230,9 @@ const Reservation = () => {
                                                 </div>
                                             </div>
                                             <div className="hr"></div>
-                                            <div className="invoice-head-bottom">
-                                                <div className="invoice-head-bottom-left">
+                                            <div className="invoice-head-bottom row mb-3">
+                                    
+                                                <div className="invoice-head-bottom-left col-6 ">
                                                     <ul className='customer-info'>
                                                         <li className='text-bold'>Customer Information</li>
                                                         <li><b>Name: </b>{selectedBooking.user.fullName || 'N/A'}</li>
@@ -240,8 +241,8 @@ const Reservation = () => {
                                                         <li><b>Dob: </b>{selectedBooking.user.dob || 'N/A'}</li>
                                                     </ul>
                                                 </div>
-                                                <div className="invoice-head-bottom-right">
-                                                    <ul className="pet-info text-end">
+                                                <div className="invoice-head-bottom-right col-6">
+                                                    <ul className="pet-info">
                                                         <li className='text-bold'>Pet Information</li>
                                                         <li><b>Name: </b>{selectedBooking.pet.name || 'N/A'}</li>
                                                         <li><b>Age: </b>{selectedBooking.pet.age || 'N/A'}</li>

@@ -74,7 +74,7 @@ function App() {
               <Route path="/assign-schedules" element={<AssignVetSchedules />} />
               {/* <AuthProvider>
                 <Routes>
-                <Route path='/payment-result' element={<PaymentResult />} />
+                
                 </Routes>
               </AuthProvider> */}
               <Route path="/hospitalization-detail/:id" element={<ViewHospitalization />} />
@@ -82,11 +82,11 @@ function App() {
               <Route path="/reservation" element={<Reservation />} />
               <Route path='/booking-history' element={<BookingHistory />} />
               <Route path="/medicine" element={<Medicine />} />
+              <Route path='/payment-result' element={<PaymentResult />} />
               <Route path="/configuration" element={<SystemConfig />} />
             </Routes >
 
             <AccountPage />
-            <PaymentPage/>
 
           </Fragment>
         </div >

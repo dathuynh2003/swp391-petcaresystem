@@ -300,24 +300,20 @@ public class BookingController {
             HttpSession session,
             @RequestParam(defaultValue = "1") Integer pageNo,
             @RequestParam Integer pageSize,
-            @RequestParam String fromDate,
-            @RequestParam String toDate,
-            @RequestParam String status
+            @RequestParam(required = false) String fromDate,
+            @RequestParam(required = false) String toDate,
+            @RequestParam(required = false) String status
     ) {
         try {
+            ResponseData<Page<Booking>> responseData = new ResponseData<>();
             User currentUser = (User) session.getAttribute("user");
             if (currentUser != null) {
-                ResponseData<Page<Booking>> responseData = new ResponseData<>();
+
                 Page<Booking> bookings;
-                Date from = SystemUtils.endOfDay(SystemUtils.parseStringToDate(fromDate));
-                Date to = SystemUtils.endOfDay(SystemUtils.parseStringToDate(toDate));
-                System.out.println(from);
-                System.out.println(to);
-                System.out.println(status);
-                bookings = bookingService.getBookingByStatusAndDate(status, from, to, pageNo, pageSize);
-                System.out.println(bookings);
+                bookings = bookingService.getBookingByStatusAndDate(status, fromDate, toDate, pageNo, pageSize);
                 responseData.setData(bookings);
                 responseData.setStatusCode(200);
+
                 return new ResponseEntity<>(responseData, HttpStatus.OK);
             }
             return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);

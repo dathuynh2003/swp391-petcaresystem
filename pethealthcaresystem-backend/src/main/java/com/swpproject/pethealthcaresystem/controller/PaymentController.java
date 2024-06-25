@@ -25,23 +25,26 @@ public class PaymentController {
     PaymentService paymentService;
 
     @PostMapping("/api/payment/create")
-    public ResponseEntity<ResponseData> createPayment(@RequestBody Payment payment) {
+    public ResponseEntity<ResponseData> createPayment(HttpSession session,@RequestBody Payment payment) {
         try {
-            System.out.println(payment);
-            CreatePaymentPosPayload payload = paymentService.createPaymentOs(payment);
-            ResponseData<PayOsDTO> data = new ResponseData();
-            final String uri = "https://api-merchant.payos.vn/v2/payment-requests";
-            RestTemplate restTemplate = new RestTemplate();
-            HttpHeaders headers = new HttpHeaders();
-            headers.set("x-client-id", PaymentService.clientId);
-            headers.set("x-api-key", PaymentService.apiKey);
-            HttpEntity<CreatePaymentPosPayload> httpEntity = new HttpEntity<>(payload, headers);
-            PayOsDTO result = restTemplate.postForObject(uri, httpEntity, PayOsDTO.class);
-            data.setData(result);
-            payment.setOrderCode(result.getData().getOrderCode());
-            paymentService.createPayment(payment);
-
-            return new ResponseEntity<>(data, HttpStatus.OK);
+            User user = (User) session.getAttribute("user");
+            if (user != null) {
+                System.out.println(payment);
+                CreatePaymentPosPayload payload = paymentService.createPaymentOs(payment);
+                ResponseData<PayOsDTO> data = new ResponseData();
+                final String uri = "https://api-merchant.payos.vn/v2/payment-requests";
+                RestTemplate restTemplate = new RestTemplate();
+                HttpHeaders headers = new HttpHeaders();
+                headers.set("x-client-id", PaymentService.clientId);
+                headers.set("x-api-key", PaymentService.apiKey);
+                HttpEntity<CreatePaymentPosPayload> httpEntity = new HttpEntity<>(payload, headers);
+                PayOsDTO result = restTemplate.postForObject(uri, httpEntity, PayOsDTO.class);
+                data.setData(result);
+                payment.setOrderCode(result.getData().getOrderCode());
+                paymentService.createPayment(payment);
+                return new ResponseEntity<>(data, HttpStatus.OK);
+            }
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         } catch (Error e) {
             ResponseData<PayOsDTO> data = new ResponseData();
             data.setErrorMessage("Payment failed");
@@ -51,13 +54,17 @@ public class PaymentController {
     }
 
     @PutMapping("/payment-update")
-    public ResponseEntity<ResponseData> updatePayment(@RequestBody Payment payment) {
+    public ResponseEntity<ResponseData> updatePayment(HttpSession session,@RequestBody Payment payment) {
         try {
-            ResponseData<Payment> data = new ResponseData();
-            Payment updatedPayment = paymentService.updatePayment(payment);
-            data.setStatusCode(200);
-            data.setData(updatedPayment);
-            return new ResponseEntity<>(data, HttpStatus.OK);
+//            User user = (User) session.getAttribute("user");
+//            if(user != null) {
+                ResponseData<Payment> data = new ResponseData();
+                Payment updatedPayment = paymentService.updatePayment(payment);
+                data.setStatusCode(200);
+                data.setData(updatedPayment);
+                return new ResponseEntity<>(data, HttpStatus.OK);
+//            }
+//            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         } catch (Error e) {
             ResponseData<Payment> data = new ResponseData();
             data.setErrorMessage(e.getMessage());

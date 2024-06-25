@@ -93,7 +93,7 @@ const ListAccount = () => {
   const handleDelete = async (id) => {
     try {
       await axios.put(`http://localhost:8080/delete-user-by-admin/${id}`);
-      
+
       toast({
         title: "Account deleted.",
         description: "The account has been successfully deleted.",
@@ -170,7 +170,11 @@ const ListAccount = () => {
   }
 
   return (
+
     <Box className="container">
+      <Link to="/account/create" style={""}>
+        <Button colorScheme="teal" ml={4}>Add New Account</Button>
+      </Link>
       <Flex mb={4} justify="space-between" align="center">
         <Box>
           <FormControl>
@@ -181,8 +185,8 @@ const ListAccount = () => {
             >
               <option value={0}>All</option>
               <option value={1}>Customer</option>
-              <option value={2}>Vet</option>
-              <option value={3}>Staff</option>
+              <option value={2}>Staff</option>
+              <option value={3}>Vet</option>
             </Select>
           </FormControl>
         </Box>
@@ -206,7 +210,7 @@ const ListAccount = () => {
           <Tr>
             <Th>#</Th>
             <Th>Full Name</Th>
-            <Th>Role ID</Th>
+            <Th>Role</Th>
             <Th>Status</Th>
             <Th>Actions</Th>
           </Tr>
@@ -216,7 +220,14 @@ const ListAccount = () => {
             <Tr key={index}>
               <Td><b>{index + 1}</b></Td>
               <Td><b>{account.fullName}</b></Td>
-              <Td><b>{account.roleId}</b></Td>
+              <Td>
+                <b>
+                  {account.roleId === 1 && "Customer"}
+                  {account.roleId === 2 && "Staff"}
+                  {account.roleId === 3 && "Vet"}
+                  {account.roleId === 4 && "Admin"}
+                </b>
+              </Td>
               <Td>
                 <Button
                   colorScheme={account.isActive ? 'green' : 'red'}
@@ -229,7 +240,7 @@ const ListAccount = () => {
                 </Button>
               </Td>
               <Td className='col-2 text-center p-2'>
-              <Link to={`/viewAccount/${account.userId}`}>
+                <Link to={`/viewAccount/${account.userId}`}>
                   <span style={{ marginRight: '20px' }} className='icon-container'>
                     <ViewIcon style={{ color: 'teal', cursor: 'pointer' }} boxSize={'5'} />
                     <span className="icon-text">View</span>

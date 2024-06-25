@@ -173,6 +173,7 @@ public class UserController {
     @GetMapping("/getuser")
     public User getUser(HttpSession session) {
         User curUser = (User) session.getAttribute("user");
+        System.out.println(curUser);
         try {
             if (curUser == null) {
                 throw new Exception("You need login first");
@@ -181,6 +182,24 @@ public class UserController {
             return null;
         }
         return userService.getUserByEmail(curUser);
+    }
+    @GetMapping("/me")
+    public ResponseEntity<ResponseData> getMe(HttpSession session) {
+        try {
+            ResponseData<User> responseData = new ResponseData<>();
+            User curUser = (User) session.getAttribute("user");
+            if(curUser == null){
+                throw new Exception("You need login first");
+            }
+            responseData.setData(curUser);
+            responseData.setStatusCode(200);
+            return new ResponseEntity<>(responseData, HttpStatus.OK);
+        }catch (Exception e){
+            ResponseData<User> responseData = new ResponseData<>();
+            responseData.setStatusCode(500);
+            responseData.setErrorMessage(e.getMessage());
+            return new ResponseEntity<>(responseData, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @GetMapping("/get-user-by-id/{id}")

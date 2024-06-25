@@ -7,7 +7,6 @@ export default function PaymentPage() {
   return (
     <AuthProvider>
         <Routes>
-        <Route path='/payment-result' element={<PaymentResult />} />
         </Routes>
     </AuthProvider>
   )

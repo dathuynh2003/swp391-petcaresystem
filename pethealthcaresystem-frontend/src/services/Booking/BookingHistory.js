@@ -33,7 +33,7 @@ import {
 } from '@chakra-ui/react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { format, parseISO } from 'date-fns';
-
+import moment from 'moment'
 import { faUser, faPaw, faXRay } from '@fortawesome/free-solid-svg-icons';
 import { SearchIcon } from '@chakra-ui/icons';
 import { South } from '@mui/icons-material';
@@ -51,8 +51,9 @@ const BookingHistory = () => {
     const [status, setStatus] = useState('');
     const [fromDate, setFromDate] = useState('');
     const [toDate, setToDate] = useState('');
-    const [isSearchByPhone, setIsSearchByPhone] = useState(false); // State để theo dõi trạng thái tìm kiếm
-    const [isFilteredSearch, setIsFilteredSearch] = useState(false); // State để theo dõi tìm kiếm có lọc
+    const [isSearchByPhone, setIsSearchByPhone] = useState(false); 
+    const [isFilteredSearch, setIsFilteredSearch] = useState(false); 
+    const [searchType, setSearchType] = useState('all'); 
 
 
 
@@ -61,17 +62,26 @@ const BookingHistory = () => {
     const pageSize = 5;
 
     useEffect(() => {
-        if (isSearchByPhone) {
-            fetchBookingsByPhoneNumber();
+        if (searchType === 'phone') {
+            fetchBookingsByPhoneNumber(currentPage);
         }
-        else if (isFilteredSearch) {
-            fetchFilteredBookings();
+        else if (searchType === 'filter') {
+            fetchFilteredBookings(currentPage);
         }
         else {
-            fetchAllBookings();
-
+            fetchAllBookings(currentPage);
         }
-    }, [currentPage, isSearchByPhone, isFilteredSearch]);
+    }, [currentPage, searchType]);
+
+
+    useEffect(() => {
+        if (status || fromDate || toDate) {
+            setSearchType('filter');
+            fetchFilteredBookings(1);
+        }
+    }, [status, fromDate, toDate]);
+
+
 
 
     const fetchAllBookings = async () => {
@@ -93,10 +103,13 @@ const BookingHistory = () => {
         }
     };
 
-    const fetchFilteredBookings = async () => {
+    const fetchFilteredBookings = async (page) => {
         setLoading(true);
+
+        const pageNo = page ?? currentPage
+
         try {
-            let url = `http://localhost:8080/staff-booking-date-status?` + `pageNo=${currentPage}&pageSize=${pageSize}`;
+            let url = `http://localhost:8080/staff-booking-date-status?` + `pageNo=${pageNo}&pageSize=${pageSize}`;
 
             if (status) {
                 console.log(status)
@@ -106,10 +119,9 @@ const BookingHistory = () => {
                 console.log(fromDate)
                 url += `&fromDate=${fromDate}`;
             }
-            if (toDate) {
-                console.log(toDate)
-                url += `&toDate=${toDate}`;
-            }
+            url += `&toDate=${toDate.length == 0 ? moment(new Date()).format("YYYY-MM-DD") : toDate}`;
+            console.log(url)
+            console.log('&toDate=' + toDate.length == 0 ? moment(new Date()).format('yyyy-MM-dd') : toDate)
             const response = await axios.get(url, { withCredentials: true });
             const { content, totalPages } = response.data.data;
             setBookings(content);
@@ -186,15 +198,18 @@ const BookingHistory = () => {
 
     const handleSearch = () => {
         setCurrentPage(1);
-        setIsSearchByPhone(true);
-        fetchBookingsByPhoneNumber();
+        // setIsSearchByPhone(true);
+        setSearchType('phone');
+        fetchBookingsByPhoneNumber(1);
     };
-    const handleFilterSearch = () => {
-        setCurrentPage(1);
-        setIsSearchByPhone(false);
-        setIsFilteredSearch(true);
 
-    };
+    // const handleFilterSearch = () => {
+    //     setCurrentPage(1);
+    //     setIsSearchByPhone(false);
+    //     setIsFilteredSearch(true);
+    // };
+
+
     const clearFilters = () => {
         setPhoneNumber('');
         setStatus('');
@@ -204,6 +219,7 @@ const BookingHistory = () => {
         setCurrentPage(1);
         setIsSearchByPhone(false);
         setIsFilteredSearch(false);
+        fetchAllBookings(1);
     };
 
     const formatPrice = (price) => {
@@ -274,7 +290,7 @@ const BookingHistory = () => {
                     <option value="PAID">Paid</option>
                 </Select>
             </FormControl>
-            <Button onClick={handleFilterSearch} mb={4}>Search</Button>
+            {/* <Button onClick={handleFilterSearch} mb={4}>Search</Button> */}
             <Button onClick={clearFilters} mb={4}>Clear Filters</Button>
 
 
@@ -317,7 +333,7 @@ const BookingHistory = () => {
                     {bookings.map((booking) => (
                         <Tr key={booking.id}>
                             <Td>B{booking.id}</Td>
-                            <Td>{new Date(booking.vetShiftDetail.date).toLocaleDateString()}</Td>
+                            <Td>{formatDateTime(booking.vetShiftDetail.date)}</Td>
                             <Td>{formatDateTime(booking.bookingDate)}</Td>
                             <Td>{formatPrice(booking.totalAmount)} VND</Td>
                             <Td>
@@ -388,7 +404,7 @@ const BookingHistory = () => {
                                 <Text><strong>Name:</strong> {selectedBooking.pet.name}</Text>
                                 <Text><strong>Type:</strong> {selectedBooking.pet.petType}</Text>
                                 <Text><strong>Gender:</strong> {selectedBooking.pet.gender}</Text>
-                                <Text><strong>Age:</strong> {selectedBooking.pet.age} Year(s)</Text>
+                                <Text><strong>Age:</strong> {selectedBooking.pet.age} Month(s</Text>
                             </Box>
                         </ModalBody>
                         <ModalFooter>
