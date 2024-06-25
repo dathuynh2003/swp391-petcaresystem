@@ -6,6 +6,7 @@ import {
   NumberInputStepper,
   NumberIncrementStepper,
   NumberDecrementStepper,
+  Select,
 } from '@chakra-ui/react';
 import RadioCard from '../components/Radio';
 import { LIST_BREED, URL } from '../utils/constant';
@@ -46,21 +47,27 @@ export default function EditPet() {
 
   const loadPet = async () => {
     const response = await axios.get(`${URL}/pet/${petId}`);
-    console.log(response.data);
+    //hospitalizations, bookings, medicalRecords là những dữ liệu getPet trả về nhưng k cần thiết trong trường hợp này
+    //set về rỗng để tránh bị lỗi k cần thiết
+    response.data.hospitalizations = []
+    response.data.bookings = []
+    response.data.medicalRecords = []
+    // console.log(response.data);
     setPet(response.data);
   };
 
   useEffect(() => {
     loadPet();
+    fetchPetType();
   }, []);
 
   const callAPI = async () => {
     try {
       const request = { ...pet };
-      console.log(request);
+      console.log("request:", request);
       const response = await axios.put(`${URL}/pet/${petId}`, request);
 
-      console.log(response.data);
+      console.log("response:", response.data);
       toast.success('Edit Pet successfully', 2000);
       setTimeout(() => {
         navigate('/listPets');
@@ -106,13 +113,28 @@ export default function EditPet() {
   const [listBreed, setListBreed] = useState([]);
 
   const handleList = (select) => {
-    setListBreed(LIST_BREED[select]);
+    const breedList = LIST_BREED[select] || LIST_BREED.Other; // Lấy danh sách breed, nếu không có thì trả về danh sách 'Other'
+    setListBreed(breedList);
     setPet((prev) => ({ ...prev, petType: select }));
   };
 
   const handleSelect = (select) => {
     setPet((prev) => ({ ...prev, breed: select }));
   };
+
+  const [petTypes, setPetTypes] = useState([])
+  const fetchPetType = async () => {
+    const configKey = "petType"
+    try {
+      const respone = await axios.get(`http://localhost:8080/configurations/${configKey}`, { withCredentials: true })
+      if (respone.data.message === 'Successfully') {
+        setPetTypes(respone.data.configurations)
+      }
+    } catch (e) {
+      // console.log(e)
+      navigate('/404page')
+    }
+  }
 
   return (
     <div>
@@ -149,7 +171,14 @@ export default function EditPet() {
           </div>
 
           <div className="mb-3" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <RadioCard options={['Dog', 'Cat', 'Bird']} onChange={handleList} value={petType}></RadioCard>
+            {/* <RadioCard options={['Dog', 'Cat', 'Bird']} onChange={handleList} value={petType}></RadioCard> */}
+            <div className='w-50'>
+              <Select placeholder='Choose pet type' onChange={(e) => handleList(e.target.value)}>
+                {petTypes?.map((petType, index) => (
+                  <option key={index} value={petType.configValue}>{petType.configValue}</option>
+                ))}
+              </Select>
+            </div>
 
             {listBreed.length === 0 ? (
               <></>

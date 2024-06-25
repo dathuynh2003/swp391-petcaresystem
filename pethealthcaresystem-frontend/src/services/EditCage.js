@@ -1,3 +1,4 @@
+import { Select } from '@chakra-ui/react'
 import axios from 'axios'
 import React, { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
@@ -29,6 +30,7 @@ export default function EditCage() {
             }
         }
         loadCage()
+        fetchPetType()
     }, [cageId, navigate])
 
     const onInputChange = (e) => {
@@ -71,6 +73,20 @@ export default function EditCage() {
         }
     }
 
+    const [petTypes, setPetTypes] = useState([])
+    const fetchPetType = async () => {
+        const configKey = "petType"
+        try {
+            const respone = await axios.get(`http://localhost:8080/configurations/${configKey}`, { withCredentials: true })
+            if (respone.data.message === 'Successfully') {
+                setPetTypes(respone.data.configurations)
+            }
+        } catch (e) {
+            // console.log(e)
+            navigate('/404page')
+        }
+    }
+
     return (
         <div className='container my-3'>
             <div className='new-cage row w-100 mx-auto my-5'>
@@ -91,31 +107,39 @@ export default function EditCage() {
                     onChange={(e) => onInputChange(e)}
                 />
                 <div className='w-75 mx-auto mt-3 px-0'>
-                    <label htmlFor='size' className='col-6 px-2'>Select Size: </label>
-                    <label htmlFor='type' className='col-6 px-2'>Cage's Type: </label>
                     <div className='d-flex justify-content-between'>
-                        <select
-                            className='border border-dark mb-3 fs-4 col-5'
-                            name='size'
-                            onChange={onInputChange}
-                            value={cage?.size}
-                        >
-                            <option className='fs-6' value="">Select size</option>
-                            <option className='fs-6' value="Small">Small</option>
-                            <option className='fs-6' value="Medium">Medium</option>
-                            <option className='fs-6' value="Large">Large</option>
-                        </select>
-                        <select
-                            className='border border-dark mb-3 fs-4 col-6'
-                            name='type'
-                            onChange={onInputChange}
-                            value={cage?.type}
-                        >
-                            <option className='fs-6' value="">Select type</option>
+                        <div className='w-50' style={{ marginRight: '5%' }}>
+                            <label htmlFor='size' className='col-6 px-2'>Select Size: </label>
+                            <Select
+                                value={cage.size}
+                                className='border border-dark col-5'
+                                name='size'
+                                onChange={onInputChange}
+                                placeholder='Select Size'
+                            >
+                                <option className='fs-6' value="Small">Small</option>
+                                <option className='fs-6' value="Medium">Medium</option>
+                                <option className='fs-6' value="Large">Large</option>
+                            </Select>
+                        </div>
+                        <div className='w-50' style={{ marginLeft: '5%' }}>
+                            <label htmlFor='type' className='col-6 px-2'>Cage's Type: </label>
+                            <Select
+                                value={cage.type}
+                                className='border border-dark col-6'
+                                name='type'
+                                onChange={onInputChange}
+                                placeholder='Select Type'
+                            >
+                                {petTypes?.map((petType, index) => (
+                                    <option key={index} lassName='fs-6' value={petType.configValue}>{petType.configValue}</option>
+                                ))}
+                                {/* <option className='fs-6' value="">Select type</option>
                             <option className='fs-6' value="Dog">Dog</option>
                             <option className='fs-6' value="Cat">Cat</option>
-                            <option className='fs-6' value="Bird">Bird</option>
-                        </select>
+                            <option className='fs-6' value="Bird">Bird</option> */}
+                            </Select>
+                        </div>
                     </div>
                 </div>
                 <label htmlFor='description' className='w-75 mx-auto mt-3'>Cage Description: </label>
