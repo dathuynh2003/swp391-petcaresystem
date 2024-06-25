@@ -404,7 +404,7 @@ const BookingHistory = () => {
                                 <Text><strong>Name:</strong> {selectedBooking.pet.name}</Text>
                                 <Text><strong>Type:</strong> {selectedBooking.pet.petType}</Text>
                                 <Text><strong>Gender:</strong> {selectedBooking.pet.gender}</Text>
-                                <Text><strong>Age:</strong> {selectedBooking.pet.age} Month(s)</Text>
+                                <Text><strong>Age:</strong> {selectedBooking.pet.age} Month(s</Text>
                             </Box>
                         </ModalBody>
                         <ModalFooter>
