@@ -2,18 +2,21 @@ import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import {
     Box, Button, Table, Thead, Tbody, Tr, Th, Td, Text, Modal, ModalOverlay, ModalContent,
-    ModalHeader, ModalFooter, ModalBody, ModalCloseButton, Badge, useToast, useDisclosure, Spinner, Flex, TableContainer, TableCaption, Tfoot
+    ModalHeader, ModalFooter, ModalBody, ModalCloseButton, Badge, useToast, useDisclosure, Spinner, Flex, TableContainer, TableCaption, Tfoot,
+    FormControl
 } from '@chakra-ui/react';
 import { format, parseISO } from 'date-fns';
 import './Invoice.css'
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
+import { RepeatIcon, ViewIcon } from '@chakra-ui/icons';
 
 
 const Reservation = () => {
     const [bookings, setBookings] = useState([]);
     const [selectedBooking, setSelectedBooking] = useState(null);
     const { isOpen, onOpen, onClose } = useDisclosure();
+    const { isOpen: isOpenRefundModal, onOpen: onOpenRefundModal, onClose: onCloseRefundModal } = useDisclosure();
     const toast = useToast();
     const [loading, setLoading] = useState(true);
     const [currentPage, setCurrentPage] = useState(1); // Current page number
@@ -37,6 +40,7 @@ const Reservation = () => {
             // setBookings(response.data.data.content);
             // setLoading(false); // Set loading to false after data is fetched
             const { content, totalPages } = response.data.data;
+            console.log(response.data.data);
             setBookings(content)
             setTotalPages(totalPages)
 
@@ -165,20 +169,48 @@ const Reservation = () => {
                         </Tr>
                     </Thead>
                     <Tbody>
-                        {bookings.map((booking) => (
-                            <Tr key={booking.id}>
-                                <Td><b>B{booking.id}</b></Td>
-                                <Td><b>{formatDateTime(booking.vetShiftDetail.date)}</b></Td>
-                                <Td><b>{booking.vetShiftDetail.shift.from_time} - {booking.vetShiftDetail.shift.to_time}</b></Td>
-                                <Td><b>{formatPrice(booking.totalAmount)} VND</b></Td>
-                                <Td>
-                                    <Badge colorScheme="green">PAID</Badge>
-                                </Td>
-                                <Td>
-                                    <Button size="sm" colorScheme="blue" onClick={() => viewDetail(booking.id)}>Detail</Button>
-                                </Td>
-                            </Tr>
-                        ))}
+                        {bookings.map((booking) => {
+                            const vetShiftDetail = booking.vetShiftDetail
+                            const shift = booking.vetShiftDetail.shift
+                            // Tạo đối tượng Date từ date và from_time
+                            const [year, month, day] = vetShiftDetail?.date.split('-');
+                            const [hour, minute] = shift.from_time.split(':');
+                            const appointmentDate = new Date(`${year}/${month}/${day} ${hour}:${minute}`); //Ngày giờ khám!
+
+                            // Định dạng lại ngày giờ (dd/MM/yyyy hh:mm)
+                            const formattedDate = `${String(appointmentDate.getDate()).padStart(2, '0')}/${String(appointmentDate.getMonth() + 1).padStart(2, '0')}/${String(appointmentDate.getFullYear())}`
+                            const formattedTime = `${String(appointmentDate.getHours()).padStart(2, '0')}:${String(appointmentDate.getMinutes()).padStart(2, '0')}`
+                            const strAppointmentTime = `${formattedDate} ${formattedTime}`  //dùng để in ra nếu cần thiết.
+
+                            const isCancelable = new Date() < appointmentDate && booking.status === 'PAID';
+                            // console.log(booking.id, " - ", isCancelable)
+                            return (
+                                <Tr key={booking.id}>
+                                    <Td><b>B{booking.id}</b></Td>
+                                    <Td><b>{formatDateTime(booking.vetShiftDetail.date)}</b></Td>
+                                    <Td><b>{booking.vetShiftDetail.shift.from_time} - {booking.vetShiftDetail.shift.to_time}</b></Td>
+                                    <Td><b>{formatPrice(booking.totalAmount)} VND</b></Td>
+                                    <Td>
+                                        <Badge colorScheme="green">PAID</Badge>
+                                    </Td>
+                                    <Td>
+                                        {/* <Button size="sm" colorScheme="blue" onClick={() => viewDetail(booking.id)}>Detail</Button> */}
+                                        <FormControl marginLeft={2}>
+                                            <span style={{ marginRight: '20px' }} className='icon-container'>
+                                                <ViewIcon style={{ color: 'teal', cursor: 'pointer' }} boxSize={'5'} onClick={() => viewDetail(booking.id)} />
+                                                <span className="icon-text">View</span>
+                                            </span>
+                                            {isCancelable &&
+                                                <span style={{ marginRight: '20px' }} className='icon-container'>
+                                                    <RepeatIcon style={{ color: 'teal', cursor: 'pointer' }} boxSize={'5'} />
+                                                    <span className="icon-text">Request Payment Refund</span>
+                                                </span>
+                                            }
+                                        </FormControl>
+                                    </Td>
+                                </Tr>
+                            )
+                        })}
                     </Tbody>
                 </Table>
                 {/* <Flex mt={4} justifyContent="center" alignItems="center">
@@ -231,7 +263,7 @@ const Reservation = () => {
                                             </div>
                                             <div className="hr"></div>
                                             <div className="invoice-head-bottom row mb-3">
-                                    
+
                                                 <div className="invoice-head-bottom-left col-6 ">
                                                     <ul className='customer-info'>
                                                         <li className='text-bold'>Customer Information</li>
