@@ -832,11 +832,27 @@ export default function ViewPet() {
                                         <AccordionPanel pb={4} >
                                             <div pb={6} className='p-5 shadow' style={{ background: '' }}>
 
-                                                <div
-                                                    className='d-flex  align-items-center '>
-                                                    <div className='d-flex align-items-center justify-content-between'><div><img src="logoApp.svg" alt="Logo" className='logo' /> Pet Health Care</div>
-                                                        <div>    {roleId === '1' ? <Button onClick={() => handleMedicalPayment(medicalRecord)}>Payment</Button> : ''}</div></div>
+                                                <div className=''>
 
+                                                    <div className='d-flex align-items-center justify-content-between text-center'>
+                                                        <div className='d-flex gap-1'><img src="logoApp.svg" alt="Logo" className='logo' /> Pet Health Care</div>
+                                                        <div>                                                           
+                                                            {roleId === '1' ? (
+                                                                <Button  
+                                                                colorScheme = {medicalRecord.isPaid === true ? 'teal' : 'pink'}                              
+                                                                    onClick={ medicalRecord.isPaid === false ? () => handleMedicalPayment(medicalRecord) : null}
+                                                                    style={{
+                                                                        color:'white'
+                                                                    }}
+                                                                    
+                                                                >
+                                                                    {medicalRecord.isPaid === true ? 'Paid' : 'Payment'}
+                                                                </Button>
+                                                            ) : (
+                                                                ''
+                                                            )}
+                                                        </div>
+                                                    </div>
                                                 </div>
 
                                                 <FormControl mt={4} className='d-flex'>

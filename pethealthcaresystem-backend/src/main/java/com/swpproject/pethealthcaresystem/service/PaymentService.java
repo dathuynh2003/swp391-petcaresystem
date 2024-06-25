@@ -214,6 +214,9 @@ public class PaymentService implements IPaymentService {
             tmp.setStatus("discharged");
             hospitalizationRepository.save(tmp);
         }
+        if (medicalRecord != null){
+            medicalRecord.setIsPaid(true);
+        }
 
         return updatePayment;
     }
