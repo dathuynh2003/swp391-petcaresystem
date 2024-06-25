@@ -1,13 +1,16 @@
 package com.swpproject.pethealthcaresystem.service;
+
 import com.swpproject.pethealthcaresystem.model.*;
 import com.swpproject.pethealthcaresystem.model.PetService;
 import com.swpproject.pethealthcaresystem.repository.*;
+import com.swpproject.pethealthcaresystem.utils.SystemUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+
 import java.util.Date;
 import java.util.List;
 
@@ -196,6 +199,7 @@ public class BookingService implements IBookingService {
         updatedBooking = bookingRepository.save(updatedBooking);
         return updatedBooking;
     }
+
     @Override
     public Page<Booking> getBookingsByUserAndStatus(int userId, String status, int pageNo, int pageSize) {
         Pageable pageable = PageRequest.of(pageNo - 1, pageSize, Sort.by("id").descending());
@@ -210,16 +214,28 @@ public class BookingService implements IBookingService {
     }
 
     @Override
-    public Page<Booking> getBookingByBookingDate(Date fromDate,Date toDate, int pageNo, int pageSize) {
+    public Page<Booking> getBookingByBookingDate(Date fromDate, Date toDate, int pageNo, int pageSize) {
         Pageable pageable = PageRequest.of(pageNo - 1, pageSize, Sort.by("id").descending());
         Page<Booking> bookings = bookingRepository.findByBookingDateBetween(fromDate, toDate, pageable);
         return bookings;
     }
 
     @Override
-    public Page<Booking> getBookingByStatusAndDate(String status, Date fromDate, Date toDate, int pageNo, int pageSize) {
+    public Page<Booking> getBookingByStatusAndDate(String status, String fromDate, String toDate, int pageNo, int pageSize) {
         Pageable pageable = PageRequest.of(pageNo - 1, pageSize, Sort.by("id").descending());
-        Page<Booking> bookings = bookingRepository.findByBookingDateBetweenAndStatus(fromDate, toDate, status, pageable);
+        System.out.println("Status:" + status);
+        System.out.println("FromDate:" + fromDate);
+        System.out.println("ToDate:" + toDate);
+        if (fromDate != null && status == null) {
+            Date from = SystemUtils.endOfDay(SystemUtils.parseStringToDate(fromDate));
+            Date to = SystemUtils.endOfDay(SystemUtils.parseStringToDate(toDate));
+            return bookingRepository.findByBookingDateBetween(from, to, pageable);
+        } else if (status != null && fromDate != null) {
+            Date from = SystemUtils.parseStringToDate(fromDate);
+            Date to = SystemUtils.parseStringToDate(toDate);
+            return bookingRepository.findByBookingDateBetweenAndStatus(from, to, status, pageable);
+        }
+        Page<Booking> bookings = bookingRepository.findByStatus(status, pageable);
         return bookings;
     }
 
