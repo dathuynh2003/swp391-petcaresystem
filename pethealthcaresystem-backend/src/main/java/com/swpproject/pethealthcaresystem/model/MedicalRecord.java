@@ -30,7 +30,7 @@ public class MedicalRecord {
     //String vaccine;
     double totalAmount;
     int status = 1;
-
+    Boolean isPaid = false;
     @ManyToOne
     @JoinColumn(name = "vet_id")
     User user;

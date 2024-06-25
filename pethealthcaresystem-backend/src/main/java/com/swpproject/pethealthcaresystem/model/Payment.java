@@ -32,9 +32,13 @@ public class Payment {
     @JoinColumn(name = "booking_id")
     @JsonIgnoreProperties("payment")
     private Booking booking;
-
     @OneToOne
     @JoinColumn(name = "hospitalization_id")
     @JsonIgnoreProperties("payment")
     private Hospitalization hospitalization;
+
+    @OneToOne
+    @JoinColumn(name = "medicalRecord_id")
+    @JsonIgnoreProperties("payment")
+    private MedicalRecord medicalRecord;
 }
