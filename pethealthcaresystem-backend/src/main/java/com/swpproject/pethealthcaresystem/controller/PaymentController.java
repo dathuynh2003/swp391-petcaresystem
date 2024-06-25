@@ -152,5 +152,34 @@ public class PaymentController {
         return response;
     }
 
+    @PostMapping("/generate-payment/medicalRecord/{medicalRecordId}")
+    public Map<String, Object> createMedicalRecordPayment(@RequestBody Payment payment, @PathVariable int medicalRecordId, HttpSession session) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            User curUser = (User) session.getAttribute("user");
+            if (curUser == null) {
+                response.put("message", "You need login first");
+            }
+            RestTemplate restTemplate = new RestTemplate();
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("x-client-id", PaymentService.clientId);
+            headers.set("x-api-key", PaymentService.apiKey);
+
+//            Payment payment1 = paymentService.createPayment(payment);
+
+            Map<String, Object> payload = paymentService.createPayLoadMedicalRecord(payment, medicalRecordId);
+            HttpEntity<Map<String, Object>> httpEntity = new HttpEntity<>(payload, headers);
+            var result = restTemplate.postForObject
+                    ("https://api-merchant.payos.vn/v2/payment-requests", httpEntity, Map.class);
+
+
+            response.put("message", "Payment created successfully");
+            response.put("result", result);
+        }catch (Exception e){
+            response.put("message", e.getMessage());
+        }
+        return response;
+    }
+
 
 }

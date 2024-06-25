@@ -2,10 +2,7 @@ package com.swpproject.pethealthcaresystem.service;
 
 import com.swpproject.pethealthcaresystem.dto.payment.CreatePaymentPosPayload;
 import com.swpproject.pethealthcaresystem.model.*;
-import com.swpproject.pethealthcaresystem.repository.BookingRepository;
-import com.swpproject.pethealthcaresystem.repository.HospitalizationRepository;
-import com.swpproject.pethealthcaresystem.repository.PaymentRepository;
-import com.swpproject.pethealthcaresystem.repository.PetRepository;
+import com.swpproject.pethealthcaresystem.repository.*;
 import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,6 +25,8 @@ public class PaymentService implements IPaymentService {
     private HospitalizationRepository hospitalizationRepository;
 
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+    @Autowired
+    private MedicalRecordRepository medicalRecordRepository;
 
     @Override
     public Payment createPayment(Payment payment) {
@@ -39,6 +38,7 @@ public class PaymentService implements IPaymentService {
         payment.setBooking(curBooking);
         return paymentRepository.save(payment);
     }
+
 
     @Override
     public Payment updatePayment(Payment payment) {
@@ -200,11 +200,80 @@ public class PaymentService implements IPaymentService {
         String dateTime = now.format(formatter);
         updatePayment.setPaymentDate(dateTime);
         paymentRepository.save(updatePayment);
-        Hospitalization hosp = hospitalizationRepository.findById(updatePayment.getHospitalization().getId())
-                .orElseThrow(() -> new Exception("Unable to update pet's hospitalization status"));
-        hosp.setStatus("discharged");
+
+//        Hospitalization hosp = hospitalizationRepository.findById(updatePayment.getHospitalization().getId())
+//                .orElseThrow(() -> new Exception("Unable to update pet's hospitalization status"));
+//        hosp.setStatus("discharged");
+        Hospitalization hosp = updatePayment.getHospitalization();
+        MedicalRecord medicalRecord = updatePayment.getMedicalRecord();
+        if (hosp == null && medicalRecord == null) {
+            throw new Exception("Unable to update pet's hospitalization and medical record status");
+        }
+        if (hosp != null) {
+            Hospitalization tmp = hospitalizationRepository.findById(hosp.getId()).orElseThrow(() -> new Exception("Unable to update pet's hospitalization status"));
+            tmp.setStatus("discharged");
+            hospitalizationRepository.save(tmp);
+        }
 
         return updatePayment;
+    }
+
+    @Override
+    public Payment createMedicalPayment(Payment payment, int medicalRecordId) throws Exception {
+        MedicalRecord medicalRecord = medicalRecordRepository.findById(medicalRecordId).get();
+        Payment tmpPayment = paymentRepository.findByMedicalRecord(medicalRecord);
+        if (tmpPayment == null) {
+            payment.setMedicalRecord(medicalRecord);
+            paymentRepository.save(payment);
+        }
+
+        return paymentRepository.save(payment);
+    }
+
+
+    public Map<String, Object> createPayLoadMedicalRecord(Payment payment, int medicalRecordId) throws Exception {
+
+//        if(payment1 == null) {}
+        Map<String, Object> payload = new HashMap<>();
+        int orderCode = new Random().nextInt(1000000) + 1;
+
+
+        payload.put("orderCode", orderCode);
+        payload.put("amount", (int) payment.getAmount());
+        payload.put("description", "Paymentorder" + orderCode);
+        MedicalRecord medicalRecord = medicalRecordRepository.findById(medicalRecordId)
+                .orElseThrow(() -> new Exception("Medical Record not found"));
+        payload.put("cancelUrl", "http://localhost:3000/viewPet/" + medicalRecord.getPet().getPetId());
+        System.out.println("http://localhost:3000/viewPet/" + medicalRecord.getPet().getPetId());
+        payload.put("returnUrl", "http://localhost:3000/viewPet/" + medicalRecord.getPet().getPetId());
+
+        //neu payment da co medicalRecrord ID
+        Payment updatePayment = paymentRepository.findByMedicalRecord(medicalRecord);
+        if (updatePayment == null) {
+//            throw new Exception("Cannot find payment info match with medical record");
+            updatePayment = new Payment();
+            updatePayment.setMedicalRecord(medicalRecord);
+            updatePayment.setUser(medicalRecord.getUser());
+        }
+        updatePayment.setPaymentType(payment.getPaymentType());
+
+        updatePayment.setOrderCode(orderCode);
+        updatePayment.setAmount(payment.getAmount());
+        paymentRepository.save(updatePayment);
+
+
+        String transaction = "amount=" + payload.get("amount") +
+                "&cancelUrl=" + payload.get("cancelUrl") +
+                "&description=" + payload.get("description") +
+                "&orderCode=" + payload.get("orderCode") +
+                "&returnUrl=" + payload.get("returnUrl");
+
+
+        String signature = this.createSignaturePayOs(transaction);
+        payload.put("signature", signature);
+
+
+        return payload;
     }
 
 

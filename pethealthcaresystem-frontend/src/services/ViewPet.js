@@ -180,18 +180,18 @@ export default function ViewPet() {
             }
         }))
     };
-    
+
     const callAPI = async () => {
         console.log("day ne");
         console.log(medicalRecordRequest);
         console.log(JSON.stringify(medicalRecordRequest, null, 2))
         try {
-            
+
             console.log(medicalRecordRequest)
             if (medicalRecord?.diagnosis || medicalRecord?.treatment) {
                 console.log(medicalRecordRequest)
                 console.log(petId)
-                const response = await axios.post(`http://localhost:8080/medicalRecord/add/${petId}`,  medicalRecordRequest, { withCredentials: true });
+                const response = await axios.post(`http://localhost:8080/medicalRecord/add/${petId}`, medicalRecordRequest, { withCredentials: true });
                 console.log("loi o day");
                 console.log(response);
                 console.log(response.data.MedicalRecord);
@@ -368,12 +368,13 @@ export default function ViewPet() {
                     toast.info("Payment failed");
                 }
                 if (status === "PAID") {
+                    console.log("status: " + status);
                     const paymentType = "Credit Card"
                     const response = await axios.put(`http://localhost:8080/update-payment/${orderCode}`, { paymentType, status }, { withCredentials: true });
                     if (response.data.message === 'Payment updated successfully') {
                         const petId = location.pathname.split('/').pop(); //Lấy petId từ URL
                         navigate(`/viewPet/${petId}`)//Navigate lại để ẩn thông tin trả về của PayOs
-                        toast.success("Payment success");
+                        toast.success("Payment successfully");
                     }
                 }
             } catch (error) {
@@ -387,6 +388,31 @@ export default function ViewPet() {
         }
 
     }, [status, orderCode]); // Đặt dependency là status để useEffect chạy lại khi status thay đổi
+
+
+    const handleMedicalPayment = async (medicalRecord) => {
+        try {
+            const payment = {
+                paymentType: 'Credit card',
+                amount: medicalRecord.totalAmount
+            }
+            console.log(payment);
+            const response = await axios.post(`http://localhost:8080/generate-payment/medicalRecord/${medicalRecord.id}`, payment, { withCredentials: true });
+            if (response.data.result.desc === 'success') {
+                const checkoutURL = response.data.result.data.checkoutUrl
+                console.log(checkoutURL);
+                window.location.href = checkoutURL
+            } else {
+                console.log(response.data);
+                toast.warning("Cannot generate payment")
+            }
+        } catch (error) {
+            toast.error(error)
+        }
+    }
+
+
+
 
     return (
         <div>
@@ -807,9 +833,9 @@ export default function ViewPet() {
                                             <div pb={6} className='p-5 shadow' style={{ background: '' }}>
 
                                                 <div
-                                                    className='d-flex align-items-center'>
-                                                    <div className='d-flex align-items-center'><img src="logoApp.svg" alt="Logo" className='logo' /> Pet Health Care</div>
-
+                                                    className='d-flex  align-items-center '>
+                                                    <div className='d-flex align-items-center justify-content-between'><div><img src="logoApp.svg" alt="Logo" className='logo' /> Pet Health Care</div>
+                                                        <div>    {roleId === '1' ? <Button onClick={() => handleMedicalPayment(medicalRecord)}>Payment</Button> : ''}</div></div>
 
                                                 </div>
 
