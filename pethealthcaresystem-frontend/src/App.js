@@ -14,7 +14,7 @@ import EditPet from './services/EditPet';
 import Profile from './services/Profile';
 import Cages from './services/Cages';
 import VetWorkSchedules from './services/VetWorkSchedules';
-import Dashboard from './services/Dashboard';
+import Dashboard from './services/Dashboard/Dashboard';
 import Verify from './services/Verify';
 import CreateShift from './services/CreateShift';
 // import CreateAccount from './services/CreateAccount';
