@@ -388,7 +388,7 @@ export default function Booking() {
         <div className="container">
             <div className="row">
                 <ToastContainer />
-                <Tabs className="col-8 mt-3 mx-auto shadow p-3 mb-5 bg-body rounded h-100" colorScheme="teal" index={step}>
+                <Tabs className="col-11 mt-3 mx-auto shadow p-3 mb-5 bg-body rounded h-100" colorScheme="teal" index={step}>
                     <TabList className="d-flex justify-content-between">
                         <Tab>Services</Tab>
                         <Tab >Choose Pet</Tab>
@@ -496,54 +496,19 @@ export default function Booking() {
                                                 style={{ height: '65px', width: '65px', overflow: 'hidden', position: 'relative' }}
                                             >
                                                 {/* Pet Image */}
-                                                {pet.petType === 'Dog' && (
-                                                    <img
-                                                        className="rounded-circle"
-                                                        src={pet.avatar === null ? '' : pet.avatar}
-                                                        alt="DogImg"
-                                                        style={{
-                                                            position: 'absolute',
-                                                            top: 0,
-                                                            left: 0,
-                                                            width: '100%',
-                                                            height: '100%',
-                                                            objectFit: 'cover',
-                                                        }}
-                                                    ></img>
-                                                    //   <WrapItem className='mt-2'>
-                                                    //   <Avatar size='lg'  src={pet.img} />
-                                                    // </WrapItem>
-                                                )}
-                                                {pet.petType === 'Cat' && (
-                                                    <img
-                                                        className="rounded-circle"
-                                                        src={pet.avatar === null ? '' : pet.avatar}
-                                                        alt="CatImg"
-                                                        style={{
-                                                            position: 'absolute',
-                                                            top: 0,
-                                                            left: 0,
-                                                            width: '100%',
-                                                            height: '100%',
-                                                            objectFit: 'cover',
-                                                        }}
-                                                    ></img>
-                                                )}
-                                                {pet.petType === 'Bird' && (
-                                                    <img
-                                                        className="rounded-circle"
-                                                        src={pet.avatar === null ? '' : pet.avatar}
-                                                        alt="BirdImg"
-                                                        style={{
-                                                            position: 'absolute',
-                                                            top: 0,
-                                                            left: 0,
-                                                            width: '100%',
-                                                            height: '100%',
-                                                            objectFit: 'cover',
-                                                        }}
-                                                    ></img>
-                                                )}
+                                                <img
+                                                    className="rounded-circle"
+                                                    src={pet.avatar === null ? '' : pet.avatar}
+                                                    alt="PetAvatar"
+                                                    style={{
+                                                        position: 'absolute',
+                                                        top: 0,
+                                                        left: 0,
+                                                        width: '100%',
+                                                        height: '100%',
+                                                        objectFit: 'cover',
+                                                    }}
+                                                ></img>
                                             </div>
                                             <div className="pet-info col-8  my-2 mx-2">
                                                 <h5>{pet.name}</h5>
