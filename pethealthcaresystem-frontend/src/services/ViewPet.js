@@ -180,18 +180,18 @@ export default function ViewPet() {
             }
         }))
     };
-    
+
     const callAPI = async () => {
         console.log("day ne");
         console.log(medicalRecordRequest);
         console.log(JSON.stringify(medicalRecordRequest, null, 2))
         try {
-            
+
             console.log(medicalRecordRequest)
             if (medicalRecord?.diagnosis || medicalRecord?.treatment) {
                 console.log(medicalRecordRequest)
                 console.log(petId)
-                const response = await axios.post(`http://localhost:8080/medicalRecord/add/${petId}`,  medicalRecordRequest, { withCredentials: true });
+                const response = await axios.post(`http://localhost:8080/medicalRecord/add/${petId}`, medicalRecordRequest, { withCredentials: true });
                 console.log("loi o day");
                 console.log(response);
                 console.log(response.data.MedicalRecord);

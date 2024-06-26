@@ -4,9 +4,7 @@ import com.swpproject.pethealthcaresystem.common.ResponseData;
 import com.swpproject.pethealthcaresystem.model.Booking;
 import com.swpproject.pethealthcaresystem.model.BookingDetail;
 import com.swpproject.pethealthcaresystem.model.User;
-import com.swpproject.pethealthcaresystem.model.VetShiftDetail;
 import com.swpproject.pethealthcaresystem.service.BookingService;
-import com.swpproject.pethealthcaresystem.service.PetService;
 import com.swpproject.pethealthcaresystem.utils.SystemUtils;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,8 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
@@ -224,7 +221,11 @@ public class BookingController {
         try {
             User currentUser = (User) session.getAttribute("user");
             if (currentUser != null) {
-                Page<Booking> bookings = bookingService.getBookingsByUserAndStatus(currentUser.getUserId(), "PAID", pageNo, pageSize);
+                List<String> statuses = new ArrayList<>();
+                statuses.add("PAID");
+                statuses.add("Request Refund");
+                statuses.add("Refunded");
+                Page<Booking> bookings = bookingService.getBookingsByUserAndStatusIn(currentUser.getUserId(), statuses, pageNo, pageSize);
                 ResponseData<Page<Booking>> responseData = new ResponseData<>();
                 responseData.setData(bookings);
                 responseData.setStatusCode(200);
@@ -324,5 +325,40 @@ public class BookingController {
             return new ResponseEntity<>(responseData, HttpStatus.BAD_REQUEST);
         }
 
+    }
+
+    @PutMapping("/refund/booking/{id}")
+    public Map<String, Object> requestRefund(@PathVariable int id, HttpSession session) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            User currentUser = (User) session.getAttribute("user");
+            if (currentUser == null) {
+                throw new Exception("You need login first");
+            }
+            response.put("booking", bookingService.requestRefundBooking(id));
+            response.put("message", "successfully");
+        }catch (Exception e) {
+            response.put("message", e.getMessage());
+        }
+        return response;
+    }
+
+    @GetMapping("/get-bookings-by-status/{status}")
+    public Map<String, Object> getBookingsByStatus(@PathVariable String status,
+                                                   @RequestParam(defaultValue = "0") int page,
+                                                   @RequestParam(defaultValue = "10") int size,
+                                                   HttpSession session) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            User currentUser = (User) session.getAttribute("user");
+            if (currentUser == null) {
+                throw new Exception("You need login first");
+            }
+            response.put("bookings", bookingService.getBookingsByStatus(status, page, size));
+            response.put("status", "successfully");
+        } catch (Exception e) {
+            response.put("message", e.getMessage());
+        }
+        return response;
     }
 }

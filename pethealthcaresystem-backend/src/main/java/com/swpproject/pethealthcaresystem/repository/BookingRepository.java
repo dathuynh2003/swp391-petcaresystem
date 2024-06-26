@@ -14,7 +14,7 @@ import java.util.List;
 public interface BookingRepository extends JpaRepository<Booking, Integer> {
     Page<Booking> findBookingsByUser(User user, Pageable pageable);
     List<Booking> findBookingsByUserAndStatus(User user, String status);
-    Page<Booking> findByUserUserIdAndStatus(int userId, String status, Pageable pageable);
+    Page<Booking> findByUserUserIdAndStatusIn(int userId, List<String> statuses, Pageable pageable);
     Page<Booking> findByStatus(String status, Pageable pageable);
     Page<Booking> findByBookingDateBetween(Date fromDate, Date toDate, Pageable pageable);
     Page<Booking> findByBookingDateBetweenAndStatus(Date fromDate, Date toDate, String status, Pageable pageable);
