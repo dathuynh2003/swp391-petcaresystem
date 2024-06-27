@@ -93,7 +93,7 @@
   /* Accounts for the sidebar width */
   box-sizing: border-box;
   overflow-y: auto;
-  /* height: calc(100vh - 60px); moi suaaa*/
+  /* height: calc(100vh - 60px); */
   /* Makes the content take full viewport height minus navbar */
   /* background-color: #f1f1f1; */
   /* background-color: red; */

@@ -275,4 +275,22 @@ public class UserController {
             return new ResponseEntity<>(responseData, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @GetMapping("/getAllUsers")
+    public Map<String, Object> getAllUsers(HttpSession session) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            if (session.getAttribute("user") == null) {
+                throw new Exception("You need login first");
+            }
+            List<User> listUser = userService.getAll();
+            response.put("users", listUser);
+            response.put("message", "Successfully");
+
+        }catch (Exception e){
+            response.put("message", e.getMessage());
+        }
+        return response;
+
+    }
 }

@@ -41,13 +41,7 @@ public class PetService implements IPetService {
 
         newPet.setOwner(curUser);
         newPet.setIsDeceased(false);
-        if (newPet.getPetType().equals("Dog")) {
-            newPet.setAvatar("https://res.cloudinary.com/dinklulzk/image/upload/v1718952304/avatarDogDefault.png");
-        } else if (newPet.getPetType().equals("Cat")) {
-            newPet.setAvatar("https://res.cloudinary.com/dinklulzk/image/upload/v1718952303/avatarCatDefault_zvuixh.png");
-        } else if (newPet.getPetType().equals("Bird")) {
-            newPet.setAvatar("https://res.cloudinary.com/dinklulzk/image/upload/v1718952303/avatarBirdDefault_kgw2pt.png");
-        }
+        newPet.setAvatar("https://res.cloudinary.com/dinklulzk/image/upload/v1719295004/logoPetCare_lktjfl.png");
         return petRepository.save(newPet);
     }
 
@@ -132,13 +126,7 @@ public class PetService implements IPetService {
 
         newPet.setOwner(anonymousUser);
         newPet.setIsDeceased(false);
-        if (newPet.getPetType().equals("Dog")) {
-            newPet.setAvatar("https://res.cloudinary.com/dinklulzk/image/upload/v1718952304/avatarDogDefault.png");
-        } else if (newPet.getPetType().equals("Cat")) {
-            newPet.setAvatar("https://res.cloudinary.com/dinklulzk/image/upload/v1718952303/avatarCatDefault_zvuixh.png");
-        } else if (newPet.getPetType().equals("Bird")) {
-            newPet.setAvatar("https://res.cloudinary.com/dinklulzk/image/upload/v1718952303/avatarBirdDefault_kgw2pt.png");
-        }
+        newPet.setAvatar("https://res.cloudinary.com/dinklulzk/image/upload/v1719295004/logoPetCare_lktjfl.png");
         return petRepository.save(newPet);
     }
 

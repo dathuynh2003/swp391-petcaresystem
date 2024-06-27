@@ -36,6 +36,7 @@ public class User {
     String gender;
     Boolean isActive;
     Date dob;
+    Date createdAt;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnoreProperties("user")

@@ -68,7 +68,7 @@ export default function AssignVetSchedules() {
 
   const handleShiftChange = () => {
     if (selectedShifts.length === 0) {
-      alert('Please select at least one shift to assign.');
+      toast.error('Please select at least one shift to assign.');
       return;
     }
 

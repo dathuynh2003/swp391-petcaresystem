@@ -116,7 +116,10 @@ export default function VetWorkSchedules() {
               <tr>
                 <th style={headerCellStyle}>Work Shift</th>
                 {dates.map((date, index) => (
-                  <th key={index} style={headerCellStyle} className="text-center">{`${formatDay(date)} ${formatDate(date)}`}</th>
+                  <th key={index} style={headerCellStyle} className="text-center">
+                    <div>{`${formatDay(date)}`}</div>
+                    <div>{`${formatDate(date)}`}</div>
+                  </th>
                 ))}
               </tr>
             </thead>
