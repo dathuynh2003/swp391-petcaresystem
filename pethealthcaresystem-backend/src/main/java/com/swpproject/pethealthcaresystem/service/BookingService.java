@@ -12,6 +12,12 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
 
@@ -266,12 +272,34 @@ public class BookingService implements IBookingService {
     }
 
     @Override
-    public Booking refuseRefundBooking(int id,String reason) {
+    public Booking refuseRefundBooking(int id, String reason) {
         Booking booking = bookingRepository.findById(id).orElseThrow(() -> new RuntimeException("Booking not found"));
         booking.setStatus("PAID");
         booking.setRefundDate(null);
         //Có thể bổ sung thêm reason nhưng cần xem xét thêm field vào booking....
         return bookingRepository.save(booking);
+    }
+
+    @Override
+    public Booking requestRefundBookingByStaff(int bookingId) {
+        Booking booking = bookingRepository.findById(bookingId).orElseThrow(() -> new RuntimeException("Booking not found"));
+        VetShiftDetail vsDetail = booking.getVetShiftDetail();
+        Shift shift = vsDetail.getShift();
+
+        // Chuyển đổi thành LocalDate và LocalTime
+        LocalDate localDate = LocalDate.parse(vsDetail.getDate());
+        LocalTime startTime = LocalTime.parse(shift.getFrom_time());
+        // Nối lại thành appoimentTime (ngày giờ khám)
+        LocalDateTime appointmentTime = LocalDateTime.of(localDate, startTime);
+        // Tạo một ngày mới nhỏ hơn 7 ngày
+        LocalDateTime newDateTime = appointmentTime.minusDays(7);
+        // Chuyển đổi LocalDateTime sang Date để lưu xuống DB
+        Date refundDate = Date.from(newDateTime.atZone(ZoneId.systemDefault()).toInstant());
+
+        booking.setRefundDate(refundDate);
+        booking.setStatus("Request Refund");
+        bookingRepository.save(booking);
+        return booking;
     }
 
 

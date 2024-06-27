@@ -393,4 +393,19 @@ public class BookingController {
         }
         return response;
     }
+    @PutMapping("/refund-booking-by-staff/{bookingId}")
+    public Map<String, Object> refundBooking(@PathVariable int bookingId, HttpSession session) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            User currentUser = (User) session.getAttribute("user");
+            if (currentUser == null) {
+                throw new Exception("You need login first");
+            }
+            response.put("message", "successfully");
+            response.put("booking", bookingService.requestRefundBookingByStaff(bookingId));
+        } catch (Exception e) {
+            response.put("message", e.getMessage());
+        }
+        return response;
+    }
 }

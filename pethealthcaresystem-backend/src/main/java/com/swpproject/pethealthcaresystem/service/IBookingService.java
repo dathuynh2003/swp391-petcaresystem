@@ -28,4 +28,5 @@ public interface IBookingService {
     Booking requestRefundBooking(int id);
     Booking acceptRefundBooking(int id);
     Booking refuseRefundBooking(int id, String reason);
+    Booking requestRefundBookingByStaff(int bookingId);
 }
