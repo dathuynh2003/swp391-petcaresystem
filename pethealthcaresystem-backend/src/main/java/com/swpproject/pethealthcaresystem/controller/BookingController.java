@@ -337,7 +337,7 @@ public class BookingController {
             }
             response.put("booking", bookingService.requestRefundBooking(id));
             response.put("message", "successfully");
-        }catch (Exception e) {
+        } catch (Exception e) {
             response.put("message", e.getMessage());
         }
         return response;
@@ -345,7 +345,7 @@ public class BookingController {
 
     @GetMapping("/get-bookings-by-status/{status}")
     public Map<String, Object> getBookingsByStatus(@PathVariable String status,
-                                                   @RequestParam(defaultValue = "0") int page,
+                                                   @RequestParam(defaultValue = "1") int page,
                                                    @RequestParam(defaultValue = "10") int size,
                                                    HttpSession session) {
         Map<String, Object> response = new HashMap<>();
@@ -355,7 +355,39 @@ public class BookingController {
                 throw new Exception("You need login first");
             }
             response.put("bookings", bookingService.getBookingsByStatus(status, page, size));
-            response.put("status", "successfully");
+            response.put("message", "Successfully");
+        } catch (Exception e) {
+            response.put("message", e.getMessage());
+        }
+        return response;
+    }
+
+    @PutMapping("/accept-refund/booking/{id}")
+    public Map<String, Object> acceptRefund(@PathVariable int id, HttpSession session) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            User currentUser = (User) session.getAttribute("user");
+            if (currentUser == null) {
+                throw new Exception("You need login first");
+            }
+            response.put("message", "successfully");
+            response.put("booking", bookingService.acceptRefundBooking(id));
+        } catch (Exception e) {
+            response.put("message", e.getMessage());
+        }
+        return response;
+    }
+
+    @PutMapping("/refuse-refund/booking/{id}")
+    public Map<String, Object> refuseRefund(@PathVariable int id, @RequestParam String reason, HttpSession session) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            User currentUser = (User) session.getAttribute("user");
+            if (currentUser == null) {
+                throw new Exception("You need login first");
+            }
+            response.put("message", "successfully");
+            response.put("booking", bookingService.refuseRefundBooking(id, reason));
         } catch (Exception e) {
             response.put("message", e.getMessage());
         }

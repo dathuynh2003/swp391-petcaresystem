@@ -229,7 +229,7 @@ const Reservation = () => {
                             //Tỉ lệ hoàn lại
                             const diffDays = Math.ceil((appointmentDate - new Date()) / (1000 * 60 * 60 * 24));
                             const refundPercentage = diffDays >= 7 ? 1 : (diffDays >= 3 ? 0.75 : 0)
-                            console.log(booking.id, " - ", diffDays, "-", refundPercentage);
+                            // console.log(booking.id, " - ", diffDays, "-", refundPercentage);
 
 
                             return (

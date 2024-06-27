@@ -163,7 +163,7 @@ export default function SystemConfig() {
                         </thead>
                         <tbody>
                             {configurations?.map((configuration, index) => (
-                                <tr key={index} className='text-center item' style={{ background: 'blue' }}>
+                                <tr key={index} className='text-center item'>
                                     <td>{index + 1}</td>
                                     <td>{configuration.configKey}</td>
                                     <td>{configuration.configValue}</td>

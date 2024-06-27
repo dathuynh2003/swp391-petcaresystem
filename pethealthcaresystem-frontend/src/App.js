@@ -36,6 +36,7 @@ import Medicine from './services/Medicine/Medicine';
 import AuthProvider from './context/auth.context';
 import PaymentPage from './pages/Payment';
 import SystemConfig from './services/SystemConfig/SystemConfig';
+import RefundRequests from './services/RefundRequests';
 function App() {
 
   const location = useLocation();
@@ -84,6 +85,7 @@ function App() {
               <Route path="/medicine" element={<Medicine />} />
               <Route path='/payment-result' element={<PaymentResult />} />
               <Route path="/configuration" element={<SystemConfig />} />
+              <Route path='/refund-requests' element={<RefundRequests />} />
             </Routes >
 
             <AccountPage />
