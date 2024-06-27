@@ -36,6 +36,7 @@ import Medicine from './services/Medicine/Medicine';
 import AuthProvider from './context/auth.context';
 import PaymentPage from './pages/Payment';
 import SystemConfig from './services/SystemConfig/SystemConfig';
+import UserChart from './services/Dashboard/UserChart'
 function App() {
 
   const location = useLocation();

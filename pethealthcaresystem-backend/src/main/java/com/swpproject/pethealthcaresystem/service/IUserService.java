@@ -33,4 +33,5 @@ public interface IUserService {
     User createOrGetAnonymousUser(String phoneNumber, String fullName);
 
     String saveAvatar(MultipartFile file, int userId) throws IOException;
+    public List<User> getAll();
 }

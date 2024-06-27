@@ -19,6 +19,7 @@
     "bootstrap": "^5.3.3",
     "chart.js": "^4.4.3",
     "date-fns": "^3.6.0",
+    "dayjs": "^1.11.11",
     "firebase": "^10.12.2",
     "font-awesome": "^4.7.0",
     "framer-motion": "^11.2.11",
