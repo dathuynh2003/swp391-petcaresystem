@@ -59,8 +59,8 @@ public class SummaryDataService implements ISummaryDataService{
     public void generateSummaryDataForDate(Date startDate, Date endDate) {
         // Lấy dữ liệu từ các nguồn khác nhau và tính toán các giá trị tổng hợp
         List<Booking> bookings = bookingRepository.findByBookingDateBetween(startDate, endDate);
+//        long totalUsers = userRepository.countByRoleIdAndCreatedAtBetween(1, startDate, endDate);
         long totalUsers = userRepository.count();
-
         double totalAmount = bookings.stream()
                 .filter(booking -> !"CANCELLED".equals(booking.getStatus()))
                 .mapToDouble(Booking::getTotalAmount)
