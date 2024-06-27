@@ -38,8 +38,7 @@ export default function Dashboard() {
           <Bar dataKey="totalBooking" fill="#8884d8" />
           <Bar dataKey="totalCancelBooking" fill="#82ca9d" />
         </BarChart>
-
-        // Chart for total users
+        Chart total Users
         <LineChart width={600} height={300} data={summaryData}>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="date" />
