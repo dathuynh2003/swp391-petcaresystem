@@ -111,7 +111,7 @@ export default function CreateCage() {
                             placeholder='Select Type'
                         >
                             {petTypes?.map((petType, index) => (
-                                <option className='fs-6' value={petType.configValue}>{petType.configValue}</option>
+                                <option key={index} lassName='fs-6' value={petType.configValue}>{petType.configValue}</option>
                             ))}
                             {/* <option className='fs-6' value="">Select type</option>
                             <option className='fs-6' value="Dog">Dog</option>

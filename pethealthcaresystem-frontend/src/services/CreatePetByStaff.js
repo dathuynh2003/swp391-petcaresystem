@@ -6,6 +6,7 @@ import {
     NumberInputStepper,
     NumberIncrementStepper,
     NumberDecrementStepper,
+    Select,
 } from '@chakra-ui/react';
 import RadioCard from '../components/Radio';
 import { LIST_BREED } from '../utils/constant';
@@ -62,7 +63,8 @@ export default function CreatePetByStaff() {
     const [listBreed, setListBreed] = useState([]);
 
     const handleList = async (select) => {
-        setListBreed(LIST_BREED[select]);
+        const breedList = LIST_BREED[select] || LIST_BREED.Other; // Lấy danh sách breed, nếu không có thì trả về danh sách 'Other'
+        setListBreed(breedList);
         setPet((prev) => ({ ...prev, petType: select }));
     };
 
@@ -86,6 +88,23 @@ export default function CreatePetByStaff() {
         console.log(pet);
     }, [pet]);
 
+    const [petTypes, setPetTypes] = useState([])
+    const fetchPetType = async () => {
+        const configKey = "petType"
+        try {
+            const respone = await axios.get(`http://localhost:8080/configurations/${configKey}`, { withCredentials: true })
+            if (respone.data.message === 'Successfully') {
+                setPetTypes(respone.data.configurations)
+            }
+        } catch (e) {
+            // console.log(e)
+            navigate('/404page')
+        }
+    }
+
+    useEffect(() => {
+        fetchPetType()
+    }, [])
     return (
         <div>
             <div className="container">
@@ -134,8 +153,14 @@ export default function CreatePetByStaff() {
                     </div>
 
                     <div className="mb-3" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                        <RadioCard options={['Dog', 'Cat', 'Bird']} onChange={handleList} value={pet.petType}></RadioCard>
-
+                        {/* <RadioCard options={['Dog', 'Cat', 'Bird']} onChange={handleList} value={pet.petType}></RadioCard> */}
+                        <div className='w-50'>
+                            <Select placeholder='Choose pet type' onChange={(e) => handleList(e.target.value)}>
+                                {petTypes?.map((petType, index) => (
+                                    <option key={index} value={petType.configValue}>{petType.configValue}</option>
+                                ))}
+                            </Select>
+                        </div>
                         {listBreed.length === 0 ? (
                             <></>
                         ) : (

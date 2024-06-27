@@ -53,7 +53,7 @@ export default function ListPets() {
             <th scope="col" className='p-3'>Age</th>
             <th scope="col" className='p-3'>Neutered</th>
             <th scope="col" className='p-3'>Description</th>
-            <th scope="col" className='col-2 text-center'>Action</th>
+            <th scope="col" className='col-2 text-center p-3'>Action</th>
           </tr>
         </thead>
         <tbody className="table-group-divider p-4">
