@@ -172,7 +172,7 @@ const ListAccount = () => {
   return (
 
     <Box className="container">
-      <Link to="/account/create" style={""}>
+      <Link to="/account/create">
         <Button colorScheme="teal" ml={4}>Add New Account</Button>
       </Link>
       <Flex mb={4} justify="space-between" align="center">

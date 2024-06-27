@@ -10,6 +10,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
@@ -201,9 +202,9 @@ public class BookingService implements IBookingService {
     }
 
     @Override
-    public Page<Booking> getBookingsByUserAndStatus(int userId, String status, int pageNo, int pageSize) {
+    public Page<Booking> getBookingsByUserAndStatusIn(int userId, List<String> statuses, int pageNo, int pageSize) {
         Pageable pageable = PageRequest.of(pageNo - 1, pageSize, Sort.by("id").descending());
-        return bookingRepository.findByUserUserIdAndStatus(userId, status, pageable);
+        return bookingRepository.findByUserUserIdAndStatusIn(userId, statuses, pageable);
     }
 
     @Override
@@ -238,6 +239,41 @@ public class BookingService implements IBookingService {
         Page<Booking> bookings = bookingRepository.findByStatus(status, pageable);
         return bookings;
     }
+
+    @Override
+    public Booking requestRefundBooking(int id) {
+        Booking booking = bookingRepository.findById(id).orElseThrow(() -> new RuntimeException("Booking not found"));
+        Date curDate = new Date();
+        booking.setRefundDate(curDate);
+        booking.setStatus("Request Refund");
+        bookingRepository.save(booking);
+        return booking;
+    }
+
+    @Override
+    @Transactional
+    public Booking acceptRefundBooking(int id) {
+        Booking booking = bookingRepository.findById(id).orElseThrow(() -> new RuntimeException("Booking not found"));
+        booking.setStatus("Refunded");
+        VetShiftDetail vetShiftDetail = booking.getVetShiftDetail();
+        if (vetShiftDetail == null) {
+            throw new RuntimeException("Vet Shift Detail not found. Cannot accept refund request");
+        }
+        vetShiftDetail.setStatus("Available");
+        vetShiftDetailRepository.save(vetShiftDetail);
+
+        return bookingRepository.save(booking);
+    }
+
+    @Override
+    public Booking refuseRefundBooking(int id,String reason) {
+        Booking booking = bookingRepository.findById(id).orElseThrow(() -> new RuntimeException("Booking not found"));
+        booking.setStatus("PAID");
+        booking.setRefundDate(null);
+        //Có thể bổ sung thêm reason nhưng cần xem xét thêm field vào booking....
+        return bookingRepository.save(booking);
+    }
+
 
 //    @Override
 //    public Page<Booking> getBookingByDateAndStatus

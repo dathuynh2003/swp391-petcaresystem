@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { MoneyOff } from '@mui/icons-material';
 
 export default function Sidenav() {
   let navigate = useNavigate();
@@ -90,6 +91,7 @@ export default function Sidenav() {
         { name: 'Dashboard', path: '/dashboard', icon: 'fas fa-tachometer-alt' },
         { name: 'Account', path: '/account', icon: 'fa-solid fa-user' },
         { name: 'System Config', path: '/configuration', icon: 'fa fa-cog' },
+        { name: 'Refunds', path: '/refund-requests', icon: <MoneyOff /> },
         { name: 'Logout', path: '', icon: 'fas fa-sign-out-alt', onClick: handleLogout },
       ];
       break;
@@ -107,7 +109,11 @@ export default function Sidenav() {
         {links.map((link) => (
           <li key={link.name}>
             <Link to={link.path} onClick={link.onClick}>
-              <i className={link.icon} style={{ marginRight: '20px', color: 'white' }}></i>
+              {typeof link.icon === 'string' ? (
+                <i className={link.icon} style={{ marginRight: '20px', color: 'white' }}></i>
+              ) : (
+                <span style={{ marginRight: '20px', color: 'white' }}>{link.icon}</span>
+              )}
               {link.name}
             </Link>
           </li>

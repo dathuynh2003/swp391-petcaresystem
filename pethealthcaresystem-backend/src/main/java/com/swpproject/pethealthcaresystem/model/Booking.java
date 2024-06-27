@@ -18,6 +18,7 @@ public class Booking {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private Date bookingDate;
+    private Date refundDate;
     private String status;
     private double totalAmount;
     private Boolean type;

@@ -2,23 +2,36 @@ import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import {
     Box, Button, Table, Thead, Tbody, Tr, Th, Td, Text, Modal, ModalOverlay, ModalContent,
-    ModalHeader, ModalFooter, ModalBody, ModalCloseButton, Badge, useToast, useDisclosure, Spinner, Flex, TableContainer, TableCaption, Tfoot
+    ModalHeader, ModalFooter, ModalBody, ModalCloseButton, Badge, useToast, useDisclosure, Spinner, Flex, TableContainer, TableCaption, Tfoot,
+    FormControl,
+    FormLabel,
+    Input,
+    Image
 } from '@chakra-ui/react';
 import { format, parseISO } from 'date-fns';
 import './Invoice.css'
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
+import { RepeatIcon, ViewIcon } from '@chakra-ui/icons';
+import { useNavigate } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
 
 
 const Reservation = () => {
+    const navigate = useNavigate();
     const [bookings, setBookings] = useState([]);
     const [selectedBooking, setSelectedBooking] = useState(null);
     const { isOpen, onOpen, onClose } = useDisclosure();
+    const { isOpen: isOpenRefundModal, onOpen: onOpenRefundModal, onClose: onCloseRefundModal } = useDisclosure();
     const toast = useToast();
     const [loading, setLoading] = useState(true);
     const [currentPage, setCurrentPage] = useState(1); // Current page number
     const [totalPages, setTotalPages] = useState(1);   // Total number of pages
     const [error, setError] = useState(null);
+    const [owner, setOwner] = useState(null)    //Lưu owner để hiển thị vào modal refund
+    const [pet, setPet] = useState(null)        //Lưu pet để hiển thị vào modal refund
+    const [appointmentTime, setAppointmentTime] = useState('')  //Lưu để hiển thị vào modal refund
+    const [refundPercentage, setRefundPercentage] = useState(null)
 
     const pageSize = 5
     useEffect(() => {
@@ -37,6 +50,7 @@ const Reservation = () => {
             // setBookings(response.data.data.content);
             // setLoading(false); // Set loading to false after data is fetched
             const { content, totalPages } = response.data.data;
+            console.log(response.data.data);
             setBookings(content)
             setTotalPages(totalPages)
 
@@ -59,10 +73,10 @@ const Reservation = () => {
         return <Spinner size="xl" />;
     }
 
-    const formatDateTime = (dateString) => {
+    const formatDateTime = (dateString, formatter) => {
         try {
             const date = parseISO(dateString);
-            return format(date, 'dd/MM/yyyy');
+            return format(date, formatter);
         } catch (error) {
             console.error('Invalid date:', dateString);
             return 'Invalid Date';
@@ -150,6 +164,37 @@ const Reservation = () => {
     //     });
     // };
 
+    const handleClickRefund = async (booking, appointmentTime, refundPercentage) => {
+        onOpenRefundModal()
+        const pet = booking.pet
+        setPet(pet)
+        setOwner(pet.owner)
+        setSelectedBooking(booking)
+        setAppointmentTime(appointmentTime)
+        setRefundPercentage(refundPercentage)
+    }
+    const handleRequestRefund = async (bookingId) => {
+        try {
+            const response = await axios.put(`http://localhost:8080/refund/booking/${bookingId}`, {}, { withCredentials: true })
+            if (response.data.message === 'successfully') {
+                // toast.success('Send request refund successfully')
+                toast({
+                    title: "Success",
+                    description: "Send request refund successfully",
+                    status: "success",
+                    duration: 5000,
+                    isClosable: true,
+                });
+                window.location.reload()
+            } else {
+                toast.warning(response.data.message)
+            }
+        } catch (e) {
+            // navigate('/404page')
+            console.log(e.message)
+        }
+    }
+
     return (
         <Box p={5}>
             <Box>
@@ -165,20 +210,58 @@ const Reservation = () => {
                         </Tr>
                     </Thead>
                     <Tbody>
-                        {bookings.map((booking) => (
-                            <Tr key={booking.id}>
-                                <Td><b>B{booking.id}</b></Td>
-                                <Td><b>{formatDateTime(booking.vetShiftDetail.date)}</b></Td>
-                                <Td><b>{booking.vetShiftDetail.shift.from_time} - {booking.vetShiftDetail.shift.to_time}</b></Td>
-                                <Td><b>{formatPrice(booking.totalAmount)} VND</b></Td>
-                                <Td>
-                                    <Badge colorScheme="green">PAID</Badge>
-                                </Td>
-                                <Td>
-                                    <Button size="sm" colorScheme="blue" onClick={() => viewDetail(booking.id)}>Detail</Button>
-                                </Td>
-                            </Tr>
-                        ))}
+                        {bookings.map((booking) => {
+                            const vetShiftDetail = booking.vetShiftDetail
+                            const shift = booking.vetShiftDetail.shift
+                            // Tạo đối tượng Date từ date và from_time
+                            const [year, month, day] = vetShiftDetail?.date.split('-');
+                            const [hour, minute] = shift.from_time.split(':');
+                            const appointmentDate = new Date(`${year}/${month}/${day} ${hour}:${minute}`); //Ngày giờ khám!
+
+                            // Định dạng lại ngày giờ (dd/MM/yyyy hh:mm)
+                            const formattedDate = `${String(appointmentDate.getDate()).padStart(2, '0')}/${String(appointmentDate.getMonth() + 1).padStart(2, '0')}/${String(appointmentDate.getFullYear())}`
+                            const formattedTime = `${String(appointmentDate.getHours()).padStart(2, '0')}:${String(appointmentDate.getMinutes()).padStart(2, '0')}`
+                            const strAppointmentTime = `${formattedDate} ${formattedTime}`  //dùng để in ra nếu cần thiết.
+
+                            const isCancelable = new Date() < appointmentDate && booking.status === 'PAID';
+                            // console.log(booking.id, " - ", strAppointmentTime)
+
+                            //Tỉ lệ hoàn lại
+                            const diffDays = Math.ceil((appointmentDate - new Date()) / (1000 * 60 * 60 * 24));
+                            const refundPercentage = diffDays >= 7 ? 1 : (diffDays >= 3 ? 0.75 : 0)
+                            // console.log(booking.id, " - ", diffDays, "-", refundPercentage);
+
+
+                            return (
+                                <Tr key={booking.id}>
+                                    <Td><b>B{booking.id}</b></Td>
+                                    <Td><b>{formatDateTime(booking.vetShiftDetail.date, 'dd/MM/yyyy')}</b></Td>
+                                    <Td><b>{booking.vetShiftDetail.shift.from_time} - {booking.vetShiftDetail.shift.to_time}</b></Td>
+                                    <Td><b>{formatPrice(booking.totalAmount)} VND</b></Td>
+                                    <Td>
+                                        {booking.status === "PAID" && <Badge colorScheme="green">{booking.status}</Badge>}
+                                        {booking.status === "Request Refund" && <Badge colorScheme="yellow">{booking.status}</Badge>}
+                                        {booking.status === "Refunded" && <Badge colorScheme="green">{booking.status}</Badge>}
+                                    </Td>
+                                    <Td>
+                                        {/* <Button size="sm" colorScheme="blue" onClick={() => viewDetail(booking.id)}>Detail</Button> */}
+                                        <FormControl marginLeft={2}>
+                                            <span style={{ marginRight: '20px' }} className='icon-container'>
+                                                <ViewIcon style={{ color: 'teal', cursor: 'pointer' }} boxSize={'5'} onClick={() => viewDetail(booking.id)} />
+                                                <span className="icon-text">View</span>
+                                            </span>
+                                            {isCancelable &&
+                                                <span style={{ marginRight: '20px' }} className='icon-container'>
+                                                    <RepeatIcon style={{ color: 'teal', cursor: 'pointer' }} boxSize={'5'}
+                                                        onClick={() => handleClickRefund(booking, strAppointmentTime, refundPercentage)} />
+                                                    <span className="icon-text">Request Payment Refund</span>
+                                                </span>
+                                            }
+                                        </FormControl>
+                                    </Td>
+                                </Tr>
+                            )
+                        })}
                     </Tbody>
                 </Table>
                 {/* <Flex mt={4} justifyContent="center" alignItems="center">
@@ -193,7 +276,91 @@ const Reservation = () => {
                 <Button onClick={handleNextPage} disabled={currentPage === totalPages}>Next</Button>
             </Box>
 
+            <Modal isOpen={isOpenRefundModal} onClose={onCloseRefundModal} size={'3xl'} >
+                <ModalOverlay />
+                <ModalContent marginTop={5}>
+                    <ModalHeader pb={0}>
+                        <Box display='flex' alignItems='center' className='fs-5'>
+                            <Image src="logoApp.svg" alt="Logo" className="logo" /> Pet Health Care
+                        </Box>
+                        <Text textAlign='center' mb={3} className='fs-3'>
+                            Request Cancellation And Refund
+                        </Text>
+                    </ModalHeader>
+                    <ModalCloseButton />
+                    <ModalBody className='py-0'>
+                        <FormControl mt={4} className='d-flex'>
+                            <FormLabel className='w-50'>
+                                Pet's owner
+                                <Input readOnly value={owner?.fullName} />
+                            </FormLabel>
+                            <FormLabel className='w-50'>
+                                Phone number
+                                <Input readOnly value={owner?.phoneNumber} />
+                            </FormLabel>
+                        </FormControl>
+                        <FormControl className='d-flex'>
+                            <FormLabel className='w-50'>
+                                Pet's name
+                                <Input readOnly value={pet?.name} />
+                            </FormLabel>
+                            <FormLabel className='w-50'>
+                                Pet's type
+                                <Input readOnly value={pet?.petType} />
+                            </FormLabel>
+                        </FormControl>
+                        <FormControl className='d-flex justify-content-between'>
+                            <FormLabel>Pet's breed <Input readOnly value={pet?.breed} /></FormLabel>
+                            <FormLabel>Pet's sex <Input readOnly value={pet?.gender} /></FormLabel>
+                            <FormLabel>Pet's age <Input readOnly value={pet?.age} /></FormLabel>
+                        </FormControl>
+                        <FormControl className='d-flex mt-3'>
+                            <FormLabel className='w-100'>
+                                <Input readOnly value="Refund Infomation" className='text-center fw-bold' />
+                            </FormLabel>
+                        </FormControl>
+                        <FormControl className='d-flex'>
+                            <FormLabel className='w-50'>
+                                Booking Date
+                                <Input readOnly value={selectedBooking?.bookingDate ? formatDateTime(selectedBooking.bookingDate, 'dd/MM/yyyy hh:mm') : 'N/A'} />
+                            </FormLabel>
+                            <FormLabel className='w-50'>
+                                Appointment Date
+                                <Input readOnly value={appointmentTime} />
+                            </FormLabel>
+                        </FormControl>
+                        <FormControl className='d-flex justify-content-between'>
+                            <FormLabel className='mb-0 w-50'>
+                                <Text className='text-danger text-center mb-0 fw-bold'>Refund Policy</Text>
+                                <Text className='text-danger my-0'>
+                                    * Full refund (100%): If cancellation is made at least 7 days in advance<br />
+                                    * Partial refund (75%): If cancellation is made between 3 to 6 days in advance<br />
+                                    * No refund (0%): For all other cases <br />
+                                    *Refund via momo using the phone number in the user profile
+                                </Text>
+                            </FormLabel>
+                            <FormLabel className='w-50'>
+                                Amount booking
+                                <Input readOnly value={selectedBooking?.totalAmount.toLocaleString('vi-VN') + " VND"} />
+                                Amount refunded
+                                <Input className="fw-bold" readOnly value={(selectedBooking?.totalAmount * refundPercentage).toLocaleString('vi-VN') + " VND"} />
+                            </FormLabel>
+                        </FormControl>
+                    </ModalBody>
+                    <ModalFooter className='pt-0'>
+                        <Button colorScheme="red" mr={3} onClick={() => onCloseRefundModal()}>
+                            Close
+                        </Button>
+                        <Button colorScheme="green" onClick={() => {
+                            handleRequestRefund(selectedBooking.id);
+                            onCloseRefundModal();
+                        }}>
+                            Refund
+                        </Button>
+                    </ModalFooter>
+                </ModalContent>
 
+            </Modal>
 
             {selectedBooking && (
                 <Modal isOpen={isOpen} onClose={onClose} size='6xl'>
@@ -217,8 +384,14 @@ const Reservation = () => {
                                             <div className="hr"></div>
                                             <div className="invoice-head-middle">
                                                 <div className="invoice-head-middle-left text-start">
-                                                    <p><span className="text-bold">Booking Date</span>: {formatDateTime(selectedBooking.bookingDate)}</p>
-                                                    <p><span className="text-bold">Appointment Date</span>: {formatDateTime(selectedBooking.vetShiftDetail.date)}</p>
+                                                    <p>
+                                                        <span className="text-bold">Booking Date</span>:
+                                                        {formatDateTime(selectedBooking.bookingDate, 'dd/MM/yyyy')}
+                                                    </p>
+                                                    <p>
+                                                        <span className="text-bold">Appointment Date</span>:
+                                                        {formatDateTime(selectedBooking.vetShiftDetail.date, 'dd/MM/yyyy')}
+                                                    </p>
 
                                                 </div>
 
@@ -231,7 +404,7 @@ const Reservation = () => {
                                             </div>
                                             <div className="hr"></div>
                                             <div className="invoice-head-bottom row mb-3">
-                                    
+
                                                 <div className="invoice-head-bottom-left col-6 ">
                                                     <ul className='customer-info'>
                                                         <li className='text-bold'>Customer Information</li>
@@ -300,6 +473,18 @@ const Reservation = () => {
                     </ModalContent>
                 </Modal>
             )}
+            <ToastContainer
+                position="top-right"
+                autoClose={5000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="light"
+            />
         </Box>
     );
 };

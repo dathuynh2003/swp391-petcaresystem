@@ -51,9 +51,9 @@ const BookingHistory = () => {
     const [status, setStatus] = useState('');
     const [fromDate, setFromDate] = useState('');
     const [toDate, setToDate] = useState('');
-    const [isSearchByPhone, setIsSearchByPhone] = useState(false); 
-    const [isFilteredSearch, setIsFilteredSearch] = useState(false); 
-    const [searchType, setSearchType] = useState('all'); 
+    const [isSearchByPhone, setIsSearchByPhone] = useState(false);
+    const [isFilteredSearch, setIsFilteredSearch] = useState(false);
+    const [searchType, setSearchType] = useState('all');
 
 
 
@@ -404,7 +404,7 @@ const BookingHistory = () => {
                                 <Text><strong>Name:</strong> {selectedBooking.pet.name}</Text>
                                 <Text><strong>Type:</strong> {selectedBooking.pet.petType}</Text>
                                 <Text><strong>Gender:</strong> {selectedBooking.pet.gender}</Text>
-                                <Text><strong>Age:</strong> {selectedBooking.pet.age} Month(s</Text>
+                                <Text><strong>Age:</strong> {selectedBooking.pet.age} Month(s)</Text>
                             </Box>
                         </ModalBody>
                         <ModalFooter>
