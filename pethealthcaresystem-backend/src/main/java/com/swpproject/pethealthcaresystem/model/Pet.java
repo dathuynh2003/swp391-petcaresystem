@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.sql.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -29,7 +30,8 @@ public class Pet {
     String breed;
     String gender;
     Boolean isNeutered;
-    int age;
+//    int age;
+    Date dob;
     String description;
     Boolean isDeceased;
 

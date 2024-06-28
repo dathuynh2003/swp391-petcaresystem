@@ -52,7 +52,8 @@ public class PetService implements IPetService {
                     pet.setName(newPet.getName());
                     pet.setPetType(newPet.getPetType());
                     pet.setAvatar(newPet.getAvatar());
-                    pet.setAge(newPet.getAge());
+//                    pet.setAge(newPet.getAge());
+                    pet.setDob(newPet.getDob());
                     pet.setGender(newPet.getGender());
                     pet.setBreed(newPet.getBreed());
                     pet.setIsDeceased(newPet.getIsDeceased());
