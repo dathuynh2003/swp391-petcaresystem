@@ -9,7 +9,7 @@ export const Authentication = ({ children }) => {
     const navigate = useNavigate();
     const getUser = async () => {
         try {
-            const result = await axios.get(`http://localhost:8080/getuser`, { withCredentials: true });
+            const result = await axios.get(`http://localhost:8080/me`, { withCredentials: true });
             setUser(result.data);
             setIsLoading(true);
         } catch (error) {

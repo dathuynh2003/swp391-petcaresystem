@@ -218,7 +218,7 @@ const ListAccount = () => {
         <Tbody>
           {accounts.map((account, index) => (
             <Tr key={index}>
-              <Td><b>{index + 1}</b></Td>
+              <Td><b>{index + 1 + page * 5}</b></Td>
               <Td><b>{account.fullName}</b></Td>
               <Td>
                 <b>
@@ -240,7 +240,7 @@ const ListAccount = () => {
                 </Button>
               </Td>
               <Td className='col-2 text-center p-2'>
-                <Link to={`/viewAccount/${account.userId}`}>
+                <Link to={`/account/viewAccount/${account.userId}`}>
                   <span style={{ marginRight: '20px' }} className='icon-container'>
                     <ViewIcon style={{ color: 'teal', cursor: 'pointer' }} boxSize={'5'} />
                     <span className="icon-text">View</span>
@@ -262,6 +262,7 @@ const ListAccount = () => {
       <Box mt={4}>
         <Button onClick={() => setPage(page - 1)} isDisabled={page <= 0}>Previous</Button>
         <Button onClick={() => setPage(page + 1)} isDisabled={page >= totalPages - 1} ml={2}>Next</Button>
+
       </Box>
 
       {/* Modal for editing account */}

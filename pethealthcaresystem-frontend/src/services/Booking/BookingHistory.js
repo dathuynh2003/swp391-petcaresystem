@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, Fragment } from 'react';
 import axios from 'axios';
 import {
     Box,
@@ -67,7 +67,6 @@ const BookingHistory = () => {
 
 
 
-
     const { isOpen, onOpen, onClose } = useDisclosure();
 
     const pageSize = 5;
@@ -95,15 +94,17 @@ const BookingHistory = () => {
 
 
 
-    const fetchAllBookings = async () => {
+    const fetchAllBookings = async (page) => {
         setLoading(true);
+        const pageNo = page ?? currentPage; // Default to currentPage if no page is provided
         try {
-            const response = await axios.get(`http://localhost:8080/all-bookings?pageNo=${currentPage}&pageSize=${pageSize}`, { withCredentials: true });
+            const response = await axios.get(`http://localhost:8080/all-bookings?pageNo=${pageNo}&pageSize=${pageSize}`, { withCredentials: true });
             const { content, totalPages } = response.data.data;
             setOriginalBookings(content);
             setBookings(content);
             setTotalPages(totalPages);
             setError(null);
+            setCurrentPage(Math.min(pageNo, totalPages));
         } catch (error) {
             console.error("Error fetching bookings:", error);
             setError("Error fetching bookings. Please try again later.");
@@ -137,6 +138,9 @@ const BookingHistory = () => {
             const { content, totalPages } = response.data.data;
             setBookings(content);
             setTotalPages(totalPages);
+            setError(null)
+            setCurrentPage(Math.min(pageNo, totalPages));
+
 
         } catch (error) {
             console.error("Error fetching bookings:", error);
@@ -148,14 +152,17 @@ const BookingHistory = () => {
         }
     };
 
-    const fetchBookingsByPhoneNumber = async () => {
+    const fetchBookingsByPhoneNumber = async (page) => {
         setLoading(true);
+        const pageNo = page ?? currentPage;
+
         try {
             const response = await axios.get(`http://localhost:8080/bookings-staff?pageNo=${currentPage}&pageSize=${pageSize}&phoneNumber=${phoneNumber}`, { withCredentials: true });
             const { content, totalPages } = response.data.data;
             setBookings(content);
             setTotalPages(totalPages);
             setError(null); // Clear any previous errors
+            setCurrentPage(Math.min(pageNo, totalPages)); // Ensure currentPage does not exceed totalPages
 
         } catch (error) {
             // console.error("Error fetching bookings by phone number:", error);
@@ -227,12 +234,13 @@ const BookingHistory = () => {
         setFromDate('');
         setToDate('');
         setBookings(originalBookings);
-        setCurrentPage(1);
+        setCurrentPage(1); // Reset to first page
         setIsSearchByPhone(false);
         setIsFilteredSearch(false);
-        fetchAllBookings(1);
-        // fetchFilteredBookings(1)
+        setSearchType('all'); // Reset search type to all
+        fetchAllBookings(1); // Fetch bookings for the first page
     };
+
 
     const formatPrice = (price) => {
         return Number(price).toLocaleString('vi-VN');
@@ -516,50 +524,70 @@ const BookingHistory = () => {
             </Modal>
 
             {selectedBooking && (
-                <Modal isOpen={isOpen} onClose={closeModal} size='xl'>
+                <Modal isOpen={isOpen} onClose={closeModal} size='2xl'>
                     <ModalOverlay />
                     <ModalContent>
-                        <ModalHeader>Booking Details #{selectedBooking.id}</ModalHeader>
+                        <ModalHeader>Booking Details #{selectedBooking.id}  <Badge colorScheme={
+                            selectedBooking.status === 'Pending' ? 'yellow' :
+                                selectedBooking.status === 'CANCELLED' ? 'red' : 'green'
+                        }>
+                            {selectedBooking.status}
+                        </Badge></ModalHeader>
                         <ModalCloseButton />
                         <ModalBody>
-                            <Box mb={4}>
-                                <Text fontSize="lg" fontWeight="bold">
-                                    <FontAwesomeIcon icon={faUser} style={{ marginRight: '8px' }} /> Customer
-                                </Text>
-                            </Box>
-                            <Box ml={4}>
-                                <Text><strong>Name:</strong> {selectedBooking.pet.owner.fullName}</Text>
-                                <Text><strong>Phone:</strong> {selectedBooking.pet.owner.phoneNumber}</Text>
-                                <Text><strong>Email:</strong> {selectedBooking.pet.owner.email}</Text>
-                                <Text><strong>Address:</strong> {selectedBooking.pet.owner.address}</Text>
-                            </Box>
-                            <Box mb={4}>
-                                <Text fontSize="lg" fontWeight="bold">
-                                    <FontAwesomeIcon icon={faXRay} style={{ marginRight: '8px' }} /> Service
-                                </Text>
-                                {bookingDetails.map((detail, index) => (
-                                    <Box key={index} ml={4}>
-                                        <Text><strong>Name:</strong> {detail.petService.nameService}</Text>
-                                        <Text><strong>Description:</strong> {detail.petService.description}</Text>
-                                        <Text><strong>Price:</strong> {formatPrice(detail.petService.price)} VND</Text>
+                            <Flex mb={4}>
+                                <Box flex="1" mr={4}>
+                                    <Text fontSize="lg" fontWeight="bold" style={{ color: 'teal' }}>
+                                        <FontAwesomeIcon icon={faUser} style={{ marginRight: '8px', color: 'teal' }} /> Customer
+                                    </Text>
+                                    <Box mt={2}>
+                                        <Text><strong>Name:</strong> {selectedBooking.pet.owner.fullName}</Text>
+                                        <Text><strong>Phone:</strong> {selectedBooking.pet.owner.phoneNumber}</Text>
+                                        <Text><strong>Email:</strong> {selectedBooking.pet.owner.email}</Text>
+                                        <Text><strong>Address:</strong> {selectedBooking.pet.owner.address}</Text>
                                     </Box>
-                                ))}
-                            </Box>
-                            <Box mb={4}>
-                                <Text fontSize="lg" fontWeight="bold">
-                                    <FontAwesomeIcon icon={faPaw} style={{ marginRight: '8px' }} /> Pet
-                                </Text>
-                            </Box>
-                            <Box ml={4}>
-
-                                <Text><strong>Name:</strong> {selectedBooking.pet.name}</Text>
-                                <Text><strong>Type:</strong> {selectedBooking.pet.petType}</Text>
-                                <Text><strong>Gender:</strong> {selectedBooking.pet.gender}</Text>
-                                <Text><strong>Age:</strong> {selectedBooking.pet.age} Month(s)</Text>
-                            </Box>
+                                </Box>
+                                <Box flex="1" ml={4}>
+                                    <Text fontSize="lg" fontWeight="bold" style={{ color: 'teal' }}>
+                                        <FontAwesomeIcon icon={faPaw} style={{ marginRight: '8px', color: 'teal' }} /> Pet
+                                    </Text>
+                                    <Box mt={2}>
+                                        <Text><strong>Name:</strong> {selectedBooking.pet.name}</Text>
+                                        <Text><strong>Type:</strong> {selectedBooking.pet.petType}</Text>
+                                        <Text><strong>Gender:</strong> {selectedBooking.pet.gender}</Text>
+                                        <Text><strong>Age:</strong> {selectedBooking.pet.age} Month(s)</Text>
+                                    </Box>
+                                </Box>
+                            </Flex>
+                            <Flex mb={4}>
+                                <Box flex="1" mr={4}>
+                                    <Text fontSize="lg" fontWeight="bold" style={{ color: 'teal', marginBottom: '0px' }}>
+                                        <FontAwesomeIcon icon={faXRay} style={{ marginRight: '8px', color: 'teal' }} /> Service
+                                    </Text>
+                                    <Box mt={2}>
+                                        {bookingDetails.map((detail, index) => (
+                                            <Fragment>
+                                                <Text><strong>Name:</strong> {detail.petService.nameService}</Text>
+                                                <Text><strong>Description:</strong> {detail.petService.description}</Text>
+                                                <Text><strong>Price:</strong> {formatPrice(detail.petService.price)} VND</Text>
+                                            </Fragment>
+                                        ))}
+                                    </Box>
+                                </Box>
+                                <Box flex="1" ml={4}>
+                                    <Text fontSize="lg" fontWeight="bold" style={{ color: 'teal', marginBottom: '0px' }}>
+                                        <FontAwesomeIcon icon={faXRay} style={{ marginRight: '8px', color: 'teal' }} /> Booking
+                                    </Text>
+                                    <Box mt={2}>
+                                        <Text><strong>Date:</strong> {formatDateTime(selectedBooking.bookingDate)}</Text>
+                                        <Text><strong>Appointment Date:</strong> {formatDateTime(selectedBooking.vetShiftDetail.date)}</Text>
+                                        <Text><strong>Description:</strong> {selectedBooking.description}</Text>
+                                    </Box>
+                                </Box>
+                            </Flex>
                         </ModalBody>
                         <ModalFooter>
-                            <Button onClick={closeModal}>Close</Button>
+                            <Button onClick={closeModal} style={{ color: 'teal' }}>Close</Button>
                         </ModalFooter>
                     </ModalContent>
                 </Modal>

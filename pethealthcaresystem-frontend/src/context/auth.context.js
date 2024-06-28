@@ -12,14 +12,9 @@ const AuthProvider = ({ children }) => {
 
     useEffect(() => {
         axios.get(`http://localhost:8080/me`, { withCredentials: true }).then((result) => {
-            console.log("da co user")
-            console.log(result.data)
             setUser(result.data);
-
             setIsLoading(false);
-
         }).catch(() => {
-            console.log("loi nhe")
             localStorage.removeItem('isLoggedIn');
             localStorage.removeItem('roleId')
             setIsLoading(false);
@@ -27,7 +22,7 @@ const AuthProvider = ({ children }) => {
         })
     }, [])
 
-    return <AuthContext.Provider value={{ user, isLoading }}>{user && children}</AuthContext.Provider>;
+    return <AuthContext.Provider value={{ user, isLoading }}>{children}</AuthContext.Provider>;
 };
 
 export default AuthProvider;
@@ -36,7 +31,7 @@ export const useAuth = () => {
     const auth = useContext(AuthContext);
 
     if (!auth) {
-
+        
     }
 
     return auth

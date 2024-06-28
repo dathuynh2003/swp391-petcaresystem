@@ -119,9 +119,9 @@ export default function PaymentResult() {
             <Text fontWeight="bold"> Slot: {booking.vetShiftDetail.shift.from_time} - {booking.vetShiftDetail.shift.to_time}</Text>
           </Box>
           <Box mb={3}>
-          
+
             <Text fontWeight="bold"
-            color={booking.status === 'CANCELLED' ? 'red.500' : booking.status === 'PAID' ? 'green.500' : 'black'}>
+              color={booking.status === 'CANCELLED' ? 'red.500' : booking.status === 'PAID' ? 'green.500' : 'black'}>
               Status: {booking.status}
             </Text>
             {/* <Text>{booking.status}</Text> */}
@@ -130,8 +130,7 @@ export default function PaymentResult() {
             <Text fontWeight="bold">Total Amount: {formatCurrency(booking.totalAmount)}</Text>
           </Box>
           <Box mb={3}>
-            <Text fontWeight="bold">Description:</Text>
-            <Text>{booking.description}</Text>
+            <Text fontWeight="bold">Description: {booking.description}</Text>
           </Box>
         </GridItem>
         <GridItem>
@@ -151,6 +150,12 @@ export default function PaymentResult() {
           <Heading as="h4" size="md" mt={6} mb={4}>Pet Information</Heading>
           <Box mb={3}>
             <Text fontWeight="bold">Pet Name: {booking.pet.name}</Text>
+          </Box>
+          <Box mb={3}>
+            <Text fontWeight="bold">Gender: {booking.pet.gender}</Text>
+          </Box>
+          <Box mb={3}>
+            <Text fontWeight="bold">Description: {booking.pet.description}</Text>
           </Box>
         </GridItem>
       </Grid>
