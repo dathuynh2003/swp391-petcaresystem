@@ -143,7 +143,7 @@ function App() {
               } />
               <Route path="/vet-work-schedules" element={
                 <AuthProvider>
-                  <Permission roleId={['2']} redirect={true}>
+                  <Permission roleId={['3']} redirect={true}>
                     <VetWorkSchedules />
                   </Permission>
                 </AuthProvider>
