@@ -125,7 +125,7 @@ export default function Login() {
 
                 <div className='content login text-center rounded shadow' style={{ width: '350px', marginLeft: '-100%' }}>
                     {/* , marginLeft: '-200px' */}
-                    <div className='form-login mx-3 mb-3 mt-3'>
+                    <form className='form-login mx-3 mb-3 mt-3'>
                         <div className='header m-4 mt-3'>
                             <h2 className='fw-bold' style={{ color: 'white' }}>Login</h2>
                         </div>
@@ -143,7 +143,7 @@ export default function Login() {
                                 <a href="#"><i>Forgot Password?</i></a>
                             </div>
                             <div>
-                                <Button className='col-12 btn-login' style={{ background: 'teal', color: 'white' }} onClick={handleLogin}>Login</Button>
+                                <button  className='col-12 btn-login rounded fw-bold' style={{ background: 'teal', color: 'white', height: '40px' }} onClick={handleLogin}>Login</button>
                             </div>
                             <div className='d-flex justify-content-center gap-2 mb-1 mt-2'>
                                 <p>Don't have an account?</p><Link to={'/register'} className='fw-bold'>Sign up</Link>
@@ -158,7 +158,7 @@ export default function Login() {
 
                         </div>
                         <div></div>
-                    </div>
+                    </form>
                 </div>
             </div>
         </div>
