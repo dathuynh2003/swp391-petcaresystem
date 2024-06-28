@@ -35,6 +35,7 @@ public class UserService implements IUserService {
     @Override
     public String createUser(User newUser) {
         User user = userRepository.findByPhoneNumber(newUser.getPhoneNumber());
+        Date now = new Date();
 
         if (user == null) {
             user = new User();
@@ -51,7 +52,7 @@ public class UserService implements IUserService {
         if (!newUser.getEmail().matches(regexPattern)) {
             return "Email is invalid";
         }
-
+        user.setCreatedAt(now);
         user.setEmail(newUser.getEmail());
         user.setPassword(newUser.getPassword());
         user.setFullName(newUser.getFullName());
@@ -136,7 +137,7 @@ public class UserService implements IUserService {
     @Transactional
     @Override
     public User createUserByAdmin(User newUser) {
-
+        Date now = new Date();
         User user = new User();
 
         if (userRepository.existsByEmail(newUser.getEmail())) {
@@ -150,6 +151,7 @@ public class UserService implements IUserService {
             throw new Error("Email is invalid");
 
         }
+        user.setCreatedAt(now);
         user.setEmail(newUser.getEmail());
         user.setPassword(newUser.getPassword());
         user.setFullName(newUser.getFullName());
@@ -202,7 +204,7 @@ public class UserService implements IUserService {
     @Transactional
     @Override
     public User createUserGoogle(User newUser) {
-
+        Date now = new Date();
         User user = new User();
 
         if (userRepository.existsByEmail(newUser.getEmail())) {
@@ -214,6 +216,7 @@ public class UserService implements IUserService {
         if (!newUser.getEmail().matches(regexPattern)) {
             throw new Error("Email is invalid");
         }
+        user.setCreatedAt(now);
         user.setEmail(newUser.getEmail());
         user.setPassword(newUser.getPassword());
         user.setFullName(newUser.getFullName());
@@ -250,9 +253,11 @@ public class UserService implements IUserService {
     @Transactional
     @Override
     public User createOrGetAnonymousUser(String phoneNumber, String fullName) {
+        Date now = new Date();
         User user = userRepository.findByPhoneNumber(phoneNumber);
         if (user == null) {
             user = User.builder()
+                    .createdAt(now)
                     .phoneNumber(phoneNumber)
                     .fullName(fullName)
                     .isActive(true)
@@ -294,6 +299,6 @@ public class UserService implements IUserService {
     }
     @Override
     public List<User> getAll(){
-        return userRepository.findAll();
+        return userRepository.findByRoleId(1);
     }
 }

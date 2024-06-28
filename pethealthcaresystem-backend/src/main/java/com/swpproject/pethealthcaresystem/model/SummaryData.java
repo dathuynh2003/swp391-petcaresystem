@@ -15,6 +15,8 @@ public class SummaryData {
     private int summaryId;
     private String date;
     private double totalAmount;
+    private double totalRefundAmount;
     private int totalBooking;
+    private int totalCancelBooking;
     private int totalUser;
 }
