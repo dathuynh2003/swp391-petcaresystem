@@ -24,7 +24,6 @@ import CreateCage from './services/CreateCage';
 import EditCage from './services/EditCage';
 import PaymentResult from './services/Booking/PaymentResult';
 import StaffBooking from './services/Booking/StaffBooking';
-import ViewHospitalization from './services/ViewHospitalization';
 import Reservation from './services/Booking/Reservation';
 import AccountPage from './pages/Account';
 import BookingHistory from './services/Booking/BookingHistory'
