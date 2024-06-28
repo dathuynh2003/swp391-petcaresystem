@@ -55,13 +55,13 @@ function App() {
               <Route path="/register" element={<Register />} />
               <Route path="/booking" element={
                 <AuthProvider>
-                  <Permission roleId={['2', '1']} redirect={true}>
+                  <Permission roleId={['2', '1', '3']} redirect={true}>
                     <Booking />
                   </Permission>
                 </AuthProvider>
 
               } />
-              <Route path="/staffBooking" element={
+              <Route path="/staff-booking" element={
                 <AuthProvider >
                   <Permission roleId={['2']} redirect={true}>
                     <StaffBooking />
@@ -79,7 +79,7 @@ function App() {
               } />
               <Route path="/viewPet/:petId" element={
                 <AuthProvider>
-                  <Permission roleId={['1']} redirect={true}>
+                  <Permission roleId={['1', '2', '3']} redirect={true}>
                     <ViewPet />
                   </Permission>
                 </AuthProvider>
@@ -225,7 +225,27 @@ function App() {
 
               } />
               <Route path="/account/*" element={<AccountPage />} />
+
+              <Route path="/configuration" element={
+                <AuthProvider>
+                  <Permission roleId={['4']} redirect={true}>
+                    <SystemConfig />
+                  </Permission>
+                </AuthProvider>
+
+
+              } />
+              <Route path="/refund-requests" element={
+                <AuthProvider>
+                  <Permission roleId={['4']} redirect={true}>
+                    <RefundRequests />
+                  </Permission>
+                </AuthProvider>
+
+
+              } />
             </Routes >
+
 
             {/* <AccountPage /> */}
             {/* <PaymentPage/> */}
