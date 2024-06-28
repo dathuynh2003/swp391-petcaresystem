@@ -58,55 +58,64 @@ export default function ListPets() {
         </thead>
         <tbody className="table-group-divider p-4">
           {
-            pets.map((pet, index) => (
-              <tr key={index} >
-                <td className='pl-4 text-center'>{index + 1}</td>
-                <td className="col-1 p-2">
-                  <img src={pet.avatar} alt={pet.name} style={{ width: '50px', height: '50px', borderRadius: '50%' }} />
-                </td>
-                <td className="col-1 p-2">{pet.name}</td>
-                <td className="col-1 p-2">{pet.petType}</td>
-                <td className="col-1 p-2">{pet.breed}</td>
-                <td className="col-1 p-2">{pet.gender}</td>
-                <td className="col-1 p-2">{pet.age}</td>
-                <td className="col-1 p-2">{pet.isNeutered ? 'Yes' : 'No'}</td>
-                <td className="col-2 p-2">{pet.description}</td>
-                <td className='col-2 text-center p-2'>
-                  <Link to={`/viewPet/${pet.petId}`}>
-                    <span style={{ marginRight: '20px' }} className='icon-container'>
-                      <ViewIcon style={{ color: 'teal', cursor: 'pointer' }} boxSize={'5'} />
-                      <span className="icon-text">View</span>
+            pets.map((pet, index) => {
+              const today = new Date();
+              const dob = new Date(pet.dob);
+              console.log(dob);
+              // Tính số tháng chênh lệch giữa hai ngày
+              const diffMonths = (today.getFullYear() - dob.getFullYear()) * 12 + (today.getMonth() - dob.getMonth());
+              const age = diffMonths !== 0 ? diffMonths : 1;
+              // const age = 0
+              return (
+                <tr key={index} >
+                  <td className='pl-4 text-center'>{index + 1}</td>
+                  <td className="col-1 p-2">
+                    <img src={pet.avatar} alt={pet.name} style={{ width: '50px', height: '50px', borderRadius: '50%' }} />
+                  </td>
+                  <td className="col-1 p-2">{pet.name}</td>
+                  <td className="col-1 p-2">{pet.petType}</td>
+                  <td className="col-1 p-2">{pet.breed}</td>
+                  <td className="col-1 p-2">{pet.gender}</td>
+                  <td className="col-1 py-2 px-4">{age}</td>
+                  <td className="col-1 py-2 px-4">{pet.isNeutered ? 'Yes' : 'No'}</td>
+                  <td className="col-2 p-2">{pet.description}</td>
+                  <td className='col-2 text-center p-2'>
+                    <Link to={`/viewPet/${pet.petId}`}>
+                      <span style={{ marginRight: '20px' }} className='icon-container'>
+                        <ViewIcon style={{ color: 'teal', cursor: 'pointer' }} boxSize={'5'} />
+                        <span className="icon-text">View</span>
+                      </span>
+                    </Link>
+                    <Link to={`/editPet/${pet.petId}`}>
+                      <span style={{ marginRight: '20px' }} className='icon-container'>
+                        <EditIcon style={{ color: 'teal', cursor: 'pointer' }} boxSize={'5'} />
+                        <span className="icon-text">Edit</span>
+                      </span>
+                    </Link>
+                    <span className='icon-container'>
+                      <DeleteIcon style={{ color: 'red', cursor: 'pointer' }} boxSize={'5'} onClick={onOpen} />
+                      <span className="icon-text">Delete</span>
                     </span>
-                  </Link>
-                  <Link to={`/editPet/${pet.petId}`}>
-                    <span style={{ marginRight: '20px' }} className='icon-container'>
-                      <EditIcon style={{ color: 'teal', cursor: 'pointer' }} boxSize={'5'} />
-                      <span className="icon-text">Edit</span>
-                    </span>
-                  </Link>
-                  <span className='icon-container'>
-                    <DeleteIcon style={{ color: 'red', cursor: 'pointer' }} boxSize={'5'} onClick={onOpen} />
-                    <span className="icon-text">Delete</span>
-                  </span>
-                  <Modal closeOnOverlayClick={false} isOpen={isOpen} onClose={onClose}>
-                    <ModalOverlay />
-                    <ModalContent>
-                      <ModalHeader>Delete medicine</ModalHeader>
-                      <ModalCloseButton />
-                      <ModalBody pb={6}>
-                        Are you sure delete this pet?
-                      </ModalBody>
-                      <ModalFooter>
-                        <Button colorScheme='red' mr={3} onClick={() => deletePet(pet.petId)}>
-                          Delete
-                        </Button>
-                        <Button onClick={onClose}>Cancel</Button>
-                      </ModalFooter>
-                    </ModalContent>
-                  </Modal>
-                </td>
-              </tr>
-            ))
+                    <Modal closeOnOverlayClick={false} isOpen={isOpen} onClose={onClose}>
+                      <ModalOverlay />
+                      <ModalContent>
+                        <ModalHeader>Delete medicine</ModalHeader>
+                        <ModalCloseButton />
+                        <ModalBody pb={6}>
+                          Are you sure delete this pet?
+                        </ModalBody>
+                        <ModalFooter>
+                          <Button colorScheme='red' mr={3} onClick={() => deletePet(pet.petId)}>
+                            Delete
+                          </Button>
+                          <Button onClick={onClose}>Cancel</Button>
+                        </ModalFooter>
+                      </ModalContent>
+                    </Modal>
+                  </td>
+                </tr>
+              )
+            })
           }
         </tbody>
       </table>

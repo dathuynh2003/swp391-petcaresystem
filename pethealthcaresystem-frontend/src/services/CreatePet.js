@@ -23,7 +23,7 @@ export default function CreatePet() {
     name: '',
     gender: '',
     breed: '',
-    age: 1,
+    dob: null,
     petType: '',
     avatar: '',
     isNeutered: '',
@@ -170,25 +170,15 @@ export default function CreatePet() {
             </div>
           </div>
 
-          <div className="age mb-3 ">
-            <label className="mt-2 ml-4 mb-3" htmlFor="age">
-              Age (month(s))
-            </label>
-            <NumberInput
-              step={1}
-              defaultValue={1}
-              min={1}
-              max={500}
-              onChange={(value) => {
-                setPet((prev) => ({ ...prev, age: value }));
-              }}
-            >
-              <NumberInputField />
-              <NumberInputStepper>
-                <NumberIncrementStepper />
-                <NumberDecrementStepper />
-              </NumberInputStepper>
-            </NumberInput>
+          <label className="mt-2 ml-4 mb-3" htmlFor="dob">
+
+          </label>
+
+          <div className="form-floating mb-3">
+            <input type="date" className="form-control" id="dob"
+              onChange={(e) => { setPet((prev) => ({ ...prev, dob: e.target.value })) }}
+            />
+            <label htmlfor="dob">Date of bird</label>
           </div>
 
           <div className="form-floating mb-3">

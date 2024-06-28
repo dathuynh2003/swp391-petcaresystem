@@ -130,9 +130,9 @@ const BookingHistory = () => {
                 console.log(fromDate)
                 url += `&fromDate=${fromDate}`;
             }
-            url += `&toDate=${toDate.length == 0 ? moment(new Date()).format("YYYY-MM-DD") : toDate}`;
+            url += `&toDate=${toDate.length === 0 ? moment(new Date()).format("YYYY-MM-DD") : toDate}`;
             console.log(url)
-            console.log('&toDate=' + toDate.length == 0 ? moment(new Date()).format('yyyy-MM-dd') : toDate)
+            console.log('&toDate=' + toDate.length === 0 ? moment(new Date()).format('yyyy-MM-dd') : toDate)
             const response = await axios.get(url, { withCredentials: true });
             const { content, totalPages } = response.data.data;
             setBookings(content);

@@ -90,6 +90,7 @@ export default function Sidenav() {
       links = [
         { name: 'Dashboard', path: '/dashboard', icon: 'fas fa-tachometer-alt' },
         { name: 'Account', path: '/account', icon: 'fa-solid fa-user' },
+        { name: 'Services', path: '/services', icon: 'fas fa-concierge-bell' },
         { name: 'System Config', path: '/configuration', icon: 'fa fa-cog' },
         { name: 'Refunds', path: '/refund-requests', icon: <MoneyOff /> },
         { name: 'Logout', path: '', icon: 'fas fa-sign-out-alt', onClick: handleLogout },

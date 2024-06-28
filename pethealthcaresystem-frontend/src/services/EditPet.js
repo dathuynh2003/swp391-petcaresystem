@@ -34,7 +34,8 @@ export default function EditPet() {
     name: '',
     gender: '',
     breed: '',
-    age: 1,
+    // age: 1,
+    dob: null,
     petType: '',
     avatar: '',
     isNeutered: '',
@@ -173,7 +174,7 @@ export default function EditPet() {
           <div className="mb-3" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             {/* <RadioCard options={['Dog', 'Cat', 'Bird']} onChange={handleList} value={petType}></RadioCard> */}
             <div className='w-50'>
-              <Select placeholder='Choose pet type' onChange={(e) => handleList(e.target.value)}>
+              <Select placeholder='Choose pet type' onChange={(e) => handleList(e.target.value)} value={pet.petType}>
                 {petTypes?.map((petType, index) => (
                   <option key={index} value={petType.configValue}>{petType.configValue}</option>
                 ))}
@@ -229,7 +230,14 @@ export default function EditPet() {
             </div>
           </div>
 
-          <div className="age mb-3 ">
+
+          <div className="form-floating mb-3">
+            <input type="date" className="form-control" id="dob" defaultValue={pet.dob}
+              onChange={(e) => { setPet((prev) => ({ ...prev, dob: e.target.value })) }}
+            />
+            <label htmlfor="dob">Date of bird</label>
+          </div>
+          {/* <div className="age mb-3 ">
             <label className="mt-2 ml-4 mb-3" htmlFor="age">
               Age (month(s))
             </label>
@@ -247,7 +255,7 @@ export default function EditPet() {
                 <NumberDecrementStepper />
               </NumberInputStepper>
             </NumberInput>
-          </div>
+          </div> */}
 
           <div className="form-floating mb-3">
             <input
