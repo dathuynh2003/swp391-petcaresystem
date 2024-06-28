@@ -3,10 +3,10 @@ import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import './Services.css'
 import ReactPaginate from 'react-paginate'
-import { Button, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, useDisclosure } from '@chakra-ui/react'
+import { Button, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Textarea, useDisclosure } from '@chakra-ui/react'
 import { DeleteIcon, EditIcon } from '@chakra-ui/icons'
 import { FormLabel } from 'react-bootstrap'
-import { toast } from 'react-toastify'
+import { ToastContainer, toast } from 'react-toastify'
 
 
 
@@ -19,9 +19,13 @@ export default function Services() {
   const [totalPages, setTotalPages] = useState(0)
   const [pageSize, setPageSize] = useState(4)
   const { isOpen: isOpenAddServices, onOpen: onOpenAddServices, onClose: onCloseAddServices } = useDisclosure();
+  const { isOpen: isOpenEditServices, onOpen: onOpenEditServices, onClose: onCloseEditServices } = useDisclosure();
+  const { isOpen: isOpenDeleteServices, onOpen: onOpenDeleteServices, onClose: onCloseDeleteServices } = useDisclosure();
+  const [selectedService, setSelectedService] = useState(null)
+
   const [service, setService] = useState({
     nameService: '',
-    price: null,
+    price: 0,
     description: '',
   })
   const [img, setImg] = useState(null)
@@ -68,11 +72,9 @@ export default function Services() {
   }
 
   const ChooseImg = (e) => {
+    // console.log(e.target.files[0])
     //Lấy file đầu tiên trong list file được chọn từ thẻ input type file
     const file = e.target.files[0]
-    //Tạo một formData và thêm file đó vào formData với key là file
-    const formData = new FormData()
-    formData.append('file', file)
     //Check xem file đó có phải img không
     if (!file?.type.startsWith('image/')) {
       toast.warning('Invalid file type. Please upload an image.');
@@ -84,7 +86,70 @@ export default function Services() {
       return;
     }
     // Lưu formData vào state img tí gửi về backend
-    setImg(formData)
+    setImg(file)
+  }
+
+  const handleCreateService = async () => {
+    //Tạo một formData
+    // gửi file img và chuỗi json service vào formData
+    const formData = new FormData()
+    formData.append("file", img)
+    formData.append("serviceJson", JSON.stringify(service))
+    try {
+      const response = await axios.post(`http://localhost:8080/create-service`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+        , withCredentials: true
+      })
+      if (response.data.message === 'successfully') {
+        toast.success('Service created successfully')
+        setService(null)
+        setImg(null)
+      } else {
+        toast.warning(response.data.message)
+      }
+    } catch (e) {
+      toast.error('Failed to create service');
+    }
+  }
+
+  const handleEditService = async (id) => {
+    const formData = new FormData()
+    formData.append("serviceJson", JSON.stringify(selectedService))
+    if (img !== null) {
+      formData.append("file", img);
+    }
+    try {
+      const response = await axios.put(`http://localhost:8080/edit-service/${id}`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }, withCredentials: true
+      })
+      if (response.data.message === 'successfully') {
+        toast.success('Service edited successfully')
+        setImg(null)
+        loadServices()
+      } else {
+        toast.warning(response.data.message)
+      }
+    } catch (e) {
+      toast.error("Failed to edit service")
+    }
+  }
+
+  const handleDeleteService = async (id) => {
+    try {
+      const response = await axios.put(`http://localhost:8080/delete-service/${id}`, {}, { withCredentials: true })
+      if (response.data.message === 'successfully') {
+        toast.success('Service delete successfully')
+        loadServices()
+      } else {
+        toast.warning(response.data.message)
+      }
+    } catch (e) {
+      toast.error("Failed to delete service")
+    }
   }
 
   return (
@@ -100,7 +165,7 @@ export default function Services() {
       <Modal isOpen={isOpenAddServices} onClose={onCloseAddServices} size={'3xl'} >
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>
+          <ModalHeader className='text-center'>
             Add New Services
           </ModalHeader>
           <ModalCloseButton />
@@ -119,17 +184,22 @@ export default function Services() {
             </FormLabel>
             <FormLabel className='w-100'>
               Service's Description
-              <Input name='description' value={service.description}
+              <Textarea rows={4} name='description' value={service.description}
                 onChange={(e) => setService({ ...service, [e.target.name]: e.target.value })}
               />
             </FormLabel>
             <FormLabel className='w-100'>
               Service's Image<br />
-              <input type='file' className='form-control' onChange={(e) => ChooseImg()} />
+              <input type='file' className='form-control' onChange={(e) => ChooseImg(e)} />
             </FormLabel>
           </ModalBody>
           <ModalFooter>
-            footer
+            <Button colorScheme="red" mr={3} onClick={() => onCloseAddServices()}>
+              Close
+            </Button>
+            <Button colorScheme="green" onClick={() => { onCloseAddServices(); handleCreateService() }}>
+              Save
+            </Button>
           </ModalFooter>
         </ModalContent>
       </Modal>
@@ -150,11 +220,14 @@ export default function Services() {
                     {roleId === '4' &&
                       <div className='text-end'>
                         <span style={{ marginRight: '20px' }} className='icon-container'>
-                          <EditIcon style={{ color: 'teal', cursor: 'pointer' }} boxSize={'5'} />
+                          <EditIcon style={{ color: 'teal', cursor: 'pointer' }} boxSize={'5'}
+                            onClick={(e) => { e.stopPropagation(); onOpenEditServices(); setSelectedService(service) }}
+                          />
                           <span className="icon-text">Edit Service</span>
                         </span>
                         <span style={{ marginRight: '20px' }} className='icon-container'>
-                          <DeleteIcon style={{ color: 'red', cursor: 'pointer' }} boxSize={'5'} />
+                          <DeleteIcon style={{ color: 'red', cursor: 'pointer' }} boxSize={'5'}
+                            onClick={(e) => { e.stopPropagation(); setSelectedService(service); onOpenDeleteServices() }} />
                           <span className="icon-text">Delete Service</span>
                         </span>
                       </div>
@@ -164,6 +237,85 @@ export default function Services() {
               </div>
             ))
           }
+          <Modal isOpen={isOpenEditServices} onClose={onCloseEditServices} size={'3xl'} >
+            <ModalOverlay />
+            <ModalContent>
+              <ModalHeader className='text-center'>
+                Edit Service
+              </ModalHeader>
+              <ModalCloseButton />
+              <ModalBody>
+                <FormLabel className='w-100'>
+                  Service's Name
+                  <Input name='nameService' value={selectedService?.nameService}
+                    onChange={(e) => setSelectedService({ ...selectedService, [e.target.name]: e.target.value })}
+                  />
+                </FormLabel>
+                <FormLabel className='w-100'>
+                  Service's Price
+                  <Input name='price' value={selectedService?.price}
+                    onChange={(e) => setSelectedService({ ...selectedService, [e.target.name]: e.target.value })}
+                  />
+                </FormLabel>
+                <FormLabel className='w-100'>
+                  Service's Description
+                  <Textarea rows={4} name='description' value={selectedService?.description}
+                    onChange={(e) => setSelectedService({ ...selectedService, [e.target.name]: e.target.value })}
+                  />
+                </FormLabel>
+                <FormLabel className='w-100'>
+                  Service's Image<br />
+                  <input type='file' className='form-control' onChange={(e) => ChooseImg(e)} />
+                </FormLabel>
+              </ModalBody>
+              <ModalFooter>
+                <Button colorScheme="red" mr={3} onClick={() => onCloseEditServices()}>
+                  Close
+                </Button>
+                <Button colorScheme="teal" onClick={() => { onCloseEditServices(); handleEditService(selectedService?.id) }}>
+                  Save
+                </Button>
+              </ModalFooter>
+            </ModalContent>
+          </Modal>
+          {/* Delete Modal */}
+          <Modal isOpen={isOpenDeleteServices} onClose={onCloseDeleteServices} size={'3xl'} >
+            <ModalOverlay />
+            <ModalContent>
+              <ModalHeader className='text-center'>
+                Are you sure to delete this service?
+              </ModalHeader>
+              <ModalCloseButton />
+              <ModalBody>
+                <FormLabel className='w-100'>
+                  Service's Name
+                  <Input readOnly name='nameService' value={selectedService?.nameService}
+                    onChange={(e) => setSelectedService({ ...selectedService, [e.target.name]: e.target.value })}
+                  />
+                </FormLabel>
+                <FormLabel className='w-100'>
+                  Service's Price
+                  <Input readOnly name='price' value={selectedService?.price}
+                    onChange={(e) => setSelectedService({ ...selectedService, [e.target.name]: e.target.value })}
+                  />
+                </FormLabel>
+                <FormLabel className='w-100'>
+                  Service's Description
+                  <Textarea readOnly rows={4} name='description' value={selectedService?.description}
+                    onChange={(e) => setSelectedService({ ...selectedService, [e.target.name]: e.target.value })}
+                  />
+                </FormLabel>
+              </ModalBody>
+              <ModalFooter>
+                <Button colorScheme="red" mr={3} onClick={() => onCloseDeleteServices()}>
+                  No
+                </Button>
+                <Button colorScheme="teal" onClick={() => { onCloseDeleteServices(); handleDeleteService(selectedService?.id) }}>
+                  Yes
+                </Button>
+              </ModalFooter>
+            </ModalContent>
+          </Modal>
         </div>
 
 
@@ -188,6 +340,18 @@ export default function Services() {
           />
         </div>
       </div>
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
     </div>
 
   )
