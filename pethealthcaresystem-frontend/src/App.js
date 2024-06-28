@@ -34,8 +34,7 @@ import BookingHistory from './services/Booking/BookingHistory'
 import { Fragment } from 'react';
 import Medicine from './services/Medicine/Medicine';
 import AuthProvider from './context/auth.context';
-import PaymentPage from './pages/Payment';
-import SystemConfig from './services/SystemConfig/SystemConfig';
+import { Permission } from './components/Permission';
 function App() {
 
   const location = useLocation();
@@ -54,39 +53,191 @@ function App() {
               <Route path="/services" element={<Services />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
-              <Route path="/booking" element={<Booking />} />
-              <Route path="/staff-booking" element={<StaffBooking />} />
-              <Route path="/createPet" element={<CreatePet />} />
-              <Route path="/viewPet/:petId" element={<ViewPet />} />
-              <Route path="/listPets" element={<ListPets />} />
-              <Route path="/editPet/:petId" element={<EditPet />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/cages" element={<Cages />} />
-              <Route path='/create-cage' element={<CreateCage />} />
-              <Route path='/edit-cage/:cageId' element={<EditCage />} />
-              <Route path="/vet-work-schedules" element={<VetWorkSchedules />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path='/verify' element={<Verify />} />
-              <Route path="/shift" element={<CreateShift />} />
-              {/* <Route path='/create-account' element={<CreateAccount />} /> */}
-              {/* <Route path='/list-account' element={<ListAccount />} /> */}
-              {/* <Route path="/edit-account/:userId" element={<EditAccount />} /> */}
-              <Route path="/assign-schedules" element={<AssignVetSchedules />} />
-              {/* <AuthProvider>
-                <Routes>
-                
-                </Routes>
-              </AuthProvider> */}
-              <Route path="/hospitalization-detail/:id" element={<ViewHospitalization />} />
-              <Route path="/create-pet-by-staff" element={<CreatePetByStaff />} />
-              <Route path="/reservation" element={<Reservation />} />
-              <Route path='/booking-history' element={<BookingHistory />} />
-              <Route path="/medicine" element={<Medicine />} />
-              <Route path='/payment-result' element={<PaymentResult />} />
-              <Route path="/configuration" element={<SystemConfig />} />
+              <Route path="/booking" element={
+                <AuthProvider>
+                  <Permission roleId={['2', '1']} redirect={true}>
+                    <Booking />
+                  </Permission>
+                </AuthProvider>
+
+              } />
+              <Route path="/staffBooking" element={
+                <AuthProvider >
+                  <Permission roleId={['2']} redirect={true}>
+                    <StaffBooking />
+                  </Permission>
+                </AuthProvider>
+
+              } />
+              <Route path="/createPet" element={
+                <AuthProvider>
+                  <Permission roleId={['1']} redirect={true}>
+                    <CreatePet />
+                  </Permission>
+                </AuthProvider>
+
+              } />
+              <Route path="/viewPet/:petId" element={
+                <AuthProvider>
+                  <Permission roleId={['1']} redirect={true}>
+                    <ViewPet />
+                  </Permission>
+                </AuthProvider>
+
+              } />
+              <Route path="/listPets" element={
+                <AuthProvider>
+                  <Permission roleId={['1']} redirect={true}>
+                    <ListPets />
+                  </Permission>
+                </AuthProvider>
+
+
+              } />
+              <Route path="/editPet/:petId" element={
+                <AuthProvider>
+                  <Permission roleId={['1']} redirect={true}>
+                    <EditPet />
+                  </Permission>
+                </AuthProvider>
+
+
+              } />
+              <Route path="/profile" element={
+                <AuthProvider>
+                  <Permission roleId={['1']} redirect={true}>
+                    <Profile />
+
+                  </Permission>
+                </AuthProvider>
+
+
+              } />
+              <Route path="/cages" element={
+                <AuthProvider>
+                  <Permission roleId={['2']} redirect={true}>
+                    <Cages />
+                  </Permission>
+                </AuthProvider>
+
+
+              } />
+              <Route path='/create-cage' element={
+                <AuthProvider>
+                  <Permission roleId={['2']} redirect={true}>
+                    <CreateCage />
+                  </Permission>
+                </AuthProvider>
+
+
+
+              } />
+              <Route path='/edit-cage/:cageId' element={
+                <AuthProvider>
+                  <Permission roleId={['2']} redirect={true}>
+                    <EditCage />
+                  </Permission>
+                </AuthProvider>
+
+
+              } />
+              <Route path="/vet-work-schedules" element={
+                <AuthProvider>
+                  <Permission roleId={['2']} redirect={true}>
+                    <VetWorkSchedules />
+                  </Permission>
+                </AuthProvider>
+
+              } />
+              <Route path="/dashboard" element={
+                <AuthProvider>
+                  <Permission roleId={['4']} redirect={true}>
+                    <Dashboard />
+
+                  </Permission>
+                </AuthProvider>
+
+              } />
+              <Route path='/verify' element={
+
+                <Verify />
+
+              } />
+              <Route path="/shift" element={
+                <AuthProvider>
+                  <Permission roleId={['2']} redirect={true}>
+                    <CreateShift />
+                  </Permission>
+                </AuthProvider>
+
+              } />
+              <Route path="/assign-schedules" element={
+                <AuthProvider>
+                  <Permission roleId={['2']} redirect={true}>
+                    <AssignVetSchedules />
+
+                  </Permission>
+                </AuthProvider>
+
+              } />
+              {/* <Route path="/hospitalization-detail/:id" element={
+                <AuthProvider>
+                  <Permission roleId={['3']} redirect={true}>
+                    <ViewHospitalization />
+                  </Permission>
+                </AuthProvider>
+
+
+              } /> */}
+              <Route path="/create-pet-by-staff" element={
+                <AuthProvider>
+                  <Permission roleId={['2']} redirect={true}>
+                    <CreatePetByStaff />
+                  </Permission>
+                </AuthProvider>
+
+              } />
+              <Route path="/reservation" element={
+                <AuthProvider>
+                  <Permission roleId={['1']} redirect={true}>
+                    <Reservation />
+                  </Permission>
+                </AuthProvider>
+
+
+              } />
+              <Route path='/booking-history' element={
+                <AuthProvider>
+                  <Permission roleId={['2']} redirect={true}>
+                    <BookingHistory />
+                  </Permission>
+                </AuthProvider>
+
+
+              } />
+              <Route path="/medicine" element={
+                <AuthProvider>
+                  <Permission roleId={['2']} redirect={true}>
+                    <Medicine />
+                  </Permission>
+                </AuthProvider>
+
+
+              } />
+              <Route path='/payment-result' element={
+                <AuthProvider>
+                  <Permission roleId={['1']} redirect={true} >
+                    <PaymentResult />
+                  </Permission>
+                </AuthProvider>
+
+
+              } />
+              <Route path="/account/*" element={<AccountPage />} />
             </Routes >
 
-            <AccountPage />
+            {/* <AccountPage /> */}
+            {/* <PaymentPage/> */}
 
           </Fragment>
         </div >

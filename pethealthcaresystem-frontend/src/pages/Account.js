@@ -1,6 +1,4 @@
-
-
-import React from 'react'
+import React, { Fragment } from 'react'
 import { Route, Routes } from 'react-router-dom'
 import AuthProvider from '../context/auth.context'
 import ListAccount from '../components/Account/ListAccount'
@@ -12,15 +10,16 @@ import PaymentResult from '../services/Booking/PaymentResult'
 
 const AccountPage = () => {
     return (
+
         <AuthProvider>
-            {/* <Permission roleId={['4']}> */}
-            <Routes>
-                <Route path="/account" element={<ListAccount />} />
-                <Route path="/viewAccount/:userId" element={<ViewAccount />} />
-                <Route path='/account/create' element={<CreateAccount />} />
-                <Route path="/account/edit/:userId" element={<EditAccount />} />
-            </Routes>
-            {/* </Permission> */}
+            <Permission roleId={['4']} redirect={true}>
+                <Routes>
+                    <Route path="/" element={<ListAccount />} />
+                    <Route path="/viewAccount/:userId" element={<ViewAccount />} />
+                    <Route path='/create' element={<CreateAccount />} />
+                    <Route path="/edit/:userId" element={<EditAccount />} />
+                </Routes>
+            </Permission>
         </AuthProvider>
     )
 }
