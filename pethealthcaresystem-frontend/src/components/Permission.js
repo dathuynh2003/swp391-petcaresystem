@@ -8,15 +8,18 @@ export const Permission = ({ roleId, children, redirect }) => {
     const navigate = useNavigate();
     useEffect(() => {
         if (user !== null) {
-            const isMatchRole = roleId.includes(user?.data.roleId.toString())
-            console.log(roleId)
-            console.log(user.data.roleId)
-            console.log(isMatchRole)
-            if (isMatchRole) {
+
+            if (user.data.roleId === 4) {
                 setRole(user.data.roleId)
-            } else {
-                if (redirect) {
-                    navigate('/not-found')
+            }
+            else {
+                const isMatchRole = roleId.includes(user?.data.roleId.toString())
+                if (isMatchRole) {
+                    setRole(user.data.roleId)
+                } else {
+                    if (redirect) {
+                        navigate('/not-found')
+                    }
                 }
             }
         }
