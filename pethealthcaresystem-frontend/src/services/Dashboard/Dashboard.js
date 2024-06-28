@@ -22,8 +22,15 @@ export default function Dashboard() {
   const [endDate, setEndDate] = useState('');
   const [totalRevenue, setTotalRevenue] = useState(0);
   const [revenueTrend, setRevenueTrend] = useState(null); // null, 'up', 'down'
+  const [totalRefundAmount, setTotalRefundAmount] = useState(0)
+  const [refundTrend, setRefundTrend] = useState()
   const [totalUser, setTotalUser] = useState(0)
   const [userTrend, setUserTrend] = useState(null)
+  const [totalBooking, setTotalBooking] = useState(0)
+  const [bookingTrend, setBookingTrend] = useState()
+  const [totalCancelBooking, setTotalCancelBooking] = useState(0)
+  const [cancelTrend, setCancelTrend] = useState()
+
   const [filter, setFilter] = useState('');
 
   const formatDate = (date) => {
@@ -48,10 +55,34 @@ export default function Dashboard() {
         return
       }
       calculateTotalUser(response?.data)
+      calculateTotalBooking(response?.data)
+      calculateTotalRefund(response?.data)
+      calculateTotalCancelBooking(response?.data)
     } catch (error) {
       toast.error(error.message);
     }
   };
+
+
+  const calculateTotalCancelBooking = (data) => {
+    let total = data.reduce((acc, cur) => acc + cur.totalCancelBooking, 0)
+    setCancelTrend(total > totalCancelBooking ? 'up' : total < totalCancelBooking ? 'down' : null)
+    setTotalCancelBooking(total)
+  }
+
+
+
+  const calculateTotalRefund = (data) => {
+    let total = data.reduce((acc, cur) => acc + cur.totalRefundAmount, 0)
+    setRefundTrend(total > totalRefundAmount ? 'up' : total < totalRefundAmount ? 'down' : null)
+    setTotalRefundAmount(total)
+  }
+
+  const calculateTotalBooking = (data) => {
+    let total = data.reduce((acc, cur) => acc + cur.totalBooking, 0)
+    setBookingTrend(total > totalBooking ? 'up' : total < totalBooking ? 'down' : null)
+    setTotalBooking(total)
+  }
 
   const calculateTotalRevenue = (data) => {
     let total = data.reduce((acc, cur) => acc + cur.totalAmount, 0);
@@ -130,52 +161,114 @@ export default function Dashboard() {
   return (
     <>
       <ToastContainer />
-      <Box textAlign="center" mt={3} mb={3}>
-        <Text fontSize="2xl">Summary Data Dashboard</Text>
-      </Box>
-      <div className='d-flex align-items-center gap-4 mb-5 mx-auto justify-content-center'>
-        <b>Start date: </b><Input type='date' onChange={(e) => setStartDate(e.target.value)} style={{ width: '20%' }} />
-        <b>End Date: </b><Input type='date' onChange={(e) => setEndDate(e.target.value)} style={{ width: '20%' }} />
-        <Button onClick={handleLoadData} colorScheme='teal'>Fillter</Button>
-        <div className='d-flex align-items-center text-center'>
-          <Button colorScheme={filter === 'lastWeek' ? 'blue' : 'gray'} onClick={() => handleFilterChange('lastWeek')}>Last Week</Button>
-          <Button colorScheme={filter === 'lastMonth' ? 'blue' : 'gray'} onClick={() => handleFilterChange('lastMonth')}>Last Month</Button>
-          <Button colorScheme={filter === 'lastYear' ? 'blue' : 'gray'} onClick={() => handleFilterChange('lastYear')}>Last Year</Button>
-        </div>
-      </div>
-      <SimpleGrid columns={3} spacing={10} mb={5}>
-        {/* <Stat>
-          <StatLabel>Total Users</StatLabel>
-          <StatNumber>61,923</StatNumber>
-          <StatHelpText>Total patient Admitted: 32,303</StatHelpText>
-        </Stat> */}
-        <div className='text-center' style={{ background: '', color: '' }}>
-          <Text fontSize="xl">Total Amount: {totalRevenue.toFixed(2)}</Text>
-          {revenueTrend === 'up' && (
-            <Text color="green.500">
-              Increasing <ArrowUpIcon />
-            </Text>
-          )}
-          {revenueTrend === 'down' && (
-            <Text color="red.500">
-              Decreasing <ArrowDownIcon />
-            </Text>
-          )}
-        </div>
-        <Box textAlign="center" mb={5}>
-          <Text fontSize="xl">Total Users: {totalUser?.toFixed()}</Text>
-          {userTrend === 'up' && (
-            <Text color="green.500">
-              Increasing <ArrowUpIcon />
-            </Text>
-          )}
-          {userTrend === 'down' && (
-            <Text color="red.500">
-              Decreasing <ArrowDownIcon />
-            </Text>
-          )}
+      <div  >
+        <Box textAlign="center" mt={3} mb={5}>
+          <h3>Summary Data Dashboard</h3>
         </Box>
-        {/* <Stat>
+        <div className='d-flex align-items-center gap-4 mb-5 mx-auto justify-content-center'>
+          <b>Start date: </b><Input type='date' onChange={(e) => setStartDate(e.target.value)} style={{ width: '20%' }} />
+          <b>End Date: </b><Input type='date' onChange={(e) => setEndDate(e.target.value)} style={{ width: '20%' }} />
+          <Button onClick={handleLoadData} colorScheme='teal'>Fillter</Button>
+          <div className='d-flex align-items-center text-center' >
+            <Button colorScheme={filter === 'lastWeek' ? 'teal' : 'gray'} onClick={() => handleFilterChange('lastWeek')}>Last Week</Button>
+            <Button colorScheme={filter === 'lastMonth' ? 'teal' : 'gray'} onClick={() => handleFilterChange('lastMonth')}>Last Month</Button>
+            <Button colorScheme={filter === 'lastYear' ? 'teal' : 'gray'} onClick={() => handleFilterChange('lastYear')}>Last Year</Button>
+          </div>
+        </div>
+        <div className='d-flex mb-5 gap-3 align-items-center justify-content-evenly'>
+
+          <div className='text-center p-5 shadow rounded-circle' style={{ background: 'linear-gradient(135deg, #008080, #FFD700)' }}>
+            <h6 className='fst-italic' style={{ color: 'white' }}>Total User</h6>
+            <div className='d-flex align-items-center text-center gap-2'>
+              <h2 className='fw-bold '>{totalUser}</h2> people
+            </div>
+
+            {userTrend === 'up' && (
+              <Text color="white">
+                Increasing <ArrowUpIcon />
+              </Text>
+            )}
+            {userTrend === 'down' && (
+              <Text color="red.500">
+                Decreasing <ArrowDownIcon />
+              </Text>
+            )}
+          </div>
+
+          <div className='d-flex gap-2'>
+            <div className='text-center p-3 shadow rounded' style={{ background: 'linear-gradient(135deg, #008080, #FFD700)', color: '' }}>
+              <h6 className='fst-italic' style={{ color: 'white' }}>Total Amount</h6>
+              <div className='d-flex align-items-center text-center gap-2'>
+                <h1 className='fw-bold '>{totalRevenue.toLocaleString('vi-VN') + " "}</h1> VND
+              </div>
+              {revenueTrend === 'up' && (
+                <Text color="white">
+                  Increasing <ArrowUpIcon />
+                </Text>
+              )}
+              {revenueTrend === 'down' && (
+                <Text color="red.500">
+                  Decreasing <ArrowDownIcon />
+                </Text>
+              )}
+            </div>
+
+            <div className='text-center p-3 shadow rounded' style={{ background: 'linear-gradient(135deg, #FF69B4, #1E90FF)', color: '' }}>
+              <h6 className='fst-italic' style={{ color: 'white' }}>Total Refund Amount</h6>
+              <div className='d-flex align-items-center text-center gap-2'>
+                <h1 className='fw-bold text-center'>{totalRefundAmount.toLocaleString('vi-VN') + " "}</h1> VND
+              </div>
+              {refundTrend === 'up' && (
+                <Text color="white">
+                  Increasing <ArrowUpIcon />
+                </Text>
+              )}
+              {refundTrend === 'down' && (
+                <Text color="red.500">
+                  Decreasing <ArrowDownIcon />
+                </Text>
+              )}
+            </div>
+          </div>
+
+          <div className='d-flex gap-2'>
+            <div className='text-center p-3 shadow rounded' style={{ background: 'linear-gradient(135deg, #008080, #FFD700)', color: '' }}>
+              <h6 className='fst-italic' style={{ color: 'white' }}>Total Booking</h6>
+              <div className='d-flex align-items-center text-center gap-2'>
+                <h1 className='fw-bold '>{totalBooking}</h1> booking(s)
+              </div>
+
+              {bookingTrend === 'up' && (
+                <Text color="white">
+                  Increasing <ArrowUpIcon />
+                </Text>
+              )}
+              {bookingTrend === 'down' && (
+                <Text color="red.500">
+                  Decreasing <ArrowDownIcon />
+                </Text>
+              )}
+            </div>
+
+            <div className='text-center p-3 shadow rounded' style={{ background: 'linear-gradient(135deg, #FF69B4, #1E90FF)', color: '' }}>
+              <h6 className='fst-italic' style={{ color: 'white' }}>Total Cancel Booking</h6>
+              <div className='d-flex align-items-center text-center gap-2'>
+                <h1 className='fw-bold '>{totalCancelBooking}</h1> booking(s)
+              </div>
+
+              {cancelTrend === 'up' && (
+                <Text color="white">
+                  Increasing <ArrowUpIcon />
+                </Text>
+              )}
+              {cancelTrend === 'down' && (
+                <Text color="red.500">
+                  Decreasing <ArrowDownIcon />
+                </Text>
+              )}
+            </div>
+          </div>
+          {/* <Stat>
           <StatLabel>Operational Cost</StatLabel>
           <StatNumber>$2,923</StatNumber>
           <StatHelpText>Avg. cost per operation: $30.0</StatHelpText>
@@ -185,56 +278,57 @@ export default function Dashboard() {
           <StatNumber>30.4</StatNumber>
           <StatHelpText>Available: 120</StatHelpText>
         </Stat> */}
-      </SimpleGrid>
+        </div>
 
 
 
 
 
 
-      <Box mb={5}>
-        <LineChart width={1200} height={300} data={summaryData}>
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="date" />
-          <YAxis tickFormatter={integerTickFormatter} />
-          <Tooltip />
-          <Legend />
-          <Line type="monotone" dataKey="totalUser" stroke="#ff7300" />
-        </LineChart>
-        <Text textAlign="center" fontStyle="italic">
-          Chart of growing user
-        </Text>
-      </Box>
+        <Box mb={5}>
+          <LineChart width={1200} height={300} data={summaryData}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="date" />
+            <YAxis tickFormatter={integerTickFormatter} />
+            <Tooltip />
+            <Legend />
+            <Line type="monotone" dataKey="totalUser" stroke="#ff7300" />
+          </LineChart>
+          <Text textAlign="center" fontStyle="italic">
+            Chart of growing user
+          </Text>
+        </Box>
 
-      <Box mb={5}>
-        <LineChart width={1200} height={300} data={summaryData}>
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="date" />
-          <YAxis />
-          <Tooltip />
-          <Legend />
-          <Line type="monotone" dataKey="totalAmount" stroke="#82ca9d" />
-          <Line type="monotone" dataKey="totalRefundAmount" stroke="#8884d8" />
-        </LineChart>
-        <Text textAlign="center" fontStyle="italic">
-          Chart of Total Amount and Total Refund Amount
-        </Text>
-      </Box>
+        <Box mb={5}>
+          <LineChart width={1200} height={300} data={summaryData}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="date" />
+            <YAxis />
+            <Tooltip />
+            <Legend />
+            <Line type="monotone" dataKey="totalAmount" stroke="#82ca9d" />
+            <Line type="monotone" dataKey="totalRefundAmount" stroke="#8884d8" />
+          </LineChart>
+          <Text textAlign="center" fontStyle="italic">
+            Chart of Total Amount and Total Refund Amount
+          </Text>
+        </Box>
 
-      <Box>
-        <BarChart width={1200} height={300} data={summaryData}>
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="date" />
-          <YAxis tickFormatter={integerTickFormatter} />
-          <Tooltip />
-          <Legend />
-          <Bar dataKey="totalBooking" fill="#82ca9d" />
-          <Bar dataKey="totalCancelBooking" fill="#cc0066" />
-        </BarChart>
-        <Text textAlign="center" fontStyle="italic">
-          Chart of total Booking and Cancel Booking
-        </Text>
-      </Box>
+        <Box>
+          <BarChart width={1200} height={300} data={summaryData}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="date" />
+            <YAxis tickFormatter={integerTickFormatter} />
+            <Tooltip />
+            <Legend />
+            <Bar dataKey="totalBooking" fill="#82ca9d" />
+            <Bar dataKey="totalCancelBooking" fill="#cc0066" />
+          </BarChart>
+          <Text textAlign="center" fontStyle="italic">
+            Chart of total Booking and Cancel Booking
+          </Text>
+        </Box>
+      </div>
     </>
   );
 }
