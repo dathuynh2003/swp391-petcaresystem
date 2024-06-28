@@ -9,9 +9,11 @@ import java.util.List;
 public interface ISummaryDataService {
     void generateMissingSummaryData(LocalDate fromDate, LocalDate toDate);
 
-    void generateSummaryDataForDate(Date startDate, Date endDate);
+    SummaryData generateSummaryDataForDate(Date startDate, Date endDate);
 
     List<SummaryData> getSummaryDataByDateRange(String startDate, String endDate);
 
     SummaryData saveSummaryData(SummaryData summaryData);
+
+    
 }

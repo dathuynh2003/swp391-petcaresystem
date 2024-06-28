@@ -29,7 +29,7 @@ public class SummaryDataService implements ISummaryDataService{
 
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
-    @Scheduled(cron = "0 0 0 * * ?")  // Chạy hàng ngày vào lúc nửa đêm
+    @Scheduled(cron = "0 0 0 * * ?", zone = "Asia/Ho_Chi_Minh")  // Chạy hàng ngày vào lúc nửa đêm
     public void generateSummaryData() {
         // Lấy dữ liệu từ ngày hôm trước
         LocalDate yesterday = LocalDate.now().minusDays(1);
@@ -56,7 +56,7 @@ public class SummaryDataService implements ISummaryDataService{
     }
 
     @Override
-    public void generateSummaryDataForDate(Date startDate, Date endDate) {
+    public SummaryData generateSummaryDataForDate(Date startDate, Date endDate) {
         // Lấy dữ liệu từ các nguồn khác nhau và tính toán các giá trị tổng hợp
         List<Booking> bookings = bookingRepository.findByBookingDateBetween(startDate, endDate);
 //        long totalUsers = userRepository.countByRoleIdAndCreatedAtBetween(1, startDate, endDate);
@@ -72,19 +72,24 @@ public class SummaryDataService implements ISummaryDataService{
         int totalBooking = bookings.size();
         int totalCancelBooking = (int) bookings.stream().filter(booking -> "CANCELLED".equals(booking.getStatus())).count();
 
-        // Tạo đối tượng SummaryData
-        SummaryData summaryData = new SummaryData();
+        //Format date
         LocalDate localDate = startDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
         String formattedDate = localDate.format(DATE_FORMATTER);
-        summaryData.setDate(formattedDate);
-        summaryData.setTotalAmount(totalAmount);
-        summaryData.setTotalRefundAmount(totalRefundAmount);
-        summaryData.setTotalBooking(totalBooking);
-        summaryData.setTotalCancelBooking(totalCancelBooking);
-        summaryData.setTotalUser((int) totalUsers);
+
+        // Tạo đối tượng SummaryData
+        SummaryData newSummaryData = summaryDataRepository.findByDate(formattedDate);
+        if(newSummaryData == null) {
+            newSummaryData = new SummaryData();
+            newSummaryData.setDate(formattedDate);
+        }
+        newSummaryData.setTotalAmount(totalAmount);
+        newSummaryData.setTotalRefundAmount(totalRefundAmount);
+        newSummaryData.setTotalBooking(totalBooking);
+        newSummaryData.setTotalCancelBooking(totalCancelBooking);
+        newSummaryData.setTotalUser((int) totalUsers);
 
         // Lưu đối tượng vào cơ sở dữ liệu
-        summaryDataRepository.save(summaryData);
+        return summaryDataRepository.save(newSummaryData);
     }
 
     @Override

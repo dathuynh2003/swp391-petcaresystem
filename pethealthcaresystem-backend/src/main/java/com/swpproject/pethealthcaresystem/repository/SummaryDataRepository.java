@@ -12,4 +12,5 @@ public interface SummaryDataRepository extends JpaRepository<SummaryData, Intege
     List<SummaryData> findByDateBetween(String startDate, String endDate);
     @Query("SELECT s.date FROM SummaryData s")
     List<String> findAllDates();
+    SummaryData findByDate(String date);
 }
