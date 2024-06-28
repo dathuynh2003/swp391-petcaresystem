@@ -52,6 +52,7 @@ export default function Dashboard() {
       calculateTotalRevenue(response.data);
       if (response.data === undefined) {
         setTotalUser(0)
+        setUserTrend(null)
         return
       }
       calculateTotalUser(response?.data)
