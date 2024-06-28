@@ -230,9 +230,6 @@ public class BookingService implements IBookingService {
     @Override
     public Page<Booking> getBookingByStatusAndDate(String status, String fromDate, String toDate, int pageNo, int pageSize) {
         Pageable pageable = PageRequest.of(pageNo - 1, pageSize, Sort.by("id").descending());
-        System.out.println("Status:" + status);
-        System.out.println("FromDate:" + fromDate);
-        System.out.println("ToDate:" + toDate);
         if (fromDate != null && status == null) {
             Date from = SystemUtils.endOfDay(SystemUtils.parseStringToDate(fromDate));
             Date to = SystemUtils.endOfDay(SystemUtils.parseStringToDate(toDate));
