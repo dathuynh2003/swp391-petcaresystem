@@ -178,7 +178,7 @@ export default function CreatePet() {
             <input type="date" className="form-control" id="dob"
               onChange={(e) => { setPet((prev) => ({ ...prev, dob: e.target.value })) }}
             />
-            <label htmlfor="dob">Date of bird</label>
+            <label htmlfor="dob">Date of birth</label>
           </div>
 
           <div className="form-floating mb-3">

@@ -235,7 +235,7 @@ export default function EditPet() {
             <input type="date" className="form-control" id="dob" defaultValue={pet.dob}
               onChange={(e) => { setPet((prev) => ({ ...prev, dob: e.target.value })) }}
             />
-            <label htmlfor="dob">Date of bird</label>
+            <label htmlfor="dob">Date of birth</label>
           </div>
           {/* <div className="age mb-3 ">
             <label className="mt-2 ml-4 mb-3" htmlFor="age">

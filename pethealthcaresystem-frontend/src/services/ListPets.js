@@ -50,7 +50,7 @@ export default function ListPets() {
             <th scope="col" className='p-3'>Type</th>
             <th scope="col" className='p-3'>Breed</th>
             <th scope="col" className='p-3'>Sex</th>
-            <th scope="col" className='p-3'>Age</th>
+            <th scope="col" className='py-3 px-4'>Age</th>
             <th scope="col" className='p-3'>Neutered</th>
             <th scope="col" className='p-3'>Description</th>
             <th scope="col" className='col-2 text-center p-3'>Action</th>
@@ -76,7 +76,7 @@ export default function ListPets() {
                   <td className="col-1 p-2">{pet.petType}</td>
                   <td className="col-1 p-2">{pet.breed}</td>
                   <td className="col-1 p-2">{pet.gender}</td>
-                  <td className="col-1 py-2 px-4">{age}</td>
+                  <td className="col-1 py-2">{age} month(s)</td>
                   <td className="col-1 py-2 px-4">{pet.isNeutered ? 'Yes' : 'No'}</td>
                   <td className="col-2 p-2">{pet.description}</td>
                   <td className='col-2 text-center p-2'>
