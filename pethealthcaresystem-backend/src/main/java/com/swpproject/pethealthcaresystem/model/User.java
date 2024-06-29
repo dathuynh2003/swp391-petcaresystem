@@ -21,6 +21,7 @@ import java.util.Set;
 @Entity
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Table(name = "user")
+@Builder
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

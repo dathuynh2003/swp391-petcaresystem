@@ -225,7 +225,7 @@ public class UserService implements IUserService {
         user.setRoleId(newUser.getRoleId());
         user.setAvatar("");
         user.setGender(newUser.getGender());
-        user.setStatus(true);
+        user.setIsActive(true);
         user.setDob(newUser.getDob());
         return userRepository.save(user);
     }
