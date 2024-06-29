@@ -5,9 +5,12 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -15,16 +18,19 @@ import java.util.List;
 @AllArgsConstructor
 @Entity
 @Table(
-        name = "Shift",
+        name = "shift",
         schema = "pethealthcare"
 )
 public class Shift {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private int shiftId;
     private String from_time;
     private String to_time;
     //one shift can have many user(vet)
-    @ManyToMany
-    List<User> users;
+//    @ManyToMany
+//    List<User> users;
+    @OneToMany(mappedBy = "shift", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Nullable
+    private Set<VetShiftDetail> vetShiftDetails = new HashSet<>();
 }

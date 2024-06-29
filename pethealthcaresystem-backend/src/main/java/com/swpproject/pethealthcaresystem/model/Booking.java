@@ -1,25 +1,47 @@
 package com.swpproject.pethealthcaresystem.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.ForeignKey;
-import jakarta.persistence.Id;
-import lombok.*;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.lang.Nullable;
 
-import java.util.Date;
-@Setter
-@Getter
-@ToString
+import java.util.*;
+
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
 public class Booking {
     @Id
-    private int booking_id;
-    private int user_id;
-    private int vs_id; //vs:vet shift
-    private Date booking_date;
-    private Date appointment_date;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
+    private Date bookingDate;
+    private Date refundDate;
     private String status;
-    private double total_amount;
-    private boolean type;
+    private double totalAmount;
+    private Boolean type;
+    private String description;
+    private int paymentId;
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    @ManyToOne
+    @JoinColumn(name = "pet_id")
+    @JsonIgnoreProperties("bookings")
+    private Pet pet;
+
+    @OneToMany(mappedBy = "booking", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<BookingDetail> bookingDetails = new ArrayList<>();
+
+    @ManyToOne
+    @JoinColumn(name = "vs_id")
+    @JsonIgnoreProperties("bookings")
+    private VetShiftDetail vetShiftDetail;
+
+//    @OneToOne(mappedBy = "booking")
+//    @JsonIgnoreProperties("booking")
+//    private Payment payment;
 }
