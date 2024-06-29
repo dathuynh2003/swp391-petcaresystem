@@ -7,6 +7,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.lang.Nullable;
 
+import java.util.*;
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
@@ -18,7 +20,7 @@ public class Payment {
     private int orderCode;
     private String paymentType;
     private double amount;
-    private String paymentDate;
+    private Date paymentDate;
     private String status;
     private String description;
 

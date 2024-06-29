@@ -256,13 +256,12 @@ public class UserService implements IUserService {
         Date now = new Date();
         User user = userRepository.findByPhoneNumber(phoneNumber);
         if (user == null) {
-            user = User.builder()
-                    .createdAt(now)
-                    .phoneNumber(phoneNumber)
-                    .fullName(fullName)
-                    .isActive(true)
-                    .roleId(1)
-                    .build();
+            user = new User();
+            user.setCreatedAt(now);
+            user.setPhoneNumber(phoneNumber);
+            user.setFullName(fullName);
+            user.setIsActive(true);
+            user.setRoleId(1);
             user = userRepository.save(user);
         }
         return user;

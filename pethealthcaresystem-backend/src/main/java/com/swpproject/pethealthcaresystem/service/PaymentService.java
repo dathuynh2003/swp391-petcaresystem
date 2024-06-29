@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 import org.apache.commons.codec.digest.HmacUtils;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
@@ -196,9 +195,8 @@ public class PaymentService implements IPaymentService {
         }
         updatePayment.setStatus(payment.getStatus());
         updatePayment.setPaymentType(payment.getPaymentType());
-        LocalDateTime now = LocalDateTime.now();
-        String dateTime = now.format(formatter);
-        updatePayment.setPaymentDate(dateTime);
+        Date now = new Date();
+        updatePayment.setPaymentDate(now);
         paymentRepository.save(updatePayment);
 
 //        Hospitalization hosp = hospitalizationRepository.findById(updatePayment.getHospitalization().getId())

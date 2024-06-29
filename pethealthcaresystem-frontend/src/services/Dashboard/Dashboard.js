@@ -34,9 +34,9 @@ export default function Dashboard() {
 
   const [filter, setFilter] = useState('');
 
-  const formatDate = (date) => {
-    return new Date(date).toLocaleDateString('en-GB').replace(/\//g, '-');
-  };
+  // const formatDate = (date) => {
+  //   return new Date(date).toLocaleDateString('en-GB').replace(/\//g, '-');
+  // };
 
   const handleLoadData = async () => {
     if (new Date(endDate) < new Date(startDate)) {
@@ -47,7 +47,7 @@ export default function Dashboard() {
     console.log(endDate);
     try {
       const response = await axios.get('http://localhost:8080/api/summary-data', {
-        params: { startDate: formatDate(startDate), endDate: formatDate(endDate) },
+        params: { startDate: startDate, endDate: endDate },
       });
       setSummaryData(response.data);
       calculateTotalRevenue(response.data);
@@ -120,12 +120,13 @@ export default function Dashboard() {
   useEffect(() => {
     const nowMonth = new Date().getMonth() + 1
     const nowYear = new Date().getFullYear()
-    const tmptStartDate = nowMonth + '-01-' + nowYear
+    const tmptStartDate = nowYear + "-01-" + nowMonth
     console.log("day neeeeeeeee");
-    setStartDate(formatDate(tmptStartDate))
+    console.log(tmptStartDate);
+    setStartDate(tmptStartDate)
 
-    setEndDate(formatDate(new Date()))
-    console.log(formatDate(new Date()));
+    setEndDate(new Date())
+    console.log(new Date());
     handleLoadData()
   }, [])
   useEffect(() => {
