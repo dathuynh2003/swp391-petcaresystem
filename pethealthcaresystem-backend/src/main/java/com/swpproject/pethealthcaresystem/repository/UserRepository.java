@@ -21,4 +21,6 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     User findByPhoneNumber(String phoneNumber);
     User findUserByPhoneNumber(String phoneNumber);
     long countByRoleId(int roleId);
+
+    long countByRoleIdAndCreatedAtBetween(int i, Date startDate, Date endDate);
 }

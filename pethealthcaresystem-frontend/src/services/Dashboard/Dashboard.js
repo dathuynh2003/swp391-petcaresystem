@@ -9,6 +9,7 @@ import {
 import { ToastContainer, toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import { ArrowUpIcon, ArrowDownIcon, TimeIcon } from '@chakra-ui/icons';
+import UserChart from './UserChart';
 
 export default function Dashboard() {
   let navigate = useNavigate();
@@ -91,25 +92,30 @@ export default function Dashboard() {
     setTotalRevenue(total);
   };
   const calculateTotalUser = (data) => {
-    console.log("length đây");
-    console.log(data);
-    console.log(data?.length);
-    if (data === undefined || data?.length === 0) {
+    let total = data.reduce((acc, cur) => acc + cur.totalUser, 0);
+    setUserTrend(total > totalUser ? 'up' : total < totalUser ? 'down' : null);
+    setTotalUser(total);
+  };
+  // const calculateTotalUser = (data) => {
+  //   console.log("length đây");
+  //   console.log(data);
+  //   console.log(data?.length);
+  //   if (data === undefined || data?.length === 0) {
 
-      setUserTrend(null);
-      setTotalUser(0)
-      return
-    }
-    let lastItem = data.slice().reverse().find(entry => entry?.totalUser !== 0) //tạo bản sao mảng, đảo ngược lại, tìm phần tử đầu tiên khác 0
-    console.log(lastItem);
-    let total = lastItem?.totalUser
-    if (lastItem == null) {
-      setTotalUser(0)
-      return
-    }
-    setUserTrend(total > totalUser ? 'up' : total < totalUser ? 'down' : null)
-    setTotalUser(total)
-  }
+  //     setUserTrend(null);
+  //     setTotalUser(0)
+  //     return
+  //   }
+  //   let lastItem = data.slice().reverse().find(entry => entry?.totalUser !== 0) //tạo bản sao mảng, đảo ngược lại, tìm phần tử đầu tiên khác 0
+  //   console.log(lastItem);
+  //   let total = lastItem?.totalUser
+  //   if (lastItem == null) {
+  //     setTotalUser(0)
+  //     return
+  //   }
+  //   setUserTrend(total > totalUser ? 'up' : total < totalUser ? 'down' : null)
+  //   setTotalUser(total)
+  // }
 
   useEffect(() => {
     const nowMonth = new Date().getMonth() + 1
