@@ -127,7 +127,7 @@ export default function PaymentResult() {
             {/* <Text>{booking.status}</Text> */}
           </Box>
           <Box mb={3}>
-            <Text fontWeight="bold">Total Amount: {formatCurrency(booking.totalAmount)}</Text>
+            <Text fontWeight="bold">Total Amount: {booking.totalAmount.toLocaleString('vi-VN')} VND</Text>
           </Box>
           <Box mb={3}>
             <Text fontWeight="bold">Description: {booking.description}</Text>

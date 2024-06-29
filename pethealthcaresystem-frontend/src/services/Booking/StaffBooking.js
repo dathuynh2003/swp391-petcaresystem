@@ -133,8 +133,15 @@ export default function Booking() {
         console.log(booking);
     }, [booking]);
 
+    //Selected pet nào thì tính tuổi cho pet đó luôn
+    const [age, setAge] = useState()
     const choosePet = (pet) => {
         setSelectedPet(pet);
+        const today = new Date();
+        const dob = new Date(pet.dob);
+        const diffMonths = (today.getFullYear() - dob.getFullYear()) * 12 + (today.getMonth() - dob.getMonth());
+        const age = diffMonths !== 0 ? diffMonths : 1;
+        setAge(age)
     };
 
     const [dates, setDates] = useState([]);
@@ -755,7 +762,7 @@ export default function Booking() {
                                         <div className="border-bottom mb-3 ">
 
                                             <label className="w-50"><b>Phone number: </b>{selectedPet?.owner?.phoneNumber}</label>
-                                            <label className='w-50'><b>Pet's age: </b> {selectedPet?.age} month(s)</label>
+                                            <label className='w-50'><b>Pet's age: </b> {age} month(s)</label>
 
 
                                         </div>
@@ -865,7 +872,7 @@ export default function Booking() {
                                         <div className="border-bottom mb-3 ">
 
                                             <label className="w-50"><b>Phone number: </b>{selectedPet?.owner?.phoneNumber}</label>
-                                            <label className='w-50'><b>Pet's age: </b> {selectedPet?.age} month(s)</label>
+                                            <label className='w-50'><b>Pet's age: </b> {age} month(s)</label>
 
 
                                         </div>

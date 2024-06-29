@@ -31,7 +31,7 @@ export default function ViewPet() {
             name: "",
             gender: "",
             breed: "",
-            age: "",
+            dob: null,
             petType: "",
             avatar: "",
             isNeutered: "",
@@ -411,8 +411,11 @@ export default function ViewPet() {
         }
     }
 
-
-
+    //Tính tuổi của pet dựa vào dob (đơn vị month(s))
+    const today = new Date();
+    const dob = new Date(pet.dob);
+    const diffMonths = (today.getFullYear() - dob.getFullYear()) * 12 + (today.getMonth() - dob.getMonth());
+    const age = diffMonths !== 0 ? diffMonths : 1;
 
     return (
         <div>
@@ -466,7 +469,7 @@ export default function ViewPet() {
 
                                     <div className="form-floating mb-3 col">
                                         <input
-                                            value={pet.age}
+                                            value={age}
                                             type="text" className="form-control" id="age" readOnly />
                                         <label htmlFor="age">Age (month(s))</label>
                                     </div>
@@ -836,15 +839,15 @@ export default function ViewPet() {
 
                                                     <div className='d-flex align-items-center justify-content-between text-center'>
                                                         <div className='d-flex gap-1'><img src="logoApp.svg" alt="Logo" className='logo' /> Pet Health Care</div>
-                                                        <div>                                                           
+                                                        <div>
                                                             {roleId === '1' ? (
-                                                                <Button  
-                                                                colorScheme = {medicalRecord.isPaid === true ? 'teal' : 'pink'}                              
-                                                                    onClick={ medicalRecord.isPaid === false ? () => handleMedicalPayment(medicalRecord) : null}
+                                                                <Button
+                                                                    colorScheme={medicalRecord.isPaid === true ? 'teal' : 'pink'}
+                                                                    onClick={medicalRecord.isPaid === false ? () => handleMedicalPayment(medicalRecord) : null}
                                                                     style={{
-                                                                        color:'white'
+                                                                        color: 'white'
                                                                     }}
-                                                                    
+
                                                                 >
                                                                     {medicalRecord.isPaid === true ? 'Paid' : 'Payment'}
                                                                 </Button>

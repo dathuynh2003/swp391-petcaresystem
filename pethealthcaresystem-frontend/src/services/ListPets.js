@@ -61,7 +61,7 @@ export default function ListPets() {
             pets.map((pet, index) => {
               const today = new Date();
               const dob = new Date(pet.dob);
-              console.log(dob);
+              // console.log(dob);
               // Tính số tháng chênh lệch giữa hai ngày
               const diffMonths = (today.getFullYear() - dob.getFullYear()) * 12 + (today.getMonth() - dob.getMonth());
               const age = diffMonths !== 0 ? diffMonths : 1;

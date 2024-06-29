@@ -23,7 +23,8 @@ export default function CreatePetByStaff() {
         name: '',
         gender: '',
         breed: '',
-        age: 1,
+        // age: 1,
+        dob: null,
         petType: '',
         avatar: '',
         isNeutered: '',
@@ -209,7 +210,13 @@ export default function CreatePetByStaff() {
                         </div>
                     </div>
 
-                    <div className="age mb-3 ">
+                    <div className="form-floating mb-3">
+                        <input type="date" className="form-control" id="dob"
+                            onChange={(e) => { setPet((prev) => ({ ...prev, dob: e.target.value })) }}
+                        />
+                        <label htmlfor="dob">Date of birth</label>
+                    </div>
+                    {/* <div className="age mb-3 ">
                         <label className="mt-2 ml-4 mb-3" htmlFor="age">
                             Age (month(s))
                         </label>
@@ -228,7 +235,7 @@ export default function CreatePetByStaff() {
                                 <NumberDecrementStepper />
                             </NumberInputStepper>
                         </NumberInput>
-                    </div>
+                    </div> */}
 
                     <div className="form-floating mb-3">
                         <input
