@@ -11,7 +11,8 @@ import {
   ModalBody,
   ModalCloseButton,
   useDisclosure,
-  Button
+  Button,
+  Avatar
 } from '@chakra-ui/react'
 import { ToastContainer, toast } from 'react-toastify'
 
@@ -40,7 +41,7 @@ export default function ListPets() {
   return (
     <div className='container'>
       <ToastContainer />
-      <Link to={'/createPet'}><Button className='mt-4' colorScheme='teal'>Add new Pet</Button></Link>
+      <Link to={'/createPet'}><Button className='mt-4 mb-3' colorScheme='teal'>Add new Pet</Button></Link>
       <table className="table py-4 border-2 shadow  table-hover ">
         <thead className='p-4'>
           <tr >
@@ -67,10 +68,10 @@ export default function ListPets() {
               const age = diffMonths !== 0 ? diffMonths : 1;
               // const age = 0
               return (
-                <tr key={index} >
+                <tr key={index}  >
                   <td className='pl-4 text-center'>{index + 1}</td>
-                  <td className="col-1 p-2">
-                    <img src={pet.avatar} alt={pet.name} style={{ width: '50px', height: '50px', borderRadius: '50%' }} />
+                  <td className="col-1 ">
+                    <Avatar src={pet.avatar} alt={pet.name} />
                   </td>
                   <td className="col-1 p-2">{pet.name}</td>
                   <td className="col-1 p-2">{pet.petType}</td>

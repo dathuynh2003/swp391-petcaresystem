@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Form, Link, useNavigate } from 'react-router-dom';
 import './profile.css';
-import { Button, FormControl } from '@chakra-ui/react';
+import { Avatar, Button, FormControl } from '@chakra-ui/react';
 import axios from 'axios';
 import { Bounce, ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -116,7 +116,7 @@ const Profile = () => {
       <div className='row m-4' style={{ position: 'relative' }}>
         <div className='avatar col-4 my-4'>
 
-          <img
+          <Avatar
             className='rounded-circle my-3 mx-5'
             src={profile?.avatar}
             alt=''
