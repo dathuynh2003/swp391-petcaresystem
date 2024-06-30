@@ -1,0 +1,27 @@
+.area-chart-container .recharts-cartesian-axis-tick-line {
+  display: none; /* Ẩn đường gạch chia dọc */
+}
+
+
+
+
+.area-chart-container .recharts-cartesian-axis-label {
+  font-size: 14px; /* Kích thước chữ của nhãn trục */
+  fill: #333; /* Màu chữ của nhãn trục */
+}
+
+.area-chart-container .recharts-cartesian-axis-tick-value {
+  font-size: 15px; /* Kích thước chữ của các giá trị trục */
+  /* fill: teal;  */
+  /* Màu chữ của các giá trị trục */
+}
+
+.area-chart-container {
+  width: 97%;
+  background-color: #f5f5f5;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding-top: 20px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  /* margin: auto; */
+}

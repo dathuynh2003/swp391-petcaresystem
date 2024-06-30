@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import {
-  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, BarChart, Bar,
+  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, BarChart, Bar, AreaChart, Area, ResponsiveContainer
 } from 'recharts';
 import {
   Button, Input, Box, Flex, Text, Stat, StatLabel, StatNumber, StatHelpText, SimpleGrid, IconButton,
@@ -10,17 +10,33 @@ import { ToastContainer, toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import { ArrowUpIcon, ArrowDownIcon, TimeIcon } from '@chakra-ui/icons';
 import UserChart from './UserChart';
+import { PureComponent } from 'react';
+import { curveCardinal } from 'd3-shape';
+import './Dashboard.css'
+
+
 
 export default function Dashboard() {
+  const cardinal = curveCardinal.tension(0.2);
   let navigate = useNavigate();
   const roleId = localStorage.getItem('roleId');
   if (roleId !== '4') {
     navigate('/404page');
   }
+  const formatDate = (date) => {
+    return new Date(date).toLocaleDateString('en-CA')
+  };
+
+  const defaultStartDate = () => {
+    const nowMonth = new Date().getMonth() + 1
+    const nowYear = new Date().getFullYear()
+    const tmptStartDate = nowYear + "-" + nowMonth + "-01"
+    return formatDate(tmptStartDate)
+  }
 
   const [summaryData, setSummaryData] = useState([]);
-  const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate] = useState('');
+  const [startDate, setStartDate] = useState(defaultStartDate);
+  const [endDate, setEndDate] = useState(formatDate(new Date()));
   const [totalRevenue, setTotalRevenue] = useState(0);
   const [revenueTrend, setRevenueTrend] = useState(null); // null, 'up', 'down'
   const [totalRefundAmount, setTotalRefundAmount] = useState(0)
@@ -31,25 +47,27 @@ export default function Dashboard() {
   const [bookingTrend, setBookingTrend] = useState()
   const [totalCancelBooking, setTotalCancelBooking] = useState(0)
   const [cancelTrend, setCancelTrend] = useState()
-
+  const [today, setToday] = useState(new Date())
   const [filter, setFilter] = useState('');
 
-  // const formatDate = (date) => {
-  //   return new Date(date).toLocaleDateString('en-GB').replace(/\//g, '-');
-  // };
+
 
   const handleLoadData = async () => {
-    if (new Date(endDate) < new Date(startDate)) {
-      toast.error('The end date is invalid!');
-      return;
-    }
-    console.log(startDate);
-    console.log(endDate);
+    // if (new Date(endDate) < new Date(startDate)) {
+    //   console.log(new Date(endDate) < new Date(startDate));
+    //   toast.error('The end date is invalid!');
+    //   return;
+    // }
+    console.log("start date đây: ");
+    console.log(formatDate(startDate));
+    console.log("end date đây: ");
+    console.log(formatDate(formatDate(endDate)));
     try {
       const response = await axios.get('http://localhost:8080/api/summary-data', {
-        params: { startDate: startDate, endDate: endDate },
+        params: { startDate: formatDate(startDate), endDate: formatDate(endDate) },
       });
       setSummaryData(response.data);
+      console.log(response.data);
       calculateTotalRevenue(response.data);
       if (response.data === undefined) {
         setTotalUser(0)
@@ -63,7 +81,7 @@ export default function Dashboard() {
     } catch (error) {
       toast.error(error.message);
     }
-  };
+  }
 
 
   const calculateTotalCancelBooking = (data) => {
@@ -96,75 +114,73 @@ export default function Dashboard() {
     setUserTrend(total > totalUser ? 'up' : total < totalUser ? 'down' : null);
     setTotalUser(total);
   };
-  // const calculateTotalUser = (data) => {
-  //   console.log("length đây");
-  //   console.log(data);
-  //   console.log(data?.length);
-  //   if (data === undefined || data?.length === 0) {
 
-  //     setUserTrend(null);
-  //     setTotalUser(0)
-  //     return
-  //   }
-  //   let lastItem = data.slice().reverse().find(entry => entry?.totalUser !== 0) //tạo bản sao mảng, đảo ngược lại, tìm phần tử đầu tiên khác 0
-  //   console.log(lastItem);
-  //   let total = lastItem?.totalUser
-  //   if (lastItem == null) {
-  //     setTotalUser(0)
-  //     return
-  //   }
-  //   setUserTrend(total > totalUser ? 'up' : total < totalUser ? 'down' : null)
-  //   setTotalUser(total)
-  // }
+
+
 
   useEffect(() => {
-    const nowMonth = new Date().getMonth() + 1
-    const nowYear = new Date().getFullYear()
-    const tmptStartDate = nowYear + "-01-" + nowMonth
-    console.log("day neeeeeeeee");
-    console.log(tmptStartDate);
-    setStartDate(tmptStartDate)
 
-    setEndDate(new Date())
-    console.log(new Date());
     handleLoadData()
-  }, [])
-  useEffect(() => {
-    handleLoadData();
-  }, [filter]);
-
+  }, [filter])
   const integerTickFormatter = (value) => {
     return Number.isInteger(value) ? value : '';
   };
+  // const handleFilterChange = (newFilter) => {
+  //   setFilter(newFilter);
+
+  //   // const today = new Date();
+  //   let startDate, endDate;
+
+  //   if (newFilter === 'lastWeek') {
+  //     let tempToday = today; // Tạo bản sao của today
+  //     tempToday.setDate(today.getDate() - (today.getDay() + 6) % 7); // Bắt đầu từ thứ 2 của tuần trước
+  //     startDate = new Date(tempToday);
+  //     endDate = new Date(tempToday);
+  //     endDate.setDate(tempToday.getDate() + 6); // Kết thúc vào chủ nhật của tuần trước
+
+  //   } else if (newFilter === 'lastMonth') {
+  //     startDate = new Date(today.getFullYear(), today.getMonth()-1, 1);
+  //     endDate = new Date(today.getFullYear(), today.getMonth() , 0);
+  //   } else if (newFilter === 'lastYear') {
+  //     startDate = new Date(today.getFullYear() - 1, 0, 1);
+  //     endDate = new Date(today.getFullYear() - 1, 11, 31);
+  //   }
+
+  //   setStartDate(formatDate(startDate)); // Định dạng và cập nhật startDate
+  //   setEndDate(formatDate(endDate)); // Định dạng và cập nhật endDate
+  // };
 
   const handleFilterChange = (newFilter) => {
+
+    console.log("12222222");
+    console.log(newFilter);
     setFilter(newFilter);
     // Set startDate and endDate based on filter
     const today = new Date();
     let start, end;
-
+    // const tmptStartDate = nowYear + "-" + nowMonth + "-01"
     if (newFilter === 'lastWeek') {
-      start = new Date(today.setDate(today.getDate() - 7));
-      end = new Date();
-    } else if (newFilter === 'lastMonth') {
-      start = new Date(today.setMonth(today.getMonth() - 1));
-      end = new Date();
-    } else if (newFilter === 'lastYear') {
-      start = new Date(today.setFullYear(today.getFullYear() - 1));
-      end = new Date();
-    }
-    // else if (newFilter === 'yearly') {
-    //   start = new Date(today.setFullYear(today.getFullYear() - 1));
-    //   end = new Date();
-    // }
-    // } else if (newFilter === 'lifeTime') {
-    //   start = new Date('2024-06-01'); // Example start date ' 2020-01-01'
-    //   end = new Date();
-    // }
+      start = new Date(today) //tạo bản sao để k ảnh hưởng đến today
+      start.setDate(today.getDate() - (today.getDay() + 6) % 7); // Bắt đầu từ thứ 2 của tuần trước
+      end = new Date(start) //tạo bản sao để k ảnh hưởng đến start
+      end.setDate(start.getDate() + 6);
 
-    setStartDate(start.toISOString().split('T')[0]);
-    setEndDate(end.toISOString().split('T')[0]);
+    } else if (newFilter === 'lastMonth') {
+      start = (today.getFullYear()) + "-" + today.getMonth() + "-01"
+      end = new Date(today.getFullYear(), today.getMonth(), 0);
+    } else if (newFilter === 'lastYear') {
+      // start = new Date(today.setFullYear(today.getFullYear() - 1));
+      start = (today.getFullYear() - 1) + "-01-01"
+      end = (today.getFullYear() - 1) + "-12-31";
+    }
+    setStartDate(formatDate(start));
+    setEndDate(formatDate(end));
+    // setStartDate(start)
+    // setEndDate(end)
+    console.log(start);
+    console.log(end);
   };
+  ;
 
   return (
     <>
@@ -174,8 +190,8 @@ export default function Dashboard() {
           <h3>Summary Data Dashboard</h3>
         </Box>
         <div className='d-flex align-items-center gap-4 mb-5 mx-auto justify-content-center'>
-          <b>Start date: </b><Input type='date' onChange={(e) => setStartDate(e.target.value)} style={{ width: '20%' }} />
-          <b>End Date: </b><Input type='date' onChange={(e) => setEndDate(e.target.value)} style={{ width: '20%' }} />
+          <b>Start date: </b><Input type='date' value={startDate} onChange={(e) => setStartDate(e.target.value)} style={{ width: '20%' }} />
+          <b>End Date: </b><Input type='date' value={endDate} onChange={(e) => setEndDate(e.target.value)} style={{ width: '20%' }} />
           <Button onClick={handleLoadData} colorScheme='teal'>Fillter</Button>
           <div className='d-flex align-items-center text-center' >
             <Button colorScheme={filter === 'lastWeek' ? 'teal' : 'gray'} onClick={() => handleFilterChange('lastWeek')}>Last Week</Button>
@@ -185,10 +201,14 @@ export default function Dashboard() {
         </div>
         <div className='d-flex mb-5 gap-3 align-items-center justify-content-evenly'>
 
-          <div className='text-center p-5 shadow rounded-circle' style={{ background: 'linear-gradient(135deg, #008080, #FFD700)' }}>
+          <div className='text-center p-5 shadow rounded-circle'
+            style={{
+              background: 'linear-gradient(135deg, #008080, #FFD700)'
+              , width: '200px', height: '200px'
+            }}>
             <h6 className='fst-italic' style={{ color: 'white' }}>Total User</h6>
             <div className='d-flex align-items-center text-center gap-2'>
-              <h2 className='fw-bold '>{totalUser}</h2> people
+              <h1 className='fw-bold '>{totalUser}</h1> people
             </div>
 
             {userTrend === 'up' && (
@@ -276,58 +296,59 @@ export default function Dashboard() {
               )}
             </div>
           </div>
-          {/* <Stat>
-          <StatLabel>Operational Cost</StatLabel>
-          <StatNumber>$2,923</StatNumber>
-          <StatHelpText>Avg. cost per operation: $30.0</StatHelpText>
-        </Stat>
-        <Stat>
-          <StatLabel>Avg Patient Per Doctor</StatLabel>
-          <StatNumber>30.4</StatNumber>
-          <StatHelpText>Available: 120</StatHelpText>
-        </Stat> */}
+
+        </div>
+
+
+        <div className='area-chart-container  mb-5 ' style={{}}>
+          <AreaChart width={1150} height={300} data={summaryData}>
+            <defs>
+              <linearGradient id="colorTotalUser" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#8884d8" stopOpacity={0.8} />
+                <stop offset="95%" stopColor="#8884d8" stopOpacity={0} />
+                {/* defs và linearGradient: Trong phần defs, chúng ta định nghĩa một linearGradient với id là "colorTotalUser".
+               Gradient này bắt đầu từ màu "#8884d8" với độ mờ dần dần (opacity) là 0.8 và kết thúc ở 0 với màu cùng một màu "#8884d8".
+                fill: fill sử dụng "url(#colorTotalUser)" để áp dụng gradient cho phần nền của biểu đồ. fillOpacity={0.8} 
+                được sử dụng để làm mờ các dải màu hơi. */}
+              </linearGradient>
+            </defs>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="date" tickFormatter={(value) => new Date(value).toLocaleDateString("en-Gb")} />
+            <YAxis tickFormatter={integerTickFormatter} />
+            <Tooltip labelFormatter={(value) => new Date(value).toLocaleDateString("en-Gb")} />
+            <Legend />
+            <Area type="monotone" dataKey="totalUser" stroke="#8884d8" fill="url(#colorTotalUser)" fillOpacity={0.8} />
+          </AreaChart>
+          <Text textAlign="center" fontStyle="italic">
+            Chart of growing user
+          </Text>
         </div>
 
 
 
+        <div className='mb-5 area-chart-container'>
 
-
-
-        <Box mb={5}>
-          <LineChart width={1200} height={300} data={summaryData}>
+          <BarChart width={1150} height={300} data={summaryData}>
             <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="date" />
+            <XAxis dataKey="date" tickFormatter={(value) => new Date(value).toLocaleDateString("en-Gb")} />
             <YAxis tickFormatter={integerTickFormatter} />
-            <Tooltip />
+            <Tooltip labelFormatter={(value) => new Date(value).toLocaleDateString("en-Gb")} />
             <Legend />
-            <Line type="monotone" dataKey="totalUser" stroke="#ff7300" />
-          </LineChart>
-          <Text textAlign="center" fontStyle="italic">
-            Chart of growing user
-          </Text>
-        </Box>
-
-        <Box mb={5}>
-          <LineChart width={1200} height={300} data={summaryData}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="date" />
-            <YAxis />
-            <Tooltip />
-            <Legend />
-            <Line type="monotone" dataKey="totalAmount" stroke="#82ca9d" />
-            <Line type="monotone" dataKey="totalRefundAmount" stroke="#8884d8" />
-          </LineChart>
+            <Bar dataKey="totalAmount" fill="#82ca9d" />
+            <Bar dataKey="totalRefundAmount" fill="#cc0066" />
+          </BarChart>
           <Text textAlign="center" fontStyle="italic">
             Chart of Total Amount and Total Refund Amount
           </Text>
-        </Box>
+        </div>
 
-        <Box>
-          <BarChart width={1200} height={300} data={summaryData}>
+
+        <div className='mb-5 area-chart-container'>
+          <BarChart width={1150} height={300} data={summaryData}>
             <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="date" />
+            <XAxis dataKey="date" tickFormatter={(value) => new Date(value).toLocaleDateString("en-Gb")} />
             <YAxis tickFormatter={integerTickFormatter} />
-            <Tooltip />
+            <Tooltip labelFormatter={(value) => new Date(value).toLocaleDateString("en-Gb")} />
             <Legend />
             <Bar dataKey="totalBooking" fill="#82ca9d" />
             <Bar dataKey="totalCancelBooking" fill="#cc0066" />
@@ -335,7 +356,7 @@ export default function Dashboard() {
           <Text textAlign="center" fontStyle="italic">
             Chart of total Booking and Cancel Booking
           </Text>
-        </Box>
+        </div>
       </div>
     </>
   );
