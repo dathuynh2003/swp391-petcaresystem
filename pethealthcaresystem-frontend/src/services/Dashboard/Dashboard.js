@@ -47,17 +47,16 @@ export default function Dashboard() {
   const [bookingTrend, setBookingTrend] = useState()
   const [totalCancelBooking, setTotalCancelBooking] = useState(0)
   const [cancelTrend, setCancelTrend] = useState()
-  const [today, setToday] = useState(new Date())
   const [filter, setFilter] = useState('');
 
-
+  // const [today, setToday] = useState(new Date())
 
   const handleLoadData = async () => {
-    // if (new Date(endDate) < new Date(startDate)) {
-    //   console.log(new Date(endDate) < new Date(startDate));
-    //   toast.error('The end date is invalid!');
-    //   return;
-    // }
+    if (new Date(endDate) < new Date(startDate)) {
+      console.log(new Date(endDate) < new Date(startDate));
+      toast.error('The end date is invalid!');
+      return;
+    }
     console.log("start date đây: ");
     console.log(formatDate(startDate));
     console.log("end date đây: ");
@@ -152,16 +151,19 @@ export default function Dashboard() {
 
   const handleFilterChange = (newFilter) => {
 
-    console.log("12222222");
-    console.log(newFilter);
     setFilter(newFilter);
     // Set startDate and endDate based on filter
     const today = new Date();
     let start, end;
-    // const tmptStartDate = nowYear + "-" + nowMonth + "-01"
     if (newFilter === 'lastWeek') {
       start = new Date(today) //tạo bản sao để k ảnh hưởng đến today
-      start.setDate(today.getDate() - (today.getDay() + 6) % 7); // Bắt đầu từ thứ 2 của tuần trước
+      let dayOfWeek = today.getDay(); // 0 (Chủ Nhật) đến 6 (Thứ Bảy)
+
+      let distanceToMonday = (dayOfWeek + 6) % 7; // Khoảng cách đến thứ 2 tuần trước
+      //cộng thêm 6 cho đủ 1 tuần 7 ngày, tính hiện tại là 1 ngày
+      // % 7 để tìm được khoảng cách nó cách thứ 2
+
+      start.setDate(today.getDate() - distanceToMonday - 7); // Lùi lại để đến thứ 2 của tuần trước
       end = new Date(start) //tạo bản sao để k ảnh hưởng đến start
       end.setDate(start.getDate() + 6);
 
@@ -175,8 +177,6 @@ export default function Dashboard() {
     }
     setStartDate(formatDate(start));
     setEndDate(formatDate(end));
-    // setStartDate(start)
-    // setEndDate(end)
     console.log(start);
     console.log(end);
   };
