@@ -192,7 +192,7 @@ export default function Dashboard() {
         <div className='d-flex align-items-center gap-4 mb-5 mx-auto justify-content-center'>
           <b>Start date: </b><Input type='date' value={startDate} onChange={(e) => setStartDate(e.target.value)} style={{ width: '20%' }} />
           <b>End Date: </b><Input type='date' value={endDate} onChange={(e) => setEndDate(e.target.value)} style={{ width: '20%' }} />
-          <Button onClick={handleLoadData} colorScheme='teal'>Fillter</Button>
+          <Button onClick={handleLoadData} colorScheme='teal'>Filter</Button>
           <div className='d-flex align-items-center text-center' >
             <Button colorScheme={filter === 'lastWeek' ? 'teal' : 'gray'} onClick={() => handleFilterChange('lastWeek')}>Last Week</Button>
             <Button colorScheme={filter === 'lastMonth' ? 'teal' : 'gray'} onClick={() => handleFilterChange('lastMonth')}>Last Month</Button>
