@@ -1,8 +1,15 @@
+import { Button } from '@chakra-ui/react';
 import React from 'react';
 import { Carousel } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, useNavigation } from 'react-router-dom';
+
+
+
 
 const Home = () => {
+
+
+
   return (
     <div className='container '  >
       {/* <div className='row my-5 mx-5 w-75 rounded' style={{ height: '550px', position: 'absolute', zIndex: 0, backgroundColor: '#007DDE' }}>
@@ -17,18 +24,28 @@ const Home = () => {
         </div>
 
       </div> */}
+      <div className='d-flex justify-content-start' style={{ marginTop: '10px' }}><Link to={'/booking'}><Button colorScheme='teal'>Book Appointment</Button></Link></div>
+
       <div style={{ width: '100%' }} >
-        <Carousel style={{ marginRight: '3%', marginTop: '4%' }}>
+
+        <Carousel style={{ marginRight: '3%', marginTop: '1%' }}>
           <Carousel.Item style={{ width: '100%' }} className='mx-auto' >
+
+
             <img
+
               className="d-block w-100" style={{ height: '580px', width: '100%' }}
               src="https://wallpaperaccess.com/full/497354.jpg"
+              // src="https://2vetpetshop.vn/wp-content/uploads/2021/04/doi-ngu-bac-sy-chuyen-gia-thu-y-2vet.jpg"
+
               alt="First slide"
             />
+
             <Carousel.Caption>
-              <h3>First slide label</h3>
+              <h3>Pet Health Care</h3>
               <p>Nulla vitae elit libero, a pharetra augue mollis interdum.</p>
             </Carousel.Caption>
+
           </Carousel.Item>
           <Carousel.Item style={{ width: '100%' }} >
             <img

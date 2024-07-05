@@ -94,6 +94,7 @@ public class PetService implements IPetService {
     public String deletePet(int id) {
         Pet pet = getPetById(id);
         pet.setIsDeceased(true);
+
         petRepository.save(pet);
         return "Delete pet successfully";
     }
