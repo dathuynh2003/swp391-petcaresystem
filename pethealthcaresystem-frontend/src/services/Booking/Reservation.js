@@ -173,13 +173,13 @@ const Reservation = () => {
 
         const sortedBookings = [...bookings].sort((a, b) => {
             if (column === 'bookingDate') {
-                const dateA = new Date(a.bookingDate);
-                const dateB = new Date(b.bookingDate);
-                return direction === 'asc' ? dateA - dateB : dateB - dateA;
+                const bDateA = new Date(a.bookingDate);
+                const bDateB = new Date(b.bookingDate);
+                return direction === 'asc' ? bDateA - bDateB : bDateB - bDateA;
             } else if (column === 'appointmentDate') {
-                const dateA = new Date(a.appointmentDate);
-                const dateB = new Date(b.appointmentDate);
-                return direction === 'asc' ? dateA - dateB : dateB - dateA;
+                const aDateA = new Date(a.appointmentDate);
+                const aDateB = new Date(b.appointmentDate);
+                return direction === 'asc' ? aDateA - aDateB : aDateB - aDateA;
             } else if (column === 'amount') {
                 const amountA = a.totalAmount;
                 const amountB = b.totalAmount;
@@ -235,8 +235,8 @@ const Reservation = () => {
                                 </span>
                             </Th>
                             <Th>
-                                <span className="icon-container" onClick={() => handleSort('bookingDate')}>
-                                    Booking Date {sortColumn === 'appointmentDate' ? (sortDirection === 'asc' ? '↓' : '↑') : ''}
+                                <span className="icon-container" onClick={() => handleSort('appointmentDate')}>
+                                    Appointment Date {sortColumn === 'appointmentDate' ? (sortDirection === 'asc' ? '↓' : '↑') : ''}
                                     <span className="icon-text">Sort by Booking Date</span>
                                 </span>
                             </Th>
