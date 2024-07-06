@@ -32,9 +32,11 @@ export default function ListPets() {
   const deletePet = async (petId) => {
     try {
       const response = await axios.put(`http://localhost:8080/deletePet/${petId}`)
+      toast.success(response.data)
     } catch (error) {
       toast.error(error)
     }
+
     loadPets()
   }
 
