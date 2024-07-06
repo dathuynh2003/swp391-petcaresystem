@@ -32,6 +32,8 @@ const Reservation = () => {
     const [pet, setPet] = useState(null)        //Lưu pet để hiển thị vào modal refund
     const [appointmentTime, setAppointmentTime] = useState('')  //Lưu để hiển thị vào modal refund
     const [refundPercentage, setRefundPercentage] = useState(null)
+    const [sortColumn, setSortColumn] = useState(null);
+    const [sortDirection, setSortDirection] = useState('asc');
 
     const pageSize = 5
     useEffect(() => {
@@ -164,6 +166,30 @@ const Reservation = () => {
     //     });
     // };
 
+    const handleSort = (column) => {
+        const direction = sortColumn === column && sortDirection === 'asc' ? 'desc' : 'asc';
+        setSortColumn(column);
+        setSortDirection(direction);
+
+        const sortedBookings = [...bookings].sort((a, b) => {
+            if (column === 'bookingDate') {
+                const dateA = new Date(a.bookingDate);
+                const dateB = new Date(b.bookingDate);
+                return direction === 'asc' ? dateA - dateB : dateB - dateA;
+            } else if (column === 'appointmentDate') {
+                const dateA = new Date(a.appointmentDate);
+                const dateB = new Date(b.appointmentDate);
+                return direction === 'asc' ? dateA - dateB : dateB - dateA;
+            } else if (column === 'amount') {
+                const amountA = a.totalAmount;
+                const amountB = b.totalAmount;
+                return direction === 'asc' ? amountA - amountB : amountB - amountA;
+            }
+            return 0;
+        });
+        setBookings(sortedBookings);
+    };
+
     const handleClickRefund = async (booking, appointmentTime, refundPercentage) => {
         onOpenRefundModal()
         const pet = booking.pet
@@ -195,7 +221,6 @@ const Reservation = () => {
         }
     }
 
-
     return (
         <Box p={5}>
             <Box>
@@ -203,10 +228,25 @@ const Reservation = () => {
                     <Thead>
                         <Tr>
                             <Th>Booking ID</Th>
-                            <Th>Booking Date</Th>
-                            <Th>Appointment Date</Th>
+                            <Th>
+                                <span className="icon-container" onClick={() => handleSort('bookingDate')}>
+                                    Booking Date {sortColumn === 'bookingDate' ? (sortDirection === 'asc' ? '↓' : '↑') : ''}
+                                    <span className="icon-text">Sort by Booking Date</span>
+                                </span>
+                            </Th>
+                            <Th>
+                                <span className="icon-container" onClick={() => handleSort('bookingDate')}>
+                                    Booking Date {sortColumn === 'appointmentDate' ? (sortDirection === 'asc' ? '↓' : '↑') : ''}
+                                    <span className="icon-text">Sort by Booking Date</span>
+                                </span>
+                            </Th>
                             <Th>Slot</Th>
-                            <Th>Amount</Th>
+                            <Th>
+                                <span className="icon-container" onClick={() => handleSort('amount')}>
+                                    Amount {sortColumn === 'amount' ? (sortDirection === 'asc' ? '↓' : '↑') : ''}
+                                    <span className="icon-text">Sort by Amount</span>
+                                </span>
+                            </Th>
                             <Th>Status</Th>
                             <Th>Action</Th>
                         </Tr>
@@ -237,7 +277,7 @@ const Reservation = () => {
                             return (
                                 <Tr key={booking.id}>
                                     <Td><b>B{booking.id}</b></Td>
-                                    <Td><b>{formatDateTime(booking.bookingDate, 'dd-MM-yyyy')}</b></Td>
+                                    <Td><b>{formatDateTime(booking.bookingDate, 'dd-MM-yyyy HH:mm:ss')}</b></Td>
                                     <Td><b>{formatDateTime(booking.vetShiftDetail.date, 'dd/MM/yyyy')}</b></Td>
                                     <Td><b>{booking.vetShiftDetail.shift.from_time} - {booking.vetShiftDetail.shift.to_time}</b></Td>
                                     <Td><b>{formatPrice(booking.totalAmount)} VND</b></Td>
