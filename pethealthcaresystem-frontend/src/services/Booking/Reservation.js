@@ -195,6 +195,7 @@ const Reservation = () => {
         }
     }
 
+
     return (
         <Box p={5}>
             <Box>
@@ -202,6 +203,7 @@ const Reservation = () => {
                     <Thead>
                         <Tr>
                             <Th>Booking ID</Th>
+                            <Th>Booking Date</Th>
                             <Th>Appointment Date</Th>
                             <Th>Slot</Th>
                             <Th>Amount</Th>
@@ -235,6 +237,7 @@ const Reservation = () => {
                             return (
                                 <Tr key={booking.id}>
                                     <Td><b>B{booking.id}</b></Td>
+                                    <Td><b>{formatDateTime(booking.bookingDate, 'dd-MM-yyyy')}</b></Td>
                                     <Td><b>{formatDateTime(booking.vetShiftDetail.date, 'dd/MM/yyyy')}</b></Td>
                                     <Td><b>{booking.vetShiftDetail.shift.from_time} - {booking.vetShiftDetail.shift.to_time}</b></Td>
                                     <Td><b>{formatPrice(booking.totalAmount)} VND</b></Td>
@@ -343,19 +346,19 @@ const Reservation = () => {
                                 Amount booking
                                 <Input readOnly value={selectedBooking?.totalAmount.toLocaleString('vi-VN') + " VND"} />
                                 Amount refunded
-                                <Input className="fw-bold" readOnly value={(selectedBooking?.totalAmount * refundPercentage).toLocaleString('vi-VN') + " VND"} />
+                                <Input className="fw-bold" readOnly value={(selectedBooking?.totalAmount * refundPercentage).toLocaleString('vi-VN') + " VND" + " (" + (refundPercentage * 100) + "%)"} />
                             </FormLabel>
                         </FormControl>
                     </ModalBody>
                     <ModalFooter className='pt-0'>
-                        <Button colorScheme="red" mr={3} onClick={() => onCloseRefundModal()}>
+                        <Button colorScheme="gray" mr={3} onClick={() => onCloseRefundModal()}>
                             Close
                         </Button>
-                        <Button colorScheme="green" onClick={() => {
+                        <Button colorScheme="red" onClick={() => {
                             handleRequestRefund(selectedBooking.id);
                             onCloseRefundModal();
                         }}>
-                            Refund
+                            Request Cancellation
                         </Button>
                     </ModalFooter>
                 </ModalContent>

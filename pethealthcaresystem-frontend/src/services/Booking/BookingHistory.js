@@ -509,10 +509,10 @@ const BookingHistory = () => {
                         </FormControl>
                     </ModalBody>
                     <ModalFooter className='pt-0'>
-                        <Button colorScheme="red" mr={3} onClick={() => onCloseRefundModal()}>
+                        <Button colorScheme="gray" mr={3} onClick={() => onCloseRefundModal()}>
                             Close
                         </Button>
-                        <Button colorScheme="green" onClick={() => {
+                        <Button colorScheme="red" onClick={() => {
                             handleRequestRefund(selectedBooking.id);
                             onCloseRefundModal();
                         }}>
