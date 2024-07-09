@@ -202,6 +202,7 @@ const Reservation = () => {
                     <Thead>
                         <Tr>
                             <Th>Booking ID</Th>
+                            <Th>Booking Date</Th>
                             <Th>Appointment Date</Th>
                             <Th>Slot</Th>
                             <Th>Amount</Th>
@@ -235,6 +236,7 @@ const Reservation = () => {
                             return (
                                 <Tr key={booking.id}>
                                     <Td><b>B{booking.id}</b></Td>
+                                    <Td><b>{formatDateTime(booking.bookingDate, 'dd/MM/yyyy')}</b></Td>
                                     <Td><b>{formatDateTime(booking.vetShiftDetail.date, 'dd/MM/yyyy')}</b></Td>
                                     <Td><b>{booking.vetShiftDetail.shift.from_time} - {booking.vetShiftDetail.shift.to_time}</b></Td>
                                     <Td><b>{formatPrice(booking.totalAmount)} VND</b></Td>
