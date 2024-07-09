@@ -102,7 +102,7 @@ public class BookingService implements IBookingService {
 
     @Override
     public Page<Booking> getBookings(Integer pageNo, Integer pageSize) {
-        Pageable pageable = PageRequest.of(pageNo - 1, pageSize, Sort.by("id").descending());
+        Pageable pageable = PageRequest.of(pageNo - 1, pageSize, Sort.by("bookingDate").descending());
         Page<Booking> bookings = bookingRepository.findAll(pageable);
         if (bookings.isEmpty()) {
             throw new RuntimeException("Booking not found");
@@ -209,7 +209,7 @@ public class BookingService implements IBookingService {
 
     @Override
     public Page<Booking> getBookingsByUserAndStatusIn(int userId, List<String> statuses, int pageNo, int pageSize) {
-        Pageable pageable = PageRequest.of(pageNo - 1, pageSize, Sort.by("id").descending());
+        Pageable pageable = PageRequest.of(pageNo - 1, pageSize, Sort.by("bookingDate").descending());
         return bookingRepository.findByUserUserIdAndStatusIn(userId, statuses, pageable);
     }
 

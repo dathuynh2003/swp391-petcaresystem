@@ -6,6 +6,7 @@ import com.swpproject.pethealthcaresystem.model.Booking;
 import com.swpproject.pethealthcaresystem.model.User;
 import com.swpproject.pethealthcaresystem.model.VetShiftDetail;
 import com.swpproject.pethealthcaresystem.repository.UserRepository;
+import com.swpproject.pethealthcaresystem.utils.SystemUtils;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +37,6 @@ public class UserService implements IUserService {
     public String createUser(User newUser) {
         User user = userRepository.findByPhoneNumber(newUser.getPhoneNumber());
         Date now = new Date();
-
         if (user == null) {
             user = new User();
         } else if (user.getEmail() != null && userRepository.existsByEmail(newUser.getEmail())) {
@@ -54,7 +54,7 @@ public class UserService implements IUserService {
         }
         user.setCreatedAt(now);
         user.setEmail(newUser.getEmail());
-        user.setPassword(newUser.getPassword());
+        user.setPassword(SystemUtils.passwordHash(newUser.getPassword()));
         user.setFullName(newUser.getFullName());
         user.setPhoneNumber(newUser.getPhoneNumber());
         user.setAddress(newUser.getAddress());
@@ -73,7 +73,7 @@ public class UserService implements IUserService {
     @Override
     public User validateLogin(User user) {
         User existUser = userRepository.findByEmail(user.getEmail());
-        if (existUser != null && existUser.getPassword().equals(user.getPassword())) {
+        if (existUser != null && existUser.getPassword().equals(SystemUtils.passwordHash(user.getPassword()))) {
             existUser.setPassword("");
             existUser.setVetShiftDetails(null);
             return existUser;
@@ -153,7 +153,7 @@ public class UserService implements IUserService {
         }
         user.setCreatedAt(now);
         user.setEmail(newUser.getEmail());
-        user.setPassword(newUser.getPassword());
+        user.setPassword(SystemUtils.passwordHash(newUser.getPassword()));
         user.setFullName(newUser.getFullName());
         user.setPhoneNumber(newUser.getPhoneNumber());
         user.setAddress(newUser.getAddress());
