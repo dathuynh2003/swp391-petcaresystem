@@ -6,15 +6,19 @@ import {
     FormControl,
     FormLabel,
     Input,
-    Image
+    Image,
+    RadioGroup,
+    Stack,
+    Radio
 } from '@chakra-ui/react';
 import { format, parseISO } from 'date-fns';
 import './Invoice.css'
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
-import { RepeatIcon, ViewIcon } from '@chakra-ui/icons';
+import { CheckCircleIcon, RepeatIcon, ViewIcon } from '@chakra-ui/icons';
 import { useNavigate } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
+import { CheckCircleOutline, RadioButtonUnchecked } from '@mui/icons-material';
 
 
 const Reservation = () => {
@@ -32,6 +36,7 @@ const Reservation = () => {
     const [pet, setPet] = useState(null)        //Lưu pet để hiển thị vào modal refund
     const [appointmentTime, setAppointmentTime] = useState('')  //Lưu để hiển thị vào modal refund
     const [refundPercentage, setRefundPercentage] = useState(null)
+    const [petAge, setPetAge] = useState(null)
 
     const pageSize = 5
     useEffect(() => {
@@ -167,6 +172,13 @@ const Reservation = () => {
     const handleClickRefund = async (booking, appointmentTime, refundPercentage) => {
         onOpenRefundModal()
         const pet = booking.pet
+        //Tính tuổi của pet để hiển thị
+        const today = new Date();
+        const dob = new Date(pet.dob);
+        // Tính số tháng chênh lệch giữa hai ngày
+        const diffMonths = (today.getFullYear() - dob.getFullYear()) * 12 + (today.getMonth() - dob.getMonth());
+        const age = diffMonths !== 0 ? diffMonths : 1;
+        setPetAge(age)
         setPet(pet)
         setOwner(pet.owner)
         setSelectedBooking(booking)
@@ -241,7 +253,7 @@ const Reservation = () => {
                                     <Td>
                                         {booking.status === "PAID" && <Badge colorScheme="green">{booking.status}</Badge>}
                                         {booking.status === "Request Refund" && <Badge colorScheme="yellow">{booking.status}</Badge>}
-                                        {booking.status === "Refunded" && <Badge colorScheme="green">{booking.status}</Badge>}
+                                        {booking.status === "Refunded" && <Badge colorScheme="red">{booking.status}</Badge>}
                                     </Td>
                                     <Td>
                                         {/* <Button size="sm" colorScheme="blue" onClick={() => viewDetail(booking.id)}>Detail</Button> */}
@@ -254,7 +266,7 @@ const Reservation = () => {
                                                 <span style={{ marginRight: '20px' }} className='icon-container'>
                                                     <RepeatIcon style={{ color: 'teal', cursor: 'pointer' }} boxSize={'5'}
                                                         onClick={() => handleClickRefund(booking, strAppointmentTime, refundPercentage)} />
-                                                    <span className="icon-text">Request Payment Refund</span>
+                                                    <span className="icon-text">Request Cancel Booking</span>
                                                 </span>
                                             }
                                         </FormControl>
@@ -284,7 +296,7 @@ const Reservation = () => {
                             <Image src="logoApp.svg" alt="Logo" className="logo" /> Pet Health Care
                         </Box>
                         <Text textAlign='center' mb={3} className='fs-3'>
-                            Request Cancellation And Refund
+                            Request Cancellation Booking
                         </Text>
                     </ModalHeader>
                     <ModalCloseButton />
@@ -312,39 +324,73 @@ const Reservation = () => {
                         <FormControl className='d-flex justify-content-between'>
                             <FormLabel>Pet's breed <Input readOnly value={pet?.breed} /></FormLabel>
                             <FormLabel>Pet's sex <Input readOnly value={pet?.gender} /></FormLabel>
-                            <FormLabel>Pet's age <Input readOnly value={pet?.age} /></FormLabel>
+                            <FormLabel>Pet's age <Input readOnly value={petAge + " month(s)"} /></FormLabel>
                         </FormControl>
                         <FormControl className='d-flex mt-3'>
                             <FormLabel className='w-100'>
                                 <Input readOnly value="Refund Infomation" className='text-center fw-bold' />
                             </FormLabel>
                         </FormControl>
-                        <FormControl className='d-flex'>
-                            <FormLabel className='w-50'>
-                                Booking Date
-                                <Input readOnly value={selectedBooking?.bookingDate ? formatDateTime(selectedBooking.bookingDate, 'dd/MM/yyyy hh:mm') : 'N/A'} />
-                            </FormLabel>
-                            <FormLabel className='w-50'>
-                                Appointment Date
-                                <Input readOnly value={appointmentTime} />
-                            </FormLabel>
+                        <FormControl className='d-flex justify-content-between'>
+                            <Table>
+                                <Thead>
+                                    <Tr>
+                                        <Th>Booking ID</Th>
+                                        <Th>Appointment Time</Th>
+                                        <Th>Cancel Time</Th>
+                                        <Th>Amount Paid</Th>
+                                    </Tr>
+                                </Thead>
+                                <Tbody>
+                                    <Tr>
+                                        <Td>B{selectedBooking?.id}</Td>
+                                        <Td>{appointmentTime}</Td>
+                                        <Td>{format(new Date(), 'dd/MM/yyyy hh:mm')}</Td>
+                                        <Td>{selectedBooking?.totalAmount.toLocaleString('vi-VN')} VND</Td>
+                                    </Tr>
+                                </Tbody>
+                            </Table>
                         </FormControl>
                         <FormControl className='d-flex justify-content-between'>
-                            <FormLabel className='mb-0 w-50'>
-                                <Text className='text-danger text-center mb-0 fw-bold'>Refund Policy</Text>
-                                <Text className='text-danger my-0'>
-                                    * Full refund (100%): If cancellation is made at least 7 days in advance<br />
-                                    * Partial refund (75%): If cancellation is made between 3 to 6 days in advance<br />
-                                    * No refund (0%): For all other cases <br />
-                                    *Refund via momo using the phone number in the user profile
-                                </Text>
-                            </FormLabel>
-                            <FormLabel className='w-50'>
-                                Amount booking
-                                <Input readOnly value={selectedBooking?.totalAmount.toLocaleString('vi-VN') + " VND"} />
-                                Amount refunded
+                            <Box className='w-50 fst-italic fw-medium'>
+                                {refundPercentage === 1 ?
+                                    <Box>
+                                        <CheckCircleOutline htmlColor='#50C8B4' />
+                                        100% refund (Cancel at least 7 days in advance)
+                                    </Box>
+                                    :
+                                    <Box>
+                                        <RadioButtonUnchecked />
+                                        100% refund (Cancel at least 7 days in advance)
+                                    </Box>
+                                }
+                                {refundPercentage === 0.75 ?
+                                    <Box>
+                                        <CheckCircleOutline htmlColor='#50C8B4' />
+                                        75% refund (Cancel 3 to 6 days in advance)
+                                    </Box>
+                                    :
+                                    <Box>
+                                        <RadioButtonUnchecked />
+                                        75% refund (Cancel 3 to 6 days in advance)
+                                    </Box>
+                                }
+                                {refundPercentage === 0 ?
+                                    <Box>
+                                        <CheckCircleOutline htmlColor='#50C8B4' />
+                                        0% refund (Cancel 2 days or less in advance)
+                                    </Box>
+                                    :
+                                    <Box>
+                                        <RadioButtonUnchecked />
+                                        0% refund (Cancel 2 days or less in advance)
+                                    </Box>
+                                }
+                            </Box>
+                            <Box className='w-50 fw-medium' fontSize={14}>
+                                Amount you will receive after canceling your booking:
                                 <Input className="fw-bold" readOnly value={(selectedBooking?.totalAmount * refundPercentage).toLocaleString('vi-VN') + " VND"} />
-                            </FormLabel>
+                            </Box>
                         </FormControl>
                     </ModalBody>
                     <ModalFooter className='pt-0'>
@@ -355,7 +401,7 @@ const Reservation = () => {
                             handleRequestRefund(selectedBooking.id);
                             onCloseRefundModal();
                         }}>
-                            Refund
+                            Send request
                         </Button>
                     </ModalFooter>
                 </ModalContent>
