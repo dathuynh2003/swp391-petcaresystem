@@ -23,6 +23,10 @@ import java.util.*;
 @Service
 public class UserService implements IUserService {
     private static final int CUSTOMER_ROLEID = 1;
+    public static final String DUPLICATE_EMAIL = "Email is already in use";
+    public static final String DUPLICATE_PHONE_NUMBER = "Phone number is already associated with a different email";
+     public static final String INVALID_EMAIL = "Email is invalid";
+     public static final String SUCCESSFUL_STATUS = "Verification email sent";
     private final Map<String, User> temporaryStorage = new HashMap<>();
 
     @Autowired
@@ -41,16 +45,15 @@ public class UserService implements IUserService {
             user = new User();
         } else if (user.getEmail() != null && userRepository.existsByEmail(newUser.getEmail())) {
             // Nếu tài khoản đã có email và email này đang được sử dụng
-            return "Email is already in use";
+            return DUPLICATE_EMAIL;
         } else if (user.getEmail() != null && !user.getEmail().equals(newUser.getEmail())) {
             // Nếu tài khoản đã có email nhưng không trùng với email mới
-            return "Phone number is already associated with a different email";
+            return DUPLICATE_PHONE_NUMBER;
         }
-
         //Validate email abc@zxc.zxc
         String regexPattern = "^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}$";
         if (!newUser.getEmail().matches(regexPattern)) {
-            return "Email is invalid";
+            return INVALID_EMAIL;
         }
         user.setCreatedAt(now);
         user.setEmail(newUser.getEmail());
@@ -67,7 +70,7 @@ public class UserService implements IUserService {
 
         temporaryStorage.put(user.getEmail(), user);
 
-        return "Verification email sent";
+        return SUCCESSFUL_STATUS;
     }
 
     @Override

@@ -21,6 +21,8 @@ import java.util.Map;
 //@CrossOrigin("http://localhost:3000")
 @CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
 public class UserController {
+    static final String SUBJECT = "Verify your email";
+    static final String BODY = "Your verification code: ";
     @Autowired
     private UserService userService;
     @Autowired
@@ -29,15 +31,29 @@ public class UserController {
     private VerifyCodeService verifyCodeService;
 
     @PostMapping("/register")
-    public String register(@RequestBody User newUser) {
-        String result = userService.createUser(newUser);
-        if (result.equals("Verification email sent")) {
-            String subject = "Verify your email";
-            String code = verifyCodeService.generateVerifyCode(newUser.getEmail());
-            String body = "Your verification code: " + code;
-            mailService.sendMail(newUser.getEmail(), subject, body);
+    public ResponseEntity<ResponseData> register(@RequestBody User newUser) {
+        ResponseData<String> responseData = new ResponseData<>();
+        try {
+            String result = userService.createUser(newUser);
+            System.out.println(result);
+            if (result == null) {
+                return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+            } else if (result.equals(UserService.SUCCESSFUL_STATUS)) {
+                String code = verifyCodeService.generateVerifyCode(newUser.getEmail());
+                mailService.sendMail(newUser.getEmail(), SUBJECT, BODY + code);
+                responseData.setData(result);
+                responseData.setStatusCode(201);
+                return new ResponseEntity<>(responseData, HttpStatus.CREATED);
+            }else{
+                responseData.setData(result);
+                responseData.setStatusCode(400);
+                return new ResponseEntity<>(responseData, HttpStatus.BAD_REQUEST);
+            }
+        } catch (Exception e) {
+            responseData.setErrorMessage(e.getMessage());
+            responseData.setStatusCode(401);
+            return new ResponseEntity<>(responseData, HttpStatus.UNAUTHORIZED);
         }
-        return result;
     }
 
     @PostMapping("/create-user-by-admin")
@@ -140,7 +156,7 @@ public class UserController {
         }
 
 
-}
+    }
 
     @PostMapping("/verify/{email}/{verifyCode}")
     public String verifyCode(@PathVariable String email, @PathVariable String verifyCode) {
@@ -183,18 +199,19 @@ public class UserController {
         }
         return userService.getUserByEmail(curUser);
     }
+
     @GetMapping("/me")
     public ResponseEntity<ResponseData> getMe(HttpSession session) {
         try {
             ResponseData<User> responseData = new ResponseData<>();
             User curUser = (User) session.getAttribute("user");
-            if(curUser == null){
+            if (curUser == null) {
                 throw new Exception("You need login first");
             }
             responseData.setData(curUser);
             responseData.setStatusCode(200);
             return new ResponseEntity<>(responseData, HttpStatus.OK);
-        }catch (Exception e){
+        } catch (Exception e) {
             ResponseData<User> responseData = new ResponseData<>();
             responseData.setStatusCode(500);
             responseData.setErrorMessage(e.getMessage());
@@ -259,6 +276,7 @@ public class UserController {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
     @GetMapping("find-user-with-email")
     public ResponseEntity<ResponseData> findUserWithEmail(@RequestParam String email) {
         try {
@@ -268,7 +286,7 @@ public class UserController {
             responseData.setStatusCode(200);
             return new ResponseEntity<>(responseData, HttpStatus.OK);
 
-        }catch (Exception e){
+        } catch (Exception e) {
             ResponseData<User> responseData = new ResponseData<>();
             responseData.setStatusCode(500);
             responseData.setErrorMessage(e.getMessage());
@@ -287,7 +305,7 @@ public class UserController {
             response.put("users", listUser);
             response.put("message", "Successfully");
 
-        }catch (Exception e){
+        } catch (Exception e) {
             response.put("message", e.getMessage());
         }
         return response;
