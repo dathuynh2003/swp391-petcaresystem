@@ -177,8 +177,8 @@ const Reservation = () => {
                 const bDateB = new Date(b.bookingDate);
                 return direction === 'asc' ? bDateA - bDateB : bDateB - bDateA;
             } else if (column === 'appointmentDate') {
-                const aDateA = new Date(a.appointmentDate);
-                const aDateB = new Date(b.appointmentDate);
+                const aDateA = new Date(a.vetShiftDetail.date);
+                const aDateB = new Date(b.vetShiftDetail.date);
                 return direction === 'asc' ? aDateA - aDateB : aDateB - aDateA;
             } else if (column === 'amount') {
                 const amountA = a.totalAmount;

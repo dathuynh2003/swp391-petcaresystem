@@ -272,6 +272,11 @@ export default function AssignVetSchedules() {
                             <CheckIcon style={{ color: "teal" }} />
                           </div>
                         )}
+                        {isAssigned && isPast && (
+                          <div style={{ position: 'relative', height: '100%' }}>
+                            <CheckIcon style={{ color: "teal" }} />
+                          </div>
+                        )}
                         {isPast && !isAssigned && (
                           <span className="text-muted">-</span>
                         )}

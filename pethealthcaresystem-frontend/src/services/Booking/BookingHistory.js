@@ -395,8 +395,8 @@ const BookingHistory = () => {
                         return (
                             <Tr key={booking.id}>
                                 <Td>B{booking.id}</Td>
-                                <Td>{formatDateTime(booking.vetShiftDetail.date, 'dd-MM-yyyy')}</Td>
-                                <Td>{formatDateTime(booking.bookingDate, 'dd-MM-yyyy')}</Td>
+                                <Td>{formatDateTime(booking.vetShiftDetail.date, 'dd-MM-yyyy')} {booking.vetShiftDetail.shift.from_time} - {booking.vetShiftDetail.shift.to_time}</Td>
+                                <Td>{formatDateTime(booking.bookingDate, 'dd-MM-yyyy HH:mm')}</Td>
                                 <Td>{formatPrice(booking.totalAmount)} VND</Td>
                                 <Td>
                                     <Badge colorScheme={
@@ -504,7 +504,7 @@ const BookingHistory = () => {
                                 Amount booking
                                 <Input readOnly value={selectedBooking?.totalAmount.toLocaleString('vi-VN') + " VND"} />
                                 Amount refunded
-                                <Input className="fw-bold" readOnly value={(selectedBooking?.totalAmount * refundPercentage).toLocaleString('vi-VN') + " VND"} />
+                                <Input className="fw-bold" readOnly value={(selectedBooking?.totalAmount * refundPercentage).toLocaleString('vi-VN') + " VND" + " (" + (refundPercentage * 100) + "%)"} />
                             </FormLabel>
                         </FormControl>
                     </ModalBody>
