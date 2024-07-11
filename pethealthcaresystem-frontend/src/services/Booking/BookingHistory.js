@@ -326,9 +326,10 @@ const BookingHistory = () => {
                         <FormLabel htmlFor="status" mt={2}>Status</FormLabel>
                         <FormControl width="150px" id='status'>
                             <Select placeholder="Status" value={status} onChange={(e) => setStatus(e.target.value)}>
-                                <option value="PENDING">Pending</option>
+                                <option value="REFUNDED">Refund</option>
                                 <option value="CANCELLED">Cancelled</option>
                                 <option value="PAID">Paid</option>
+                                <option value="Request Refund">Refund Requests</option>
                             </Select>
                         </FormControl>
                     </Flex>
