@@ -22,7 +22,7 @@ import java.util.*;
 
 @Service
 public class UserService implements IUserService {
-
+    private static final int CUSTOMER_ROLEID = 1;
     private final Map<String, User> temporaryStorage = new HashMap<>();
 
     @Autowired
@@ -73,7 +73,13 @@ public class UserService implements IUserService {
     @Override
     public User validateLogin(User user) {
         User existUser = userRepository.findByEmail(user.getEmail());
-        if (existUser != null && existUser.getPassword().equals(SystemUtils.passwordHash(user.getPassword()))) {
+        int userRoleId = existUser.getRoleId();
+        if (userRoleId == CUSTOMER_ROLEID
+                && existUser != null && existUser.getPassword().equals(SystemUtils.passwordHash(user.getPassword()))) {
+            existUser.setPassword("");
+            existUser.setVetShiftDetails(null);
+            return existUser;
+        }else if(existUser != null && existUser.getPassword().equals(user.getPassword())) {
             existUser.setPassword("");
             existUser.setVetShiftDetails(null);
             return existUser;
@@ -218,7 +224,7 @@ public class UserService implements IUserService {
         }
         user.setCreatedAt(now);
         user.setEmail(newUser.getEmail());
-        user.setPassword(newUser.getPassword());
+        user.setPassword(SystemUtils.passwordHash(newUser.getPassword()));
         user.setFullName(newUser.getFullName());
         user.setPhoneNumber(newUser.getPhoneNumber());
         user.setAddress(newUser.getAddress());

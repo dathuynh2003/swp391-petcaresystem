@@ -51,8 +51,6 @@ public class PetController {
     List<Pet> getAllPets(HttpSession session) {
         User curUser = (User) session.getAttribute("user");
         List<Pet> pets = petService.getAllPetsByUser(curUser.getUserId());
-//        System.out.println("-----------------------------------------------------------------------------------");
-//        System.out.println(pets.toString());
         return pets;
     }
     @GetMapping("/pets")

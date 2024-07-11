@@ -48,7 +48,6 @@ public class PaymentService implements IPaymentService {
         if (existingPayment != null) {
             // Update the status of the payment
             existingPayment.setStatus(payment.getStatus());
-
             // Get the associated booking
             Booking booking = existingPayment.getBooking();
             if (booking != null) {
@@ -68,7 +67,6 @@ public class PaymentService implements IPaymentService {
                 }
                 // Set the payment ID on the booking
                 booking.setPaymentId(existingPayment.getId());
-
                 // Save the updated booking
                 bookingRepository.save(booking);
             }

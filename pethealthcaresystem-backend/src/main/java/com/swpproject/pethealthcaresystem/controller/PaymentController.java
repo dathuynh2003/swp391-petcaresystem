@@ -29,7 +29,6 @@ public class PaymentController {
         try {
             User user = (User) session.getAttribute("user");
             if (user != null) {
-                System.out.println(payment);
                 CreatePaymentPosPayload payload = paymentService.createPaymentOs(payment);
                 ResponseData<PayOsDTO> data = new ResponseData();
                 final String uri = "https://api-merchant.payos.vn/v2/payment-requests";
@@ -64,7 +63,7 @@ public class PaymentController {
                 data.setData(updatedPayment);
                 return new ResponseEntity<>(data, HttpStatus.OK);
 //            }
-//            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+//           return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         } catch (Error e) {
             ResponseData<Payment> data = new ResponseData();
             data.setErrorMessage(e.getMessage());
