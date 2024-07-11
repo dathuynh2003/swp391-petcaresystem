@@ -15,7 +15,7 @@ import {
     useDisclosure,
     background
 } from '@chakra-ui/react'
-
+import { URL } from '../utils/constant';
 
 export default function Verify() {
 
@@ -31,7 +31,7 @@ export default function Verify() {
 
     const handleVerifyCode = async (e) => {
         e.preventDefault();
-        const result = await axios.post(`http://localhost:8080/verify/${email}/${verifyCode}`)
+        const result = await axios.post(`${URL}/verify/${email}/${verifyCode}`)
         setMessage("")
         if (result.data === 'Email verify successfully') {
             toast.success('Register successfully')

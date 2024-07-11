@@ -1,7 +1,7 @@
 import axios from "axios";
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-
+import { URL } from '../utils/constant';
 export default function CreateShift() {
     let navigate = useNavigate();
 
@@ -18,7 +18,7 @@ export default function CreateShift() {
     useEffect(() => {
         const fetchShifts = async () => {
             try {
-                const response = await axios.get("http://localhost:8080/shifts/all");
+                const response = await axios.get(`${URL}/shifts/all`);
                 setShifts(response.data);
             } catch (err) {
                 console.error("There was an error fetching the shifts:", err);
@@ -45,7 +45,7 @@ export default function CreateShift() {
         }
 
         try {
-          const response = await axios.post("http://localhost:8080/shifts/add", shift);
+          const response = await axios.post(`${URL}/shifts/add`, shift);
             setShifts([...shifts, response.data]);
             setShift({
                 from_time: "",
@@ -59,7 +59,7 @@ export default function CreateShift() {
 
     const deleteShift = async (shiftId) => {
       try {
-          await axios.delete(`http://localhost:8080/shifts/delete/${shiftId}`);
+          await axios.delete(`${URL}/shifts/delete/${shiftId}`);
           setShifts(shifts.filter((shift) => shift.shiftId !== shiftId));
       } catch (err) {
           console.error("There was an error deleting the shift:", err);

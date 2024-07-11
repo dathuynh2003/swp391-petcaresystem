@@ -3,7 +3,7 @@ import axios from 'axios'
 import React, { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { ToastContainer, toast } from 'react-toastify'
-
+import { URL } from '../utils/constant';
 export default function EditCage() {
     let navigate = useNavigate()
     const { cageId } = useParams()
@@ -18,7 +18,7 @@ export default function EditCage() {
     useEffect(() => {
         const loadCage = async () => {
             try {
-                const response = await axios.get(`http://localhost:8080/cage/${cageId}`, { withCredentials: true })
+                const response = await axios.get(`${URL}/cage/${cageId}`, { withCredentials: true })
                 if (response.data.message === "Cage found") {
                     setCage(response.data.cage)
                 } else {
@@ -51,7 +51,7 @@ export default function EditCage() {
             return
         }
         try {
-            const respone = await axios.put(`http://localhost:8080/updateCage/${cageId}`,
+            const respone = await axios.put(`${URL}/updateCage/${cageId}`,
                 {
                     name: cage.name,
                     price: cage.price,
@@ -77,7 +77,7 @@ export default function EditCage() {
     const fetchPetType = async () => {
         const configKey = "petType"
         try {
-            const respone = await axios.get(`http://localhost:8080/configurations/${configKey}`, { withCredentials: true })
+            const respone = await axios.get(`${URL}/configurations/${configKey}`, { withCredentials: true })
             if (respone.data.message === 'Successfully') {
                 setPetTypes(respone.data.configurations)
             }

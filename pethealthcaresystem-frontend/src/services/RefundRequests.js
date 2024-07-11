@@ -6,7 +6,7 @@ import { ToastContainer, toast } from 'react-toastify'
 import ReactPaginate from 'react-paginate'
 import { format } from 'date-fns'
 import { CancelPresentation, CheckBox } from '@mui/icons-material'
-
+import { URL } from '../utils/constant';
 export default function RefundRequests() {
     const navigate = useNavigate()
     const { isOpen: isOpenRefuseModal, onOpen: onOpenRefuseModal, onClose: onCloseRefuseModal } = useDisclosure()
@@ -25,7 +25,7 @@ export default function RefundRequests() {
     useEffect(() => {
         const fetchBookingsNeedRefund = async (page, status) => {
             try {
-                const response = await axios.get(`http://localhost:8080/get-bookings-by-status/${status}?page=${page}&size=${pageSize}`, { withCredentials: true })
+                const response = await axios.get(`${URL}/get-bookings-by-status/${status}?page=${page}&size=${pageSize}`, { withCredentials: true })
                 if (response.data.message === 'Successfully') {
                     console.log("bookings: ", response.data.bookings.content)
                     setTotalPages(response.data.bookings.totalPages)
@@ -41,7 +41,7 @@ export default function RefundRequests() {
     }, [currentPage])
     const acceptRefundRequest = async (booking) => {
         try {
-            const response = await axios.put(`http://localhost:8080/accept-refund/booking/${booking.id}`, {}, { withCredentials: true })
+            const response = await axios.put(`${URL}/accept-refund/booking/${booking.id}`, {}, { withCredentials: true })
             if (response.data.message === 'successfully') {
                 toast.success('Refund confirmation successed')
                 window.location.reload()
@@ -55,7 +55,7 @@ export default function RefundRequests() {
     }
     const refuseRefundRequest = async (booking) => {
         try {
-            const response = await axios.put(`http://localhost:8080/refuse-refund/booking/${booking.id}?reason=${reason}`, {}, { withCredentials: true })
+            const response = await axios.put(`${URL}/refuse-refund/booking/${booking.id}?reason=${reason}`, {}, { withCredentials: true })
             if (response.data.message === 'successfully') {
                 toast.success('Refused refund successed')
                 window.location.reload()

@@ -25,6 +25,7 @@ import {
   GridItem
 } from '@chakra-ui/react';
 import { parseISO, format } from 'date-fns';
+import { URL } from '../utils/constant';
 
 export default function PaymentResult() {
   function useQuery() {
@@ -42,7 +43,7 @@ export default function PaymentResult() {
 
   useEffect(() => {
     if (status && orderCode) {
-      axios.put('http://localhost:8080/payment-update', {
+      axios.put(`${URL}/payment-update`, {
         orderCode,
         status
       })

@@ -9,7 +9,7 @@ import './Booking.css'
 import ReactPaginate from 'react-paginate';
 import { SignalWifiStatusbarConnectedNoInternet4Outlined } from '@mui/icons-material';
 import { Box, Image, Table, Tbody, Td, Text, Th, Thead, Tr } from '@chakra-ui/react';
-
+import { URL } from '../utils/constant';
 
 export default function Booking() {
 
@@ -67,7 +67,7 @@ export default function Booking() {
       if (pageNo === 0 && data) {
         size = 4
       }
-      const response = await axios.get(`http://localhost:8080/services?pageNo=${pageNo}&pageSize=${size}`)
+      const response = await axios.get(`${URL}/services?pageNo=${pageNo}&pageSize=${size}`)
       let list = response.data.content
       if (data) {
         list = list.filter(service => service.id !== data.id)
@@ -93,7 +93,7 @@ export default function Booking() {
 
   const loadPets = async () => {
     try {
-      const response = await axios.get('http://localhost:8080/pet', { withCredentials: true });
+      const response = await axios.get(`${URL}/pet`, { withCredentials: true });
       setPets(response.data);
     } catch (error) {
       console.log(error)
@@ -102,7 +102,7 @@ export default function Booking() {
 
   const loadShift = async () => {
     try {
-      const response = await axios.get('http://localhost:8080/shifts/details', { withCredentials: true });
+      const response = await axios.get(`${URL}/shifts/details`, { withCredentials: true });
       setShifts(response.data);
     } catch (error) {
       console.log(error)
@@ -199,7 +199,7 @@ export default function Booking() {
     setActiveShiftIndex(null);
     setDisplaySelectedDate(date.toLocaleDateString("en-Gb", { month: 'numeric', day: 'numeric', year: 'numeric' }))
     setActiveDateIndex(index)
-    const response = await axios.get(`http://localhost:8080/shifts/shiftByDate/${date.toLocaleDateString('en-CA')}`);
+    const response = await axios.get(`${URL}/shifts/shiftByDate/${date.toLocaleDateString('en-CA')}`);
     const shifts = response.data;
     const updateVets = []
     shifts.forEach((shift) => {
@@ -252,14 +252,14 @@ export default function Booking() {
     console.log(selectedPet.petId);
     console.log(selectedVetShift);
     console.log(serviceIds);
-    const response = await axios.post(`http://localhost:8080/createBooking/pet/${selectedPet.petId}/vet-shift/${selectedVetShift}/services/${serviceIds}`, booking, { withCredentials: true })
+    const response = await axios.post(`${URL}/createBooking/pet/${selectedPet.petId}/vet-shift/${selectedVetShift}/services/${serviceIds}`, booking, { withCredentials: true })
     setCurrentBooking(response.data)
     console.log(response.data);
 
   }
   const updateBookingAfterPAID = async (booking) => {
     try {
-      const response = await axios.put(`http://localhost:8080/booking/paid`, booking);
+      const response = await axios.put(`${URL}/booking/paid`, booking);
       return response.data;
     } catch (error) {
       console.error("There was an error updating the booking to PAID!", error);
@@ -268,7 +268,7 @@ export default function Booking() {
   };
   const updateBookingAfterCANCELLED = async (booking) => {
     try {
-      const response = await axios.put(`http://localhost:8080/booking/cancelled`, booking);
+      const response = await axios.put(`${URL}/booking/cancelled`, booking);
       return response.data;
     } catch (error) {
       console.error("There was an error updating the booking to CANCELLED!", error);
@@ -336,7 +336,7 @@ export default function Booking() {
     console.log(payment)
 
     try {
-      const response = await axios.post('http://localhost:8080/api/payment/create', payment, { withCredentials: true });
+      const response = await axios.post(`${URL}/api/payment/create`, payment, { withCredentials: true });
       const { data } = response.data;
       //toast.success('Payment initiated successfully!');
       if (data && data.data && data.data.checkoutUrl) {
@@ -352,7 +352,7 @@ export default function Booking() {
   const [vetList, setVetList] = useState([]);
   const handleGetVets = async () => {
     try {
-      const respone = await axios.get('http://localhost:8080/vets', { withCredentials: true })
+      const respone = await axios.get(`${URL}/vets`, { withCredentials: true })
       if (respone.data.message === "Successfully") {
         setVetList(respone.data.vets);
       }

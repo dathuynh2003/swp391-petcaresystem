@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { Avatar, AvatarBadge } from '@chakra-ui/react';
-
+import { URL } from '../utils/constant';
 const Navbar = () => {
   const location = useLocation();
   const pageName = location.pathname.substring(1) || 'Home';
@@ -12,7 +12,7 @@ const Navbar = () => {
   useEffect(() => {
     const getUser = async () => {
       try {
-        const result = await axios.get('http://localhost:8080/getuser', { withCredentials: true });
+        const result = await axios.get(`${URL}/getuser`, { withCredentials: true });
         if (result.data) {
           setUser(result.data);
         }

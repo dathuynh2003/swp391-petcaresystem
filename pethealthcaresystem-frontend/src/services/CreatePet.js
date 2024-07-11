@@ -9,7 +9,7 @@ import {
   Select,
 } from '@chakra-ui/react';
 import RadioCard from '../components/Radio';
-import { LIST_BREED } from '../utils/constant';
+import { LIST_BREED, URL } from '../utils/constant';
 import axios from 'axios';
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer, toast } from 'react-toastify';
@@ -38,7 +38,7 @@ export default function CreatePet() {
         return;
       }
       console.log(request);
-      const response = await axios.post('http://localhost:8080/pet', request, { withCredentials: true });
+      const response = await axios.post(`${URL}/pet`, request, { withCredentials: true });
       console.log(response.data);
       toast.success('Add new pet successfully!', 2000);
 
@@ -75,7 +75,7 @@ export default function CreatePet() {
   const fetchPetType = async () => {
     const configKey = "petType"
     try {
-      const respone = await axios.get(`http://localhost:8080/configurations/${configKey}`, { withCredentials: true })
+      const respone = await axios.get(`${URL}/configurations/${configKey}`, { withCredentials: true })
       if (respone.data.message === 'Successfully') {
         setPetTypes(respone.data.configurations)
       }

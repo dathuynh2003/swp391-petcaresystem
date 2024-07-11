@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useContext, createContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-
+import { URL } from '../utils/constant';
 const AuthContext = createContext();
 
 const AuthProvider = ({ children }) => {
@@ -11,7 +11,7 @@ const AuthProvider = ({ children }) => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        axios.get(`http://localhost:8080/me`, { withCredentials: true }).then((result) => {
+        axios.get(`${URL}me`, { withCredentials: true }).then((result) => {
             setUser(result.data);
             setIsLoading(false);
         }).catch(() => {

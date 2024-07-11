@@ -4,7 +4,7 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import ReactPaginate from 'react-paginate';
 import { Link, useNavigate } from 'react-router-dom';
-
+import { URL } from '../utils/constant';
 const Cages = () => {
 
   const navigate = useNavigate()
@@ -18,7 +18,7 @@ const Cages = () => {
   // const [nameCage, setNameCage] = useState("")
 
   const loadCage = async (name, page) => {
-    const response = await axios.get(`http://localhost:8080/cage/search/${name}?page=${page}&size=${pageSize}`, { withCredentials: true })
+    const response = await axios.get(`${URL}/cage/search/${name}?page=${page}&size=${pageSize}`, { withCredentials: true })
     if (response.data.message === "Cage found") {
       setCages(response.data.cages.content)
       setTotalPages(response.data.cages.totalPages)

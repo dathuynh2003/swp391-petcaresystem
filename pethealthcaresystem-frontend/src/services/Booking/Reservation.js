@@ -15,7 +15,7 @@ import html2canvas from 'html2canvas';
 import { RepeatIcon, ViewIcon } from '@chakra-ui/icons';
 import { useNavigate } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
-
+import { URL } from '../utils/constant';
 
 const Reservation = () => {
     const navigate = useNavigate();
@@ -41,7 +41,7 @@ const Reservation = () => {
     const fetchBookings = async () => {
         setLoading(false)
         try {
-            const response = await axios.get('http://localhost:8080/reservations', {
+            const response = await axios.get(`${URL}/reservations`, {
                 params: {
                     pageNo: currentPage,
                     pageSize: pageSize
@@ -175,7 +175,7 @@ const Reservation = () => {
     }
     const handleRequestRefund = async (bookingId) => {
         try {
-            const response = await axios.put(`http://localhost:8080/refund/booking/${bookingId}`, {}, { withCredentials: true })
+            const response = await axios.put(`${URL}/refund/booking/${bookingId}`, {}, { withCredentials: true })
             if (response.data.message === 'successfully') {
                 // toast.success('Send request refund successfully')
                 toast({

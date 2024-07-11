@@ -1,7 +1,7 @@
 import React, { Fragment, useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from "react-router-dom";
-
+import { URL } from '../utils/constant';
 export const Authentication = ({ children }) => {
     const isLoggedIn = localStorage.getItem('isLoggedIn');
     const [isLoading, setIsLoading] = useState(true);
@@ -9,7 +9,7 @@ export const Authentication = ({ children }) => {
     const navigate = useNavigate();
     const getUser = async () => {
         try {
-            const result = await axios.get(`http://localhost:8080/me`, { withCredentials: true });
+            const result = await axios.get(`${URL}/me`, { withCredentials: true });
             setUser(result.data);
             setIsLoading(true);
         } catch (error) {

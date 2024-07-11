@@ -13,7 +13,7 @@ import UserChart from './UserChart';
 import { PureComponent } from 'react';
 import { curveCardinal } from 'd3-shape';
 import './Dashboard.css'
-
+import { URL } from '../utils/constant';
 
 
 export default function Dashboard() {
@@ -62,7 +62,7 @@ export default function Dashboard() {
     console.log("end date đây: ");
     console.log(formatDate(formatDate(endDate)));
     try {
-      const response = await axios.get('http://localhost:8080/api/summary-data', {
+      const response = await axios.get(`${URL}/api/summary-data`, {
         params: { startDate: formatDate(startDate), endDate: formatDate(endDate) },
       });
       setSummaryData(response.data);

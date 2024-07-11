@@ -7,7 +7,7 @@ import { Button, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalF
 import { DeleteIcon, EditIcon } from '@chakra-ui/icons'
 import { FormLabel } from 'react-bootstrap'
 import { ToastContainer, toast } from 'react-toastify'
-
+import { URL } from '../utils/constant';
 
 
 export default function Services() {
@@ -35,7 +35,7 @@ export default function Services() {
   const [services, setServices] = useState([])
 
   const loadServices = async () => {
-    const response = await axios.get(`http://localhost:8080/services?pageNo=${page}&pageSize=${pageSize}`)
+    const response = await axios.get(`${URL}/services?pageNo=${page}&pageSize=${pageSize}`)
     setServices(response.data.content)
     setTotalPages(response.data.totalPages);
   }
@@ -96,7 +96,7 @@ export default function Services() {
     formData.append("file", img)
     formData.append("serviceJson", JSON.stringify(service))
     try {
-      const response = await axios.post(`http://localhost:8080/create-service`, formData, {
+      const response = await axios.post(`${URL}/create-service`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
@@ -121,7 +121,7 @@ export default function Services() {
       formData.append("file", img);
     }
     try {
-      const response = await axios.put(`http://localhost:8080/edit-service/${id}`, formData, {
+      const response = await axios.put(`${URL}/edit-service/${id}`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }, withCredentials: true
@@ -140,7 +140,7 @@ export default function Services() {
 
   const handleDeleteService = async (id) => {
     try {
-      const response = await axios.put(`http://localhost:8080/delete-service/${id}`, {}, { withCredentials: true })
+      const response = await axios.put(`${URL}/delete-service/${id}`, {}, { withCredentials: true })
       if (response.data.message === 'successfully') {
         toast.success('Service delete successfully')
         loadServices()

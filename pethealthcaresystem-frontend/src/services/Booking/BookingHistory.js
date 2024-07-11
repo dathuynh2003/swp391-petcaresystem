@@ -40,7 +40,7 @@ import { RepeatIcon, SearchIcon, ViewIcon } from '@chakra-ui/icons';
 import { South } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
-
+import { URL } from '../utils/constant';
 const BookingHistory = () => {
     const navigate = useNavigate()
     const [originalBookings, setOriginalBookings] = useState([]);
@@ -98,7 +98,7 @@ const BookingHistory = () => {
         setLoading(true);
         const pageNo = page ?? currentPage; // Default to currentPage if no page is provided
         try {
-            const response = await axios.get(`http://localhost:8080/all-bookings?pageNo=${pageNo}&pageSize=${pageSize}`, { withCredentials: true });
+            const response = await axios.get(`${URL}/all-bookings?pageNo=${pageNo}&pageSize=${pageSize}`, { withCredentials: true });
             const { content, totalPages } = response.data.data;
             setOriginalBookings(content);
             setBookings(content);
@@ -121,7 +121,7 @@ const BookingHistory = () => {
         const pageNo = page ?? currentPage
 
         try {
-            let url = `http://localhost:8080/staff-booking-date-status?` + `pageNo=${pageNo}&pageSize=${pageSize}`;
+            let url = `${URL}/staff-booking-date-status?` + `pageNo=${pageNo}&pageSize=${pageSize}`;
 
             if (status) {
                 console.log(status)
@@ -157,7 +157,7 @@ const BookingHistory = () => {
         const pageNo = page ?? currentPage;
 
         try {
-            const response = await axios.get(`http://localhost:8080/bookings-staff?pageNo=${currentPage}&pageSize=${pageSize}&phoneNumber=${phoneNumber}`, { withCredentials: true });
+            const response = await axios.get(`${URL}/bookings-staff?pageNo=${currentPage}&pageSize=${pageSize}&phoneNumber=${phoneNumber}`, { withCredentials: true });
             const { content, totalPages } = response.data.data;
             setBookings(content);
             setTotalPages(totalPages);
@@ -188,7 +188,7 @@ const BookingHistory = () => {
         try {
             const booking = bookings.find(booking => booking.id === bookingId);
             setSelectedBooking(booking);
-            const response = await axios.get(`http://localhost:8080/get-booking/${bookingId}/details`, { withCredentials: true });
+            const response = await axios.get(`${URL}/get-booking/${bookingId}/details`, { withCredentials: true });
             setBookingDetails(response.data.data);
             onOpen();
         } catch (error) {
@@ -266,7 +266,7 @@ const BookingHistory = () => {
 
     const handleRequestRefund = async (bookingId) => {
         try {
-            const response = await axios.put(`http://localhost:8080/refund-booking-by-staff/${bookingId}`, {}, { withCredentials: true })
+            const response = await axios.put(`${URL}/refund-booking-by-staff/${bookingId}`, {}, { withCredentials: true })
             if (response.data.message === 'successfully') {
                 toast.success('Send request refund successfully')
             } else {
