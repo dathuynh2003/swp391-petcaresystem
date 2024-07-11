@@ -12,6 +12,9 @@ import { EditIcon } from '@chakra-ui/icons';
 const Profile = () => {
   const navigate = useNavigate();
 
+  const [messagePhone, setMessagePhone] = useState("")
+  const [messageDob, setMessageDob] = useState("")
+
   const [isEditing, setIsEditing] = useState({
     fullName: false,
     phoneNumber: false,
@@ -31,18 +34,29 @@ const Profile = () => {
     dob: '',
   });
 
-  const { fullName, phoneNumber, address, avatar, gender, dob } = isEditing;
+  // const { fullName, phoneNumber, address, avatar, gender, dob } = isEditing;
 
   const onInputChange = (field, event) => {
+    console.log(event.target.value)
     setProfile({ ...profile, [field]: event.target.value });
   };
 
   const handleUpdateProfile = async (e, field) => {
+    if (field === 'phoneNumber' && !isVietnamesePhoneNumberValid(profile.phoneNumber)) {
+      setMessagePhone("Phone Number is invalid")
+      return;
+    }
+    if (field === 'dob' && calculateAge(profile.dob.split('T')[0]) < 13) {
+      setMessageDob("You need to be at least 13 years old")
+      return;
+    }
     const response = await axios.put(`http://localhost:8080/updateuser`, profile, { withCredentials: true });
-    if (response.data !== '') {
-      toast.success('Update profile success');
+    if (response.data.message === 'Successfully') {
+      toast.success('Update profile successfully');
       setIsEditing({ ...isEditing, [field]: false });
       navigate('/profile');
+    } else {
+      toast.info(response.data.message)
     }
   };
 
@@ -93,15 +107,39 @@ const Profile = () => {
     }
   }, []);
 
-  const formatDate = (dateString) => {
+  const formatDate = (dateString, formatter) => {
     const date = new Date(dateString);
-    const day = date.getDate();
-    const month = date.getMonth() + 1;
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
     const year = date.getFullYear();
-    return `${day}/${month}/${year}`;
+    return formatter
+      .replace('dd', day)
+      .replace('MM', month)
+      .replace('yyyy', year);
   };
 
-  const dateOfBirth = formatDate(profile.dob);
+  const dateOfBirth = formatDate(profile.dob, 'dd/MM/yyyy');
+
+  // Các loại số điện thoại hợp lệ:
+  // Các đầu số 03, 05, 07, 08, 09 (ví dụ: 0981234567)
+  // Số có thể bắt đầu với +84 hoặc 84 (ví dụ +84981234567, 84981234567)
+  function isVietnamesePhoneNumberValid(number) {
+    return /(((\+|)84)|0)(3|5|7|8|9)+([0-9]{8})\b/.test(number);
+  }
+
+  const calculateAge = (dob) => {
+    const [year, month, day] = dob.split('-').map(Number);
+    const birthDate = new Date(year, month - 1, day);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    console.log(year, month, day)
+    const monthDifference = today.getMonth() - birthDate.getMonth();
+
+    if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    return age;
+  };
 
   return (
     <div className='container'>
@@ -142,7 +180,8 @@ const Profile = () => {
                   <div>
                     <span className='fw-bold text-secondary' style={{ fontSize: '10px' }}>Full Name</span>
                     <div className='row border border-top-0 border-end-0 border-start-0 align-middle'>
-                      <input className='col-8 mb-0 mt-2 fw-bold fs-6' name='fullName' value={profile.fullName} onChange={(e) => onInputChange('fullName', e)} />
+                      <input className='col-8 mb-0 mt-2 fw-bold fs-6' name='fullName' value={profile.fullName} maxLength={25}
+                        onChange={(e) => onInputChange('fullName', e)} />
                       <Button className='btn btn-outline-light h-50 w-25 col-4 my-1 fw-bold' onClick={(e) => handleUpdateProfile(e, 'fullName')}>Save</Button>
                     </div>
                   </div>
@@ -165,6 +204,7 @@ const Profile = () => {
                       <input className='col-8 mb-0 mt-2 fw-bold fs-6' name='phoneNumber' value={profile.phoneNumber} onChange={(e) => onInputChange('phoneNumber', e)} />
                       <Button className='btn btn-outline-light h-50 w-25 col-4 my-1 fw-bold' onClick={(e) => handleUpdateProfile(e, 'phoneNumber')}>Save</Button>
                     </div>
+                    <h6 style={{ color: 'red', textAlign: 'center' }}>{messagePhone}</h6>
                   </div>
                 ) : (
                   <div>
@@ -182,7 +222,8 @@ const Profile = () => {
                   <div>
                     <span className='fw-bold text-secondary' style={{ fontSize: '10px' }}>Address</span>
                     <div className='row border border-top-0 border-end-0 border-start-0 align-middle'>
-                      <input className='col-8 mb-0 mt-2 fw-bold fs-6' name='address' value={profile.address} onChange={(e) => onInputChange('address', e)} />
+                      <input className='col-8 mb-0 mt-2 fw-bold fs-6' name='address' value={profile.address}
+                        maxLength={50} onChange={(e) => onInputChange('address', e)} />
                       <Button className='btn btn-outline-light h-50 w-25 col-4 my-1 fw-bold' onClick={(e) => handleUpdateProfile(e, 'address')}>Save</Button>
                     </div>
                   </div>
@@ -202,9 +243,13 @@ const Profile = () => {
                   <div>
                     <span className='fw-bold text-secondary' style={{ fontSize: '10px' }}>Date of birth</span>
                     <div className='row border border-top-0 border-end-0 border-start-0 align-middle'>
-                      <input type='date' className='col-8 mb-0 mt-2 fw-bold fs-6' name='dob' value={profile.dob} onChange={(e) => onInputChange('dob', e)} />
+                      <input type='date' className='col-8 mb-0 mt-2 fw-bold fs-6' name='dob' value={formatDate(profile.dob, 'yyyy-MM-dd')}
+                        // Đúng định dạng YYYY-MM-DD mới set vào max được
+                        max={new Date().toISOString().split('T')[0]}
+                        onChange={(e) => onInputChange('dob', e)} required />
                       <Button className='btn btn-outline-light h-50 w-25 col-4 my-1 fw-bold' onClick={(e) => handleUpdateProfile(e, 'dob')}>Save</Button>
                     </div>
+                    <h6 style={{ color: 'red', textAlign: 'center' }}>{messageDob}</h6>
                   </div>
                 ) : (
                   <div>

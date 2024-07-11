@@ -140,7 +140,7 @@ public class UserController {
         }
 
 
-}
+    }
 
     @PostMapping("/verify/{email}/{verifyCode}")
     public String verifyCode(@PathVariable String email, @PathVariable String verifyCode) {
@@ -183,18 +183,19 @@ public class UserController {
         }
         return userService.getUserByEmail(curUser);
     }
+
     @GetMapping("/me")
     public ResponseEntity<ResponseData> getMe(HttpSession session) {
         try {
             ResponseData<User> responseData = new ResponseData<>();
             User curUser = (User) session.getAttribute("user");
-            if(curUser == null){
+            if (curUser == null) {
                 throw new Exception("You need login first");
             }
             responseData.setData(curUser);
             responseData.setStatusCode(200);
             return new ResponseEntity<>(responseData, HttpStatus.OK);
-        }catch (Exception e){
+        } catch (Exception e) {
             ResponseData<User> responseData = new ResponseData<>();
             responseData.setStatusCode(500);
             responseData.setErrorMessage(e.getMessage());
@@ -236,13 +237,21 @@ public class UserController {
     }
 
     @PutMapping("/updateuser")
-    public User updateUser(@RequestBody User newUserProfile, HttpSession session) throws Exception {
-        User curUser = (User) session.getAttribute("user");
-        if (curUser != null) {
-            session.setAttribute("user", curUser);
-            return userService.updateUser(curUser.getEmail(), newUserProfile);
+    public Map<String, Object> updateUser(@RequestBody User newUserProfile, HttpSession session) throws Exception {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            User curUser = (User) session.getAttribute("user");
+            if (curUser != null) {
+                session.setAttribute("user", curUser);
+                response.put("user", userService.updateUser(curUser.getEmail(), newUserProfile));
+                response.put("message", "Successfully");
+            } else {
+                throw new Exception("You need login first");
+            }
+        } catch (Exception e) {
+            response.put("message", e.getMessage());
         }
-        throw new Exception("You need login first");
+        return response;
     }
 
     @PostMapping("/upload-avatar")
@@ -259,6 +268,7 @@ public class UserController {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
     @GetMapping("find-user-with-email")
     public ResponseEntity<ResponseData> findUserWithEmail(@RequestParam String email) {
         try {
@@ -268,7 +278,7 @@ public class UserController {
             responseData.setStatusCode(200);
             return new ResponseEntity<>(responseData, HttpStatus.OK);
 
-        }catch (Exception e){
+        } catch (Exception e) {
             ResponseData<User> responseData = new ResponseData<>();
             responseData.setStatusCode(500);
             responseData.setErrorMessage(e.getMessage());
@@ -287,7 +297,7 @@ public class UserController {
             response.put("users", listUser);
             response.put("message", "Successfully");
 
-        }catch (Exception e){
+        } catch (Exception e) {
             response.put("message", e.getMessage());
         }
         return response;

@@ -1,9 +1,8 @@
 import { Button } from '@chakra-ui/react'
 import axios from 'axios'
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import './Register.css'
-import { delay } from 'framer-motion'
 export default function Register() {
     let navigate = useNavigate()
 
@@ -37,6 +36,8 @@ export default function Register() {
         setMessagePhone("")
         if (calculateAge(user.dob) < 13) {
             setMessageDob("You need to be at least 13 years old to register")
+        } else if (!isVietnamesePhoneNumberValid(user.phoneNumber)) {
+            setMessagePhone("Phone number is invalid")
         } else if (password === confirm_pass) {
             setMessagePass("")
             try {
@@ -74,6 +75,12 @@ export default function Register() {
         }
         return age;
     };
+    // Các loại số điện thoại hợp lệ:
+    // Các đầu số 03, 05, 07, 08, 09 (ví dụ: 0981234567)
+    // Số có thể bắt đầu với +84 hoặc 84 (ví dụ +84981234567, 84981234567)
+    function isVietnamesePhoneNumberValid(number) {
+        return /(((\+|)84)|0)(3|5|7|8|9)+([0-9]{8})\b/.test(number);
+    }
 
     return (
         <div className='App d-flex align-items-center' style={{ overflowY: 'hidden', backgroundImage: "url('SignUpBg.png')", backgroundSize: 'cover', paddingTop: '0px' }}>
@@ -84,7 +91,8 @@ export default function Register() {
                     </div>
                     <div className='body'>
                         <div className="form-floating mb-2 ">
-                            <input type="text" className="form-control inputSignUp" name='fullName' placeholder="name@example.com" value={fullName} onChange={(e) => onInputChange(e)} required />
+                            <input type="text" className="form-control inputSignUp" name='fullName' placeholder="name@example.com"
+                                maxLength={25} value={fullName} onChange={(e) => onInputChange(e)} required />
                             <label htmlFor="floatingInput" id='label-input'>Full name</label>
                         </div>
                         <div className="form-floating mb-2 ">
@@ -114,7 +122,8 @@ export default function Register() {
                         </div>
                         <h6 style={{ color: 'red', textAlign: 'center' }}>{messagePhone}</h6>
                         <div className="form-floating mb-2 ">
-                            <input type="text" className="form-control inputSignUp" placeholder="name@example.com" name='address' value={address} onChange={(e) => onInputChange(e)} />
+                            <input type="text" className="form-control inputSignUp" placeholder="name@example.com" name='address' value={address}
+                                maxLength={50} onChange={(e) => onInputChange(e)} />
                             <label htmlFor="floatingInput" id='label-input'>Address</label>
                         </div>
                         <div className="form-floating mb-2 ">

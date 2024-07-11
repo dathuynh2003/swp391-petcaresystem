@@ -79,7 +79,7 @@ public class UserService implements IUserService {
             existUser.setPassword("");
             existUser.setVetShiftDetails(null);
             return existUser;
-        }else if(existUser != null && existUser.getPassword().equals(user.getPassword())) {
+        } else if (existUser != null && existUser.getPassword().equals(user.getPassword())) {
             existUser.setPassword("");
             existUser.setVetShiftDetails(null);
             return existUser;
@@ -126,16 +126,21 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public User updateUser(String email, User newUser) {
-        User existUser = userRepository.findByEmail(email);
-        if (existUser != null && newUser != null) {
-            existUser.setFullName(newUser.getFullName());
-//            existUser.setEmail(newUser.getEmail());
-            existUser.setPhoneNumber(newUser.getPhoneNumber());
-            existUser.setAddress(newUser.getAddress());
-            existUser.setGender(newUser.getGender());
-            existUser.setDob(newUser.getDob());
-            return userRepository.save(existUser);
+    public User updateUser(String email, User newUser) throws Exception {
+        User curUser = userRepository.findByEmail(email);
+        if (curUser != null && newUser != null) {
+            //Kiểm tra sdt này đã tồn tại ở user khác chưa. Nếu có thì throw exception
+            User existingUserByPhone = userRepository.findByPhoneNumber(newUser.getPhoneNumber());
+            if (existingUserByPhone != null && !existingUserByPhone.equals(curUser)) {
+                throw new Exception("Phone Number is already exist");
+            }
+            //Sđt chưa tồn tại ở user khác thì update lại và save xuống
+            curUser.setFullName(newUser.getFullName());
+            curUser.setPhoneNumber(newUser.getPhoneNumber());
+            curUser.setAddress(newUser.getAddress());
+            curUser.setGender(newUser.getGender());
+            curUser.setDob(newUser.getDob());
+            return userRepository.save(curUser);
         }
         throw new EntityNotFoundException("User not found");
     }
@@ -303,8 +308,9 @@ public class UserService implements IUserService {
         Pageable pageable = PageRequest.of(pageNo, pageSize);
         return userRepository.findAll(pageable);
     }
+
     @Override
-    public List<User> getAll(){
+    public List<User> getAll() {
         return userRepository.findByRoleId(1);
     }
 }
