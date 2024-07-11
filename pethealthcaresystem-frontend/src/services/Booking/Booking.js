@@ -653,6 +653,7 @@ export default function Booking() {
                                           width: '12%',
                                           color: activeShiftIndex === workSchedule?.vs_id ? 'white' : '',
                                           background: activeShiftIndex === workSchedule?.vs_id ? 'rgb(80, 200, 180)' : '',
+                                          border: '1px solid #ccc',
                                           opacity: isPastShift || workSchedule?.status !== "Available" ? 0.5 : 1
                                         }}
                                         disabled={isPastShift || workSchedule?.status !== "Available"}
@@ -737,6 +738,7 @@ export default function Booking() {
                                             width: '12%',
                                             color: activeShiftIndex === detail?.vs_id ? 'white' : '',
                                             background: activeShiftIndex === detail?.vs_id ? 'rgb(80, 200, 180)' : '',
+                                            border: '1px solid #ccc',
                                             opacity: isPastShift || detail?.status !== "Available" ? 0.5 : 1
                                           }}
                                           disabled={isPastShift || detail?.status !== "Available"}

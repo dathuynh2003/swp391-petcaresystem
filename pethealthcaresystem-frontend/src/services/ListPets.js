@@ -77,11 +77,11 @@ export default function ListPets() {
                   </td>
                   <td className="col-1 p-2">{pet.name}</td>
                   <td className="col-1 p-2">{pet.petType}</td>
-                  <td className="col-1 p-2">{pet.breed}</td>
+                  <td className="col-1 p-2">{pet.breed ? pet.breed : 'N/A'}</td>
                   <td className="col-1 p-2">{pet.gender}</td>
                   <td className="col-1 py-2">{age} month(s)</td>
                   <td className="col-1 py-2 px-4">{pet.isNeutered ? 'Yes' : 'No'}</td>
-                  <td className="col-2 p-2">{pet.description}</td>
+                  <td className="col-2 p-2">{pet.description ? pet.description : 'N/A'}</td>
                   <td className='col-2 text-center p-2'>
                     <Link to={`/viewPet/${pet.petId}`}>
                       <span style={{ marginRight: '20px' }} className='icon-container'>
