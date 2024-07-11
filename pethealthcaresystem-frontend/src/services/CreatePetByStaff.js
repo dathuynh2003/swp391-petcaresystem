@@ -75,6 +75,22 @@ export default function CreatePetByStaff() {
 
     const handlePetInputChange = (e) => {
         const { name, value } = e.target;
+
+        // Validation for customer's name
+        if (name === 'fullName' && value.length > 25) {
+            toast.info("Customer name must be a maximum of 25 characters.");
+            return;
+        }
+
+        if (name === 'phoneNumber') {
+            const phoneRegex = /^(03|05|07|08|09)\d{8}$/;
+            if (value.length === 10 && !phoneRegex.test(value)) {
+                toast.info("Please enter a valid Vietnamese phone number.");
+                return;
+            }
+        }
+
+
         setPet((prev) => ({
             ...prev,
             [name]: value,
@@ -141,12 +157,20 @@ export default function CreatePetByStaff() {
 
                     <div className="form-floating mb-3">
                         <input
-                            value={pet.name}
-                            onChange={handlePetInputChange}
+                            value={pet?.name}
+                            onChange={(e) => {
+                                const inputName = e.target.value;
+
+                                if (inputName.length > 25) {
+                                    toast.info("Maximum 25 characters");
+                                    return; // Ngăn người dùng tiếp tục
+                                }
+
+                                setPet((prev) => ({ ...prev, name: e.target.value }));
+                            }}
                             type="text"
                             className="form-control"
                             id="name"
-                            name="name"
                             placeholder="Enter Pet's name"
                             required
                         />
@@ -254,12 +278,20 @@ export default function CreatePetByStaff() {
 
                     <div className="form-floating mb-3">
                         <input
-                            value={pet.description}
-                            onChange={handlePetInputChange}
+                            value={pet?.description}
+                            onChange={(e) => {
+                                const inputDescription = e.target.value
+
+                                if (inputDescription > 255) {
+                                    toast.info("Maximum 255 characters.");
+                                    return;
+                                }
+
+                                setPet((prev) => ({ ...prev, description: e.target.value }));
+                            }}
                             type="text"
                             className="form-control"
                             id="description"
-                            name="description"
                             placeholder="Enter Pet's description"
                         />
                         <label htmlFor="description">Enter Pet's description</label>
