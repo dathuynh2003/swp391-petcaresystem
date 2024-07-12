@@ -13,7 +13,7 @@ export default function Register() {
         phoneNumber: "",
         address: "",
         avatar: "",
-        gender: "",
+        gender: "Male",
         dob: "",
 
     })
