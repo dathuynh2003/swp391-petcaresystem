@@ -64,17 +64,19 @@ export default function Register() {
             setMessageConfirmPass("")
             try {
                 const result = await axios.post(`http://localhost:8080/register`, user)
-                console.log(result.data)
-                if (result.data === 'Verification email sent') {
+                const responseData = result.data
+
+                console.log(responseData)
+                if (responseData.data === 'Verification email sent') {
                     //register success
                     // navigate(`/verify/${user.email}`)
                     navigate(`/verify`, { state: { email } })
                     // setMessage("Register success")
-                } else if (result.data === 'Email is invalid') {
+                } else if (responseData.data === 'Email is invalid') {
                     setMessageEmail("Email is invalid")
-                } else if (result.data === 'Email is already in use')
+                } else if (responseData.data === 'Email is already in use')
                     setMessageEmail("Email is already in use")
-                else if (result.data === 'Phone number is already associated with a different email')
+                else if (responseData.data === 'Phone number is already associated with a different email')
                     setMessagePhone("Phone number is already in use")
             } catch (e) {
                 console.log(e)

@@ -21,6 +21,11 @@ import java.util.Map;
 //@CrossOrigin("http://localhost:3000")
 @CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
 public class UserController {
+    static final String SUBJECT = "Verify your email";
+    static final String BODY = "Your verification code: ";
+    static final String EMAIL_VERIFIED = "Email verify successfully";
+    static final String EMAIL_VERIFIED_FAILED = "Email verify failed";
+
     @Autowired
     private UserService userService;
     @Autowired
@@ -29,15 +34,29 @@ public class UserController {
     private VerifyCodeService verifyCodeService;
 
     @PostMapping("/register")
-    public String register(@RequestBody User newUser) {
-        String result = userService.createUser(newUser);
-        if (result.equals("Verification email sent")) {
-            String subject = "Verify your email";
-            String code = verifyCodeService.generateVerifyCode(newUser.getEmail());
-            String body = "Your verification code: " + code;
-            mailService.sendMail(newUser.getEmail(), subject, body);
+    public ResponseEntity<ResponseData> register(@RequestBody User newUser) {
+        ResponseData<String> responseData = new ResponseData<>();
+        try {
+            String result = userService.createUser(newUser);
+            if (result.equals(UserService.SUCCESSFUL_STATUS)) {
+                String code = verifyCodeService.generateVerifyCode(newUser.getEmail());
+                mailService.sendMail(newUser.getEmail(), SUBJECT, BODY + code);
+                responseData.setData(result);
+                responseData.setStatusCode(200);
+                return new ResponseEntity<>(responseData, HttpStatus.OK);
+            } else if(result.equals(UserService.DUPLICATE_EMAIL)
+                    || result.equals(UserService.INVALID_EMAIL)
+                    || result.equals(UserService.DUPLICATE_PHONE_NUMBER)) {
+                responseData.setData(result);
+                responseData.setStatusCode(200);
+                return new ResponseEntity<>(responseData, HttpStatus.OK);
+            }
+            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+        } catch (Exception e) {
+            responseData.setErrorMessage(e.getMessage());
+            responseData.setStatusCode(500);
+            return new ResponseEntity<>(responseData, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return result;
     }
 
     @PostMapping("/create-user-by-admin")
@@ -145,9 +164,9 @@ public class UserController {
     @PostMapping("/verify/{email}/{verifyCode}")
     public String verifyCode(@PathVariable String email, @PathVariable String verifyCode) {
         if (userService.verifyUser(email, verifyCode)) {
-            return "Email verify successfully";
+            return EMAIL_VERIFIED;
         }
-        return "Email verify failed";
+        return EMAIL_VERIFIED_FAILED;
     }
 
     @PostMapping("/login")
@@ -165,9 +184,21 @@ public class UserController {
     }
 
     @PostMapping("/logout")
-    public String logout(HttpSession session) {
-        session.invalidate();
-        return "Logged out successfully";
+    public ResponseEntity<ResponseData> logout(HttpSession session) {
+        ResponseData<Boolean> responseData = new ResponseData<>();
+        try{
+            if(session != null){
+                session.invalidate();
+                responseData.setStatusCode(200);
+                responseData.setData(true);
+                return new ResponseEntity<>(responseData, HttpStatus.OK);
+            }
+            responseData.setData(false);
+            return new ResponseEntity<>(responseData, HttpStatus.UNAUTHORIZED);
+        }catch (Exception e){
+            responseData.setErrorMessage(e.getMessage());
+            return new ResponseEntity<>(responseData, HttpStatus.BAD_REQUEST);
+        }
     }
 
     @GetMapping("/getuser")
