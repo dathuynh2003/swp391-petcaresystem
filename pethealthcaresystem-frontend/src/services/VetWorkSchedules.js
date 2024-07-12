@@ -12,6 +12,7 @@ export default function VetWorkSchedules() {
   const [currentWeek, setCurrentWeek] = useState(new Date());
   const [showModal, setShowModal] = useState(false);
   const [modalData, setModalData] = useState(null);
+  const [selectedDate, setSelectedDate] = useState('');
 
   useEffect(() => {
     const fetchShifts = async () => {
@@ -59,6 +60,17 @@ export default function VetWorkSchedules() {
     setCurrentWeek(nextWeek);
   };
 
+  const handleDateChange = (event) => {
+    setSelectedDate(event.target.value);
+  };
+
+  const handleDateFilter = () => {
+    if (selectedDate) {
+      const date = new Date(selectedDate);
+      setCurrentWeek(date);
+    }
+  };
+
   const formatDate = (isoDate) => {
     if (!isoDate) return "N/A";
     const dateObj = new Date(isoDate);
@@ -81,8 +93,6 @@ export default function VetWorkSchedules() {
     setShowModal(false);
     setModalData(null);
   };
-
-  const getFieldValue = (value) => (value !== "" && value !== null && value !== undefined ? value : "N/A");
 
   const cellStyle = {
     height: '50px', // Adjust as needed
@@ -109,6 +119,18 @@ export default function VetWorkSchedules() {
             </Button>
             <Button onClick={handleNextWeek} style={{ background: 'teal', color: 'white' }}>
               Next Week
+            </Button>
+          </div>
+          <div className="d-flex mb-3">
+            <input
+              type="date"
+              value={selectedDate}
+              onChange={handleDateChange}
+              className="form-control"
+              style={{ maxWidth: '200px' }}
+            />
+            <Button onClick={handleDateFilter} style={{ background: 'teal', color: 'white', marginLeft: '20px' }}>
+              Filter by Date
             </Button>
           </div>
           <table className="table table-bordered">
@@ -184,17 +206,17 @@ export default function VetWorkSchedules() {
               <div className="row mb-3">
                 <div className="col-md-6">
                   <h5>Customer Information</h5>
-                  <p><strong>Name:</strong> {getFieldValue(modalData.bookings[0].user.fullName)}</p>
-                  <p><strong>Address:</strong> {getFieldValue(modalData.bookings[0].user.address)}</p>
-                  <p><strong>Phone:</strong> {getFieldValue(modalData.bookings[0].user.phoneNumber)}</p>
-                  <p><strong>Dob:</strong> {getFieldValue(formatDate(modalData.bookings[0].user.dob))}</p>
+                  <p><strong>Name:</strong> {modalData.bookings[0].user.fullName ? modalData.bookings[0].user.fullName : 'N/A'}</p>
+                  <p><strong>Address:</strong> {modalData.bookings[0].user.address ? modalData.bookings[0].user.address : 'N/A'}</p>
+                  <p><strong>Phone:</strong> {modalData.bookings[0].user.phoneNumber ? modalData.bookings[0].user.phoneNumber : 'N/A'}</p>
+                  <p><strong>Dob:</strong> {formatDate(modalData.bookings[0].user.dob) ? formatDate(modalData.bookings[0].user.dob) : 'N/A'}</p>
                 </div>
                 <div className="col-md-6">
                   <h5>Pet Information</h5>
-                  <p><strong>Name:</strong> {getFieldValue(modalData.bookings[0].pet.name)}</p>
-                  <p><strong>Age:</strong> {getFieldValue(modalData.bookings[0].pet.age)} (month(s))</p>
-                  <p><strong>Gender:</strong> {getFieldValue(modalData.bookings[0].pet.gender)}</p>
-                  <p><strong>Breed:</strong> {getFieldValue(modalData.bookings[0].pet.breed)}</p>
+                  <p><strong>Name:</strong> {modalData.bookings[0].pet.name ? modalData.bookings[0].pet.name : 'N/A'}</p>
+                  <p><strong>Age:</strong> {modalData.bookings[0].pet.age ? modalData.bookings[0].pet.age + 'month(s)' : 'N/A'}</p>
+                  <p><strong>Gender:</strong> {modalData.bookings[0].pet.gender ? modalData.bookings[0].pet.gender : 'N/A'}</p>
+                  <p><strong>Breed:</strong> {modalData.bookings[0].pet.breed ? modalData.bookings[0].pet.breed : 'N/A'}</p>
                 </div>
               </div>
               <table className="table table-bordered">
@@ -210,8 +232,8 @@ export default function VetWorkSchedules() {
                   {modalData.bookings[0].bookingDetails.map((detail, index) => (
                     <tr key={index}>
                       <td>{index + 1}</td>
-                      <td>{getFieldValue(detail.petService.nameService)}</td>
-                      <td>{getFieldValue(detail.petService.description)}</td>
+                      <td>{detail.petService.nameService ? detail.petService.nameService : 'N/A'}</td>
+                      <td>{detail.petService.description ? detail.petService.description : 'N/A'}</td>
                       {/* <td>{getFieldValue(detail.petService.price)}</td> */}
                     </tr>
                   ))}
@@ -222,9 +244,12 @@ export default function VetWorkSchedules() {
         </Modal.Body>
         <Modal.Footer>
           {modalData && (
-            <Link to={`/viewPet/${modalData.bookings[0].pet.petId}`} className="btn btn-primary">
-              View Pet
-            </Link>
+            <Button style={{ background: 'teal', color: 'white' }}>
+              <Link to={`/viewPet/${modalData.bookings[0].pet.petId}`} >
+                View Pet
+              </Link>
+            </Button>
+
           )}
           <Button variant="secondary" onClick={handleCloseModal}>
             Close

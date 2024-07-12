@@ -78,7 +78,7 @@ export default function CreatePetByStaff() {
 
         // Validation for customer's name
         if (name === 'fullName' && value.length > 25) {
-            toast.info("Customer name must be a maximum of 25 characters.");
+            toast.info("Maximum 25 characters.");
             return;
         }
 
@@ -88,8 +88,12 @@ export default function CreatePetByStaff() {
                 toast.info("Please enter a valid Vietnamese phone number.");
                 return;
             }
+            // if (value.length === 11 && phoneRegex.index(0).test('0') && (phoneRegex.index(1).test('3') || phoneRegex.index(1).test('5') ||
+            //     phoneRegex.index(1).test('7') || phoneRegex.index(1).test('8') || phoneRegex.index(1).test('9'))) {
+            //     toast.info("Vietnamese phone number must be exactly 10 digits.");
+            //     return;
+            // }
         }
-
 
         setPet((prev) => ({
             ...prev,
@@ -282,8 +286,8 @@ export default function CreatePetByStaff() {
                             onChange={(e) => {
                                 const inputDescription = e.target.value
 
-                                if (inputDescription > 255) {
-                                    toast.info("Maximum 255 characters.");
+                                if (inputDescription.length > 100) {
+                                    toast.info("Maximum 100 characters.");
                                     return;
                                 }
 

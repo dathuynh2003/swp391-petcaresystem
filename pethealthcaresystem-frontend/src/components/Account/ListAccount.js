@@ -175,7 +175,7 @@ const ListAccount = () => {
         <div className='mt-3 d-flex justify-content-between'>
           <Box className="container">
             <Link to="/account/create">
-              <Button colorScheme="teal" ml={4}>Add New Account</Button>
+              <Button colorScheme="teal" ml={0} >Add New Account</Button>
             </Link>
             <Flex mb={4} justify="space-between" align="center">
               <Box>
