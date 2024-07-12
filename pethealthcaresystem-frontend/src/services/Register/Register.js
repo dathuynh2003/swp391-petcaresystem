@@ -20,11 +20,31 @@ export default function Register() {
 
     const [messageEmail, setMessageEmail] = useState('')
     const [messagePass, setMessagePass] = useState("")
+    const [messageConfirmPass, setMessageConfirmPass] = useState("")
     const [confirm_pass, setConfirmPass] = useState("")
     const [messagePhone, setMessagePhone] = useState("")
     const [messageDob, setMessageDob] = useState("")
     const { fullName, phoneNumber, address, gender, dob, email, password } = user;
     const onInputChange = (e) => {
+        if (e.target.name === 'password') {
+            if (e.target.value.length !== 0 && !isValidPassword(e.target.value)) {
+                if (!/(?=.*[0-9])/.test(e.target.value)) {
+                    setMessagePass("Password must include at least one Numeric digit");
+                } else if (!/(?=.*[@.#$!%*?&^])/.test(e.target.value)) {
+                    setMessagePass("Password must include at least one special character");
+                } else if (e.target.value.length < 8 || e.target.value.length > 15) {
+                    setMessagePass("Password total length must be in the range [8-15]");
+                } else if (!/(?=.*[a-z])/.test(e.target.value)) {
+                    setMessagePass("Password must include at least one lowercase letter");
+                } else if (!/(?=.*[A-Z])/.test(e.target.value)) {
+                    setMessagePass("Password must include at least one uppercase letter");
+                } else {
+                    setMessagePass("Invalid password format");
+                }
+            } else {
+                setMessagePass("")
+            }
+        }
         setUser({ ...user, [e.target.name]: e.target.value })
         setConfirmPass(confirm_pass)
     }
@@ -38,8 +58,10 @@ export default function Register() {
             setMessageDob("You need to be at least 13 years old to register")
         } else if (!isVietnamesePhoneNumberValid(user.phoneNumber)) {
             setMessagePhone("Phone number is invalid")
+        } else if (!isValidPassword(password)) {
+            return
         } else if (password === confirm_pass) {
-            setMessagePass("")
+            setMessageConfirmPass("")
             try {
                 const result = await axios.post(`http://localhost:8080/register`, user)
                 console.log(result.data)
@@ -58,7 +80,7 @@ export default function Register() {
                 console.log(e)
             }
         } else {
-            setMessagePass("Confirm password does not match")
+            setMessageConfirmPass("Confirm password does not match")
         }
 
     }
@@ -80,6 +102,10 @@ export default function Register() {
     // Số có thể bắt đầu với +84 hoặc 84 (ví dụ +84981234567, 84981234567)
     function isVietnamesePhoneNumberValid(number) {
         return /(((\+|)84)|0)(3|5|7|8|9)+([0-9]{8})\b/.test(number);
+    }
+    //Valid password là password có ít nhất 1 chữ cái thường, 1 chữ cái hoa, 1 ký tự đặc biệt trong [@.#$!%*?&], 1 chữ số và có độ dài từ 8-15
+    function isValidPassword(password) {
+        return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@.#$!%*?&])[A-Za-z\d@.#$!%*?&]{8,15}$/.test(password);
     }
 
     return (
@@ -136,12 +162,13 @@ export default function Register() {
                             <input type="password" className="form-control inputSignUp" placeholder="name@example.com" name='password' value={password} onChange={(e) => onInputChange(e)} required />
                             <label htmlFor="floatingInput" id='label-input'>Password</label>
                         </div>
+                        <h6 style={{ color: 'red', textAlign: 'center' }}>{messagePass}</h6>
                         <div className="form-floating mb-2 ">
                             <input type="password" className="form-control inputSignUp" placeholder="name@example.com" name='confirm_pass' value={confirm_pass} onChange={(e) => setConfirmPass(e.target.value)} required />
                             <label htmlFor="floatingInput" id='label-input'>Repeat password</label>
 
                         </div>
-                        <h6 style={{ color: 'red', textAlign: 'center' }}>{messagePass}</h6>
+                        <h6 style={{ color: 'red', textAlign: 'center' }}>{messageConfirmPass}</h6>
                         <div>
                             <input type="submit" value="Sign up" className='col-12 btn-sign-up btn' style={{ background: 'teal', color: 'white' }} />
                         </div>
