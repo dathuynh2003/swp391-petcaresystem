@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import axios from 'axios';
-import { Avatar } from '@chakra-ui/react';
+import { Avatar, AvatarBadge } from '@chakra-ui/react';
 
 const Navbar = () => {
   const location = useLocation();
@@ -41,11 +41,12 @@ const Navbar = () => {
 
   return (
     <div className="navbar" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 20px' }}>
+      
       <h1 style={{ color: '#ffff' }}>{capitalizeText(pageName ?? "")}</h1>
       {user && (
         <div style={{ display: 'flex', alignItems: 'center', color: '#fff' }}>
-          <Avatar src={user.avatar} alt="Avatar" className="avatar" style={{ width: '40px', height: '40px', borderRadius: '50%', marginRight: '10px' }} />
-          <div style={{ color: '#cc3333', marginRight: '3px' }}>{getRoleName(user.roleId)}</div>
+          <Avatar src={user.avatar} alt="Avatar" className="avatar" style={{ width: '40px', height: '40px', borderRadius: '50%', marginRight: '10px' }}/>
+          <div style={{ color: 'white', marginRight: '3px' }}>{getRoleName(user.roleId)}</div>
           {user.fullName}
 
         </div>

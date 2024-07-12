@@ -617,33 +617,53 @@ export default function Booking() {
                             </Button>
                           </div>
                           <div className='choose-date row mt-3'>
-                            {dates.map((date, index) => (
-                              <Button
-                                key={index}
-                                className='mx-auto btn  fw-normal'
-                                style={{ width: '12%', color: activeDateIndex === index ? 'white' : '', background: activeDateIndex === index ? ' rgb(80, 200, 180)' : '' }}
-                                onClick={() => handleClickDay(date, index)}
-                              >{`${formatDate(date)}`} <br /> </Button>
-                            ))}
+                            {dates.map((date, index) => {
+                              const today = new Date().setHours(0, 0, 0, 0);
+                              const isPastDate = new Date(date).setHours(0, 0, 0, 0) < today;
+                              return (
+                                <Button
+                                  key={index}
+                                  className='mx-auto btn fw-normal'
+                                  style={{
+                                    width: '12%',
+                                    color: activeDateIndex === index ? 'white' : '',
+                                    background: activeDateIndex === index ? 'rgb(80, 200, 180)' : '',
+                                    opacity: isPastDate ? 0.5 : 1
+                                  }}
+                                  onClick={() => handleClickDay(date, index)}
+                                  isDisabled={isPastDate}
+                                >
+                                  {`${formatDate(date)}`} <br />
+                                </Button>
+                              );
+                            })}
                           </div>
                           <div className='choose-vetshift mt-3'>
                             {vets.map((vet, index) => (
-                              <div className=' text-center' >
+                              <div className='text-center' key={index}>
                                 <h1 className='fs-3'>{vet?.fullName}</h1>
-                                <div className='row  mr-3 mx-2 ' >
-                                  {vet?.workSchedule?.map((workSchedule, workScheduleIndex) => (
-                                    <>
+                                <div className='row mr-3 mx-2'>
+                                  {vet?.workSchedule?.map((workSchedule, workScheduleIndex) => {
+                                    const isPastShift = new Date(workSchedule.date + ' ' + workSchedule.shift.from_time) < new Date();
+                                    return (
                                       <button
+                                        key={workScheduleIndex}
                                         className='col-2 mt-3 mx-3 my-2 btn'
-                                        style={{ width: '12%', color: activeShiftIndex === workSchedule?.vs_id ? 'white' : '', background: activeShiftIndex === workSchedule?.vs_id ? ' rgb(80, 200, 180)' : '' }}
-                                        disabled={workSchedule?.status !== "Available"}
+                                        style={{
+                                          width: '12%',
+                                          color: activeShiftIndex === workSchedule?.vs_id ? 'white' : '',
+                                          background: activeShiftIndex === workSchedule?.vs_id ? 'rgb(80, 200, 180)' : '',
+                                          border: '1px solid #ccc',
+                                          opacity: isPastShift || workSchedule?.status !== "Available" ? 0.5 : 1
+                                        }}
+                                        disabled={isPastShift || workSchedule?.status !== "Available"}
                                         onClick={() => chooseShift(workSchedule?.vs_id, workSchedule?.vs_id, vet?.fullName, workSchedule?.shift.from_time + ' - ' + workSchedule?.shift.to_time)}
                                         _hover={{ background: 'teal', color: 'white' }}
                                       >
                                         {workSchedule?.shift?.from_time} - {workSchedule?.shift?.to_time}
                                       </button>
-                                    </>
-                                  ))}
+                                    );
+                                  })}
                                 </div>
                               </div>
                             ))}
@@ -651,11 +671,12 @@ export default function Booking() {
                         </div>
                       </div>
                     </div>
-                    <div className='text-center mt-3 d-flex d-flex justify-content-center gap-3 text-center'>
+                    <div className='text-center mt-3 d-flex justify-content-center gap-3 text-center'>
                       <Button onClick={() => handleBackClick()} style={{ background: 'teal', color: 'white' }}>Back</Button>
                       <Button onClick={() => handleClickAPI(selectedVetShift)} style={{ background: 'teal', color: 'white' }}>Next</Button>
                     </div>
                   </TabPanel>
+
                   <TabPanel>
                     <div className="container">
                       <div className="row border rounded p-4 mt-2 shadow">
@@ -666,7 +687,7 @@ export default function Booking() {
                             onChange={handleVetChange}
                           >
                             {vetList?.map((vet, index) => (
-                              <option value={vet?.userId}>{vet?.fullName}</option>
+                              <option value={vet?.userId} key={index}>{vet?.fullName}</option>
                             ))}
                           </Select>
                         </div>
@@ -681,44 +702,65 @@ export default function Booking() {
                               </Button>
                             </div>
                             <div className='choose-date row'>
-                              {dates.map((date, index) => (
-                                <Button
-                                  key={index}
-                                  className='mx-auto btn  fw-normal'
-                                  style={{ width: '12%', color: activeDateIndex === index ? 'white' : '', background: activeDateIndex === index ? ' rgb(80, 200, 180)' : '' }}
-                                  onClick={() => handleClickDay2(date, index)}
-                                  isDisabled={!groupedVetShiftDetailsArray.some(detail => detail.date === new Date(date).toLocaleDateString('en-CA'))}
-                                >{`${formatDate(date)}`} <br /> </Button>
-                              ))}
+                              {dates.map((date, index) => {
+                                const today = new Date().setHours(0, 0, 0, 0);
+                                const isPastDate = new Date(date).setHours(0, 0, 0, 0) < today;
+                                return (
+                                  <Button
+                                    key={index}
+                                    className='mx-auto btn fw-normal'
+                                    style={{
+                                      width: '12%',
+                                      color: activeDateIndex === index ? 'white' : '',
+                                      background: activeDateIndex === index ? 'rgb(80, 200, 180)' : '',
+                                      opacity: isPastDate || !groupedVetShiftDetailsArray.some(detail => detail.date === new Date(date).toLocaleDateString('en-CA')) ? 0.5 : 1
+                                    }}
+                                    onClick={() => handleClickDay2(date, index)}
+                                    isDisabled={isPastDate || !groupedVetShiftDetailsArray.some(detail => detail.date === new Date(date).toLocaleDateString('en-CA'))}
+                                  >
+                                    {`${formatDate(date)}`} <br />
+                                  </Button>
+                                );
+                              })}
                             </div>
                             <div className='choose-vetshift'>
                               {groupedVetShiftDetailsArray
                                 .filter(detail => detail.date === selectedDate)
                                 .map((vetShiftDetail, index) => (
-                                  <div className='row'>
-                                    {vetShiftDetail?.details?.map((detail, detailIndex) => (
-                                      <button
-                                        className='col-2 mt-3 mx-3 my-2 btn'
-                                        style={{ width: '12%', color: activeShiftIndex === detail?.vs_id ? 'white' : '', background: activeShiftIndex === detail?.vs_id ? ' rgb(80, 200, 180)' : '' }}
-                                        disabled={detail?.status !== "Available"}
-                                        onClick={() => chooseShift(detail?.vs_id, detail?.vs_id, selectedVet.fullName, detail?.shift.from_time + ' - ' + detail?.shift.to_time)}
-                                      >
-                                        {detail?.shift?.from_time} - {detail?.shift?.to_time}
-                                      </button>
-                                    ))}
+                                  <div className='row' key={index}>
+                                    {vetShiftDetail?.details?.map((detail, detailIndex) => {
+                                      const isPastShift = new Date(detail.date + ' ' + detail.shift.to_time) < new Date();
+                                      return (
+                                        <button
+                                          key={detailIndex}
+                                          className='col-2 mt-3 mx-3 my-2 btn'
+                                          style={{
+                                            width: '12%',
+                                            color: activeShiftIndex === detail?.vs_id ? 'white' : '',
+                                            background: activeShiftIndex === detail?.vs_id ? 'rgb(80, 200, 180)' : '',
+                                            border: '1px solid #ccc',
+                                            opacity: isPastShift || detail?.status !== "Available" ? 0.5 : 1
+                                          }}
+                                          disabled={isPastShift || detail?.status !== "Available"}
+                                          onClick={() => chooseShift(detail?.vs_id, detail?.vs_id, selectedVet.fullName, detail?.shift.from_time + ' - ' + detail?.shift.to_time)}
+                                        >
+                                          {detail?.shift?.from_time} - {detail?.shift?.to_time}
+                                        </button>
+                                      );
+                                    })}
                                   </div>
                                 ))}
                             </div>
                           </div>
                         }
-
                       </div>
                     </div>
-                    <div className='text-center mt-3 d-flex d-flex justify-content-center gap-3 text-center'>
+                    <div className='text-center mt-3 d-flex justify-content-center gap-3 text-center'>
                       <Button onClick={() => handleBackClick()} style={{ background: 'teal', color: 'white' }}>Back</Button>
                       <Button onClick={() => handleClickAPI(selectedVetShift)} style={{ background: 'teal', color: 'white' }}>Next</Button>
                     </div>
                   </TabPanel>
+
                 </TabPanels>
               </Tabs>
             </TabPanel>

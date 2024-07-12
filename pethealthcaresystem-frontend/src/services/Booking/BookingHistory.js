@@ -404,8 +404,8 @@ const BookingHistory = () => {
                         return (
                             <Tr key={booking.id}>
                                 <Td>B{booking.id}</Td>
-                                <Td>{formatDateTime(booking.vetShiftDetail.date, 'dd-MM-yyyy')}</Td>
-                                <Td>{formatDateTime(booking.bookingDate, 'dd-MM-yyyy')}</Td>
+                                <Td>{formatDateTime(booking.vetShiftDetail.date, 'dd-MM-yyyy')} {booking.vetShiftDetail.shift.from_time} - {booking.vetShiftDetail.shift.to_time}</Td>
+                                <Td>{formatDateTime(booking.bookingDate, 'dd-MM-yyyy HH:mm')}</Td>
                                 <Td>{formatPrice(booking.totalAmount)} VND</Td>
                                 <Td>
                                     {/* <Badge colorScheme={
@@ -559,10 +559,10 @@ const BookingHistory = () => {
                         </FormControl>
                     </ModalBody>
                     <ModalFooter className='pt-0'>
-                        <Button colorScheme="red" mr={3} onClick={() => onCloseRefundModal()}>
+                        <Button colorScheme="gray" mr={3} onClick={() => onCloseRefundModal()}>
                             Close
                         </Button>
-                        <Button colorScheme="green" onClick={() => {
+                        <Button colorScheme="red" onClick={() => {
                             handleRequestRefund(selectedBooking.id);
                             onCloseRefundModal();
                         }}>

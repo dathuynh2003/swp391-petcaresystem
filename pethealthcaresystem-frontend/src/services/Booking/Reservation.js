@@ -37,6 +37,8 @@ const Reservation = () => {
     const [appointmentTime, setAppointmentTime] = useState('')  //Lưu để hiển thị vào modal refund
     const [refundPercentage, setRefundPercentage] = useState(null)
     const [petAge, setPetAge] = useState(null)
+    const [sortColumn, setSortColumn] = useState(null);
+    const [sortDirection, setSortDirection] = useState('asc');
 
     const pageSize = 5
     useEffect(() => {
@@ -169,6 +171,30 @@ const Reservation = () => {
     //     });
     // };
 
+    const handleSort = (column) => {
+        const direction = sortColumn === column && sortDirection === 'asc' ? 'desc' : 'asc';
+        setSortColumn(column);
+        setSortDirection(direction);
+
+        const sortedBookings = [...bookings].sort((a, b) => {
+            if (column === 'bookingDate') {
+                const bDateA = new Date(a.bookingDate);
+                const bDateB = new Date(b.bookingDate);
+                return direction === 'asc' ? bDateA - bDateB : bDateB - bDateA;
+            } else if (column === 'appointmentDate') {
+                const aDateA = new Date(a.vetShiftDetail.date);
+                const aDateB = new Date(b.vetShiftDetail.date);
+                return direction === 'asc' ? aDateA - aDateB : aDateB - aDateA;
+            } else if (column === 'amount') {
+                const amountA = a.totalAmount;
+                const amountB = b.totalAmount;
+                return direction === 'asc' ? amountA - amountB : amountB - amountA;
+            }
+            return 0;
+        });
+        setBookings(sortedBookings);
+    };
+
     const handleClickRefund = async (booking, appointmentTime, refundPercentage) => {
         onOpenRefundModal()
         const pet = booking.pet
@@ -214,10 +240,25 @@ const Reservation = () => {
                     <Thead>
                         <Tr>
                             <Th>Booking ID</Th>
-                            <Th>Booking Date</Th>
-                            <Th>Appointment Date</Th>
+                            <Th>
+                                <span className="icon-container" onClick={() => handleSort('bookingDate')}>
+                                    Booking Date {sortColumn === 'bookingDate' ? (sortDirection === 'asc' ? '↓' : '↑') : ''}
+                                    <span className="icon-text">Sort by Booking Date</span>
+                                </span>
+                            </Th>
+                            <Th>
+                                <span className="icon-container" onClick={() => handleSort('appointmentDate')}>
+                                    Appointment Date {sortColumn === 'appointmentDate' ? (sortDirection === 'asc' ? '↓' : '↑') : ''}
+                                    <span className="icon-text">Sort by Booking Date</span>
+                                </span>
+                            </Th>
                             <Th>Slot</Th>
-                            <Th>Amount</Th>
+                            <Th>
+                                <span className="icon-container" onClick={() => handleSort('amount')}>
+                                    Amount {sortColumn === 'amount' ? (sortDirection === 'asc' ? '↓' : '↑') : ''}
+                                    <span className="icon-text">Sort by Amount</span>
+                                </span>
+                            </Th>
                             <Th>Status</Th>
                             <Th>Action</Th>
                         </Tr>
@@ -248,7 +289,7 @@ const Reservation = () => {
                             return (
                                 <Tr key={booking.id}>
                                     <Td><b>B{booking.id}</b></Td>
-                                    <Td><b>{formatDateTime(booking.bookingDate, 'dd/MM/yyyy')}</b></Td>
+                                    <Td><b>{formatDateTime(booking.bookingDate, 'dd-MM-yyyy HH:mm:ss')}</b></Td>
                                     <Td><b>{formatDateTime(booking.vetShiftDetail.date, 'dd/MM/yyyy')}</b></Td>
                                     <Td><b>{booking.vetShiftDetail.shift.from_time} - {booking.vetShiftDetail.shift.to_time}</b></Td>
                                     <Td><b>{formatPrice(booking.totalAmount)} VND</b></Td>
@@ -273,17 +314,17 @@ const Reservation = () => {
                                             }
                                         </FormControl>
                                     </Td>
-                                </Tr>
+                                </Tr >
                             )
                         })}
-                    </Tbody>
-                </Table>
+                    </Tbody >
+                </Table >
                 {/* <Flex mt={4} justifyContent="center" alignItems="center">
                     <Button size="sm" onClick={handlePrevPage} isDisabled={currentPage === 0}>Previous</Button>
                     <Text mx={4}>Page {currentPage + 1} of {totalPages}</Text>
                     <Button size="sm" onClick={handleNextPage} isDisabled={currentPage === totalPages - 1}>Next</Button>
                 </Flex> */}
-            </Box>
+            </Box >
             <Box mt={4} display="flex" justifyContent="space-between">
                 <Button onClick={handlePreviousPage} disabled={currentPage === 1}>Previous</Button>
                 <Text>Page {currentPage} of {totalPages}</Text>
@@ -393,22 +434,22 @@ const Reservation = () => {
                                 Amount you will receive after canceling your booking:
                                 <Input className="fw-bold" readOnly value={(selectedBooking?.totalAmount * refundPercentage).toLocaleString('vi-VN') + " VND"} />
                             </Box>
-                        </FormControl>
-                    </ModalBody>
+                        </FormControl >
+                    </ModalBody >
                     <ModalFooter className='pt-0'>
-                        <Button colorScheme="red" mr={3} onClick={() => onCloseRefundModal()}>
+                        <Button colorScheme="gray" mr={3} onClick={() => onCloseRefundModal()}>
                             Close
                         </Button>
-                        <Button colorScheme="green" onClick={() => {
+                        <Button colorScheme="red" onClick={() => {
                             handleRequestRefund(selectedBooking.id);
                             onCloseRefundModal();
                         }}>
-                            Send request
-                        </Button>
-                    </ModalFooter>
-                </ModalContent>
+                            Request Cancellation
+                        </Button >
+                    </ModalFooter >
+                </ModalContent >
 
-            </Modal>
+            </Modal >
 
             {selectedBooking && (
                 <Modal isOpen={isOpen} onClose={onClose} size='6xl'>
@@ -533,7 +574,7 @@ const Reservation = () => {
                 pauseOnHover
                 theme="light"
             />
-        </Box>
+        </Box >
     );
 };
 

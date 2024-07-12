@@ -160,6 +160,13 @@ export default function EditPet() {
             <input
               value={name}
               onChange={(e) => {
+                const inputName = e.target.value
+
+                if (inputName > 25) {
+                  toast.info("Maximum 25 characters.");
+                  return;
+                }
+
                 setPet((prev) => ({ ...prev, name: e.target.value }));
               }}
               type="text"
@@ -230,12 +237,26 @@ export default function EditPet() {
             </div>
           </div>
 
-
           <div className="form-floating mb-3">
-            <input type="date" className="form-control" id="dob" defaultValue={pet.dob}
-              onChange={(e) => { setPet((prev) => ({ ...prev, dob: e.target.value })) }}
+            <input
+              type="date"
+              className="form-control"
+              id="dob"
+              defaultValue={pet?.dob}
+              onChange={(e) => {
+                const selectedDate = new Date(e.target.value);
+                const currentDate = new Date();
+
+                // Kiểm tra xem ngày được chọn có lớn hơn ngày hiện tại không
+                if (selectedDate > currentDate) {
+                  toast.info("Please select a valid date of birth.");
+                  return; // Ngăn người dùng tiếp tục
+                }
+
+                setPet((prev) => ({ ...prev, dob: e.target.value }));
+              }}
             />
-            <label htmlfor="dob">Date of birth</label>
+            <label htmlFor="dob">Date of birth</label>
           </div>
           {/* <div className="age mb-3 ">
             <label className="mt-2 ml-4 mb-3" htmlFor="age">
@@ -261,6 +282,13 @@ export default function EditPet() {
             <input
               value={description}
               onChange={(e) => {
+                const inputDescription = e.target.value
+
+                if (inputDescription > 255) {
+                  toast.info("Maximum 255 characters.");
+                  return;
+                }
+
                 setPet((prev) => ({ ...prev, description: e.target.value }));
               }}
               type="text"

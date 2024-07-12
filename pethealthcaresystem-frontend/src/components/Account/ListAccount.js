@@ -170,136 +170,141 @@ const ListAccount = () => {
   }
 
   return (
-
-    <Box className="container">
-      <Link to="/account/create">
-        <Button colorScheme="teal" ml={4}>Add New Account</Button>
-      </Link>
-      <Flex mb={4} justify="space-between" align="center">
-        <Box>
-          <FormControl>
-            <Select
-              id="roleFilter"
-              value={roleFilter}
-              onChange={(e) => setRoleFilter(parseInt(e.target.value))}
-            >
-              <option value={0}>All</option>
-              <option value={1}>Customer</option>
-              <option value={2}>Staff</option>
-              <option value={3}>Vet</option>
-            </Select>
-          </FormControl>
-        </Box>
-        <InputGroup width="300px">
-          <Input
-            placeholder="Search by email"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-          <InputRightElement>
-            <IconButton
-              aria-label="Search"
-              icon={<SearchIcon />}
-              onClick={handleSearch}
-            />
-          </InputRightElement>
-        </InputGroup>
-      </Flex>
-      <Table variant="striped" colorScheme="teal">
-        <Thead>
-          <Tr>
-            <Th>#</Th>
-            <Th>Full Name</Th>
-            <Th>Role</Th>
-            <Th>Status</Th>
-            <Th>Actions</Th>
-          </Tr>
-        </Thead>
-        <Tbody>
-          {accounts.map((account, index) => (
-            <Tr key={index}>
-              <Td><b>{index + 1 + page * 5}</b></Td>
-              <Td><b>{account.fullName}</b></Td>
-              <Td>
-                <b>
-                  {account.roleId === 1 && "Customer"}
-                  {account.roleId === 2 && "Staff"}
-                  {account.roleId === 3 && "Vet"}
-                  {account.roleId === 4 && "Admin"}
-                </b>
-              </Td>
-              <Td>
-                <Button
-                  colorScheme={account.isActive ? 'green' : 'red'}
-                  variant="outline"
-                  borderColor={account.isActive ? 'green.500' : 'red.500'}
-                  bg={account.isActive ? 'green.100' : 'red.100'}
-                  size="sm"
-                >
-                  {account.isActive ? "Active" : "Inactive"}
-                </Button>
-              </Td>
-              <Td className='col-2 text-center p-2'>
-                <Link to={`/account/viewAccount/${account.userId}`}>
-                  <span style={{ marginRight: '20px' }} className='icon-container'>
-                    <ViewIcon style={{ color: 'teal', cursor: 'pointer' }} boxSize={'5'} />
-                    <span className="icon-text">View</span>
-                  </span>
-                </Link>
-                <span style={{ marginRight: '20px' }} className='icon-container'>
-                  <EditIcon style={{ color: 'teal', cursor: 'pointer' }} boxSize={'5'} onClick={() => handleEdit(account)} />
-                  <span className="icon-text">Edit</span>
-                </span>
-                <span className='icon-container'>
-                  <DeleteIcon style={{ color: 'red', cursor: 'pointer' }} boxSize={'5'} onClick={() => handleDelete(account.userId)} />
-                  <span className="icon-text">Delete</span>
-                </span>
-              </Td>
-            </Tr>
-          ))}
-        </Tbody>
-      </Table>
-      <Box mt={4}>
-        <Button onClick={() => setPage(page - 1)} isDisabled={page <= 0}>Previous</Button>
-        <Button onClick={() => setPage(page + 1)} isDisabled={page >= totalPages - 1} ml={2}>Next</Button>
-
-      </Box>
-
-      {/* Modal for editing account */}
-      {selectedUser && (
-        <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
-          <ModalOverlay />
-          <ModalContent>
-            <ModalHeader>Edit Account</ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>
-              <FormControl id="roleId" mb={4}>
-                <FormLabel>Role</FormLabel>
-                <Select name="roleId" value={selectedUser.roleId} onChange={onInputChange}>
-                  <option value="1">Customer</option>
-                  <option value="2">Vet</option>
-                  <option value="3">Staff</option>
-                </Select>
-              </FormControl>
-              <FormControl id="isActive" display="flex" alignItems="center" mb={4}>
-                <Switch
-                  id="isActiveSwitch"
-                  name="isActive"
-                  isChecked={selectedUser.isActive}
-                  onChange={onInputChange}
-                  mr={2}
+    <div className='container'>
+      <div className='row'>
+        <div className='mt-3 d-flex justify-content-between'>
+          <Box className="container">
+            <Link to="/account/create">
+              <Button colorScheme="teal" ml={0} >Add New Account</Button>
+            </Link>
+            <Flex mb={4} justify="space-between" align="center">
+              <Box>
+                <FormControl>
+                  <Select
+                    id="roleFilter"
+                    value={roleFilter}
+                    onChange={(e) => setRoleFilter(parseInt(e.target.value))}
+                  >
+                    <option value={0}>All</option>
+                    <option value={1}>Customer</option>
+                    <option value={2}>Staff</option>
+                    <option value={3}>Vet</option>
+                  </Select>
+                </FormControl>
+              </Box>
+              <InputGroup width="300px">
+                <Input
+                  placeholder="Search by email"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
                 />
-                <FormLabel htmlFor="isActiveSwitch" mb="0">Active Status</FormLabel>
-              </FormControl>
-            </ModalBody>
-            <ModalFooter>
-              <Button colorScheme="blue" mr={3} onClick={handleUpdate}>Update</Button>
-              <Button variant="ghost" onClick={() => setIsModalOpen(false)}>Cancel</Button>
-            </ModalFooter>
-          </ModalContent>
-        </Modal>
-      )}
-    </Box>
+                <InputRightElement>
+                  <IconButton
+                    aria-label="Search"
+                    icon={<SearchIcon />}
+                    onClick={handleSearch}
+                  />
+                </InputRightElement>
+              </InputGroup>
+            </Flex>
+            <Table variant="striped" colorScheme="teal">
+              <Thead>
+                <Tr>
+                  <Th>#</Th>
+                  <Th>Full Name</Th>
+                  <Th>Role</Th>
+                  <Th>Status</Th>
+                  <Th>Actions</Th>
+                </Tr>
+              </Thead>
+              <Tbody>
+                {accounts.map((account, index) => (
+                  <Tr key={index}>
+                    <Td><b>{index + 1 + page * 5}</b></Td>
+                    <Td><b>{account.fullName}</b></Td>
+                    <Td>
+                      <b>
+                        {account.roleId === 1 && "Customer"}
+                        {account.roleId === 2 && "Staff"}
+                        {account.roleId === 3 && "Vet"}
+                        {account.roleId === 4 && "Admin"}
+                      </b>
+                    </Td>
+                    <Td>
+                      <Button
+                        colorScheme={account.isActive ? 'green' : 'red'}
+                        variant="outline"
+                        borderColor={account.isActive ? 'green.500' : 'red.500'}
+                        bg={account.isActive ? 'green.100' : 'red.100'}
+                        size="sm"
+                      >
+                        {account.isActive ? "Active" : "Inactive"}
+                      </Button>
+                    </Td>
+                    <Td className='col-2 text-center p-2'>
+                      <Link to={`/account/viewAccount/${account.userId}`}>
+                        <span style={{ marginRight: '20px' }} className='icon-container'>
+                          <ViewIcon style={{ color: 'teal', cursor: 'pointer' }} boxSize={'5'} />
+                          <span className="icon-text">View</span>
+                        </span>
+                      </Link>
+                      <span style={{ marginRight: '20px' }} className='icon-container'>
+                        <EditIcon style={{ color: 'teal', cursor: 'pointer' }} boxSize={'5'} onClick={() => handleEdit(account)} />
+                        <span className="icon-text">Edit</span>
+                      </span>
+                      <span className='icon-container'>
+                        <DeleteIcon style={{ color: 'red', cursor: 'pointer' }} boxSize={'5'} onClick={() => handleDelete(account.userId)} />
+                        <span className="icon-text">Delete</span>
+                      </span>
+                    </Td>
+                  </Tr>
+                ))}
+              </Tbody>
+            </Table>
+            <Box mt={4}>
+              <Button onClick={() => setPage(page - 1)} isDisabled={page <= 0}>Previous</Button>
+              <Button onClick={() => setPage(page + 1)} isDisabled={page >= totalPages - 1} ml={2}>Next</Button>
+
+            </Box>
+
+            {/* Modal for editing account */}
+            {selectedUser && (
+              <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+                <ModalOverlay />
+                <ModalContent>
+                  <ModalHeader>Edit Account</ModalHeader>
+                  <ModalCloseButton />
+                  <ModalBody>
+                    <FormControl id="roleId" mb={4}>
+                      <FormLabel>Role</FormLabel>
+                      <Select name="roleId" value={selectedUser.roleId} onChange={onInputChange}>
+                        <option value="1">Customer</option>
+                        <option value="2">Vet</option>
+                        <option value="3">Staff</option>
+                      </Select>
+                    </FormControl>
+                    <FormControl id="isActive" display="flex" alignItems="center" mb={4}>
+                      <Switch
+                        id="isActiveSwitch"
+                        name="isActive"
+                        isChecked={selectedUser.isActive}
+                        onChange={onInputChange}
+                        mr={2}
+                      />
+                      <FormLabel htmlFor="isActiveSwitch" mb="0">Active Status</FormLabel>
+                    </FormControl>
+                  </ModalBody>
+                  <ModalFooter>
+                    <Button colorScheme="blue" mr={3} onClick={handleUpdate}>Update</Button>
+                    <Button variant="ghost" onClick={() => setIsModalOpen(false)}>Cancel</Button>
+                  </ModalFooter>
+                </ModalContent>
+              </Modal>
+            )}
+          </Box>
+        </div>
+      </div>
+    </div >
   );
 };
 

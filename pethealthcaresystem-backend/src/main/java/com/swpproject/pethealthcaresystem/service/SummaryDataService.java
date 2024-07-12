@@ -1,23 +1,24 @@
 package com.swpproject.pethealthcaresystem.service;
 
 import com.swpproject.pethealthcaresystem.model.Booking;
+import com.swpproject.pethealthcaresystem.model.Payment;
 import com.swpproject.pethealthcaresystem.model.SummaryData;
 import com.swpproject.pethealthcaresystem.repository.BookingRepository;
+import com.swpproject.pethealthcaresystem.repository.PaymentRepository;
 import com.swpproject.pethealthcaresystem.repository.SummaryDataRepository;
 import com.swpproject.pethealthcaresystem.repository.UserRepository;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
-public class SummaryDataService implements ISummaryDataService{
+public class SummaryDataService implements ISummaryDataService {
     @Autowired
     private SummaryDataRepository summaryDataRepository;
 
@@ -27,31 +28,37 @@ public class SummaryDataService implements ISummaryDataService{
     @Autowired
     private UserRepository userRepository;
 
-    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+    @Autowired
+    private PaymentRepository paymentRepository;
+
+    @PostConstruct
+    public void onStartup() {
+        generateSummaryData();
+    }
 
     @Scheduled(cron = "0 0 0 * * ?", zone = "Asia/Ho_Chi_Minh")  // Chạy hàng ngày vào lúc nửa đêm
     public void generateSummaryData() {
         // Lấy dữ liệu từ ngày hôm trước
-        LocalDate yesterday = LocalDate.now().minusDays(1);
-        Date startDate = Date.from(yesterday.atStartOfDay(ZoneId.systemDefault()).toInstant());
-        Date endDate = Date.from(yesterday.atTime(23, 59, 59).atZone(ZoneId.systemDefault()).toInstant());
+        Date yesterday = Date.from(java.time.LocalDate.now().minusDays(1).atStartOfDay(ZoneId.systemDefault()).toInstant());
+        Date startDate = Date.from(yesterday.toInstant());
+        Date endDate = Date.from(java.time.LocalDate.now().minusDays(1).atTime(23, 59, 59).atZone(ZoneId.systemDefault()).toInstant());
 
         generateSummaryDataForDate(startDate, endDate);
     }
 
     @Override
-    public void generateMissingSummaryData(LocalDate fromDate, LocalDate toDate) {
-        List<String> existingDates = summaryDataRepository.findAllDates();
+    public void generateMissingSummaryData(Date fromDate, Date toDate) {
 
-        List<LocalDate> allDates = fromDate.datesUntil(toDate.plusDays(1)).collect(Collectors.toList());
+        // Convert the Date objects to LocalDate for easy iteration
+        LocalDate start = fromDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        LocalDate end = toDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 
-        for (LocalDate date : allDates) {
-            String formattedDate = date.format(DATE_FORMATTER);
-            if (!existingDates.contains(formattedDate)) {
-                Date startDate = Date.from(date.atStartOfDay(ZoneId.systemDefault()).toInstant());
-                Date endDate = Date.from(date.atTime(23, 59, 59).atZone(ZoneId.systemDefault()).toInstant());
-                generateSummaryDataForDate(startDate, endDate);
-            }
+        while (!start.isAfter(end)) {
+            Date startDate = Date.from(start.atStartOfDay(ZoneId.systemDefault()).toInstant());
+            Date endDate = Date.from(start.atTime(23, 59, 59).atZone(ZoneId.systemDefault()).toInstant());
+
+            generateSummaryDataForDate(startDate, endDate);
+            start = start.plusDays(1);
         }
     }
 
@@ -59,28 +66,28 @@ public class SummaryDataService implements ISummaryDataService{
     public SummaryData generateSummaryDataForDate(Date startDate, Date endDate) {
         // Lấy dữ liệu từ các nguồn khác nhau và tính toán các giá trị tổng hợp
         List<Booking> bookings = bookingRepository.findByBookingDateBetween(startDate, endDate);
+        List<Payment> payments = paymentRepository.findByPaymentDateBetween(startDate, endDate);
+
         long totalUsers = userRepository.countByRoleIdAndCreatedAtBetween(1, startDate, endDate);
-//        long totalUsers = userRepository.countByRoleId(1);
-        double totalAmount = bookings.stream()
-                .filter(booking -> !"CANCELLED".equals(booking.getStatus()))
-                .mapToDouble(Booking::getTotalAmount)
+
+        double totalAmount = payments.stream()
+                .filter(payment -> "PAID".equals(payment.getStatus()))
+                .mapToDouble(Payment::getAmount)
                 .sum();
+
         double totalRefundAmount = bookings.stream()
                 .filter(booking -> "Refunded".equals(booking.getStatus()))
                 .mapToDouble(Booking::getTotalAmount)
                 .sum();
-        int totalBooking = bookings.size();
-        int totalCancelBooking = (int) bookings.stream().filter(booking -> "CANCELLED".equals(booking.getStatus())).count();
 
-        //Format date
-        LocalDate localDate = startDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-        String formattedDate = localDate.format(DATE_FORMATTER);
+        int totalBooking = (int) bookings.stream().filter(booking -> !"CANCELLED".equals(booking.getStatus())).count();
 
-        // Tạo đối tượng SummaryData
-        SummaryData newSummaryData = summaryDataRepository.findByDate(formattedDate);
-        if(newSummaryData == null) {
+        int totalCancelBooking = (int) bookings.stream().filter(booking -> "Refunded".equals(booking.getStatus())).count();
+
+        SummaryData newSummaryData = summaryDataRepository.findByDate(startDate);
+        if (newSummaryData == null) {
             newSummaryData = new SummaryData();
-            newSummaryData.setDate(formattedDate);
+            newSummaryData.setDate(startDate);
         }
         newSummaryData.setTotalAmount(totalAmount);
         newSummaryData.setTotalRefundAmount(totalRefundAmount);
@@ -93,12 +100,9 @@ public class SummaryDataService implements ISummaryDataService{
     }
 
     @Override
-    public List<SummaryData> getSummaryDataByDateRange(String startDate, String endDate) {
+    public List<SummaryData> getSummaryDataByDateRange(Date startDate, Date endDate) {
         return summaryDataRepository.findByDateBetween(startDate, endDate);
     }
 
-    @Override
-    public SummaryData saveSummaryData(SummaryData summaryData) {
-        return summaryDataRepository.save(summaryData);
-    }
+
 }

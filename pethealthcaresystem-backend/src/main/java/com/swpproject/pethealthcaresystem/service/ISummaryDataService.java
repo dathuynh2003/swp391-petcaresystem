@@ -2,18 +2,13 @@ package com.swpproject.pethealthcaresystem.service;
 
 import com.swpproject.pethealthcaresystem.model.SummaryData;
 
-import java.time.LocalDate;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
+
 
 public interface ISummaryDataService {
-    void generateMissingSummaryData(LocalDate fromDate, LocalDate toDate);
+    void generateMissingSummaryData(Date fromDate, Date toDate);
 
     SummaryData generateSummaryDataForDate(Date startDate, Date endDate);
 
-    List<SummaryData> getSummaryDataByDateRange(String startDate, String endDate);
-
-    SummaryData saveSummaryData(SummaryData summaryData);
-
-    
+    List<SummaryData> getSummaryDataByDateRange(Date startDate, Date endDate);
 }

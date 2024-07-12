@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.*;
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
@@ -13,7 +15,7 @@ public class SummaryData {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int summaryId;
-    private String date;
+    private Date date;
     private double totalAmount;
     private double totalRefundAmount;
     private int totalBooking;
