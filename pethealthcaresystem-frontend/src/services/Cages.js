@@ -13,8 +13,23 @@ const Cages = () => {
   const [totalPages, setTotalPages] = useState(0)
   const pageSize = 5
 
+  //Custom hook useDebounce
+  const useDebounce = (value, delay = 500) => {
+    const [debouncedValue, setDebouncedValue] = useState(value)
+    useEffect(() => {
+      const timer = setTimeout(() => {
+        setDebouncedValue(value)
+      }, delay);
+      return () => {
+        clearTimeout(timer);
+      }
+    }, [value, delay])
+    return debouncedValue;
+  };
+
   const [cages, setCages] = useState()
   const [cageName, setCageName] = useState("")
+  const searchDebounce = useDebounce(cageName, 500);
   const { isOpen: isOpenAddCage, onOpen: onOpenAddCage, onClose: onCloseAddCage } = useDisclosure()
   const { isOpen: isOpenUpdateCage, onOpen: onOpenUpdateCage, onClose: onCloseUpdateCage } = useDisclosure()
   const [newCage, setNewCage] = useState({
@@ -35,8 +50,8 @@ const Cages = () => {
   }
 
   useEffect(() => {
-    loadCage(cageName, currentPage);
-  }, [currentPage, cageName])
+    loadCage(searchDebounce, currentPage);
+  }, [currentPage, searchDebounce])
 
   const handleInputChange = (e) => {
     const value = e.target.value;
@@ -65,12 +80,24 @@ const Cages = () => {
   }, [])
 
   const onInputChange = (e) => {
+    const { name, value } = e.target;
+
+    let formattedValue = value;
+
+    // Nếu input có name là price thì format cái value thêm dấu . vào
+    // if (name === 'price') {
+    //   // Loại bỏ các ký tự không phải số
+    //   const formattedValue = value.replace(/\D/g, '');
+
+    //   // Định dạng giá trị số với dấu chấm làm dấu phân cách hàng nghìn
+    //   // formattedValue = new Intl.NumberFormat('vi-VN').format(numericValue);
+    //   // formattedValue = numericValue.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    // }
     if (editedCage === null) {
-      setNewCage({ ...newCage, [e.target.name]: e.target.value })
+      setNewCage({ ...newCage, [e.target.name]: formattedValue })
     } else {
-      setEditedCage({ ...editedCage, [e.target.name]: e.target.value })
+      setEditedCage({ ...editedCage, [e.target.name]: formattedValue })
     }
-    // console.log(newCage);
   }
 
   const handleCreateCage = async () => {
@@ -87,12 +114,14 @@ const Cages = () => {
       return
     }
     try {
+      // Loại bỏ dấu chấm ra khỏi giá trị price
+      newCage.price = newCage.price.replace(/\./g, '');
       const respone = await axios.post('http://localhost:8080/createCage', newCage, { withCredentials: true })
       if (respone.data.message === 'Cage created') {
         toast.success('Add new cage successfully!');
-        setTimeout(() => {
-          window.location.reload()
-        }, 2000)
+        // setTimeout(() => {
+        //   window.location.reload()
+        // }, 2000)
       } else {
         toast.warning(respone.data.message)
       }
@@ -115,6 +144,8 @@ const Cages = () => {
       return
     }
     try {
+      // Loại bỏ dấu chấm ra khỏi giá trị price
+      editedCage.price = String(editedCage.price).replace(/\./g, '');
       const respone = await axios.put(`http://localhost:8080/updateCage/${editedCage.id}`,
         {
           name: editedCage.name,
@@ -153,13 +184,15 @@ const Cages = () => {
             <ModalBody>
               <div className="form-floating mb-3">
                 <input type="text" className="form-control" id="floatingInput" placeholder=""
-                  name='name' value={newCage?.name}
+                  name='name' maxLength={25} value={newCage?.name}
                   onChange={(e) => onInputChange(e)} required />
                 <label htmlfor="floatingInput">Enter cage's name</label>
               </div>
               <div className="form-floating mb-3">
                 <input type="text" className="form-control" id="floatingInput" placeholder=""
-                  name='price' value={newCage?.price}
+                  name='price'
+                  value={newCage?.price ? Intl.NumberFormat('vi-VN').format(String(newCage?.price).replace(/\D/g, '')) : '0'}
+                  maxLength={12}
                   onChange={(e) => onInputChange(e)} required />
                 <label htmlfor="floatingInput">Enter cage's price (VND/hour)</label>
               </div>
@@ -191,7 +224,7 @@ const Cages = () => {
               </div>
               <div className="form-floating mb-3">
                 <input type="text" className="form-control" id="floatingInput" placeholder=""
-                  name='description' value={newCage?.description}
+                  maxLength={100} name='description' value={newCage?.description}
                   onChange={(e) => onInputChange(e)} required />
                 <label htmlfor="floatingInput">Enter cage's description</label>
               </div>
@@ -295,13 +328,15 @@ const Cages = () => {
             <ModalBody>
               <div className="form-floating mb-3">
                 <input type="text" className="form-control" id="floatingInput" placeholder=""
-                  name='name' value={editedCage?.name}
+                  name='name' value={editedCage?.name} maxLength={25}
                   onChange={(e) => onInputChange(e)} required />
                 <label htmlfor="floatingInput">Enter cage's name</label>
               </div>
               <div className="form-floating mb-3">
                 <input type="text" className="form-control" id="floatingInput" placeholder=""
-                  name='price' value={editedCage?.price}
+                  name='price'
+                  value={editedCage?.price ? Intl.NumberFormat('vi-VN').format(String(editedCage.price).replace(/\D/g, '')) : '0'}
+                  maxLength={12}
                   onChange={(e) => onInputChange(e)} required />
                 <label htmlfor="floatingInput">Enter cage's price (VND/hour)</label>
               </div>
