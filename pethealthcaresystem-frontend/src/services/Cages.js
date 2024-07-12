@@ -119,9 +119,9 @@ const Cages = () => {
       const respone = await axios.post('http://localhost:8080/createCage', newCage, { withCredentials: true })
       if (respone.data.message === 'Cage created') {
         toast.success('Add new cage successfully!');
-        // setTimeout(() => {
-        //   window.location.reload()
-        // }, 2000)
+        setTimeout(() => {
+          window.location.reload()
+        }, 2000)
       } else {
         toast.warning(respone.data.message)
       }

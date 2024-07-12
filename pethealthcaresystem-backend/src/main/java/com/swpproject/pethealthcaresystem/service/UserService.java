@@ -25,8 +25,8 @@ public class UserService implements IUserService {
     private static final int CUSTOMER_ROLEID = 1;
     public static final String DUPLICATE_EMAIL = "Email is already in use";
     public static final String DUPLICATE_PHONE_NUMBER = "Phone number is already associated with a different email";
-     public static final String INVALID_EMAIL = "Email is invalid";
-     public static final String SUCCESSFUL_STATUS = "Verification email sent";
+    public static final String INVALID_EMAIL = "Email is invalid";
+    public static final String SUCCESSFUL_STATUS = "Verification email sent";
     private final Map<String, User> temporaryStorage = new HashMap<>();
 
     @Autowired
@@ -78,11 +78,11 @@ public class UserService implements IUserService {
         User existUser = userRepository.findByEmail(user.getEmail());
         int userRoleId = existUser.getRoleId();
         if (userRoleId == CUSTOMER_ROLEID
-                && existUser != null && existUser.getPassword().equals(SystemUtils.passwordHash(user.getPassword()))) {
+                && existUser.getPassword().equals(SystemUtils.passwordHash(user.getPassword()))) {
             existUser.setPassword("");
             existUser.setVetShiftDetails(null);
             return existUser;
-        } else if (existUser != null && existUser.getPassword().equals(user.getPassword())) {
+        } else if (existUser.getPassword().equals(SystemUtils.passwordHash(user.getPassword()))) {
             existUser.setPassword("");
             existUser.setVetShiftDetails(null);
             return existUser;

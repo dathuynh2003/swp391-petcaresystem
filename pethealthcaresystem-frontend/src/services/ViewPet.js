@@ -1244,7 +1244,7 @@ export default function ViewPet() {
                                                         </div>
                                                     </div>
                                                     <div className='col-1'></div>
-                                                    <div className='fw-bold col-1 text-end my-auto'>Toal Time: </div>
+                                                    <div className='fw-bold col-1 text-end my-auto'>Total Time: </div>
                                                     <div className='col-1 my-auto text-center'>{timeDifference > 0 ? timeDifference + " hour(s)" : "N/A"}</div>
                                                     <div className='col-1'></div>
                                                     <div className='col-2 fw-bold text-end my-auto'>Hospitalization fee: </div>
