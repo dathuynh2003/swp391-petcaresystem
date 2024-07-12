@@ -15,6 +15,7 @@ export default function SystemConfig() {
     const [configurations, setConfigurations] = useState([])
     const [currentPage, setCurrentPage] = useState(0)
     const [totalPages, setTotalPages] = useState(0)
+    const [selectedKey2, setSelectedKey2] = useState("")
     const pageSize = 10
 
     const handlePageClick = (data) => {
@@ -27,6 +28,14 @@ export default function SystemConfig() {
         configValue: '',
     })
     const addConfig = async () => {
+        if (configuration.configKey === "" || configuration.configKey === null) {
+            toast.info("Please choose configuration you want to add!")
+            return
+        }
+        if (configuration.configValue === "" || configuration.configValue === null) {
+            toast.info("Please enter value you want to add!")
+            return
+        }
         try {
             const response = await axios.post(`http://localhost:8080/configuration/add`, configuration, { withCredentials: true })
             if (response.data.message === 'Successfully') {
@@ -122,14 +131,24 @@ export default function SystemConfig() {
                                 <ModalCloseButton />
                                 <ModalBody pb={6} >
                                     <div className="form-floating mb-3 mx-3">
-                                        <input type="text" className="form-control" id="configKey"
-                                            onChange={(e) => setConfiguration((prev) => ({ ...prev, configKey: e.target.value }))} required />
-                                        <label htmlFor="configKey">Enter Config Key</label>
+                                        <Select placeholder='Choose Config' onChange={(e) => {
+                                            // setSelectedKey2(e.target.value ? e.target.value : "")
+                                            setConfiguration((prev) => ({ ...prev, configKey: e.target.value }))
+                                        }}>
+                                            {configKeys?.map((configKey, index) => (
+                                                <option key={index} value={configKey}>{configKey}</option>
+                                            ))}
+                                        </Select>
                                     </div>
+                                    {/* <div className="form-floating mb-3 mx-3">
+                                        <input type="text" readOnly className="form-control" id="configKey"
+                                            value={configuration.configKey} />
+                                        <label htmlFor="configKey">Enter Config Key</label>
+                                    </div> */}
                                     <div className="form-floating mb-3 mx-3">
                                         <input type="text" className="form-control" id="configValue"
                                             onChange={(e) => setConfiguration((prev) => ({ ...prev, configValue: e.target.value }))} required />
-                                        <label htmlFor="configValue">Enter Config value</label>
+                                        <label htmlFor="configValue">Enter new config value</label>
                                     </div>
                                 </ModalBody>
                                 <ModalFooter>

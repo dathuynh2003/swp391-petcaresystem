@@ -37,7 +37,7 @@ import { format, parseISO } from 'date-fns';
 import moment from 'moment'
 import { faUser, faPaw, faXRay } from '@fortawesome/free-solid-svg-icons';
 import { RepeatIcon, SearchIcon, ViewIcon } from '@chakra-ui/icons';
-import { South } from '@mui/icons-material';
+import { CheckCircleOutline, RadioButtonUnchecked, South } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 
@@ -64,6 +64,7 @@ const BookingHistory = () => {
     const [appointmentTime, setAppointmentTime] = useState('')  //Lưu để hiển thị vào modal refund
     //Tỉ lệ hoàn lại 100% vì là staff cacel nên có trách nhiệm hoàn lại 100%
     const refundPercentage = 1
+    const [petAge, setPetAge] = useState(null)
 
 
 
@@ -258,6 +259,13 @@ const BookingHistory = () => {
     const handleClickRefund = async (booking, appointmentTime) => {
         onOpenRefundModal()
         const pet = booking.pet
+        //Tính tuổi của pet để hiển thị
+        const today = new Date();
+        const dob = new Date(pet.dob);
+        // Tính số tháng chênh lệch giữa hai ngày
+        const diffMonths = (today.getFullYear() - dob.getFullYear()) * 12 + (today.getMonth() - dob.getMonth());
+        const age = diffMonths !== 0 ? diffMonths : 1;
+        setPetAge(age)
         setPet(pet)
         setOwner(pet.owner)
         setSelectedBooking(booking)
@@ -400,12 +408,16 @@ const BookingHistory = () => {
                                 <Td>{formatDateTime(booking.bookingDate, 'dd-MM-yyyy')}</Td>
                                 <Td>{formatPrice(booking.totalAmount)} VND</Td>
                                 <Td>
-                                    <Badge colorScheme={
+                                    {/* <Badge colorScheme={
                                         (booking.status === 'Pending' || booking.status === 'Request Refund') ? 'yellow' :
                                             booking.status === 'CANCELLED' ? 'red' : 'green'
                                     }>
                                         {booking.status}
-                                    </Badge>
+                                    </Badge> */}
+                                    {booking.status === "PAID" && <Badge colorScheme="green">{booking.status}</Badge>}
+                                    {(booking.status === "Request Refund" || booking.status === 'Pending') && <Badge colorScheme="yellow">{booking.status}</Badge>}
+                                    {(booking.status === "Refunded" || booking.status === 'CANCELLED') && <Badge colorScheme="red">{booking.status}</Badge>}
+
                                 </Td>
                                 <Td>
                                     {/* <Button size="sm" onClick={() => viewDetail(booking.id)}>Detail</Button> */}
@@ -449,7 +461,7 @@ const BookingHistory = () => {
                             <Image src="logoApp.svg" alt="Logo" className="logo" /> Pet Health Care
                         </Box>
                         <Text textAlign='center' mb={3} className='fs-3'>
-                            Request Cancellation And Refund
+                            Request Cancellation Booking
                         </Text>
                     </ModalHeader>
                     <ModalCloseButton />
@@ -477,36 +489,73 @@ const BookingHistory = () => {
                         <FormControl className='d-flex justify-content-between'>
                             <FormLabel>Pet's breed <Input readOnly value={pet?.breed} /></FormLabel>
                             <FormLabel>Pet's sex <Input readOnly value={pet?.gender} /></FormLabel>
-                            <FormLabel>Pet's age <Input readOnly value={pet?.age} /></FormLabel>
+                            <FormLabel>Pet's age <Input readOnly value={petAge + " month(s)"} /></FormLabel>
                         </FormControl>
                         <FormControl className='d-flex mt-3'>
                             <FormLabel className='w-100'>
                                 <Input readOnly value="Refund Infomation" className='text-center fw-bold' />
                             </FormLabel>
                         </FormControl>
-                        <FormControl className='d-flex'>
-                            <FormLabel className='w-50'>
-                                Booking Date
-                                <Input readOnly value={selectedBooking?.bookingDate ? formatDateTime(selectedBooking.bookingDate, 'dd/MM/yyyy hh:mm') : 'N/A'} />
-                            </FormLabel>
-                            <FormLabel className='w-50'>
-                                Appointment Date
-                                <Input readOnly value={appointmentTime} />
-                            </FormLabel>
+                        <FormControl className='d-flex justify-content-between'>
+                            <Table>
+                                <Thead>
+                                    <Tr>
+                                        <Th>Booking ID</Th>
+                                        <Th>Appointment Time</Th>
+                                        <Th>Cancel Time</Th>
+                                        <Th>Amount Paid</Th>
+                                    </Tr>
+                                </Thead>
+                                <Tbody>
+                                    <Tr>
+                                        <Td>B{selectedBooking?.id}</Td>
+                                        <Td>{appointmentTime}</Td>
+                                        <Td>{format(new Date(), 'dd/MM/yyyy hh:mm')}</Td>
+                                        <Td>{selectedBooking?.totalAmount.toLocaleString('vi-VN')} VND</Td>
+                                    </Tr>
+                                </Tbody>
+                            </Table>
                         </FormControl>
                         <FormControl className='d-flex justify-content-between'>
-                            <FormLabel className='mb-0 w-50'>
-                                <Text className='text-danger text-center mb-0 fw-bold'>Refund Policy</Text>
-                                <Text className='text-danger my-0'>
-                                    * Staff canceling a booking requires a full refund (100%)
-                                </Text>
-                            </FormLabel>
-                            <FormLabel className='w-50'>
-                                Amount booking
-                                <Input readOnly value={selectedBooking?.totalAmount.toLocaleString('vi-VN') + " VND"} />
-                                Amount refunded
+                            <Box className='w-50 fst-italic fw-medium'>
+                                {refundPercentage === 1 ?
+                                    <Box>
+                                        <CheckCircleOutline htmlColor='#50C8B4' />
+                                        100% refund (Cancel at least 7 days in advance)
+                                    </Box>
+                                    :
+                                    <Box>
+                                        <RadioButtonUnchecked />
+                                        100% refund (Cancel at least 7 days in advance)
+                                    </Box>
+                                }
+                                {refundPercentage === 0.75 ?
+                                    <Box>
+                                        <CheckCircleOutline htmlColor='#50C8B4' />
+                                        75% refund (Cancel 3 to 6 days in advance)
+                                    </Box>
+                                    :
+                                    <Box>
+                                        <RadioButtonUnchecked />
+                                        75% refund (Cancel 3 to 6 days in advance)
+                                    </Box>
+                                }
+                                {refundPercentage === 0 ?
+                                    <Box>
+                                        <CheckCircleOutline htmlColor='#50C8B4' />
+                                        0% refund (Cancel 2 days or less in advance)
+                                    </Box>
+                                    :
+                                    <Box>
+                                        <RadioButtonUnchecked />
+                                        0% refund (Cancel 2 days or less in advance)
+                                    </Box>
+                                }
+                            </Box>
+                            <Box className='w-50 fw-medium' fontSize={14}>
+                                Amount customer will receive after canceling booking:
                                 <Input className="fw-bold" readOnly value={(selectedBooking?.totalAmount * refundPercentage).toLocaleString('vi-VN') + " VND"} />
-                            </FormLabel>
+                            </Box>
                         </FormControl>
                     </ModalBody>
                     <ModalFooter className='pt-0'>
@@ -517,7 +566,7 @@ const BookingHistory = () => {
                             handleRequestRefund(selectedBooking.id);
                             onCloseRefundModal();
                         }}>
-                            Refund
+                            Send request
                         </Button>
                     </ModalFooter>
                 </ModalContent>
