@@ -23,18 +23,35 @@ export default function Login() {
         }
     }, [navigate])
 
-
+    const validateEmail = (email) => {
+        const re = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+        return re.test(String(email).toLowerCase());
+    }
 
     const handleLogin = async (e) => {
         e.preventDefault();
-        const response = await axios.post(`${URL}/login`, { email, password }, { withCredentials: true })
-        if (response.data.isSuccess === 'true') {
-            localStorage.setItem('isLoggedIn', true);
-            localStorage.setItem('roleId', response.data.user.roleId)
-            localStorage.setItem('email', response.data.user.email)
-            navigate('/')
-        } else {
-            setMessage("Invalid username or password!")
+        if (!email || !password) {
+            setMessage("Please fill in all fields.");
+            return;
+        }
+
+        if (!validateEmail(email)) {
+            setMessage("Please enter a valid email address.");
+            return;
+        }
+
+        try {
+            const response = await axios.post(`http://localhost:8080/login`, { email, password }, { withCredentials: true });
+            if (response.data.isSuccess === 'true') {
+                localStorage.setItem('isLoggedIn', true);
+                localStorage.setItem('roleId', response.data.user.roleId)
+                localStorage.setItem('email', response.data.user.email)
+                navigate('/')
+            } else {
+                setMessage("Invalid username or password!");
+            }
+        } catch (error) {
+            setMessage("Invalid username or password!");
         }
     }
 
@@ -143,7 +160,7 @@ export default function Login() {
                                 <a href="#"><i>Forgot Password?</i></a>
                             </div>
                             <div>
-                                <button  className='col-12 btn-login rounded fw-bold' style={{ background: 'teal', color: 'white', height: '40px' }} onClick={handleLogin}>Login</button>
+                                <button className='col-12 btn-login rounded fw-bold' style={{ background: 'teal', color: 'white', height: '40px' }} onClick={handleLogin}>Login</button>
                             </div>
                             <div className='d-flex justify-content-center gap-2 mb-1 mt-2'>
                                 <p>Don't have an account?</p><Link to={'/register'} className='fw-bold'>Sign up</Link>

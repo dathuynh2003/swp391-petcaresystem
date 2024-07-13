@@ -238,6 +238,14 @@ const Reservation = () => {
     const dob = new Date(selectedBooking?.pet?.dob);
     const diffMonths = (today.getFullYear() - dob.getFullYear()) * 12 + (today.getMonth() - dob.getMonth());
     const age = diffMonths !== 0 ? diffMonths : 1;
+    const formatDate = (isoDate) => {
+        if (!isoDate) return "N/A";
+        const dateObj = new Date(isoDate);
+        const day = dateObj.getDate().toString().padStart(2, '0');
+        const month = (dateObj.getMonth() + 1).toString().padStart(2, '0');
+        const year = dateObj.getFullYear();
+        return `${day}/${month}/${year}`;
+    };
 
     return (
         <Box p={5}>
@@ -458,109 +466,98 @@ const Reservation = () => {
             </Modal >
 
             {selectedBooking && (
-                <Modal isOpen={isOpen} onClose={onClose} size='6xl'>
+                <Modal isOpen={isOpen} onClose={onClose} size='3xl'>
                     <ModalOverlay />
-                    <ModalContent>
-                        <ModalHeader>Booking Details #{selectedBooking.id}</ModalHeader>
+                    <ModalContent marginTop={5}>
+                        <ModalHeader pb={0}>
+                            <Box display='flex' alignItems='center' className='fs-5'>
+                                <Image src="logoApp.svg" alt="Logo" className="logo" /> Pet Health Care
+                            </Box>
+                            <Text textAlign='center' mb={3} className='fs-3'>
+                                Booking Details #{selectedBooking.id}
+                            </Text>
+                        </ModalHeader>
                         <ModalCloseButton />
                         <ModalBody>
-                            <div className="invoice-wrapper" id="print-area">
-                                <div className="invoice">
-                                    <div className="invoice-container">
-                                        <div className="invoice-head">
-                                            <div className="invoice-head-top">
-                                                <div className="invoice-head-top-left text-start">
-                                                    <img src="/assets/logoPetCare.png" alt="Logo" />
-                                                </div>
-                                                <div className="invoice-head-top-right text-end">
-                                                    <h3>Booking Detail #{selectedBooking.id}</h3>
-                                                </div>
-                                            </div>
-                                            <div className="hr"></div>
-                                            <div className="invoice-head-middle">
-                                                <div className="invoice-head-middle-left text-start">
-                                                    <p>
-                                                        <span className="text-bold">Booking Date</span>:
-                                                        {formatDateTime(selectedBooking.bookingDate, 'dd/MM/yyyy')}
-                                                    </p>
-                                                    <p>
-                                                        <span className="text-bold">Appointment Date</span>:
-                                                        {formatDateTime(selectedBooking.vetShiftDetail.date, 'dd/MM/yyyy')}
-                                                    </p>
-
-                                                </div>
-
-                                                <div className="invoice-head-middle-right text-end">
-                                                    <p><span className="text-bold">Booking No:</span> {selectedBooking.id}</p>
-                                                </div>
-                                                <div className="invoice-head-middle-left text-start">
-                                                    <p><span className="text-bold">Description</span>: {selectedBooking.description}</p>
-                                                </div>
-                                            </div>
-                                            <div className="hr"></div>
-                                            <div className="invoice-head-bottom row mb-3">
-
-                                                <div className="invoice-head-bottom-left col-6 ">
-                                                    <ul className='customer-info'>
-                                                        <li className='text-bold'>Customer Information</li>
-                                                        <li><b>Name: </b>{selectedBooking.user.fullName || 'N/A'}</li>
-                                                        <li><b>Address: </b>{selectedBooking.user.address || 'N/A'}</li>
-                                                        <li><b>Phone: </b>{selectedBooking.user.phoneNumber || 'N/A'}</li>
-                                                        <li><b>Dob: </b>{formatDateTime(selectedBooking.user.dob, 'dd/MM/yyyy') || 'N/A'}</li>
-                                                    </ul>
-                                                </div>
-                                                <div className="invoice-head-bottom-right col-6">
-                                                    <ul className="pet-info">
-                                                        <li className='text-bold'>Pet Information</li>
-                                                        <li><b>Name: </b>{selectedBooking.pet.name || 'N/A'}</li>
-                                                        <li><b>Age: </b>{age || 'N/A'} Month(s)</li>
-                                                        <li><b>Gender: </b>{selectedBooking.pet.gender || 'N/A'}</li>
-                                                        <li><b>Breed: </b>{selectedBooking.pet.breed || 'N/A'}</li>
-                                                    </ul>
-                                                </div>
-                                            </div>
+                            <div className="invoice-container">
+                                <div className="invoice-head">
+                                    <div className="invoice-head-middle">
+                                        <div className="invoice-head-middle-left text-start">
+                                            <p>
+                                                <span className="text-bold">Booking Date</span>: {formatDateTime(selectedBooking.bookingDate, 'dd/MM/yyyy')}
+                                            </p>
+                                            <p>
+                                                <span className="text-bold">Appointment Date</span>: {formatDateTime(selectedBooking.vetShiftDetail.date, 'dd/MM/yyyy')}
+                                            </p>
                                         </div>
-                                        <div className="overflow-view">
-                                            <div className="invoice-body">
-                                                <table>
-                                                    <thead>
-                                                        <tr>
-                                                            <td className='text-bold'>#</td>
-                                                            <td className="text-bold">Service</td>
-                                                            <td className="text-bold">Description</td>
-                                                            <td className="text-end text-bold" >Price</td>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        {selectedBooking.bookingDetails.map((detail, index) => (
-                                                            <tr key={index}>
-                                                                <td>{index + 1}</td>
-                                                                <td>{detail.petService.nameService}</td>
-                                                                <td>{detail.petService.description}</td>
-                                                                <td className="text-end">{formatPrice(detail.petService.price)}</td>
-                                                            </tr>
-                                                        ))}
-                                                    </tbody>
-                                                </table>
-                                                <div className="invoice-body-bottom">
-                                                    {/* <div className="invoice-body-info-item border-bottom">
+
+                                        <div className="invoice-head-middle-right text-end">
+                                            <p><span className="text-bold">Booking No:</span> {selectedBooking.id}</p>
+                                        </div>
+                                        <div className="invoice-head-middle-left text-start">
+                                            <p><span className="text-bold">Description</span>: {selectedBooking.description}</p>
+                                        </div>
+                                    </div>
+                                    <div className="hr"></div>
+                                    <div className="invoice-head-bottom row mb-3">
+
+                                        <div className="invoice-head-bottom-left col-6 ">
+                                            <ul className='customer-info'>
+                                                <li className='text-bold'>Customer Information</li>
+                                                <li><b>Name: </b>{selectedBooking.user.fullName || 'N/A'}</li>
+                                                <li><b>Address: </b>{selectedBooking.user.address || 'N/A'}</li>
+                                                <li><b>Phone: </b>{selectedBooking.user.phoneNumber || 'N/A'}</li>
+                                                <li><b>Dob: </b>{formatDateTime(selectedBooking.user.dob, 'dd/MM/yyyy') || 'N/A'}</li>
+                                            </ul>
+                                        </div>
+                                        <div className="invoice-head-bottom-right col-6">
+                                            <ul className="pet-info">
+                                                <li className='text-bold'>Pet Information</li>
+                                                <li><b>Name: </b>{selectedBooking.pet.name || 'N/A'}</li>
+                                                <li><b>Age: </b>{age || 'N/A'} Month(s)</li>
+                                                <li><b>Gender: </b>{selectedBooking.pet.gender || 'N/A'}</li>
+                                                <li><b>Breed: </b>{selectedBooking.pet.breed || 'N/A'}</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="overflow-view">
+                                    <div className="invoice-body">
+                                        <table>
+                                            <thead>
+                                                <tr>
+                                                    <td className='text-bold'>#</td>
+                                                    <td className="text-bold">Service</td>
+                                                    <td className="text-bold">Description</td>
+                                                    <td className="text-end text-bold" >Price</td>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {selectedBooking.bookingDetails.map((detail, index) => (
+                                                    <tr key={index}>
+                                                        <td>{index + 1}</td>
+                                                        <td>{detail.petService.nameService}</td>
+                                                        <td>{detail.petService.description}</td>
+                                                        <td className="text-end">{formatPrice(detail.petService.price)}</td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                        <div className="invoice-body-bottom">
+                                            {/* <div className="invoice-body-info-item border-bottom">
                                                         <div className="info-item-td text-end text-bold">Sub Total:</div>
                                                         <div className="info-item-td text-end">{selectedBooking.bookingDetails.reduce((acc, detail) => acc + detail.amount, 0)}</div>
                                                     </div> */}
-                                                    <div className="invoice-body-info-item border-bottom">
-                                                        <div className="info-item-td text-end text-bold">Tax:</div>
-                                                        <div className="info-item-td text-end"></div>
-                                                    </div>
-                                                    <div className="invoice-body-info-item">
-                                                        <div className="info-item-td text-end text-bold">Total:</div>
-                                                        <div className="info-item-td text-end">{formatPrice(selectedBooking.bookingDetails.reduce((acc, detail) => acc + detail.petService.price, 0))} VND</div>
-                                                    </div>
-                                                </div>
+                                            <div className="invoice-body-info-item">
+                                                <div className="info-item-td text-end text-bold">Total:</div>
+                                                <div className="info-item-td text-end">{formatPrice(selectedBooking.bookingDetails.reduce((acc, detail) => acc + detail.petService.price, 0))} VND</div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
+
+
                         </ModalBody>
                         <ModalFooter>
                             <Button variant="ghost" onClick={onClose}>Close</Button>

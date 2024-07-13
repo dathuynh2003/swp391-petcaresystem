@@ -635,8 +635,9 @@ const BookingHistory = () => {
                                         <FontAwesomeIcon icon={faXRay} style={{ marginRight: '8px', color: 'teal' }} /> Booking
                                     </Text>
                                     <Box mt={2}>
-                                        <Text><strong>Date:</strong> {formatDateTime(selectedBooking.bookingDate, 'dd/MM/yyyy')}</Text>
-                                        <Text><strong>Appointment Date:</strong> {formatDateTime(selectedBooking.vetShiftDetail.date, 'dd/MM/yyyy - hh:mm')}</Text>
+                                        <Text><strong>Date:</strong> {formatDateTime(selectedBooking.bookingDate, 'dd-MM-yyy')}</Text>
+                                        <Text><strong>Appointment Date:</strong> {formatDateTime(selectedBooking.vetShiftDetail.date, 'dd-MM-yyy')}</Text>
+                                        <Text><strong>Slot:</strong> {selectedBooking.vetShiftDetail.shift.from_time} - {selectedBooking.vetShiftDetail.shift.to_time}</Text>
                                         <Text><strong>Description:</strong> {selectedBooking.description}</Text>
                                     </Box>
                                 </Box>
