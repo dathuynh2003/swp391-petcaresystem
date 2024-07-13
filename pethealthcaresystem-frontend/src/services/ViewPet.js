@@ -629,7 +629,7 @@ export default function ViewPet() {
                                         <FormControl className='d-flex justify-content-between'>
                                             <FormLabel>Pet's breed <Input ref={initialRef} value={pet.breed} /></FormLabel>
                                             <FormLabel>Pet's sex <Input value={pet.gender} /></FormLabel>
-                                            <FormLabel>Pet's age <Input value={pet.age} /></FormLabel>
+                                            <FormLabel>Pet's age <Input value={age + " month(s)"} /></FormLabel>
                                         </FormControl>
                                         <FormControl  >
                                             <FormLabel>
@@ -870,7 +870,7 @@ export default function ViewPet() {
                                                 <FormControl className='d-flex justify-content-between'>
                                                     <FormLabel>Pet's breed <Input ref={initialRef} value={pet.breed} /></FormLabel>
                                                     <FormLabel>Pet's sex <Input value={pet.gender} /></FormLabel>
-                                                    <FormLabel>Pet's age <Input value={pet.age + " month(s)"} /></FormLabel>
+                                                    <FormLabel>Pet's age <Input value={age + " month(s)"} /></FormLabel>
                                                 </FormControl>
                                                 <FormControl  >
                                                     <FormLabel>

@@ -109,6 +109,12 @@ export default function VetWorkSchedules() {
     textAlign: 'center'
   };
 
+  //Tính tuổi của pet dựa vào dob (đơn vị month(s))
+  const today = new Date();
+  const dob = new Date(modalData?.bookings[0]?.pet?.dob);
+  const diffMonths = (today.getFullYear() - dob.getFullYear()) * 12 + (today.getMonth() - dob.getMonth());
+  const age = diffMonths !== 0 ? diffMonths : 1;
+
   return (
     <div className="container">
       <div className="row">
@@ -214,7 +220,7 @@ export default function VetWorkSchedules() {
                 <div className="col-md-6">
                   <h5>Pet Information</h5>
                   <p><strong>Name:</strong> {modalData.bookings[0].pet.name ? modalData.bookings[0].pet.name : 'N/A'}</p>
-                  <p><strong>Age:</strong> {modalData.bookings[0].pet.age ? modalData.bookings[0].pet.age + 'month(s)' : 'N/A'}</p>
+                  <p><strong>Age:</strong> {age ? age + ' month(s)' : 'N/A'}</p>
                   <p><strong>Gender:</strong> {modalData.bookings[0].pet.gender ? modalData.bookings[0].pet.gender : 'N/A'}</p>
                   <p><strong>Breed:</strong> {modalData.bookings[0].pet.breed ? modalData.bookings[0].pet.breed : 'N/A'}</p>
                 </div>

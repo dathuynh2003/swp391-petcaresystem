@@ -233,6 +233,12 @@ const Reservation = () => {
         }
     }
 
+    //Tính tuổi của pet dựa vào dob (đơn vị month(s))
+    const today = new Date();
+    const dob = new Date(selectedBooking?.pet?.dob);
+    const diffMonths = (today.getFullYear() - dob.getFullYear()) * 12 + (today.getMonth() - dob.getMonth());
+    const age = diffMonths !== 0 ? diffMonths : 1;
+
     return (
         <Box p={5}>
             <Box>
@@ -500,14 +506,14 @@ const Reservation = () => {
                                                         <li><b>Name: </b>{selectedBooking.user.fullName || 'N/A'}</li>
                                                         <li><b>Address: </b>{selectedBooking.user.address || 'N/A'}</li>
                                                         <li><b>Phone: </b>{selectedBooking.user.phoneNumber || 'N/A'}</li>
-                                                        <li><b>Dob: </b>{selectedBooking.user.dob || 'N/A'}</li>
+                                                        <li><b>Dob: </b>{formatDateTime(selectedBooking.user.dob, 'dd/MM/yyyy') || 'N/A'}</li>
                                                     </ul>
                                                 </div>
                                                 <div className="invoice-head-bottom-right col-6">
                                                     <ul className="pet-info">
                                                         <li className='text-bold'>Pet Information</li>
                                                         <li><b>Name: </b>{selectedBooking.pet.name || 'N/A'}</li>
-                                                        <li><b>Age: </b>{selectedBooking.pet.age || 'N/A'}</li>
+                                                        <li><b>Age: </b>{age || 'N/A'} Month(s)</li>
                                                         <li><b>Gender: </b>{selectedBooking.pet.gender || 'N/A'}</li>
                                                         <li><b>Breed: </b>{selectedBooking.pet.breed || 'N/A'}</li>
                                                     </ul>
