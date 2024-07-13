@@ -234,11 +234,14 @@ export default function VetWorkSchedules() {
                       <td>{index + 1}</td>
                       <td>{detail.petService.nameService ? detail.petService.nameService : 'N/A'}</td>
                       <td>{detail.petService.description ? detail.petService.description : 'N/A'}</td>
-                      {/* <td>{getFieldValue(detail.petService.price)}</td> */}
+                      {/* <td>{detail.petService.price}</td> */}
                     </tr>
                   ))}
                 </tbody>
               </table>
+              <div className="col-md-6">
+                <p><strong>Booking Description:</strong> {modalData.bookings[0].description ? modalData.bookings[0].description : 'N/A'}</p>
+              </div>
             </>
           )}
         </Modal.Body>
