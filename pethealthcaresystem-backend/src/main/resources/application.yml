@@ -6,11 +6,19 @@ server:
       cookie:
         name: JSESSIONID
 
+#spring:
+#  datasource:
+#    url: "jdbc:mysql://localhost:3306/pethealthcare"
+#    username: root
+#    password: root
 spring:
   datasource:
-    url: "jdbc:mysql://localhost:3306/pethealthcare"
-    username: root
-    password: root
+    url: jdbc:mysql://locsql.mysql.database.azure.com:3306/pethealthcare?useSSL=true
+    username: loc123
+    password: phuoc123@
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+
   jpa:
     hibernate:
       ddl-auto: update

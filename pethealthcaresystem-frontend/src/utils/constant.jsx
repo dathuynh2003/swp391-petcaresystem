@@ -70,4 +70,5 @@ export const LIST_BREED = {
     ]
 }
 
-export const URL = "https://pethealthcare.vercel.app"
+export const URL = "https://pethealthcare.internal.politeplant-a3c0f0ac.japaneast.azurecontainerapps.io"
+// https://pethealthcare.internal.politeplant-a3c0f0ac.japaneast.azurecontainerapps.io

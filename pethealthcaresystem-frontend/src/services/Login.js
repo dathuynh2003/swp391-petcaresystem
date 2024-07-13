@@ -47,7 +47,7 @@ export default function Login() {
 
         try {
             const result = await signInWithPopup(auth, provider)
-            await axios.post(`http://localhost:8080/register-gg`, {
+            await axios.post(`${URL}/register-gg`, {
                 email: result.user.email,
                 fullName: result.user.displayName,
                 password: "111111"
