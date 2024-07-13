@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom'
 import { ToastContainer, toast } from 'react-toastify'
 import '../Medicine/Medicine.css'
 import ReactPaginate from 'react-paginate'
-
+import { URL } from '../../utils/constant'
 export default function SystemConfig() {
     const navigate = useNavigate()
     const { isOpen: isOpenAddConfig, onOpen: onOpenAddConfig, onClose: onCloseAddConfig } = useDisclosure()
@@ -37,7 +37,7 @@ export default function SystemConfig() {
             return
         }
         try {
-            const response = await axios.post(`http://localhost:8080/configuration/add`, configuration, { withCredentials: true })
+            const response = await axios.post(`${URL}/configuration/add`, configuration, { withCredentials: true })
             if (response.data.message === 'Successfully') {
                 toast.success('Add config success')
             } else {
@@ -52,7 +52,7 @@ export default function SystemConfig() {
     const [configKeys, setConfigkeys] = useState([])
     const fetchConfigKey = async () => {
         try {
-            const response = await axios.get(`http://localhost:8080/configuration/configKeys`, { withCredentials: true })
+            const response = await axios.get(`${URL}/configuration/configKeys`, { withCredentials: true })
             if (response.data.message === 'Successfully') {
                 setConfigkeys(response.data.configKeys)
                 // console.log("Keys:")
@@ -72,7 +72,7 @@ export default function SystemConfig() {
     useEffect(() => {
         const fetchConfigurationsByKey = async (key, page) => {
             try {
-                const response = await axios.get(`http://localhost:8080/configuration/search/${key}?page=${page}&size=${pageSize}`, { withCredentials: true })
+                const response = await axios.get(`${URL}/configuration/search/${key}?page=${page}&size=${pageSize}`, { withCredentials: true })
                 if (response.data.message === 'Successfully') {
                     setConfigurations(response.data.configurations.content)
                     setTotalPages(response.data.configurations.totalPages)
@@ -90,7 +90,7 @@ export default function SystemConfig() {
     const { isOpen: isOpenEditConfig, onOpen: onOpenEditConfig, onClose: onCloseEditConfig } = useDisclosure()
     const hanldeEditSConfig = async (config) => {
         try {
-            const response = await axios.put(`http://localhost:8080/configuration/update/${config?.id}`, config, { withCredentials: true })
+            const response = await axios.put(`${URL}/configuration/update/${config?.id}`, config, { withCredentials: true })
             if (response.data.message === 'Successfully') {
                 toast.success("Updated Successs")
                 window.location.reload()
@@ -105,7 +105,7 @@ export default function SystemConfig() {
 
     const handleDeleteSConfig = async (config) => {
         try {
-            const response = await axios.delete(`http://localhost:8080/configuration/${config?.id}`, { withCredentials: true })
+            const response = await axios.delete(`${URL}/configuration/${config?.id}`, { withCredentials: true })
             if (response.data.message === 'Deleted') {
                 toast.success("Delete Successs")
                 window.location.reload()

@@ -3,7 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
 import { Box, Text, Spinner, Alert, AlertIcon, Heading, Flex, Button } from '@chakra-ui/react';
 import { ArrowBackIcon } from '@chakra-ui/icons';
-
+import { URL } from '../../utils/constant';
 const ViewAccount = () => {
     const { userId } = useParams();
     const [user, setUser] = useState(null);
@@ -13,7 +13,7 @@ const ViewAccount = () => {
     useEffect(() => {
         const fetchUser = async () => {
             try {
-                const response = await axios.get(`http://localhost:8080/get-user-by-id/${userId}`);
+                const response = await axios.get(`${URL}/get-user-by-id/${userId}`);
                 setUser(response.data.data);
             } catch (error) {
                 setError('Error fetching user details. Please try again later.');

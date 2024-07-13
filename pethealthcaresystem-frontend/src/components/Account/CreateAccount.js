@@ -17,7 +17,7 @@ import {
     Textarea,
     useToast,
 } from '@chakra-ui/react';
-
+import { URL } from '../../utils/constant';
 const CreateAccount = () => {
     let navigate = useNavigate();
 
@@ -52,7 +52,7 @@ const CreateAccount = () => {
         }
 
         try {
-            await axios.post(`http://localhost:8080/create-user-by-admin`, user);
+            await axios.post(`${URL}/create-user-by-admin`, user);
             toast({
                 title: "Account created.",
                 description: "The user account has been created successfully.",

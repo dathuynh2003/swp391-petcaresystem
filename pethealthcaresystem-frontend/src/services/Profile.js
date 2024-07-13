@@ -8,7 +8,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { Margin } from '@mui/icons-material';
 import { width } from '@mui/system';
 import { EditIcon } from '@chakra-ui/icons';
-
+import { URL } from '../utils/constant';
 const Profile = () => {
   const navigate = useNavigate();
 
@@ -50,7 +50,7 @@ const Profile = () => {
       setMessageDob("You need to be at least 13 years old")
       return;
     }
-    const response = await axios.put(`http://localhost:8080/updateuser`, profile, { withCredentials: true });
+    const response = await axios.put(`${URL}/updateuser`, profile, { withCredentials: true });
     if (response.data.message === 'Successfully') {
       toast.success('Update profile successfully');
       setIsEditing({ ...isEditing, [field]: false });
@@ -61,7 +61,7 @@ const Profile = () => {
   };
 
   const handleGetProfile = async () => {
-    const response = await axios.get(`http://localhost:8080/getuser`, { withCredentials: true });
+    const response = await axios.get(`${URL}/getuser`, { withCredentials: true });
     if (response.data !== '') {
       setProfile(response.data);
     }
@@ -83,7 +83,7 @@ const Profile = () => {
     }
 
     try {
-      const response = await axios.post(`http://localhost:8080/upload-avatar`, formData, {
+      const response = await axios.post(`${URL}/upload-avatar`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },

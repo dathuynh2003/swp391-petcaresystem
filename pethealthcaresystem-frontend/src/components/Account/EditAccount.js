@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css'; // Import Bootstrap CSS
-
+import { URL } from '../../utils/constant';
 const EditAccount = () => {
     let navigate = useNavigate();
     let { userId } = useParams(); // Assuming you're passing the user ID as a route parameter
@@ -27,7 +27,7 @@ const EditAccount = () => {
     useEffect(() => {
         const fetchUserData = async () => {
             try {
-                const result = await axios.get(`http://localhost:8080/get-user-by-id/${userId}`);
+                const result = await axios.get(`${URL}/get-user-by-id/${userId}`);
                 console.log('Fetched user data:', result.data?.data); // Log fetched user data
                 setUser(result.data?.data); // Accessing the nested data property
             } catch (error) {
@@ -59,7 +59,7 @@ const EditAccount = () => {
         }); // Log data being sent to the backend
 
         try {
-            await axios.put(`http://localhost:8080/update-user-by-admin/${userId}`, {
+            await axios.put(`${URL}/update-user-by-admin/${userId}`, {
                 roleId: user.roleId,
                 isActive: user.isActive
             });

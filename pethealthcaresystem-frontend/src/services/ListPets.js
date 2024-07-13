@@ -17,13 +17,13 @@ import {
   Tooltip
 } from '@chakra-ui/react'
 import { ToastContainer, toast } from 'react-toastify'
-
+import { URL } from '../utils/constant';
 export default function ListPets() {
   const { isOpen, onOpen, onClose } = useDisclosure()
   const [pets, setPets] = useState([])
 
   const loadPets = async () => {
-    const response = await axios.get("http://localhost:8080/pet", { withCredentials: true })
+    const response = await axios.get(`${URL}/pet`, { withCredentials: true })
     setPets(response.data)
   }
 
@@ -33,7 +33,7 @@ export default function ListPets() {
 
   const deletePet = async (petId) => {
     try {
-      const response = await axios.put(`http://localhost:8080/deletePet/${petId}`)
+      const response = await axios.put(`${URL}/deletePet/${petId}`)
       toast.success(response.data)
     } catch (error) {
       toast.error(error)

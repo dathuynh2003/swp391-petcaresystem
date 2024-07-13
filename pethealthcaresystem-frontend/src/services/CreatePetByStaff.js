@@ -13,7 +13,7 @@ import { LIST_BREED } from '../utils/constant';
 import axios from 'axios';
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer, toast } from 'react-toastify';
-
+import { URL } from '../utils/constant';
 import { Menu, MenuButton, MenuList, MenuItemOption, MenuOptionGroup, Button } from '@chakra-ui/react';
 
 export default function CreatePetByStaff() {
@@ -45,7 +45,7 @@ export default function CreatePetByStaff() {
                 return;
             }
 
-            const response = await axios.post('http://localhost:8080/createForAnonymous', petRequest, { withCredentials: true });
+            const response = await axios.post(`${URL}/createForAnonymous`, petRequest, { withCredentials: true });
             toast.success('Add new pet and account successfully!', 2000);
 
             setTimeout(() => {
@@ -113,7 +113,7 @@ export default function CreatePetByStaff() {
     const fetchPetType = async () => {
         const configKey = "petType"
         try {
-            const respone = await axios.get(`http://localhost:8080/configurations/${configKey}`, { withCredentials: true })
+            const respone = await axios.get(`${URL}/configurations/${configKey}`, { withCredentials: true })
             if (respone.data.message === 'Successfully') {
                 setPetTypes(respone.data.configurations)
             }

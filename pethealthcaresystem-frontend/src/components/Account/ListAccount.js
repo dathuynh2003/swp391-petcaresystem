@@ -33,7 +33,7 @@ import {
 } from '@chakra-ui/react';
 import { Link } from 'react-router-dom';
 import { SearchIcon, ViewIcon, EditIcon, DeleteIcon } from '@chakra-ui/icons';
-
+import { URL } from '../../utils/constant';
 const ListAccount = () => {
   const [accounts, setAccounts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -53,7 +53,7 @@ const ListAccount = () => {
   const fetchAccounts = async () => {
     setLoading(true);
     try {
-      let url = `http://localhost:8080/get-users-by-id/${roleFilter}?pageNo=${page}&pageSize=5`;
+      let url = `${URL}/get-users-by-id/${roleFilter}?pageNo=${page}&pageSize=5`;
       const response = await axios.get(url);
       const data = response.data.data;
       setAccounts(data.content);
@@ -74,7 +74,7 @@ const ListAccount = () => {
     }
 
     try {
-      const response = await axios.get("http://localhost:8080/find-user-with-email", {
+      const response = await axios.get(`${URL}/find-user-with-email`, {
         params: { email: searchQuery }
       });
       setAccounts([response.data.data]);
@@ -92,7 +92,7 @@ const ListAccount = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.put(`http://localhost:8080/delete-user-by-admin/${id}`);
+      await axios.put(`${URL}/delete-user-by-admin/${id}`);
 
       toast({
         title: "Account deleted.",
@@ -121,7 +121,7 @@ const ListAccount = () => {
 
   const handleUpdate = async () => {
     try {
-      await axios.put(`http://localhost:8080/update-user-by-admin/${selectedUser.userId}`, {
+      await axios.put(`${URL}/update-user-by-admin/${selectedUser.userId}`, {
         roleId: selectedUser.roleId,
         isActive: selectedUser.isActive
       });

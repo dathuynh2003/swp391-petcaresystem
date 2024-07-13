@@ -5,7 +5,7 @@ import React, { useEffect, useState } from 'react';
 import ReactPaginate from 'react-paginate';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast, ToastContainer } from 'react-toastify';
-
+import { URL } from '../utils/constant';
 const Cages = () => {
 
   const navigate = useNavigate()
@@ -42,7 +42,7 @@ const Cages = () => {
   })
   const [editedCage, setEditedCage] = useState(null)
   const loadCage = async (name, page) => {
-    const response = await axios.get(`http://localhost:8080/cage/search/${name}?page=${page}&size=${pageSize}`, { withCredentials: true })
+    const response = await axios.get(`${URL}/cage/search/${name}?page=${page}&size=${pageSize}`, { withCredentials: true })
     if (response.data.message === "Cage found") {
       setCages(response.data.cages.content)
       setTotalPages(response.data.cages.totalPages)
@@ -66,7 +66,7 @@ const Cages = () => {
   const fetchPetType = async () => {
     const configKey = "petType"
     try {
-      const respone = await axios.get(`http://localhost:8080/configurations/${configKey}`, { withCredentials: true })
+      const respone = await axios.get(`${URL}/configurations/${configKey}`, { withCredentials: true })
       if (respone.data.message === 'Successfully') {
         setPetTypes(respone.data.configurations)
       }
@@ -116,7 +116,7 @@ const Cages = () => {
     try {
       // Loại bỏ dấu chấm ra khỏi giá trị price
       newCage.price = newCage.price.replace(/\./g, '');
-      const respone = await axios.post('http://localhost:8080/createCage', newCage, { withCredentials: true })
+      const respone = await axios.post(`${URL}/createCage`, newCage, { withCredentials: true })
       if (respone.data.message === 'Cage created') {
         toast.success('Add new cage successfully!');
         setTimeout(() => {
@@ -146,7 +146,7 @@ const Cages = () => {
     try {
       // Loại bỏ dấu chấm ra khỏi giá trị price
       editedCage.price = String(editedCage.price).replace(/\./g, '');
-      const respone = await axios.put(`http://localhost:8080/updateCage/${editedCage.id}`,
+      const respone = await axios.put(`${URL}/updateCage/${editedCage.id}`,
         {
           name: editedCage.name,
           price: editedCage.price,

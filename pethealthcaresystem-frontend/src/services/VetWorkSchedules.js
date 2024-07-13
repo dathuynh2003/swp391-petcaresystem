@@ -4,6 +4,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { Link } from 'react-router-dom';
 import { Modal } from 'react-bootstrap';
 import { Button } from '@chakra-ui/react';
+import { URL } from '../utils/constant';
 
 export default function VetWorkSchedules() {
   const [shifts, setShifts] = useState([]);
@@ -17,7 +18,7 @@ export default function VetWorkSchedules() {
   useEffect(() => {
     const fetchShifts = async () => {
       try {
-        const response = await axios.get('http://localhost:8080/shifts/all', { withCredentials: true });
+        const response = await axios.get(`${URL}/shifts/all`, { withCredentials: true });
         setShifts(response.data);
       } catch (error) {
         console.error('Error fetching shifts:', error);
@@ -26,7 +27,7 @@ export default function VetWorkSchedules() {
 
     const fetchSchedule = async () => {
       try {
-        const response = await axios.get('http://localhost:8080/shifts/vet-shift', { withCredentials: true });
+        const response = await axios.get(`${URL}/shifts/vet-shift`, { withCredentials: true });
         setSchedule(response.data);
       } catch (error) {
         console.error('Error fetching schedule:', error);

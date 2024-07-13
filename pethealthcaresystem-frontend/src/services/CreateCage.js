@@ -3,7 +3,7 @@ import axios from 'axios'
 import React, { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { ToastContainer, toast } from 'react-toastify'
-
+import { URL } from '../utils/constant';
 export default function CreateCage() {
 
     let navigate = useNavigate()
@@ -36,7 +36,7 @@ export default function CreateCage() {
             return
         }
         try {
-            const respone = await axios.post('http://localhost:8080/createCage', cage, { withCredentials: true })
+            const respone = await axios.post(`${URL}/createCage`, cage, { withCredentials: true })
             if (respone.data.message === 'Cage created') {
                 toast.success('Add new cage successfully!');
                 setTimeout(() => {
@@ -56,7 +56,7 @@ export default function CreateCage() {
     const fetchPetType = async () => {
         const configKey = "petType"
         try {
-            const respone = await axios.get(`http://localhost:8080/configurations/${configKey}`, { withCredentials: true })
+            const respone = await axios.get(`${URL}/configurations/${configKey}`, { withCredentials: true })
             if (respone.data.message === 'Successfully') {
                 setPetTypes(respone.data.configurations)
             }

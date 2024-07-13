@@ -24,6 +24,8 @@ import {
 } from '@chakra-ui/react'
 import { ToastContainer, toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
+import { URL } from '../../utils/constant'
+
 export default function Medicine() {
 
   const navigate = useNavigate()
@@ -42,7 +44,7 @@ export default function Medicine() {
   const fetchMedicineUnit = async () => {
     const configKey = "medicineUnit"
     try {
-      const respone = await axios.get(`http://localhost:8080/configurations/${configKey}`, { withCredentials: true })
+      const respone = await axios.get(`${URL}/configurations/${configKey}`, { withCredentials: true })
       if (respone.data.message === 'Successfully') {
         setMedicineUnits(respone.data.configurations)
       }
@@ -104,7 +106,7 @@ export default function Medicine() {
       console.log("DANG o: " + currentPage);
       console.log("pageNo: " + pageNo);
       console.log("pageSearch: " + pageNoSearch);
-      const response = await axios.get(`http://localhost:8080/medicine/list?pageNo=${pageNo}&pageSize=${pageSize}`, { withCredentials: true })
+      const response = await axios.get(`${URL}/medicine/list?pageNo=${pageNo}&pageSize=${pageSize}`, { withCredentials: true })
       setMedicines(response.data.content)
       setTotalPages(response.data.totalPages)
     } catch (error) {
@@ -178,7 +180,7 @@ export default function Medicine() {
       // setPageNoSearch(0)
       console.log(pageSize);
       console.log("keyword day ne:  " + keyword);
-      const response = await axios.get(`http://localhost:8080/medicine/search/${keyword1}?pageNo=${pageNoSearch}&pageSize=${2}`, { withCredentials: true });
+      const response = await axios.get(`${URL}/medicine/search/${keyword1}?pageNo=${pageNoSearch}&pageSize=${2}`, { withCredentials: true });
 
       setTotalPages(response.data.MEDICINES.totalPages)
       setMedicines(response.data.MEDICINES.content)
@@ -199,7 +201,7 @@ export default function Medicine() {
   const callAPISearch = async () => {
 
     try {
-      const response = await axios.get(`http://localhost:8080/medicine/search/${keyword}?pageNo=${pageNoSearch}&pageSize=${2}`, { withCredentials: true });
+      const response = await axios.get(`${URL}/medicine/search/${keyword}?pageNo=${pageNoSearch}&pageSize=${2}`, { withCredentials: true });
       setMedicines(response.data.MEDICINES.content)
       setTotalPages(response.data.MEDICINES.totalPages)
     } catch (error) {
@@ -259,7 +261,7 @@ export default function Medicine() {
     try {
       if (returnListAll === false) {
 
-        const response = await axios.get(`http://localhost:8080/medicine/expired?pageNo=${pageNoExpired}&pageSize=${1}`, { withCredentials: true });
+        const response = await axios.get(`${URL}/medicine/expired?pageNo=${pageNoExpired}&pageSize=${1}`, { withCredentials: true });
         setMedicines(response.data.content)
         setTotalPages(response.data.totalPages)
       } else {
@@ -345,7 +347,7 @@ export default function Medicine() {
         listError.push("Add medicine failed!")
       }
       if (listError.length === 0) {
-        const response = await axios.post(`http://localhost:8080/medicine/add`, medicine, { withCredentials: true })
+        const response = await axios.post(`${URL}/medicine/add`, medicine, { withCredentials: true })
         if (response.data !== null || response.data !== undefined) {
           toast.success("Add medicine successfully!")
           loadMedicines()
@@ -394,7 +396,7 @@ export default function Medicine() {
         listError.push("Add medicine failed!")
       }
       if (listError.length === 0) {
-        const response = await axios.put(`http://localhost:8080/medicine/edit/${selectedMedicine?.id}`, selectedMedicine, { withCredentials: true })
+        const response = await axios.put(`${URL}/medicine/edit/${selectedMedicine?.id}`, selectedMedicine, { withCredentials: true })
         if (response.data !== null || response.data !== undefined) {
           toast.success("Edit medicine successfully!")
           loadMedicines()
@@ -415,7 +417,7 @@ export default function Medicine() {
   }
   const callDeleteMedicineAPI = async () => {
     try {
-      const response = await axios.put(`http://localhost:8080/medicine/delete/${selectedMedicine?.id}`, [], { withCredentials: true })
+      const response = await axios.put(`${URL}/medicine/delete/${selectedMedicine?.id}`, [], { withCredentials: true })
       console.log(response.data);
       if (response.data === 'Medicine deleted successfully') {
         toast.success(response.data)

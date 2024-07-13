@@ -6,7 +6,7 @@ import { Link, useNavigate, } from 'react-router-dom'
 import { GoogleAuthProvider, getAuth, signInWithPopup } from "firebase/auth";
 import app from '../firebase';
 import { Button } from '@chakra-ui/react';
-
+import { URL } from '../utils/constant';
 
 
 export default function Login() {
@@ -27,7 +27,7 @@ export default function Login() {
 
     const handleLogin = async (e) => {
         e.preventDefault();
-        const response = await axios.post(`http://localhost:8080/login`, { email, password }, { withCredentials: true })
+        const response = await axios.post(`${URL}/login`, { email, password }, { withCredentials: true })
         if (response.data.isSuccess === 'true') {
             localStorage.setItem('isLoggedIn', true);
             localStorage.setItem('roleId', response.data.user.roleId)
@@ -47,7 +47,7 @@ export default function Login() {
 
         try {
             const result = await signInWithPopup(auth, provider)
-            await axios.post(`http://localhost:8080/register-gg`, {
+            await axios.post(`${URL}/register-gg`, {
                 email: result.user.email,
                 fullName: result.user.displayName,
                 password: "111111"

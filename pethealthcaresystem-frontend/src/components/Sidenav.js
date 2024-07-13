@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { MoneyOff } from '@mui/icons-material';
 import { Avatar } from '@chakra-ui/react';
-
+import { URL } from '../utils/constant';
 export default function Sidenav() {
   let navigate = useNavigate();
 
@@ -13,7 +13,7 @@ export default function Sidenav() {
 
   const getUser = async () => {
     try {
-      const result = await axios.get(`http://localhost:8080/getuser`, { withCredentials: true });
+      const result = await axios.get(`${URL}/getuser`, { withCredentials: true });
       if (result.data !== '') {
         setUser(result.data);
       } else {
@@ -30,7 +30,7 @@ export default function Sidenav() {
   const handleLogout = async (e) => {
     try {
       e.preventDefault();
-      await axios.post(`http://localhost:8080/logout`, {}, { withCredentials: true });
+      await axios.post(`${URL}/logout`, {}, { withCredentials: true });
       localStorage.removeItem('isLoggedIn');
       localStorage.removeItem('roleId')
       navigate('/login');

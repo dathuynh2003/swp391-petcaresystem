@@ -18,7 +18,7 @@ import {
     NumberDecrementStepper,
 } from '@chakra-ui/react'
 import QRCode from 'qrcode.react';
-
+import { URL } from '../utils/constant';
 
 export default function ViewPet() {
     let navigate = useNavigate();
@@ -41,7 +41,7 @@ export default function ViewPet() {
 
     const { petId } = useParams();
     const loadPet = async () => {
-        const response = await axios.get(`http://localhost:8080/pet/${petId}`, { withCredentials: true })
+        const response = await axios.get(`${URL}/pet/${petId}`, { withCredentials: true })
         setPet(response.data)
         setMedicalRecord((prev) => ({ ...prev, pet: response.data }))
         setHospitalizations(response.data.hospitalizations)
@@ -54,7 +54,7 @@ export default function ViewPet() {
             return
         }
         try {
-            const response = await axios.post(`http://localhost:8080/admit/pet/${petId}/cage/${chooseCage}`, {}, { withCredentials: true })
+            const response = await axios.post(`${URL}/admit/pet/${petId}/cage/${chooseCage}`, {}, { withCredentials: true })
             if (response.data.message === 'Admitted pet successfully') {
                 // setHospitalization(response.data.hospitalization)
                 toast.success(response.data.message);
@@ -76,7 +76,7 @@ export default function ViewPet() {
 
     const handleDischarge = async (hospitalizationId) => {
         try {
-            const response = await axios.put(`http://localhost:8080/discharged/${hospitalizationId}`, {}, { withCredentials: true })
+            const response = await axios.put(`${URL}/discharged/${hospitalizationId}`, {}, { withCredentials: true })
             if (response.data.message === 'Discharged pet successfully') {
                 toast.success(response.data.message)
                 setTimeout(() => {
@@ -110,7 +110,7 @@ export default function ViewPet() {
 
     const loadMedicineBySearch = async () => {
         if (keyword) {
-            const response = await axios.get(`http://localhost:8080/medicine/searchByName/${keyword}`, { withCredentials: true });
+            const response = await axios.get(`${URL}/medicine/searchByName/${keyword}`, { withCredentials: true });
             setListMedicineBySearch(response.data.MEDICINES);
 
         }
@@ -191,7 +191,7 @@ export default function ViewPet() {
             if (medicalRecord?.diagnosis || medicalRecord?.treatment) {
                 console.log(medicalRecordRequest)
                 console.log(petId)
-                const response = await axios.post(`http://localhost:8080/medicalRecord/add/${petId}`, medicalRecordRequest, { withCredentials: true });
+                const response = await axios.post(`${URL}/medicalRecord/add/${petId}`, medicalRecordRequest, { withCredentials: true });
                 console.log("loi o day");
                 console.log(response);
                 console.log(response.data.MedicalRecord);
@@ -219,7 +219,7 @@ export default function ViewPet() {
 
     const [medicalRecords, setMedicalRecords] = useState([])
     const loadMedicalRecord = async () => {
-        const response = await axios.get(`http://localhost:8080/medicalRecord/getById/${petId}`, { withCredentials: true })
+        const response = await axios.get(`${URL}/medicalRecord/getById/${petId}`, { withCredentials: true })
         // console.log(response.data);
         response.data.sort((a, b) => new Date(b.date) - new Date(a.date))
         setMedicalRecords(response.data)
@@ -233,7 +233,7 @@ export default function ViewPet() {
     const [cages, setCages] = useState()
     const loadAvailableCage = async () => {
         try {
-            const response = await axios.get(`http://localhost:8080/cages/${pet?.petType}`, { withCredentials: true })
+            const response = await axios.get(`${URL}/cages/${pet?.petType}`, { withCredentials: true })
             if (response.data.message === 'Cage found') {
                 setCages(response.data.cages)
                 console.log(response.data.cages)
@@ -289,7 +289,7 @@ export default function ViewPet() {
 
     const updateAdmissionInfo = async (hospId) => {
         try {
-            const respone = await axios.post(`http://localhost:8080/hospitalization/update/${hospId}`, hospitalizationDetails, { withCredentials: true })
+            const respone = await axios.post(`${URL}/hospitalization/update/${hospId}`, hospitalizationDetails, { withCredentials: true })
             if (respone.data.message === "Successfully") {
                 loadPet();
                 setHospitalizationDetails([]);
@@ -307,7 +307,7 @@ export default function ViewPet() {
                 toast.info("Please fill in care information")
                 return
             }
-            const respone = await axios.post(`http://localhost:8080/hospitalization/update/${hospId}/note/${vetNote}`, {}, { withCredentials: true })
+            const respone = await axios.post(`${URL}/hospitalization/update/${hospId}/note/${vetNote}`, {}, { withCredentials: true })
             if (respone.data.message === "Successfully") {
                 loadPet();
                 setHospitalizationDetails([]);
@@ -339,7 +339,7 @@ export default function ViewPet() {
         }
 
         try {
-            const response = await axios.post(`http://localhost:8080/generate-payment/hospitalization/${hospitalization.id}`, payment, { withCredentials: true });
+            const response = await axios.post(`${URL}/generate-payment/hospitalization/${hospitalization.id}`, payment, { withCredentials: true });
             if (response.data.result.desc === 'success') {
                 const checkoutURL = response.data.result.data.checkoutUrl
                 window.location.href = checkoutURL
@@ -370,7 +370,7 @@ export default function ViewPet() {
                 if (status === "PAID") {
                     console.log("status: " + status);
                     const paymentType = "Credit Card"
-                    const response = await axios.put(`http://localhost:8080/update-payment/${orderCode}`, { paymentType, status }, { withCredentials: true });
+                    const response = await axios.put(`${URL}/update-payment/${orderCode}`, { paymentType, status }, { withCredentials: true });
                     if (response.data.message === 'Payment updated successfully') {
                         const petId = location.pathname.split('/').pop(); //Lấy petId từ URL
                         navigate(`/viewPet/${petId}`)//Navigate lại để ẩn thông tin trả về của PayOs
@@ -397,7 +397,7 @@ export default function ViewPet() {
                 amount: medicalRecord.totalAmount
             }
             console.log(payment);
-            const response = await axios.post(`http://localhost:8080/generate-payment/medicalRecord/${medicalRecord.id}`, payment, { withCredentials: true });
+            const response = await axios.post(`${URL}/generate-payment/medicalRecord/${medicalRecord.id}`, payment, { withCredentials: true });
             if (response.data.result.desc === 'success') {
                 const checkoutURL = response.data.result.data.checkoutUrl
                 console.log(checkoutURL);

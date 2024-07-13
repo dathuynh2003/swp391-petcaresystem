@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { ToastContainer, toast } from 'react-toastify';
 import { Button } from '@chakra-ui/react';
 import { CheckCircleIcon, CheckIcon, DeleteIcon } from "@chakra-ui/icons";
-
+import { URL } from '../utils/constant';
 export default function AssignVetSchedules() {
   const [vets, setVets] = useState([]);
   const [shifts, setShifts] = useState([]);
@@ -14,11 +14,11 @@ export default function AssignVetSchedules() {
   const [selectAll, setSelectAll] = useState(false);
 
   useEffect(() => {
-    axios.get('http://localhost:8080/vets', { withCredentials: true })
+    axios.get(`${URL}/vets`, { withCredentials: true })
       .then(response => setVets(response.data.vets))
       .catch(error => console.error('Error fetching vets:', error));
 
-    axios.get('http://localhost:8080/shifts/all', { withCredentials: true })
+    axios.get(`${URL}/shifts/all`, { withCredentials: true })
       .then(response => setShifts(response.data))
       .catch(error => console.error('Error fetching shifts:', error));
 
@@ -42,7 +42,7 @@ export default function AssignVetSchedules() {
   }, [selectedVet, currentWeek]);
 
   const fetchShiftDetails = () => {
-    axios.get('http://localhost:8080/shifts/details', { withCredentials: true })
+    axios.get(`${URL}/shifts/details`, { withCredentials: true })
       .then(response => {
         const vetSchedule = response.data.filter(detail => detail.user.userId === parseInt(selectedVet));
         setShiftDetails(vetSchedule);
@@ -79,7 +79,7 @@ export default function AssignVetSchedules() {
       status: 'Available'
     }));
 
-    axios.put('http://localhost:8080/shifts/assign-vet', vetShiftDetails, { withCredentials: true })
+    axios.put(`${URL}/shifts/assign-vet`, vetShiftDetails, { withCredentials: true })
       .then(response => {
         toast.success('Shifts assigned successfully!');
         setSelectedShifts([]);
@@ -125,7 +125,7 @@ export default function AssignVetSchedules() {
 
   const handleDeleteAssignment = (shiftId, date) => {
     const dateString = date.toISOString().split('T')[0];
-    axios.delete('http://localhost:8080/shifts/delete-vet-shift', {
+    axios.delete(`${URL}/shifts/delete-vet-shift`, {
       params: {
         shiftId: shiftId,
         vetId: selectedVet,

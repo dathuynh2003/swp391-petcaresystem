@@ -3,6 +3,7 @@ import axios from 'axios'
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import './Register.css'
+import { URL } from '../../utils/constant'
 export default function Register() {
     let navigate = useNavigate()
 
@@ -63,7 +64,7 @@ export default function Register() {
         } else if (password === confirm_pass) {
             setMessageConfirmPass("")
             try {
-                const result = await axios.post(`http://localhost:8080/register`, user)
+                const result = await axios.post(`${URL}/register`, user)
                 const responseData = result.data
 
                 console.log(responseData)

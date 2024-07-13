@@ -127,7 +127,7 @@ export default function EditPet() {
   const fetchPetType = async () => {
     const configKey = "petType"
     try {
-      const respone = await axios.get(`http://localhost:8080/configurations/${configKey}`, { withCredentials: true })
+      const respone = await axios.get(`${URL}/configurations/${configKey}`, { withCredentials: true })
       if (respone.data.message === 'Successfully') {
         setPetTypes(respone.data.configurations)
       }
