@@ -43,7 +43,7 @@ const Home = () => {
 
             <Carousel.Caption>
               <h3>Pet Health Care</h3>
-              <p>Nulla vitae elit libero, a pharetra augue mollis interdum.</p>
+              <p>Our pet health care booking website allows you to easily schedule veterinary appointments online, ensuring your pet receives timely medical attention</p>
             </Carousel.Caption>
 
           </Carousel.Item>
@@ -54,8 +54,8 @@ const Home = () => {
               alt="Second slide"
             />
             <Carousel.Caption>
-              <h3>Second slide label</h3>
-              <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+              <h3>Pet Health Care</h3>
+              <p>With our user-friendly interface, you can book and manage appointments for your pet’s health check-ups, vaccinations, and treatments in just a few clicks.</p>
             </Carousel.Caption>
           </Carousel.Item>
           <Carousel.Item style={{ width: '100%' }}>
@@ -65,8 +65,8 @@ const Home = () => {
               alt="Third slide"
             />
             <Carousel.Caption>
-              <h3>Third slide label</h3>
-              <p>Praesent commodo cursus magna, vel scelerisque nisl consectetur.</p>
+              <h3>Pet Health Care</h3>
+              <p>Our online booking system for pet health care appointments simplifies the process, allowing you to choose convenient times for your pet's check-ups and treatments.</p>
             </Carousel.Caption>
           </Carousel.Item>
         </Carousel>
