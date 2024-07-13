@@ -286,6 +286,12 @@ const BookingHistory = () => {
         }
     }
 
+    //Tính tuổi của pet dựa vào dob (đơn vị month(s))
+    const today = new Date();
+    const dob = new Date(selectedBooking?.pet?.dob);
+    const diffMonths = (today.getFullYear() - dob.getFullYear()) * 12 + (today.getMonth() - dob.getMonth());
+    const age = diffMonths !== 0 ? diffMonths : 1;
+
     return (
         <Container maxW="container.xl" py={6}>
             {error && <Text color="red.500" mb={4}>{error}</Text>}
@@ -605,7 +611,7 @@ const BookingHistory = () => {
                                         <Text><strong>Name:</strong> {selectedBooking.pet.name}</Text>
                                         <Text><strong>Type:</strong> {selectedBooking.pet.petType}</Text>
                                         <Text><strong>Gender:</strong> {selectedBooking.pet.gender}</Text>
-                                        <Text><strong>Age:</strong> {selectedBooking.pet.age} Month(s)</Text>
+                                        <Text><strong>Age:</strong> {age} Month(s)</Text>
                                     </Box>
                                 </Box>
                             </Flex>
@@ -629,8 +635,8 @@ const BookingHistory = () => {
                                         <FontAwesomeIcon icon={faXRay} style={{ marginRight: '8px', color: 'teal' }} /> Booking
                                     </Text>
                                     <Box mt={2}>
-                                        <Text><strong>Date:</strong> {formatDateTime(selectedBooking.bookingDate)}</Text>
-                                        <Text><strong>Appointment Date:</strong> {formatDateTime(selectedBooking.vetShiftDetail.date)}</Text>
+                                        <Text><strong>Date:</strong> {formatDateTime(selectedBooking.bookingDate, 'dd/MM/yyyy')}</Text>
+                                        <Text><strong>Appointment Date:</strong> {formatDateTime(selectedBooking.vetShiftDetail.date, 'dd/MM/yyyy - hh:mm')}</Text>
                                         <Text><strong>Description:</strong> {selectedBooking.description}</Text>
                                     </Box>
                                 </Box>
