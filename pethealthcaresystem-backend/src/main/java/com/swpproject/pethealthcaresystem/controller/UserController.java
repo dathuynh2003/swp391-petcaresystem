@@ -179,6 +179,7 @@ public class UserController {
             response.put("user", curUser);
         } else {
             response.put("isSuccess", "false");
+            response.put("message", "Invalid username, password, or account is inactive."); // Add message
         }
         return response;
     }

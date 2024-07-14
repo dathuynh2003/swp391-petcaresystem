@@ -76,16 +76,18 @@ public class UserService implements IUserService {
     @Override
     public User validateLogin(User user) {
         User existUser = userRepository.findByEmail(user.getEmail());
-        int userRoleId = existUser.getRoleId();
-        if (userRoleId == CUSTOMER_ROLEID
-                && existUser.getPassword().equals(SystemUtils.passwordHash(user.getPassword()))) {
-            existUser.setPassword("");
-            existUser.setVetShiftDetails(null);
-            return existUser;
-        } else if (existUser.getPassword().equals(SystemUtils.passwordHash(user.getPassword()))) {
-            existUser.setPassword("");
-            existUser.setVetShiftDetails(null);
-            return existUser;
+        if (existUser != null && existUser.getIsActive()) {
+            int userRoleId = existUser.getRoleId();
+            if (userRoleId == CUSTOMER_ROLEID
+                    && existUser.getPassword().equals(SystemUtils.passwordHash(user.getPassword()))) {
+                existUser.setPassword("");
+                existUser.setVetShiftDetails(null);
+                return existUser;
+            } else if (existUser.getPassword().equals(SystemUtils.passwordHash(user.getPassword()))) {
+                existUser.setPassword("");
+                existUser.setVetShiftDetails(null);
+                return existUser;
+            }
         }
         return null;
     }

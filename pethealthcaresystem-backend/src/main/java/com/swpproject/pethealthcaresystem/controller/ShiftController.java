@@ -48,7 +48,7 @@ public class ShiftController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Please login first!");
         }
         shiftService.deleteShift(shiftId);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok("Shift deleted successfully");
     }
 
     @GetMapping("/details")
