@@ -2,6 +2,7 @@ package com.swpproject.pethealthcaresystem.controller;
 
 import com.swpproject.pethealthcaresystem.model.Hospitalization;
 import com.swpproject.pethealthcaresystem.model.HospitalizationDetail;
+import com.swpproject.pethealthcaresystem.model.Pet;
 import com.swpproject.pethealthcaresystem.model.User;
 import com.swpproject.pethealthcaresystem.service.HospitalizationService;
 import jakarta.servlet.http.HttpSession;
@@ -135,5 +136,22 @@ public class HospitalizationController {
         }
         return response;
     }
+
+    @GetMapping("/hospitalization/pet/{petId}/status/{status}")
+    public Map<String, Object> viewHospitalization(@PathVariable int petId, @PathVariable String status, HttpSession session) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            User curUser = (User) session.getAttribute("user");
+            if (curUser == null) {
+                throw new RuntimeException("You need to login first");
+            }
+            response.put("message", "Successfully");
+            response.put("hospitalizations", hospitalizationService.getHospitalizationByPetIdAndStatus(petId, status));
+        } catch (Exception e) {
+            response.put("message", e.getMessage());
+        }
+        return response;
+    }
+
 
 }

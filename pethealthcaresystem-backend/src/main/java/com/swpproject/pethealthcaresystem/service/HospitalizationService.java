@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Set;
 
 @Service
@@ -141,6 +142,15 @@ public class HospitalizationService implements IHospitalizationService {
         hospDetail.setHospitalization(hosp);
         hospDetail.setDescription(vetNote);
         hospitalizationDetailRepository.save(hospDetail);
+        return hosp;
+    }
+
+    @Override
+    public List<Hospitalization> getHospitalizationByPetIdAndStatus(int petId, String status) throws Exception {
+        Pet pet = petRepository.findById(petId).orElseThrow(() -> new RuntimeException("Pet not found"));
+        List<Hospitalization> hosp = hospitalizationRepository.findByPetAndStatus(pet, status);
+        if (hosp.isEmpty())
+            throw new Exception("List hosp is empty");
         return hosp;
     }
 

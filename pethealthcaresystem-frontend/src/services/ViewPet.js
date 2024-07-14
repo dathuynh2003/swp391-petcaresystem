@@ -17,7 +17,6 @@ import {
     NumberIncrementStepper,
     NumberDecrementStepper,
 } from '@chakra-ui/react'
-import QRCode from 'qrcode.react';
 import { URL } from '../utils/constant';
 
 export default function ViewPet() {

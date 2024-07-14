@@ -2,7 +2,9 @@ package com.swpproject.pethealthcaresystem.service;
 
 import com.swpproject.pethealthcaresystem.model.Hospitalization;
 import com.swpproject.pethealthcaresystem.model.HospitalizationDetail;
+import com.swpproject.pethealthcaresystem.model.Pet;
 
+import java.util.List;
 import java.util.Set;
 
 public interface IHospitalizationService {
@@ -16,4 +18,5 @@ public interface IHospitalizationService {
 
     public Hospitalization updateAdmissionInfo(int hospId, String vetNote) throws Exception;
 
+    public List<Hospitalization> getHospitalizationByPetIdAndStatus(int petId, String status) throws Exception;
 }

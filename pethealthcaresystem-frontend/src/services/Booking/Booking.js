@@ -1,13 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Tab, TabList, Tabs, TabPanel, TabPanels, Button, WrapItem, Avatar, background, Select } from '@chakra-ui/react';
+import { Tab, TabList, Tabs, TabPanel, TabPanels, Button, WrapItem, Avatar, Select } from '@chakra-ui/react';
 import axios from 'axios';
 import { CheckIcon } from '@chakra-ui/icons';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer, toast } from 'react-toastify';
 import './Booking.css'
 import ReactPaginate from 'react-paginate';
-import { SignalWifiStatusbarConnectedNoInternet4Outlined } from '@mui/icons-material';
 import { Box, Image, Table, Tbody, Td, Text, Th, Thead, Tr } from '@chakra-ui/react';
 import { URL } from '../../utils/constant'
 
@@ -44,7 +43,7 @@ export default function Booking() {
   useEffect(() => {
     loadServices();
     loadPets();
-    loadShift();
+    // loadShift();
     // Kiểm tra xem data có tồn tại không và không được trống
     // const data = location?.state;
 
@@ -77,10 +76,6 @@ export default function Booking() {
       }
       setServices(list)
       setTotalPages(response.data.totalPages)
-
-
-
-
     } catch (error) {
       console.log(error)
     }
@@ -100,18 +95,14 @@ export default function Booking() {
     }
   };
 
-  const loadShift = async () => {
-    try {
-      const response = await axios.get(`${URL}/shifts/details`, { withCredentials: true });
-      setShifts(response.data);
-    } catch (error) {
-      console.log(error)
-    }
-  };
-
-
-
-
+  // const loadShift = async () => {
+  //   try {
+  //     const response = await axios.get(`${URL}/shifts/details`, { withCredentials: true });
+  //     setShifts(response.data);
+  //   } catch (error) {
+  //     console.log(error)
+  //   }
+  // };
 
   const chooseServices = (serviceId) => {
     setSelectedServices((prevSelectedServices) => {
@@ -124,22 +115,32 @@ export default function Booking() {
   };
 
 
-
-
-
-  useEffect(() => {
-    console.log(booking);
-  }, [booking]);
-
   //Selected pet nào thì tính tuổi cho pet đó luôn
   const [age, setAge] = useState()
-  const choosePet = (pet) => {
-    setSelectedPet(pet);
-    const today = new Date();
-    const dob = new Date(pet.dob);
-    const diffMonths = (today.getFullYear() - dob.getFullYear()) * 12 + (today.getMonth() - dob.getMonth());
-    const age = diffMonths !== 0 ? diffMonths : 1;
-    setAge(age)
+  const choosePet = async (pet) => {
+    try {
+      const response = await axios.get(`${URL}/hospitalization/pet/${pet.petId}/status/admitted`, { withCredentials: true })
+      // console.log(response.data.message)
+      if (response.data.message !== 'List hosp is empty') {
+        toast.info("Pet is still being kept at the clinic, no more appointments can be made!")
+        return
+      }
+      const response2 = await axios.get(`${URL}/hospitalization/pet/${pet.petId}/status/pending`, { withCredentials: true })
+      // console.log(response2.data.message)
+      if (response2.data.message !== 'List hosp is empty') {
+        toast.info('You need to pay for the previous hospitalization before booking for ' + pet.name)
+        return
+      }
+
+      setSelectedPet(pet);
+      const today = new Date();
+      const dob = new Date(pet.dob);
+      const diffMonths = (today.getFullYear() - dob.getFullYear()) * 12 + (today.getMonth() - dob.getMonth());
+      const age = diffMonths !== 0 ? diffMonths : 1;
+      setAge(age)
+    } catch (e) {
+      toast.error("An error occurred during the pet selection process")
+    }
   };
 
   const [dates, setDates] = useState([]);
@@ -186,13 +187,10 @@ export default function Booking() {
 
   const [vets, setVets] = useState([]);
   const [activeDateIndex, setActiveDateIndex] = useState(null);
-  const [shifts, setShifts] = useState([]);
+  // const [shifts, setShifts] = useState([]);
   const handlePageClick = (data) => {
     setPageNo(data.selected)
   }
-
-
-
 
   const handleClickDay = async (date, index) => {
     setSelectedVetShift(null);
@@ -248,33 +246,32 @@ export default function Booking() {
   const [curBooking, setCurrentBooking] = useState()
   const serviceIds = selectedServices?.map(service => service?.id);//dùng để gửi mảng id đi
   const callAPI = async () => {
-    console.log('gui ve');
-    console.log(selectedPet.petId);
-    console.log(selectedVetShift);
-    console.log(serviceIds);
+    // console.log('gui ve');
+    // console.log(selectedPet.petId);
+    // console.log(selectedVetShift);
+    // console.log(serviceIds);
     const response = await axios.post(`${URL}/createBooking/pet/${selectedPet.petId}/vet-shift/${selectedVetShift}/services/${serviceIds}`, booking, { withCredentials: true })
     setCurrentBooking(response.data)
-    console.log(response.data);
-
+    // console.log(response.data);
   }
-  const updateBookingAfterPAID = async (booking) => {
-    try {
-      const response = await axios.put(`${URL}/booking/paid`, booking);
-      return response.data;
-    } catch (error) {
-      console.error("There was an error updating the booking to PAID!", error);
-      throw error;
-    }
-  };
-  const updateBookingAfterCANCELLED = async (booking) => {
-    try {
-      const response = await axios.put(`${URL}/booking/cancelled`, booking);
-      return response.data;
-    } catch (error) {
-      console.error("There was an error updating the booking to CANCELLED!", error);
-      throw error;
-    }
-  };
+  // const updateBookingAfterPAID = async (booking) => {
+  //   try {
+  //     const response = await axios.put(`${URL}/booking/paid`, booking);
+  //     return response.data;
+  //   } catch (error) {
+  //     console.error("There was an error updating the booking to PAID!", error);
+  //     throw error;
+  //   }
+  // };
+  // const updateBookingAfterCANCELLED = async (booking) => {
+  //   try {
+  //     const response = await axios.put(`${URL}/booking/cancelled`, booking);
+  //     return response.data;
+  //   } catch (error) {
+  //     console.error("There was an error updating the booking to CANCELLED!", error);
+  //     throw error;
+  //   }
+  // };
   const [step, setStep] = useState(0)
   const handleNextClick = (content) => {
     if (content === null || content === undefined || content === '' || content.length === 0) {
@@ -289,32 +286,36 @@ export default function Booking() {
     setStep(step - 1)
   }
   const handleNextClickDescription = () => {
+    if (booking.description.length > 50) {
+      toast.warning("Reasons should only have a maximum length of 50 characters")
+      return
+    }
     setStep(step + 1)
   }
 
-  const handleConfirmClick = async () => {
-    try {
-      const updatedBooking = await updateBookingAfterPAID(curBooking);
-      console.log('Booking updated to PAID:', updatedBooking);
-      setBooking(updatedBooking); // Update state with the updated booking
-    } catch (error) {
-      console.error('Error updating booking to PAID:', error);
-    }
-    setStep(step + 1)
-    toast.done('Book Appointment Successfully!')
-  }
+  // const handleConfirmClick = async () => {
+  //   try {
+  //     const updatedBooking = await updateBookingAfterPAID(curBooking);
+  //     console.log('Booking updated to PAID:', updatedBooking);
+  //     setBooking(updatedBooking); // Update state with the updated booking
+  //   } catch (error) {
+  //     console.error('Error updating booking to PAID:', error);
+  //   }
+  //   setStep(step + 1)
+  //   toast.done('Book Appointment Successfully!')
+  // }
 
-  const handleCancelClick = async () => {
-    try {
-      const updatedBooking = await updateBookingAfterCANCELLED(curBooking);
-      console.log('Booking updated to CANCELLED:', updatedBooking);
-      setBooking(updatedBooking); // Update state with the updated booking
-    } catch (error) {
-      console.error('Error updating booking to CANCELLED:', error);
-    }
-    setStep(step + 1)
-    toast.done('Cancel Book Appointment Successfully!')
-  }
+  // const handleCancelClick = async () => {
+  //   try {
+  //     const updatedBooking = await updateBookingAfterCANCELLED(curBooking);
+  //     console.log('Booking updated to CANCELLED:', updatedBooking);
+  //     setBooking(updatedBooking); // Update state with the updated booking
+  //   } catch (error) {
+  //     console.error('Error updating booking to CANCELLED:', error);
+  //   }
+  //   setStep(step + 1)
+  //   toast.done('Cancel Book Appointment Successfully!')
+  // }
   const handleClickAPI = (content) => {
     if (content !== null && content !== undefined && content !== '') {
       callAPI()
@@ -360,7 +361,7 @@ export default function Booking() {
       toast.error(e.message);
     }
   }
-  const [selectedVet, setSelectedVet] = useState('');
+  const [selectedVet, setSelectedVet] = useState("");
   const [groupedVetShiftDetails, setGroupedVetShiftDetails] = useState({});
   // Hàm để nhóm các đối tượng theo ngày
   const groupByDate = (vetShiftDetails) => {
@@ -376,7 +377,7 @@ export default function Booking() {
   const handleVetChange = (e) => {
     const userId = parseInt(e.target.value, 10)
     const vet = vetList.find(vet => vet.userId === userId);
-    setSelectedVet(vet);
+    vet ? setSelectedVet(vet) : setSelectedVet("")
     if (vet) {
       const grouped = groupByDate(vet.vetShiftDetails)
       setGroupedVetShiftDetails(grouped)
@@ -397,8 +398,6 @@ export default function Booking() {
     setActiveDateIndex(index)
     setSelectedDate(new Date(date).toLocaleDateString('en-CA'))
   };
-
-
 
   return (
     <div className="container">
@@ -488,57 +487,64 @@ export default function Booking() {
             <TabPanel className="mx-auto">
               Choose <b>Your Pet</b>
               <div className="container">
-                {pets?.map((pet, index) => (
-                  <div
-                    key={index}
-                    className="row w-100 shadow m-3 rounded-3"
-                    style={{ height: '85px' }}
-                    onClick={() => choosePet(pet)}
-                  >
+                {pets?.map((pet, index) => {
+                  //Tính tuổi của pet dựa vào dob (đơn vị month(s))
+                  const today = new Date();
+                  const dob = new Date(pet.dob);
+                  const diffMonths = (today.getFullYear() - dob.getFullYear()) * 12 + (today.getMonth() - dob.getMonth());
+                  const age = diffMonths !== 0 ? diffMonths : 1;
+                  return (
                     <div
-                      className="pet-avatar border my-auto mx-4 rounded-circle col-4"
-                      style={{ height: '65px', width: '65px', overflow: 'hidden', position: 'relative' }}
+                      key={index}
+                      className="row w-100 shadow m-3 rounded-3"
+                      style={{ height: '85px' }}
+                      onClick={() => choosePet(pet)}
                     >
+                      <div
+                        className="pet-avatar border my-auto mx-4 rounded-circle col-4"
+                        style={{ height: '65px', width: '65px', overflow: 'hidden', position: 'relative' }}
+                      >
 
-                      <img
-                        className="rounded-circle"
-                        src={pet.avatar === null ? '' : pet.avatar}
-                        alt="PetAvatar"
-                        style={{
-                          position: 'absolute',
-                          top: 0,
-                          left: 0,
-                          width: '100%',
-                          height: '100%',
-                          objectFit: 'cover',
-                        }}
-                      ></img>
+                        <img
+                          className="rounded-circle"
+                          src={pet.avatar === null ? '' : pet.avatar}
+                          alt="PetAvatar"
+                          style={{
+                            position: 'absolute',
+                            top: 0,
+                            left: 0,
+                            width: '100%',
+                            height: '100%',
+                            objectFit: 'cover',
+                          }}
+                        ></img>
 
-                    </div>
-                    <div className="pet-info col-8  my-2 mx-2">
-                      <h5>{pet.name}</h5>
-                      <div className="fs-6">
-                        {pet.petType}. {pet.age} Months. {pet.breed}
+                      </div>
+                      <div className="pet-info col-8  my-2 mx-2">
+                        <h5>{pet.name}</h5>
+                        <div className="fs-6">
+                          {pet.petType}. {age} Month(s). {pet.breed}
+                        </div>
+                      </div>
+                      <div
+                        className="pet-choose col-1 my-auto mx-4  rounded-circle"
+                        style={{ width: '50px', height: '50px' }}
+                      >
+                        {pet.petId === selectedPet?.petId ? (
+                          <CheckIcon boxSize={8}
+                            className="rounded-circle"
+                            style={{
+                              backgroundColor: 'teal',
+                              color: 'white',
+                            }}
+                          />
+                        ) : (
+                          ''
+                        )}
                       </div>
                     </div>
-                    <div
-                      className="pet-choose col-1 my-auto mx-4  rounded-circle"
-                      style={{ width: '50px', height: '50px' }}
-                    >
-                      {pet.petId === selectedPet?.petId ? (
-                        <CheckIcon boxSize={8}
-                          className="rounded-circle"
-                          style={{
-                            backgroundColor: 'teal',
-                            color: 'white',
-                          }}
-                        />
-                      ) : (
-                        ''
-                      )}
-                    </div>
-                  </div>
-                ))}
+                  )
+                })}
               </div>
               <div className='d-flex justify-content-center gap-3'>
                 <Button style={{ background: 'teal', color: 'white' }} onClick={() => handleBackClick()}>Back</Button>
@@ -728,7 +734,12 @@ export default function Booking() {
                                 .filter(detail => detail.date === selectedDate)
                                 .map((vetShiftDetail, index) => (
                                   <div className='row' key={index}>
-                                    {vetShiftDetail?.details?.map((detail, detailIndex) => {
+                                    {/*Sort lại các shift cho đúng thứ tự từ bé đến lớn */}
+                                    {vetShiftDetail?.details?.slice().sort((a, b) => {
+                                      const [aHour, aMinute] = a.shift.from_time.split(':').map(Number);
+                                      const [bHour, bMinute] = b.shift.from_time.split(':').map(Number);
+                                      return aHour - bHour || aMinute - bMinute;
+                                    }).map((detail, detailIndex) => {
                                       const isPastShift = new Date(detail.date + ' ' + detail.shift.to_time) < new Date();
                                       return (
                                         <button
