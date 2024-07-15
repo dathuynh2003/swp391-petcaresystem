@@ -188,6 +188,7 @@ const BookingHistory = () => {
     const viewDetail = async (bookingId) => {
         try {
             const booking = bookings.find(booking => booking.id === bookingId);
+            console.log(booking)
             setSelectedBooking(booking);
             const response = await axios.get(`${URL}/get-booking/${bookingId}/details`, { withCredentials: true });
             setBookingDetails(response.data.data);
@@ -291,6 +292,25 @@ const BookingHistory = () => {
     const dob = new Date(selectedBooking?.pet?.dob);
     const diffMonths = (today.getFullYear() - dob.getFullYear()) * 12 + (today.getMonth() - dob.getMonth());
     const age = diffMonths !== 0 ? diffMonths : 1;
+
+    const handleCheckin = async (booking) => {
+        console.log(booking)
+        console.log(booking);
+
+        // Cập nhật trạng thái của booking
+        const updatedBooking = { ...booking, status: 'Checked_In' };
+        // Call API
+        try {
+            const response = await axios.put(`${URL}/update-booking`, updatedBooking, { withCredentials: true })
+            if (response.data.statusCode) {
+                window.location.reload()
+                toast.success("Check in successfully")
+            }
+        } catch (e) {
+            navigate('404page')
+        }
+
+    }
 
     return (
         <Container maxW="container.xl" py={6}>
@@ -406,24 +426,17 @@ const BookingHistory = () => {
                         const strAppointmentTime = `${formattedDate} ${formattedTime}`  //dùng để in ra nếu cần thiết.
 
                         const isCancelable = new Date() < appointmentDate && booking.status === 'PAID';
-                        // console.log(booking.id, " - ", strAppointmentTime)
                         return (
-                            <Tr key={booking.id}>
+                            //Các booking có trạng thái CANCELLED (Booking nhưng hủy thanh toán thì k cần hiển thị
+                            (booking?.status !== "CANCELLED") && <Tr key={booking.id}>
                                 <Td>B{booking.id}</Td>
                                 <Td>{formatDateTime(booking.vetShiftDetail.date, 'dd-MM-yyyy')} {booking.vetShiftDetail.shift.from_time} - {booking.vetShiftDetail.shift.to_time}</Td>
                                 <Td>{formatDateTime(booking.bookingDate, 'dd-MM-yyyy HH:mm')}</Td>
                                 <Td>{formatPrice(booking.totalAmount)} VND</Td>
                                 <Td>
-                                    {/* <Badge colorScheme={
-                                        (booking.status === 'Pending' || booking.status === 'Request Refund') ? 'yellow' :
-                                            booking.status === 'CANCELLED' ? 'red' : 'green'
-                                    }>
-                                        {booking.status}
-                                    </Badge> */}
-                                    {booking.status === "PAID" && <Badge colorScheme="green">{booking.status}</Badge>}
+                                    {(booking.status === "PAID" || booking.status === "Checked_In") && <Badge colorScheme="green">{booking.status}</Badge>}
                                     {(booking.status === "Request Refund" || booking.status === 'Pending') && <Badge colorScheme="yellow">{booking.status}</Badge>}
-                                    {(booking.status === "Refunded" || booking.status === 'CANCELLED') && <Badge colorScheme="red">{booking.status}</Badge>}
-
+                                    {(booking.status === "Refunded") && <Badge colorScheme="red">{booking.status}</Badge>}
                                 </Td>
                                 <Td>
                                     {/* <Button size="sm" onClick={() => viewDetail(booking.id)}>Detail</Button> */}
@@ -584,8 +597,9 @@ const BookingHistory = () => {
                     <ModalOverlay />
                     <ModalContent>
                         <ModalHeader>Booking Details #{selectedBooking.id}  <Badge colorScheme={
-                            selectedBooking.status === 'Pending' ? 'yellow' :
-                                selectedBooking.status === 'CANCELLED' ? 'red' : 'green'
+                            (selectedBooking.status === "PAID" || selectedBooking.status === "Checked_In") ? "green" : (
+                                selectedBooking.status === "Request Refund" || selectedBooking.status === 'Pending') ? "yellow" :
+                                (selectedBooking.status === "Refunded") && "red"
                         }>
                             {selectedBooking.status}
                         </Badge></ModalHeader>
@@ -636,7 +650,7 @@ const BookingHistory = () => {
                                     </Text>
                                     <Box mt={2}>
                                         <Text><strong>Date:</strong> {formatDateTime(selectedBooking.bookingDate, 'dd-MM-yyy')}</Text>
-                                        <Text><strong>Appointment Date:</strong> {formatDateTime(selectedBooking.vetShiftDetail.date, 'dd-MM-yyy')}</Text>
+                                        <Text><strong>Appointment Date:</strong> {formatDateTime(selectedBooking.vetShiftDetail.date, 'dd-MM-yyyy')}</Text>
                                         <Text><strong>Slot:</strong> {selectedBooking.vetShiftDetail.shift.from_time} - {selectedBooking.vetShiftDetail.shift.to_time}</Text>
                                         <Text><strong>Description:</strong> {selectedBooking.description}</Text>
                                     </Box>
@@ -644,7 +658,10 @@ const BookingHistory = () => {
                             </Flex>
                         </ModalBody>
                         <ModalFooter>
-                            <Button onClick={closeModal} style={{ color: 'teal' }}>Close</Button>
+                            <Button onClick={closeModal} colorScheme='red'>Close</Button>
+                            {/* Ngày khám = ngày hiện tại thì hiện nút Checkin */}
+                            {(selectedBooking.status === "PAID" && formatDateTime(selectedBooking.vetShiftDetail.date, 'dd/MM/yyyy') === format(new Date(), 'dd/MM/yyy')) &&
+                                <Button onClick={() => { closeModal(); handleCheckin(selectedBooking) }} className='mx-2' colorScheme='teal'>Check In</Button>}
                         </ModalFooter>
                     </ModalContent>
                 </Modal>
@@ -661,7 +678,7 @@ const BookingHistory = () => {
                 pauseOnHover
                 theme="light"
             />
-        </Container>
+        </Container >
     );
 };
 

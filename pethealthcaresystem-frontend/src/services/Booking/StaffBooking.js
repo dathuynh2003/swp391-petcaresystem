@@ -320,7 +320,7 @@ export default function Booking() {
         };
 
         try {
-            const response = await axios.post('${URL}/api/payment/create', payment, { withCredentials: true });
+            const response = await axios.post(`${URL}/api/payment/create`, payment, { withCredentials: true });
         } catch (error) {
             toast.error('Payment failed!');
             console.error(error);
