@@ -33,8 +33,9 @@ import AuthProvider from './context/auth.context';
 import PaymentPage from './pages/Payment';
 import SystemConfig from './services/SystemConfig/SystemConfig';
 import RefundRequests from './services/RefundRequests';
-import UserChart from './services/Dashboard/UserChart'
+
 import { Permission } from './components/Permission';
+import NotFound from './pages/NotFound';
 function App() {
 
   const location = useLocation();
@@ -105,7 +106,7 @@ function App() {
               } />
               <Route path="/profile" element={
                 <AuthProvider>
-                  <Permission roleId={['1']} redirect={true}>
+                  <Permission roleId={['1', '2', '3']} redirect={true}>
                     <Profile />
 
                   </Permission>
@@ -244,6 +245,7 @@ function App() {
 
 
               } />
+               <Route path="/NotFound" element={<NotFound />} />
             </Routes >
 
 

@@ -35,6 +35,7 @@ export default function ListPets() {
     try {
       const response = await axios.put(`${URL}/deletePet/${petId}`)
       toast.success(response.data)
+      onClose()
     } catch (error) {
       toast.error(error)
     }
@@ -115,7 +116,7 @@ export default function ListPets() {
                     <Modal closeOnOverlayClick={false} isOpen={isOpen} onClose={onClose}>
                       <ModalOverlay />
                       <ModalContent>
-                        <ModalHeader>Delete medicine</ModalHeader>
+                        <ModalHeader>Delete pet</ModalHeader>
                         <ModalCloseButton />
                         <ModalBody pb={6}>
                           Are you sure delete this pet?

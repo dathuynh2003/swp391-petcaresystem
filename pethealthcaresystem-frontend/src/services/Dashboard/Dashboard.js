@@ -9,11 +9,14 @@ import {
 import { ToastContainer, toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import { ArrowUpIcon, ArrowDownIcon, TimeIcon } from '@chakra-ui/icons';
-import UserChart from './UserChart';
 import { PureComponent } from 'react';
 import { curveCardinal } from 'd3-shape';
 import './Dashboard.css'
-
+import PeopleIcon from '@mui/icons-material/People';
+import PaidIcon from '@mui/icons-material/Paid';
+import CurrencyExchangeIcon from '@mui/icons-material/CurrencyExchange';
+import BookIcon from '@mui/icons-material/Book';
+import AppBlockingIcon from '@mui/icons-material/AppBlocking';
 import { URL } from '../../utils/constant'
 
 export default function Dashboard() {
@@ -187,7 +190,7 @@ export default function Dashboard() {
       <ToastContainer />
       <div  >
         <Box textAlign="center" mt={3} mb={5}>
-          <h3>Summary Data Dashboard</h3>
+          <h3 style={{ color: 'teal' }}>Summary Data Dashboard</h3>
         </Box>
         <div className='d-flex align-items-center gap-4 mb-5 mx-auto justify-content-center'>
           <b>Start date: </b><Input type='date' value={startDate} onChange={(e) => setStartDate(e.target.value)} style={{ width: '20%' }} />
@@ -203,10 +206,10 @@ export default function Dashboard() {
 
           <div className='text-center p-5 shadow rounded-circle'
             style={{
-              background: 'linear-gradient(135deg, #008080, #FFD700)'
-              , width: '200px', height: '200px'
+              background: 'linear-gradient(135deg, #FFC0CB, #FF69B4)'
+              , width: '200px', height: '200px', color: 'white', textShadow: '1px 1px 2px rgba(0, 0, 0, 0.5)'
             }}>
-            <h6 className='fst-italic' style={{ color: 'white' }}>Total User</h6>
+            <h6 className='fst-italic' style={{ color: 'white' }}><PeopleIcon></PeopleIcon> Total User</h6>
             <div className='d-flex align-items-center text-center gap-2'>
               <h1 className='fw-bold '>{totalUser}</h1> people
             </div>
@@ -224,8 +227,8 @@ export default function Dashboard() {
           </div>
 
           <div className='d-flex gap-2'>
-            <div className='text-center p-3 shadow rounded' style={{ background: 'linear-gradient(135deg, #008080, #FFD700)', color: '' }}>
-              <h6 className='fst-italic' style={{ color: 'white' }}>Total Amount</h6>
+            <div className='text-center p-3 shadow rounded' style={{ background: 'linear-gradient(135deg, #1E90FF, #00FFFF)', color: 'white', textShadow: '1px 1px 2px rgba(0, 0, 0, 0.5)' }}>
+              <h6 className='fst-italic' style={{ color: 'white' }}><PaidIcon></PaidIcon> Total Amount</h6>
               <div className='d-flex align-items-center text-center gap-2'>
                 <h1 className='fw-bold '>{totalRevenue.toLocaleString('vi-VN') + " "}</h1> VND
               </div>
@@ -241,8 +244,8 @@ export default function Dashboard() {
               )}
             </div>
 
-            <div className='text-center p-3 shadow rounded' style={{ background: 'linear-gradient(135deg, #FF69B4, #1E90FF)', color: '' }}>
-              <h6 className='fst-italic' style={{ color: 'white' }}>Total Refund Amount</h6>
+            <div className='text-center p-3 shadow rounded' style={{ background: 'linear-gradient(135deg, #FFB6C1, #FF4500)', color: 'white', textShadow: '1px 1px 2px rgba(0, 0, 0, 0.5)' }}>
+              <h6 className='fst-italic' style={{ color: 'white' }}><CurrencyExchangeIcon></CurrencyExchangeIcon> Total Refund Amount</h6>
               <div className='d-flex align-items-center text-center gap-2'>
                 <h1 className='fw-bold text-center'>{totalRefundAmount.toLocaleString('vi-VN') + " "}</h1> VND
               </div>
@@ -260,8 +263,8 @@ export default function Dashboard() {
           </div>
 
           <div className='d-flex gap-2'>
-            <div className='text-center p-3 shadow rounded' style={{ background: 'linear-gradient(135deg, #008080, #FFD700)', color: '' }}>
-              <h6 className='fst-italic' style={{ color: 'white' }}>Total Booking</h6>
+            <div className='text-center p-3 shadow rounded' style={{ background: 'linear-gradient(135deg, #1E90FF, #00FFFF)', color: 'white', textShadow: '1px 1px 2px rgba(0, 0, 0, 0.5)' }}>
+              <h6 className='fst-italic' style={{ color: 'white' }}><BookIcon></BookIcon> Total Booking</h6>
               <div className='d-flex align-items-center text-center gap-2'>
                 <h1 className='fw-bold '>{totalBooking}</h1> booking(s)
               </div>
@@ -278,8 +281,8 @@ export default function Dashboard() {
               )}
             </div>
 
-            <div className='text-center p-3 shadow rounded' style={{ background: 'linear-gradient(135deg, #FF69B4, #1E90FF)', color: '' }}>
-              <h6 className='fst-italic' style={{ color: 'white' }}>Total Cancel Booking</h6>
+            <div className='text-center p-3 shadow rounded' style={{ background: 'linear-gradient(135deg, #FFB6C1, #FF4500)', color: 'white', textShadow: '1px 1px 2px rgba(0, 0, 0, 0.5)' }}>
+              <h6 className='fst-italic' style={{ color: 'white' }}><AppBlockingIcon></AppBlockingIcon> Total Cancel Booking</h6>
               <div className='d-flex align-items-center text-center gap-2'>
                 <h1 className='fw-bold '>{totalCancelBooking}</h1> booking(s)
               </div>
@@ -296,20 +299,18 @@ export default function Dashboard() {
               )}
             </div>
           </div>
-
         </div>
 
 
+
+
+
         <div className='area-chart-container  mb-5 ' style={{}}>
-          <AreaChart width={1150} height={300} data={summaryData}>
+          <BarChart width={1150} height={300} data={summaryData}>
             <defs>
-              <linearGradient id="colorTotalUser" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#8884d8" stopOpacity={0.8} />
-                <stop offset="95%" stopColor="#8884d8" stopOpacity={0} />
-                {/* defs và linearGradient: Trong phần defs, chúng ta định nghĩa một linearGradient với id là "colorTotalUser".
-               Gradient này bắt đầu từ màu "#8884d8" với độ mờ dần dần (opacity) là 0.8 và kết thúc ở 0 với màu cùng một màu "#8884d8".
-                fill: fill sử dụng "url(#colorTotalUser)" để áp dụng gradient cho phần nền của biểu đồ. fillOpacity={0.8} 
-                được sử dụng để làm mờ các dải màu hơi. */}
+              <linearGradient id="colorPink" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#FFB6C1" stopOpacity={0.8} />
+                <stop offset="95%" stopColor="#FF69B4" stopOpacity={0.8} />
               </linearGradient>
             </defs>
             <CartesianGrid strokeDasharray="3 3" />
@@ -317,9 +318,9 @@ export default function Dashboard() {
             <YAxis tickFormatter={integerTickFormatter} />
             <Tooltip labelFormatter={(value) => new Date(value).toLocaleDateString("en-Gb")} />
             <Legend />
-            <Area type="monotone" dataKey="totalUser" stroke="#8884d8" fill="url(#colorTotalUser)" fillOpacity={0.8} />
-          </AreaChart>
-          <Text textAlign="center" fontStyle="italic">
+            <Bar type="monotone" dataKey="totalUser" fill="url(#colorPink)" />
+          </BarChart>
+          <Text textAlign="center" fontStyle="italic" fontSize={'18'} color='teal'>
             Chart of growing user
           </Text>
         </div>
@@ -329,15 +330,25 @@ export default function Dashboard() {
         <div className='mb-5 area-chart-container'>
 
           <BarChart width={1150} height={300} data={summaryData}>
+            <defs>
+              <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#87CEFA" stopOpacity={0.8} />
+                <stop offset="95%" stopColor="#B0E0E6" stopOpacity={0.8} />
+              </linearGradient>
+              <linearGradient id="colorCancel" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#FA8072" stopOpacity={0.8} />
+                <stop offset="95%" stopColor="#F08080" stopOpacity={0.8} />
+              </linearGradient>
+            </defs>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="date" tickFormatter={(value) => new Date(value).toLocaleDateString("en-Gb")} />
             <YAxis tickFormatter={integerTickFormatter} />
             <Tooltip labelFormatter={(value) => new Date(value).toLocaleDateString("en-Gb")} />
             <Legend />
-            <Bar dataKey="totalAmount" fill="#82ca9d" />
-            <Bar dataKey="totalRefundAmount" fill="#cc0066" />
+            <Bar dataKey="totalAmount" fill="url(#colorUv)" />
+            <Bar dataKey="totalRefundAmount" fill="url(#colorCancel)" />
           </BarChart>
-          <Text textAlign="center" fontStyle="italic">
+          <Text textAlign="center" fontStyle="italic" fontSize={'18'} color='teal'>
             Chart of Total Amount and Total Refund Amount
           </Text>
         </div>
@@ -345,15 +356,25 @@ export default function Dashboard() {
 
         <div className='mb-5 area-chart-container'>
           <BarChart width={1150} height={300} data={summaryData}>
+            <defs>
+              <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#87CEFA" stopOpacity={0.8} />
+                <stop offset="95%" stopColor="#B0E0E6" stopOpacity={0.8} />
+              </linearGradient>
+              <linearGradient id="colorCancel" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#FA8072" stopOpacity={0.8} />
+                <stop offset="95%" stopColor="#F08080" stopOpacity={0.8} />
+              </linearGradient>
+            </defs>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="date" tickFormatter={(value) => new Date(value).toLocaleDateString("en-Gb")} />
             <YAxis tickFormatter={integerTickFormatter} />
             <Tooltip labelFormatter={(value) => new Date(value).toLocaleDateString("en-Gb")} />
             <Legend />
-            <Bar dataKey="totalBooking" fill="#82ca9d" />
-            <Bar dataKey="totalCancelBooking" fill="#cc0066" />
+            <Bar dataKey="totalBooking" fill="url(#colorUv)" />
+            <Bar dataKey="totalCancelBooking" fill="url(#colorCancel)" />
           </BarChart>
-          <Text textAlign="center" fontStyle="italic">
+          <Text textAlign="center" fontStyle="italic" fontSize={'18'} color='teal'>
             Chart of total Booking and Cancel Booking
           </Text>
         </div>

@@ -19,7 +19,8 @@ import java.util.Map;
 
 @RestController
 //@CrossOrigin("http://localhost:3000")
-@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
+@CrossOrigin(origins = {"http://localhost:3000", "https://pethealthcare.vercel.app"}, allowCredentials = "true")
+
 public class UserController {
     static final String SUBJECT = "Verify your email";
     static final String BODY = "Your verification code: ";

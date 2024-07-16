@@ -12,6 +12,8 @@ import { URL } from '../utils/constant';
 const Profile = () => {
   const navigate = useNavigate();
 
+  const roleId = localStorage.getItem("roleId")
+
   const [messagePhone, setMessagePhone] = useState("")
   const [messageDob, setMessageDob] = useState("")
 
@@ -95,6 +97,7 @@ const Profile = () => {
           avatar: response.data,
         }));
         toast.success('Avatar uploaded successfully');
+        window.location.reload()
       }
     } catch (error) {
       toast.error('Failed to upload avatar');
@@ -165,12 +168,16 @@ const Profile = () => {
 
             <h5 className='text-center fw-bold mb-0' style={{ width: '80%' }}>{profile.fullName}</h5>
             <p className='fw-light text-center mb-4' style={{ width: '80%' }}>{profile.email}</p>
-            <div className=''>
-              <Link className="list-group-item py-1 px-2 text-decoration-none btn btn-light my-2 rounded shadow text-center" to={`/listPets`}>My Pets</Link>
-              <Link className="list-group-item py-1 px-2 text-decoration-none btn btn-light my-2 rounded shadow text-center" to={`/reservation`}>My Appointments</Link>
-              {/* <Link className="list-group-item py-1 px-2 text-decoration-none btn btn-light my-2 shadow" to={`/`}>My Report</Link>
+            {roleId === '1' ?
+              <div className=''>
+
+                <Link className="list-group-item py-1 px-2 text-decoration-none btn btn-light my-2 rounded shadow text-center" to={`/listPets`}>My Pets</Link>
+                <Link className="list-group-item py-1 px-2 text-decoration-none btn btn-light my-2 rounded shadow text-center" to={`/reservation`}>My Appointments</Link>
+
+                {/* <Link className="list-group-item py-1 px-2 text-decoration-none btn btn-light my-2 shadow" to={`/`}>My Report</Link>
             <Link className="list-group-item py-1 px-2 text-decoration-none btn btn-light my-2 shadow" to={`/`}>My Vet</Link> */}
-            </div>
+              </div> : ''
+            }
           </div>
           <div className='profile col-8 my-5'>
             <div className='col-md-6 offset-md-3 border rounded p-4 mt-2 shadow bg-light'>

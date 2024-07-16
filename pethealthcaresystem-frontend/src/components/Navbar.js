@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { Avatar, AvatarBadge } from '@chakra-ui/react';
 import { URL } from '../utils/constant';
@@ -25,9 +25,10 @@ const Navbar = () => {
   }, []);
 
   const capitalizeText = (str) => {
-    const firstPath = str.split("/")[0] ?? str;
-    const strSplit = firstPath.split("-").join(" ");
-    return strSplit.split(" ").map((s) => s.charAt(0).toUpperCase() + s.slice(1)).join(" ")
+    let title = str.split("/")[1] ?? str;    //   /home  ["", "home"] 
+    title = title.split('-').join(' ')
+    title = title.charAt(0).toUpperCase() + title.slice(1)   //viết hoa chữ đầu tiên + phần còn lại sau ký tự đầu tiên qua hàm slice(1) 
+    return title.split(/(?=[A-Z])/).join(' '); // tìm vị trí mà sau nó là 1 chữ viết hoa tách str thành str có các phần tử bắt đầu là chữ hoa  str = ["List", "Pets"]
   }
 
   const getRoleName = (roleId) => {
@@ -41,15 +42,15 @@ const Navbar = () => {
 
   return (
     <div className="navbar" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 20px' }}>
-      
+
       <h1 style={{ color: '#ffff' }}>{capitalizeText(pageName ?? "")}</h1>
       {user && (
-        <div style={{ display: 'flex', alignItems: 'center', color: '#fff' }}>
-          <Avatar src={user.avatar} alt="Avatar" className="avatar" style={{ width: '40px', height: '40px', borderRadius: '50%', marginRight: '10px' }}/>
+        <Link to={'/profile'}><div style={{ display: 'flex', alignItems: 'center', color: '#fff' }}>
+          <Avatar src={user.avatar} alt="Avatar" className="avatar" style={{ width: '40px', height: '40px', borderRadius: '50%', marginRight: '10px' }} />
           <div style={{ color: 'white', marginRight: '3px' }}>{getRoleName(user.roleId)}</div>
           {user.fullName}
 
-        </div>
+        </div></Link>
 
       )}
     </div>

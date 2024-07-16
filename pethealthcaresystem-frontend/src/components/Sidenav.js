@@ -2,8 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { MoneyOff } from '@mui/icons-material';
+import CurrencyExchangeIcon from '@mui/icons-material/CurrencyExchange';
 import { Avatar } from '@chakra-ui/react';
 import { URL } from '../utils/constant';
+
 export default function Sidenav() {
   let navigate = useNavigate();
 
@@ -70,6 +72,7 @@ export default function Sidenav() {
     case 2:
       links = [
         { name: 'Home', path: '/', icon: 'fas fa-home' },
+        { name: 'Profile', path: '/profile', icon: 'fas fa-user' },
         { name: 'Cages', path: '/cages', icon: 'fas fa-warehouse' },
         { name: 'Booking Appointments', path: '/staff-booking', icon: 'fas fa-calendar-check' },
         { name: 'Assign Vet\'s Work Schedules', path: '/assign-schedules', icon: 'fas fa-clipboard-list' },
@@ -82,6 +85,7 @@ export default function Sidenav() {
     case 3:
       links = [
         { name: 'Home', path: '/', icon: 'fas fa-home' },
+        { name: 'Profile', path: '/profile', icon: 'fas fa-user' },
         { name: 'Booking Appointments', path: '/booking', icon: 'fas fa-calendar-check' },
         { name: 'Work Schedules', path: '/vet-work-schedules', icon: 'fas fa-clipboard-list' },
         { name: 'Logout', path: '/login', icon: 'fas fa-sign-out-alt', onClick: handleLogout },
@@ -93,7 +97,7 @@ export default function Sidenav() {
         { name: 'Account', path: '/account', icon: 'fa-solid fa-user' },
         { name: 'Services', path: '/services', icon: 'fas fa-concierge-bell' },
         { name: 'System Config', path: '/configuration', icon: 'fa fa-cog' },
-        { name: 'Refunds', path: '/refund-requests', icon: <MoneyOff /> },
+        { name: 'Refunds', path: '/refund-requests', icon: <CurrencyExchangeIcon /> },
         { name: 'Logout', path: '', icon: 'fas fa-sign-out-alt', onClick: handleLogout },
       ];
       break;
@@ -103,10 +107,11 @@ export default function Sidenav() {
 
   return (
     <div className="sidenav" style={{ background: 'teal' }}>
-      <div className="sidenav-header">
+      <Link to={'/'}><div className="sidenav-header d-flex align-items-center">
         <Avatar src="logoApp.svg" alt="Logo" className="logo rounded-circle " style={{ background: 'white' }} />
-        <h5 style={{ color: 'white' }}>Pet Health Care</h5>
+        <h5 className='text-center' style={{ color: 'white' }}>Pet Health Care</h5>
       </div>
+      </Link>
       <ul>
         {links.map((link) => (
           <li key={link.name}>

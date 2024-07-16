@@ -15,7 +15,8 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/shifts")
-@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
+@CrossOrigin(origins = {"http://localhost:3000", "https://pethealthcare.vercel.app"}, allowCredentials = "true")
+
 public class ShiftController {
 
     @Autowired

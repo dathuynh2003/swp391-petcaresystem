@@ -204,7 +204,7 @@ export default function Services() {
         </ModalContent>
       </Modal>
       <div className='row'>
-        <h2 className='text-center mb-4 mt-3'><b>Our services</b></h2>
+        <h2 className='text-center mb-4 mt-3' style={{color: 'teal'}}><b>Our services</b></h2>
         <div className='row mx-auto mb-3 mt-4' style={{ marginBottom: '0px' }}>
           {
             services?.map((service, index) => (
