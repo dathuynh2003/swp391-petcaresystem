@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 public interface IBookingService {
     Booking createBooking(Booking newBooking, User user, int petId, int vsId, List<Integer> serviceIds);

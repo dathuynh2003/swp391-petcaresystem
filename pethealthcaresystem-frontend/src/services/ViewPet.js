@@ -41,10 +41,10 @@ export default function ViewPet() {
     const { petId } = useParams();
     const loadPet = async () => {
         const response = await axios.get(`${URL}/pet/${petId}`, { withCredentials: true })
+        console.log(response.data)
         setPet(response.data)
         setMedicalRecord((prev) => ({ ...prev, pet: response.data }))
         setHospitalizations(response.data.hospitalizations)
-        // console.log(response.data)
     }
 
     const handleHospitalize = async () => {
@@ -119,8 +119,8 @@ export default function ViewPet() {
     useEffect(() => {
 
         loadMedicineBySearch()
-        console.log(typeof (keyword));
-        console.log(listMedicineBySearch);
+        // console.log(typeof (keyword));
+        // console.log(listMedicineBySearch);
 
     }, [keyword])
 
@@ -181,19 +181,16 @@ export default function ViewPet() {
     };
 
     const callAPI = async () => {
-        console.log("day ne");
-        console.log(medicalRecordRequest);
-        console.log(JSON.stringify(medicalRecordRequest, null, 2))
+        // console.log(medicalRecordRequest);
+        // console.log(JSON.stringify(medicalRecordRequest, null, 2))
         try {
 
             console.log(medicalRecordRequest)
             if (medicalRecord?.diagnosis || medicalRecord?.treatment) {
-                console.log(medicalRecordRequest)
-                console.log(petId)
+                // console.log(medicalRecordRequest)
+                // console.log(petId)
                 const response = await axios.post(`${URL}/medicalRecord/add/${petId}`, medicalRecordRequest, { withCredentials: true });
-                console.log("loi o day");
-                console.log(response);
-                console.log(response.data.MedicalRecord);
+                // console.log(response.data.MedicalRecord);
                 if (response.data.MedicalRecord === null || response.data.MedicalRecord === undefined) {
                     toast.error("Add new medical record failed!")
 
@@ -212,7 +209,8 @@ export default function ViewPet() {
             }
 
         } catch (error) {
-            console.log(error.message);
+            // console.log(error.message);
+            navigate('/404page')
         }
     }
 
@@ -235,9 +233,9 @@ export default function ViewPet() {
             const response = await axios.get(`${URL}/cages/${pet?.petType}`, { withCredentials: true })
             if (response.data.message === 'Cage found') {
                 setCages(response.data.cages)
-                console.log(response.data.cages)
+                // console.log(response.data.cages)
             } else {
-                console.log(response.data.message)
+                // console.log(response.data.message)
             }
         }
         catch (e) {
@@ -367,7 +365,7 @@ export default function ViewPet() {
                     toast.info("Payment failed");
                 }
                 if (status === "PAID") {
-                    console.log("status: " + status);
+                    // console.log("status: " + status);
                     const paymentType = "Credit Card"
                     const response = await axios.put(`${URL}/update-payment/${orderCode}`, { paymentType, status }, { withCredentials: true });
                     if (response.data.message === 'Payment updated successfully') {
@@ -395,14 +393,14 @@ export default function ViewPet() {
                 paymentType: 'Credit card',
                 amount: medicalRecord.totalAmount
             }
-            console.log(payment);
+            // console.log(payment);
             const response = await axios.post(`${URL}/generate-payment/medicalRecord/${medicalRecord.id}`, payment, { withCredentials: true });
             if (response.data.result.desc === 'success') {
                 const checkoutURL = response.data.result.data.checkoutUrl
-                console.log(checkoutURL);
+                // console.log(checkoutURL);
                 window.location.href = checkoutURL
             } else {
-                console.log(response.data);
+                // console.log(response.data);
                 toast.warning("Cannot generate payment")
             }
         } catch (error) {
@@ -510,8 +508,6 @@ export default function ViewPet() {
                                         pet?.hospitalizations?.some(admitPet => admitPet?.status === "pending") ? (
                                             <Link
                                                 className='btn btn-warning col-md-12'
-                                                onClick={() => handleHospPayment(hospitalizations
-                                                    .find(hospitalization => hospitalization.status === "pending"))}
                                             >
                                                 Waiting Payment
                                             </Link>
@@ -552,7 +548,7 @@ export default function ViewPet() {
                                                             <FormControl className='d-flex justify-content-between'>
                                                                 <FormLabel>Pet's breed <Input readOnly ref={initialRef} value={pet.breed} /></FormLabel>
                                                                 <FormLabel>Pet's sex <Input readOnly value={pet.gender} /></FormLabel>
-                                                                <FormLabel>Pet's age <Input readOnly value={pet.age} /></FormLabel>
+                                                                <FormLabel>Pet's age <Input readOnly value={age + " Month(s)"} /></FormLabel>
                                                             </FormControl>
                                                             <FormControl className='d-flex'>
                                                                 <FormLabel className='w-100'>
@@ -605,7 +601,9 @@ export default function ViewPet() {
 
                     <TabPanel>
                         <div className='container'>
-                            {roleId === '3' ? <Button onClick={onOpen} colorScheme='teal' className='mb-3'>Add new medical record</Button> : <></>}
+                            {(roleId === '3' && pet.bookings?.find((booking) => booking.status === "Checked_In")) ?
+                                <Button onClick={onOpen} colorScheme='teal' className='mb-3'>Add new medical record</Button> : <></>
+                            }
                             <Modal size={'3xl'} className="mx-auto"
                                 initialFocusRef={initialRef}
                                 finalFocusRef={finalRef}

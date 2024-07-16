@@ -14,6 +14,8 @@ export default function VetWorkSchedules() {
   const [showModal, setShowModal] = useState(false);
   const [modalData, setModalData] = useState(null);
   const [selectedDate, setSelectedDate] = useState('');
+  //dùng để lưu status booking của ca làm việc muốn xem chi tiết lên
+  const [statusBooking, setStatusBooking] = useState("");
 
   useEffect(() => {
     const fetchShifts = async () => {
@@ -85,8 +87,9 @@ export default function VetWorkSchedules() {
     return date.toLocaleDateString('en-GB', { weekday: 'long' }); // Định dạng ngày thành Mon, Tue, Wed, ...
   };
 
-  const handleShowModal = (scheduledShift) => {
+  const handleShowModal = (scheduledShift, status) => {
     setModalData(scheduledShift);
+    setStatusBooking(status)
     setShowModal(true);
   };
 
@@ -115,6 +118,25 @@ export default function VetWorkSchedules() {
   const dob = new Date(modalData?.bookings[0]?.pet?.dob);
   const diffMonths = (today.getFullYear() - dob.getFullYear()) * 12 + (today.getMonth() - dob.getMonth());
   const age = diffMonths !== 0 ? diffMonths : 1;
+
+  //Che sđt
+  const maskPhoneNumber = (phoneNumber) => {
+    if (!phoneNumber) return 'N/A';
+    // Tính số lượng chữ 'x' cần hiển thị
+    const totalLength = phoneNumber.length;
+    const numberOfXLetters = totalLength - 5; // 3 số đầu và 2 số cuối không bị che giấu
+
+    const maskedPart = 'x'.repeat(numberOfXLetters); // Tạo chuỗi 'x'
+    return phoneNumber.slice(0, 3) + maskedPart + phoneNumber.slice(-2);
+  };
+
+  //Che địa chỉ
+  const maskAddress = (address) => {
+    if (!address) return 'N/A';
+
+    //Các số đầu tiền là số nhà nên che = x
+    return address.replace(/^\d+/, match => 'x'.repeat(match.length));
+  };
 
   return (
     <div className="container">
@@ -162,19 +184,25 @@ export default function VetWorkSchedules() {
                         new Date(item.date).toLocaleDateString('en-GB') === formatDate(date) &&
                         item.shift.shiftId === shift.shiftId,
                     );
+                    //Thêm vào lọc lại nếu chỉ mới thanh toán thì hiện màu vàng còn checkin rồi thì hiện màu xanh lá
+                    const status = scheduledShift?.status === "Booked" && scheduledShift?.bookings?.find((booking) =>
+                      booking?.status === 'PAID' || booking?.status === 'Checked_In'
+                    )?.status
+                    const backgroundColor = status === 'PAID' ? '#FFC107' :
+                      status === 'Checked_In' ? 'green' : '';
                     return (
                       <td
                         key={dateIndex}
                         style={{
                           ...cellStyle,
                           cursor: scheduledShift ? 'pointer' : 'default',
-                          backgroundColor: scheduledShift ? '#188754' : '',
+                          backgroundColor: backgroundColor,
                           color: scheduledShift ? 'white' : ''
                         }}
-                        onClick={() => scheduledShift?.status === "Booked" && handleShowModal(scheduledShift)}
+                        onClick={() => scheduledShift?.status === "Booked" && handleShowModal(scheduledShift, status)}
                       >
                         {scheduledShift?.status === "Booked" && scheduledShift?.bookings?.map((booking, index) => (
-                          booking?.status === "PAID" && (
+                          (booking?.status === "Checked_In" || booking?.status === "PAID") && (
                             <div key={index}>
                               <strong>{booking?.user?.fullName}</strong>
                               <div>{booking?.pet?.name} ({booking?.pet?.petType})</div>
@@ -214,8 +242,8 @@ export default function VetWorkSchedules() {
                 <div className="col-md-6">
                   <h5>Customer Information</h5>
                   <p><strong>Name:</strong> {modalData.bookings[0].user.fullName ? modalData.bookings[0].user.fullName : 'N/A'}</p>
-                  <p><strong>Address:</strong> {modalData.bookings[0].user.address ? modalData.bookings[0].user.address : 'N/A'}</p>
-                  <p><strong>Phone:</strong> {modalData.bookings[0].user.phoneNumber ? modalData.bookings[0].user.phoneNumber : 'N/A'}</p>
+                  <p><strong>Address:</strong> {maskAddress(modalData.bookings[0].user.address)}</p>
+                  <p><strong>Phone:</strong> {maskPhoneNumber(modalData.bookings[0].user.phoneNumber)}</p>
                   <p><strong>Dob:</strong> {formatDate(modalData.bookings[0].user.dob) ? formatDate(modalData.bookings[0].user.dob) : 'N/A'}</p>
                 </div>
                 <div className="col-md-6">
@@ -254,8 +282,10 @@ export default function VetWorkSchedules() {
         </Modal.Body>
         <Modal.Footer>
           {modalData && (
-            <Button style={{ background: 'teal', color: 'white' }}>
-              <Link to={`/viewPet/${modalData.bookings[0].pet.petId}`} >
+            //Check in rồi mới cho bác sĩ view vào để khám
+            statusBooking === "Checked_In" && <Button style={{ background: 'teal', color: 'white' }}>
+              {/* Thêm state vào để chặn vet view = đường dẫn link */}
+              <Link to={`/viewPet/${modalData.bookings[0].pet.petId}`} state={{ fromButton: true }} >
                 View Pet
               </Link>
             </Button>

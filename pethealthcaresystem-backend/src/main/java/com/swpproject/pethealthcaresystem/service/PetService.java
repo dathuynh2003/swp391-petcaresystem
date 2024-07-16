@@ -3,14 +3,8 @@ package com.swpproject.pethealthcaresystem.service;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
-import com.swpproject.pethealthcaresystem.model.Hospitalization;
-import com.swpproject.pethealthcaresystem.model.HospitalizationDetail;
-import com.swpproject.pethealthcaresystem.model.Pet;
-import com.swpproject.pethealthcaresystem.model.User;
-import com.swpproject.pethealthcaresystem.repository.HospitalizationDetailRepository;
-import com.swpproject.pethealthcaresystem.repository.HospitalizationRepository;
-import com.swpproject.pethealthcaresystem.repository.PetRepository;
-import com.swpproject.pethealthcaresystem.repository.UserRepository;
+import com.swpproject.pethealthcaresystem.model.*;
+import com.swpproject.pethealthcaresystem.repository.*;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +29,8 @@ public class PetService implements IPetService {
     private UserService userService;
     @Autowired
     private Cloudinary cloudinary;
+    @Autowired
+    private BookingRepository bookingRepository;
 
     @Override
     public Pet createPet(Pet newPet, User curUser) {
@@ -67,6 +63,7 @@ public class PetService implements IPetService {
     @Override
     public Pet getPetById(int id) {
         Pet pet = petRepository.findById(id).orElseThrow(() -> new RuntimeException("Pet not found"));
+        Set<Booking> bookings = bookingRepository.findBookingsByPet(pet);
         Set<Hospitalization> hospitalizationSet = hospitalizationRepository.findByPetOrderByIdDesc(pet);
         for (Hospitalization hospitalization : hospitalizationSet) {
             Set<HospitalizationDetail> hospDetails = hospitalizationDetailRepository
@@ -79,6 +76,14 @@ public class PetService implements IPetService {
             hospitalization.getUser().setVetShiftDetails(null);
         }
         pet.setHospitalizations(hospitalizationSet);
+//        Chống vòng lặp vô hạn, pet có booking, booking lại có pet. tương tự user và các object khác
+        for (Booking booking : bookings) {
+            booking.setPet(null);
+            booking.setUser(null);
+            booking.setBookingDetails(null);
+            booking.setVetShiftDetail(null);
+        }
+        pet.setBookings(bookings);
         return pet;
     }
 

@@ -1,6 +1,6 @@
 import './App.css';
 import "../node_modules/bootstrap/dist/css/bootstrap.min.css";
-import { BrowserRouter as Router, Route, Routes, useLocation, useMatch } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, useLocation, useMatch, useParams, Navigate } from 'react-router-dom';
 import Login from './services/Login';
 import Home from './pages/Home';
 import Register from './services/Register/Register';
@@ -75,15 +75,15 @@ function App() {
                     <CreatePet />
                   </Permission>
                 </AuthProvider>
-
               } />
               <Route path="/viewPet/:petId" element={
-                <AuthProvider>
-                  <Permission roleId={['1', '2', '3']} redirect={true}>
-                    <ViewPet />
-                  </Permission>
-                </AuthProvider>
-
+                <ConditionalViewPet>
+                  <AuthProvider>
+                    <Permission roleId={['1', '2', '3']} redirect={true}>
+                      <ViewPet />
+                    </Permission>
+                  </AuthProvider>
+                </ConditionalViewPet>
               } />
               <Route path="/listPets" element={
                 <AuthProvider>
@@ -257,5 +257,15 @@ function App() {
     </div >
   );
 }
+const ConditionalViewPet = () => {
+  const location = useLocation();
+  const roleId = localStorage.getItem('roleId');
 
+  // Nếu roleId = 3 mà không có state từ navigate thì chuyển hướng đến /page404
+  if (roleId === '3' && !location.state?.fromButton) {
+    return <Navigate to="/page404" />;
+  }
+
+  return <ViewPet />;
+};
 export default App;
