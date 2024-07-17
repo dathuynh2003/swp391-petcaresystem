@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
-import { Tab, TabList, Tabs, TabPanel, TabPanels, Button, Textarea, Avatar } from '@chakra-ui/react';
+import { Tab, TabList, Tabs, TabPanel, TabPanels, Button, Textarea, Avatar, Image } from '@chakra-ui/react';
 import axios from 'axios'
 import { ToastContainer, toast } from 'react-toastify';
 import {
@@ -859,7 +859,9 @@ export default function ViewPet() {
                                                 <div className=''>
 
                                                     <div className='d-flex align-items-center justify-content-between text-center'>
-                                                        <div className='d-flex gap-1'><Avatar src="logoPetCare.png" alt="Logo" className='logo' /> Pet Health Care</div>
+                                                        <div className='d-flex gap-1'>
+                                                            <Image src="../logoApp.svg" alt="Logo" className='logo' /> Pet Health Care
+                                                        </div>
                                                         <div>
                                                             {roleId === '1' ? (
                                                                 <Button

@@ -107,7 +107,6 @@ const BookingHistory = () => {
             setError(null);
             setCurrentPage(Math.min(pageNo, totalPages));
         } catch (error) {
-            console.error("Error fetching bookings:", error);
             setError("Error fetching bookings. Please try again later.");
             setBookings([]);
             setTotalPages(0);
@@ -312,11 +311,26 @@ const BookingHistory = () => {
 
     }
 
+    const getUpcomingRevisitBookings = async (page) => {
+        const pageNo = page ?? currentPage;
+        try {
+            const response = await axios.get(`${URL}/upcoming-revisit-bookings?pageNo=${pageNo}&pageSize=${pageSize}`, { withCredentials: true })
+            if (response.data.message === "successfully") {
+                setBookings(response.data.content.content)
+                setTotalPages(response.data.content.totalPages)
+            } else {
+                toast.warn(response.data.message)
+            }
+        } catch (e) {
+            toast.error(e.message)
+        }
+    }
+
     return (
         <Container maxW="container.xl" py={6}>
             {error && <Text color="red.500" mb={4}>{error}</Text>}
             <Flex justify="space-between" mb={3}>
-                <FormControl width="100px" mr={2}>
+                <FormControl className='row' mr={2}>
                     <InputGroup width="300px"> {/* Điều chỉnh độ rộng ở đây */}
                         <Input
                             id="phoneNumber"
@@ -332,6 +346,8 @@ const BookingHistory = () => {
                             />
                         </InputRightElement>
                     </InputGroup>
+                    {/* Nút để filter các booking cần phải liên hệ để nhắc tái khái */}
+                    <Button className='col-2 mx-3' colorScheme='teal' onClick={() => getUpcomingRevisitBookings(currentPage)}>Re-visit Reminders</Button>
                 </FormControl>
 
                 {loading && <Spinner size="lg" />}
@@ -364,6 +380,8 @@ const BookingHistory = () => {
                                 <option value="CANCELLED">Cancelled</option>
                                 <option value="PAID">Paid</option>
                                 <option value="Request Refund">Refund Requests</option>
+                                <option value="Checked_In">Checked In</option>
+                                <option value="DONE">Done</option>
                             </Select>
                         </FormControl>
                     </Flex>
@@ -434,8 +452,8 @@ const BookingHistory = () => {
                                 <Td>{formatDateTime(booking.bookingDate, 'dd-MM-yyyy HH:mm')}</Td>
                                 <Td>{formatPrice(booking.totalAmount)} VND</Td>
                                 <Td>
-                                    {(booking.status === "PAID" || booking.status === "Checked_In") && <Badge colorScheme="green">{booking.status}</Badge>}
-                                    {(booking.status === "Request Refund" || booking.status === 'Pending') && <Badge colorScheme="yellow">{booking.status}</Badge>}
+                                    {(booking.status === "PAID" || booking.status === "DONE") && <Badge colorScheme="green">{booking.status}</Badge>}
+                                    {(booking.status === "Request Refund" || booking.status === 'Checked_In') && <Badge colorScheme="yellow">{booking.status}</Badge>}
                                     {(booking.status === "Refunded") && <Badge colorScheme="red">{booking.status}</Badge>}
                                 </Td>
                                 <Td>
@@ -596,13 +614,19 @@ const BookingHistory = () => {
                 <Modal isOpen={isOpen} onClose={closeModal} size='2xl'>
                     <ModalOverlay />
                     <ModalContent>
-                        <ModalHeader>Booking Details #{selectedBooking.id}  <Badge colorScheme={
-                            (selectedBooking.status === "PAID" || selectedBooking.status === "Checked_In") ? "green" : (
-                                selectedBooking.status === "Request Refund" || selectedBooking.status === 'Pending') ? "yellow" :
-                                (selectedBooking.status === "Refunded") && "red"
-                        }>
-                            {selectedBooking.status}
-                        </Badge></ModalHeader>
+                        <ModalHeader>Booking Details #{selectedBooking.id}
+                            <Badge className='mx-3 mb-1' colorScheme={
+                                (selectedBooking.status === "PAID" || selectedBooking.status === "DONE") ? "green" : (
+                                    selectedBooking.status === "Request Refund" || selectedBooking.status === 'Checked_In') ? "yellow" :
+                                    (selectedBooking.status === "Refunded") && "red"
+                            }>
+                                {selectedBooking.status}
+                            </Badge>
+                            {selectedBooking.reVisitDate && <Badge className='col-3 mx-5 text-center fs-6' colorScheme='white'>
+                                Re-visitDate: {formatDateTime(selectedBooking.reVisitDate, 'dd/MM/yyyy')}
+                            </Badge>
+                            }
+                        </ModalHeader>
                         <ModalCloseButton />
                         <ModalBody>
                             <Flex mb={4}>

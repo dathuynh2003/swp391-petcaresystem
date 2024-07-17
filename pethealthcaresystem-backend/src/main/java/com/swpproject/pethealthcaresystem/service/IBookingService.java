@@ -32,4 +32,6 @@ public interface IBookingService {
     Booking requestRefundBookingByStaff(int bookingId);
 
     Booking finishBooking (Booking newBooking);
-}
+
+    Page<Booking> getUpcomingRevisitBookings(int pageNo, int pageSize);
+ }

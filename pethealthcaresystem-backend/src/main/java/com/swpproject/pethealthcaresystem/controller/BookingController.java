@@ -225,6 +225,8 @@ public class BookingController {
                 statuses.add("PAID");
                 statuses.add("Request Refund");
                 statuses.add("Refunded");
+                statuses.add("DONE");
+                statuses.add("Checked_In");
                 Page<Booking> bookings = bookingService.getBookingsByUserAndStatusIn(currentUser.getUserId(), statuses, pageNo, pageSize);
                 ResponseData<Page<Booking>> responseData = new ResponseData<>();
                 responseData.setData(bookings);
@@ -393,6 +395,7 @@ public class BookingController {
         }
         return response;
     }
+
     @PutMapping("/refund-booking-by-staff/{bookingId}")
     public Map<String, Object> refundBooking(@PathVariable int bookingId, HttpSession session) {
         Map<String, Object> response = new HashMap<>();
@@ -419,6 +422,24 @@ public class BookingController {
             }
             response.put("message", "successfully");
             response.put("booking", bookingService.finishBooking(completedBooking));
+        } catch (Exception e) {
+            response.put("message", e.getMessage());
+        }
+        return response;
+    }
+
+    @GetMapping("/upcoming-revisit-bookings")
+    public Map<String, Object> getUpcomingRevisitBookings(HttpSession session,
+                                                          @RequestParam(defaultValue = "1") Integer pageNo,
+                                                          @RequestParam Integer pageSize) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            User currentUser = (User) session.getAttribute("user");
+            if (currentUser == null) {
+                throw new Exception("You need login first");
+            }
+            response.put("message", "successfully");
+            response.put("content", bookingService.getUpcomingRevisitBookings(pageNo, pageSize));
         } catch (Exception e) {
             response.put("message", e.getMessage());
         }

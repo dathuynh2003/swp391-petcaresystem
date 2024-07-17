@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { MoneyOff } from '@mui/icons-material';
-import { Avatar } from '@chakra-ui/react';
+import { Avatar, Image } from '@chakra-ui/react';
 import { URL } from '../utils/constant';
 export default function Sidenav() {
   let navigate = useNavigate();
@@ -104,7 +104,7 @@ export default function Sidenav() {
   return (
     <div className="sidenav" style={{ background: 'teal' }}>
       <div className="sidenav-header">
-        <Avatar src="logoApp.svg" alt="Logo" className="logo rounded-circle " style={{ background: 'white' }} />
+        <Image src="../logoApp.svg" alt="Logo" className="logo rounded-circle " style={{ background: 'white' }} />
         <h5 style={{ color: 'white' }}>Pet Health Care</h5>
       </div>
       <ul>

@@ -310,5 +310,10 @@ public class BookingService implements IBookingService {
         return bookingRepository.save(curBooking);
     }
 
+    @Override
+    public Page<Booking> getUpcomingRevisitBookings(int pageNo, int pageSize) {
+        Pageable pageable = PageRequest.of(pageNo - 1, pageSize, Sort.by("reVisitDate").ascending());
+        return bookingRepository.findUpComingRevisitBookings(pageable);
+    }
 
 }

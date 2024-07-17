@@ -308,8 +308,8 @@ const Reservation = () => {
                                     <Td><b>{booking.vetShiftDetail.shift.from_time} - {booking.vetShiftDetail.shift.to_time}</b></Td>
                                     <Td><b>{formatPrice(booking.totalAmount)} VND</b></Td>
                                     <Td>
-                                        {booking.status === "PAID" && <Badge colorScheme="green">{booking.status}</Badge>}
-                                        {booking.status === "Request Refund" && <Badge colorScheme="yellow">{booking.status}</Badge>}
+                                        {(booking.status === "PAID" || booking.status === 'DONE') && <Badge colorScheme="green">{booking.status}</Badge>}
+                                        {(booking.status === "Request Refund" || booking.status === 'Checked_In') && <Badge colorScheme="yellow">{booking.status}</Badge>}
                                         {booking.status === "Refunded" && <Badge colorScheme="red">{booking.status}</Badge>}
                                     </Td>
                                     <Td>
@@ -493,6 +493,11 @@ const Reservation = () => {
 
                                         <div className="invoice-head-middle-right text-end">
                                             <p><span className="text-bold">Booking No:</span> {selectedBooking.id}</p>
+                                            {selectedBooking.reVisitDate &&
+                                                <p>
+                                                    <span className="text-bold">Re-visit Date: </span>
+                                                    {formatDateTime(selectedBooking.reVisitDate, 'dd/MM/yyyy')}
+                                                </p>}
                                         </div>
                                         <div className="invoice-head-middle-left text-start">
                                             <p><span className="text-bold">Description</span>: {selectedBooking.description}</p>
