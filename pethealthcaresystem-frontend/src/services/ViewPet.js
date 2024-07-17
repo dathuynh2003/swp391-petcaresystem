@@ -21,6 +21,9 @@ import { URL } from '../utils/constant';
 
 export default function ViewPet() {
     let navigate = useNavigate();
+    //Nhận booking từ VetWorkSchedule gửi qua để khi bác sĩ cập nhật medicalRecord xong thì kết thúc quá trình khám
+    const { booking } = useLocation().state || {};
+    const [completedBooking, setCompletedBooking] = useState(booking);
 
     const roleId = localStorage.getItem('roleId')
     const [hospitalizations, setHospitalizations] = useState()
@@ -181,11 +184,15 @@ export default function ViewPet() {
     };
 
     const callAPI = async () => {
+        if (new Date(completedBooking.reVisitDate) < new Date(minDate)) {
+            toast.warn("Revist Date invalid")
+            return
+        }
         // console.log(medicalRecordRequest);
         // console.log(JSON.stringify(medicalRecordRequest, null, 2))
         try {
-
-            console.log(medicalRecordRequest)
+            setCompletedBooking({ ...completedBooking, status: "DONE" })
+            // console.log(medicalRecordRequest)
             if (medicalRecord?.diagnosis || medicalRecord?.treatment) {
                 // console.log(medicalRecordRequest)
                 // console.log(petId)
@@ -195,11 +202,17 @@ export default function ViewPet() {
                     toast.error("Add new medical record failed!")
 
                 } else {
-                    onClose()
-                    setMedicalRecord()
-                    setListSelectedMedicines([])
-                    setPrescription()
-                    toast.success("Add new medical record successfully!")
+                    console.log(completedBooking)
+                    const result = await axios.put(`${URL}/finish-booking`, completedBooking, { withCredentials: true })
+                    if (result.data.message === "successfully") {
+                        onClose()
+                        setMedicalRecord()
+                        setListSelectedMedicines([])
+                        setPrescription()
+                        toast.success("Add new medical record successfully!")
+                    } else {
+                        toast.error(result.data.message)
+                    }
                 }
 
                 loadMedicalRecord()
@@ -414,6 +427,9 @@ export default function ViewPet() {
     const diffMonths = (today.getFullYear() - dob.getFullYear()) * 12 + (today.getMonth() - dob.getMonth());
     const age = diffMonths !== 0 ? diffMonths : 1;
 
+    //Tính ngày nhỏ nhất để tái khái
+    const minDate = new Date(today.setDate(today.getDate() + 1)).toISOString().split('T')[0]
+
     return (
         <div>
 
@@ -601,7 +617,7 @@ export default function ViewPet() {
 
                     <TabPanel>
                         <div className='container'>
-                            {(roleId === '3' && pet.bookings?.find((booking) => booking.status === "Checked_In")) ?
+                            {(roleId === '3' && completedBooking.status !== "DONE") ?
                                 <Button onClick={onOpen} colorScheme='teal' className='mb-3'>Add new medical record</Button> : <></>
                             }
                             <Modal size={'3xl'} className="mx-auto"
@@ -796,6 +812,14 @@ export default function ViewPet() {
                                             </table> : <></>
 
                                         }
+                                        <FormControl mt={4}>
+                                            <FormLabel>Revist Date</FormLabel>
+                                            <Input type='date' min={minDate}
+                                                onChange={(e) => setCompletedBooking((prev) => ({
+                                                    ...prev, reVisitDate: e.target.value
+                                                }))}
+                                            />
+                                        </FormControl>
                                         <FormControl mt={4}>
                                             <FormLabel>Note</FormLabel>
                                             <Input

@@ -186,10 +186,10 @@ export default function VetWorkSchedules() {
                     );
                     //Thêm vào lọc lại nếu chỉ mới thanh toán thì hiện màu vàng còn checkin rồi thì hiện màu xanh lá
                     const status = scheduledShift?.status === "Booked" && scheduledShift?.bookings?.find((booking) =>
-                      booking?.status === 'PAID' || booking?.status === 'Checked_In'
+                      booking?.status === 'PAID' || booking?.status === 'Checked_In' || booking?.status === 'DONE'
                     )?.status
                     const backgroundColor = status === 'PAID' ? '#FFC107' :
-                      status === 'Checked_In' ? 'green' : '';
+                      (status === 'Checked_In' || status === 'DONE') ? 'green' : '';
                     return (
                       <td
                         key={dateIndex}
@@ -202,12 +202,12 @@ export default function VetWorkSchedules() {
                         onClick={() => scheduledShift?.status === "Booked" && handleShowModal(scheduledShift, status)}
                       >
                         {scheduledShift?.status === "Booked" && scheduledShift?.bookings?.map((booking, index) => (
-                          (booking?.status === "Checked_In" || booking?.status === "PAID") && (
+                          (booking?.status === "Checked_In" || booking?.status === "PAID") ? (
                             <div key={index}>
                               <strong>{booking?.user?.fullName}</strong>
                               <div>{booking?.pet?.name} ({booking?.pet?.petType})</div>
                             </div>
-                          )
+                          ) : (booking?.status === "DONE" && <div key={index} className='fw-bold'>DONE</div>)
                         ))}
                       </td>
                     );
@@ -284,14 +284,15 @@ export default function VetWorkSchedules() {
           {modalData && (
             //Check in rồi mới cho bác sĩ view vào để khám
             statusBooking === "Checked_In" && <Button style={{ background: 'teal', color: 'white' }}>
-              {/* Thêm state vào để chặn vet view = đường dẫn link */}
-              <Link to={`/viewPet/${modalData.bookings[0].pet.petId}`} state={{ fromButton: true }} >
+              {/* Thêm state { fromButton: true } vào để chặn vet view = đường dẫn link chỉ có thể vào bằng cách nhấn nút này */}
+              {/* Thêm state { booking: modalData.bookings[0] } vào để gửi booking đã chọn qua trang viewPet */}
+              <Link to={`/viewPet/${modalData.bookings[0].pet.petId}`} state={{ fromButton: true, booking: modalData.bookings[0] }} >
                 View Pet
               </Link>
             </Button>
 
           )}
-          <Button variant="secondary" onClick={handleCloseModal}>
+          <Button variant="secondary" style={{ background: 'red', color: 'white' }} onClick={handleCloseModal}>
             Close
           </Button>
         </Modal.Footer>

@@ -408,4 +408,20 @@ public class BookingController {
         }
         return response;
     }
+
+    @PutMapping("/finish-booking")
+    public Map<String, Object> finishBooking(@RequestBody Booking completedBooking, HttpSession session) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            User currentUser = (User) session.getAttribute("user");
+            if (currentUser == null) {
+                throw new Exception("You need login first");
+            }
+            response.put("message", "successfully");
+            response.put("booking", bookingService.finishBooking(completedBooking));
+        } catch (Exception e) {
+            response.put("message", e.getMessage());
+        }
+        return response;
+    }
 }

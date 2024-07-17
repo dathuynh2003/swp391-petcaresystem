@@ -20,9 +20,9 @@ public class Booking {
     @Column(name = "booking_date")
     private Date bookingDate;
     private Date refundDate;
+    private Date reVisitDate;
     private String status;
     private double totalAmount;
-    private Boolean type;
     private String description;
     private int paymentId;
     @ManyToOne

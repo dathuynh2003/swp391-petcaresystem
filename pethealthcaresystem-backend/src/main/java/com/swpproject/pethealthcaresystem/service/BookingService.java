@@ -300,18 +300,15 @@ public class BookingService implements IBookingService {
         return booking;
     }
 
+    @Override
+    public Booking finishBooking(Booking completedBooking) {
+        Booking curBooking = bookingRepository.findById(completedBooking.getId()).orElseThrow(() -> new RuntimeException("Booking not found"));
+        curBooking.setStatus("DONE");
+        if (completedBooking.getReVisitDate() != null) {
+            curBooking.setReVisitDate(completedBooking.getReVisitDate());
+        }
+        return bookingRepository.save(curBooking);
+    }
 
-//    @Override
-//    public Page<Booking> getBookingByDateAndStatus
-//            (Date fromDate, Date toDate, String status, String phoneNumber, int pageNo, int pageSize) {
-//        System.out.println("Entry here");
-//        Pageable pageable = PageRequest.of(pageNo - 1, pageSize, Sort.by("id").descending());
-//        Page<Booking> bookings =
-//                bookingRepository.findByStatusAndBookingDateBetweenAndUserPhoneNumber
-//                        (status, fromDate, toDate, phoneNumber, pageable);
-//        return bookings;
-//
-//
-//
-//    }
+
 }

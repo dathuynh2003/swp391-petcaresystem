@@ -30,4 +30,6 @@ public interface IBookingService {
     Booking acceptRefundBooking(int id);
     Booking refuseRefundBooking(int id, String reason);
     Booking requestRefundBookingByStaff(int bookingId);
+
+    Booking finishBooking (Booking newBooking);
 }
