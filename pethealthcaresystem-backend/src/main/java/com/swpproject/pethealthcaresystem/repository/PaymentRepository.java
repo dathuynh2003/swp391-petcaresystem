@@ -14,4 +14,6 @@ public interface PaymentRepository extends JpaRepository<Payment, Integer> {
     Payment findByMedicalRecord(MedicalRecord medicalRecord);
 
     List<Payment> findByPaymentDateBetween(Date startDate, Date endDate);
+
+
 }
