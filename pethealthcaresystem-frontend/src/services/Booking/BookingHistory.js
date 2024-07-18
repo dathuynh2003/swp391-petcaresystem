@@ -30,10 +30,12 @@ import {
     Badge,
     Select,
     Flex,
-    Image
+    Image,
+    Link
 } from '@chakra-ui/react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { format, parseISO } from 'date-fns';
+import { faFileExport } from '@fortawesome/free-solid-svg-icons';
 import moment from 'moment'
 import { faUser, faPaw, faXRay } from '@fortawesome/free-solid-svg-icons';
 import { RepeatIcon, SearchIcon, ViewIcon } from '@chakra-ui/icons';
@@ -285,10 +287,68 @@ const BookingHistory = () => {
             console.log(e.message)
         }
     }
+    // const handleExportPayments = async () => {
+    //     try {
+    //         const response = await axios.get('http://localhost:8080/api/export/payments', {
+    //             responseType: 'blob', // Ensure response type is blob for file download
+    //             withCredentials: true // Include credentials if required
+    //         });
+
+    //         // Create a blob object from the response data
+    //         const blob = new Blob([response.data], { type: 'application/pdf' });
+
+    //         // Create a URL for the blob object
+    //         const url = window.URL.createObjectURL(blob);
+
+    //         // Create a link element to initiate download
+    //         const link = document.createElement('a');
+    //         link.href = url;
+    //         link.setAttribute('download', 'payments.pdf'); // Set the filename for download
+    //         document.body.appendChild(link);
+    //         link.click();
+
+    //         // Clean up
+    //         link.parentNode.removeChild(link);
+    //     } catch (error) {
+    //         console.error('Error exporting payments:', error);
+    //         toast.error('Error exporting payments. Please try again later.');
+    //     }
+    // };
+    // const handleExportPayments = async () => {
+    //     try {
+    //         const response = await axios.get('http://localhost:8080/api/export/payments', { responseType: 'blob' });
+
+    //         // Create a Blob object from the CSV data
+    //         const blob = new Blob([response.data], { type: 'text/csv' });
+
+    //         // Create a link element to trigger the download
+    //         const url = window.URL.createObjectURL(blob);
+    //         const link = document.createElement('a');
+    //         link.href = url;
+    //         link.setAttribute('download', 'payments.csv');
+    //         document.body.appendChild(link);
+
+    //         // Trigger the download
+    //         link.click();
+
+    //         // Clean up: remove the temporary link and URL object
+    //         document.body.removeChild(link);
+    //         window.URL.revokeObjectURL(url);
+    //     } catch (error) {
+    //         console.error('Error exporting payments:', error);
+    //         toast.error('Error exporting payments. Please try again later.');
+
+    //         // Handle error, show a message to the user
+    //     }
+    // };
+
 
     return (
+
         <Container maxW="container.xl" py={6}>
             {error && <Text color="red.500" mb={4}>{error}</Text>}
+            {/* <Button onClick={handleExportPayments} colorScheme="teal" mb={4}>Export Payments</Button> */}
+
             <Flex justify="space-between" mb={3}>
                 <FormControl width="100px" mr={2}>
                     <InputGroup width="300px"> {/* Điều chỉnh độ rộng ở đây */}
@@ -307,6 +367,16 @@ const BookingHistory = () => {
                         </InputRightElement>
                     </InputGroup>
                 </FormControl>
+                <Link
+                    color="teal.500"
+                    href="http://localhost:8080/payments/export"
+                    textDecoration="none"
+                    fontWeight="bold"
+                    fontSize="16px"
+                >
+                    <FontAwesomeIcon icon={faFileExport} style={{ marginRight: '8px' }} />
+                    Export File
+                </Link>
 
                 {loading && <Spinner size="lg" />}
             </Flex>

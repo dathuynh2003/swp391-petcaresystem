@@ -50,7 +50,7 @@ export default function Login() {
             await axios.post(`http://localhost:8080/register-gg`, {
                 email: result.user.email,
                 fullName: result.user.displayName,
-                password: "111111"
+                password: result.user.email
             }, { withCredentials: true });
 
 
@@ -143,7 +143,7 @@ export default function Login() {
                                 <a href="#"><i>Forgot Password?</i></a>
                             </div>
                             <div>
-                                <button  className='col-12 btn-login rounded fw-bold' style={{ background: 'teal', color: 'white', height: '40px' }} onClick={handleLogin}>Login</button>
+                                <button className='col-12 btn-login rounded fw-bold' style={{ background: 'teal', color: 'white', height: '40px' }} onClick={handleLogin}>Login</button>
                             </div>
                             <div className='d-flex justify-content-center gap-2 mb-1 mt-2'>
                                 <p>Don't have an account?</p><Link to={'/register'} className='fw-bold'>Sign up</Link>
