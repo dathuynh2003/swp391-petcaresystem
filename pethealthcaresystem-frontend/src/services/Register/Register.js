@@ -116,7 +116,7 @@ export default function Register() {
             <div className='content sign-up mt-1 rounded' style={{ width: '450px', marginRight: '10px' }}>
                 <form className='p-3' onSubmit={(e) => handleRegister(e)} method='post'>
                     <div className='header text-center mb-3'>
-                        <h2 className='fw-bold ' style={{ color: 'white' }}>Sign up</h2>
+                        <h2 className='fw-bold ' style={{ color: 'teal' }}>Sign up</h2>
                     </div>
                     <div className='body'>
                         <div className="form-floating mb-2 ">

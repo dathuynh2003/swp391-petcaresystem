@@ -104,7 +104,7 @@ export default function ViewPet() {
     const initialRef = React.useRef(null)
     const finalRef = React.useRef(null)
 
-    const [isAddingMedicine, setIsAddingMedicine] = useState(false);
+    const [isAddingMedicine, setIsAddingMedicine] = useState(false); //giao diện thêm thuốc
     const initialRef1 = React.useRef(null);
 
     const [listMedicineBySearch, setListMedicineBySearch] = useState([])
@@ -152,10 +152,13 @@ export default function ViewPet() {
 
 
     const handleAddPrescription = () => {
-        setListSelectedMedicines((prev) => {
-            const filteredList = prev.filter(item => item.medicine_id !== prescription.medicine_id);
-            return [...filteredList, { ...prescription, dosage: Number(prescription.dosage) }];
-        });
+        //tìm coi có trùng không
+        const isDuplicate = listSelectedMedicines.some(item => item.medicine_id === prescription.medicine_id)
+        if (isDuplicate) {
+            toast.error("Duplicate medicine!")
+            return
+        }
+        setListSelectedMedicines(prev => [...prev, prescription]);
 
     };
 
@@ -237,6 +240,7 @@ export default function ViewPet() {
 
     const handleDeleteMedicine = (e) => {
         setListSelectedMedicines((prev) => (prev.filter(medicine => medicine.medicine_id !== e.medicine_id)))
+        //lấy những thuốc mà có id khác thuốc đc chọn để xóa thui
     }
     const { isOpen: isOpenChooseCage, onOpen: onOpenChooseCage, onClose: onCloseChooseCage } = useDisclosure();
     const [chooseCage, setChooseCage] = useState('')
@@ -429,6 +433,8 @@ export default function ViewPet() {
 
     //Tính ngày nhỏ nhất để tái khái
     const minDate = new Date(today.setDate(today.getDate() + 1)).toISOString().split('T')[0]
+    //xử lí nút bấm xem tiền dự kiến
+    const [isDisplayCost, setIsDisplayCost] = useState(false)
 
     return (
         <div>
@@ -738,6 +744,7 @@ export default function ViewPet() {
                                                             Add
                                                         </Button>
                                                         <Button onClick={() => setIsAddingMedicine(false)}>Cancel</Button>
+                                                        {/* giao diện thêm thuốc */}
                                                     </ModalFooter>
                                                 </ModalContent>
                                             </Modal>
@@ -750,7 +757,7 @@ export default function ViewPet() {
                                                         <td className="col-3">Medical Name</td>
                                                         <td className="col-1">Unit</td>
                                                         <td className="col-1">Dosage</td>
-                                                        <td className="col-2">Price</td>
+                                                        <td className="col-2">Price per unit</td>
                                                         <td className="col-1">Action</td>
                                                     </tr>
 
@@ -779,7 +786,7 @@ export default function ViewPet() {
                                                                     </NumberInputStepper>
                                                                 </NumberInput>
                                                             </td>
-                                                            <td >{medicine.price.toLocaleString('vi-VN')}/{medicine.unit}</td>
+                                                            <td >{medicine.price.toLocaleString('vi-VN')} VND</td>
 
                                                             <td className='text-center'>
                                                                 <span className='icon-container'>
@@ -881,11 +888,13 @@ export default function ViewPet() {
                                                     </div>
                                                 </div>
 
-                                                <FormControl mt={4} className='d-flex'>
+                                                <h4 className='d-flex justify-content-center align-items-center text-center gap-3' style={{ color: 'teal' }}><Avatar src={pet?.owner?.avatar}></Avatar>Customer's information</h4>
+                                                <FormControl mt={4} mb={3} className='d-flex'>
                                                     <FormLabel className='w-50'>Pet's owner  <Input ref={initialRef} value={pet?.owner?.fullName} /></FormLabel>
                                                     <FormLabel className='w-50'>Phone number <Input value={pet?.owner?.phoneNumber} /></FormLabel>
                                                     <FormLabel className='w-50'>Date <Input value={new Date(medicalRecord.date).toLocaleDateString("en-GB")} /></FormLabel>
                                                 </FormControl>
+                                                <h4 className='d-flex justify-content-center align-items-center text-center gap-3' style={{ color: 'teal' }} ><Avatar src={pet.avatar}></Avatar>  Pet's information</h4>
                                                 <FormControl className='d-flex'>
                                                     <FormLabel className='w-50'>Pet's name <Input ref={initialRef} value={pet.name} /></FormLabel>
                                                     <FormLabel className='w-50'>Pet's type <Input value={pet.petType} /></FormLabel>
@@ -925,7 +934,7 @@ export default function ViewPet() {
                                                                 <td>Medical Name</td>
                                                                 <td>Unit</td>
                                                                 <td>Dosage</td>
-                                                                <td>Price</td>
+                                                                <td>Price per unit</td>
 
                                                             </tr>
 
@@ -938,7 +947,7 @@ export default function ViewPet() {
                                                                     <td className="col-1">{prescription.medicine?.unit}</td>
                                                                     <td className="col-1">{prescription.dosage}</td>
                                                                     <td className="col-1">
-                                                                        {prescription.medicine?.price.toLocaleString('vi-VN')}/{prescription.medicine?.unit}
+                                                                        {prescription.medicine?.price.toLocaleString('vi-VN')} VND
                                                                     </td>
                                                                 </tr>
 
@@ -1180,7 +1189,7 @@ export default function ViewPet() {
                                                         <div className='col-2'>Time</div>
                                                         <div className='col-3'>Medical Name</div>
                                                         <div className='col-1'>Unit</div>
-                                                        <div className='col-1'>Unit Price</div>
+                                                        <div className='col-1'>Price per unit</div>
                                                         <div className='col-1 text-center'>Dosage</div>
                                                         <div className='col-1'>Amount</div>
                                                     </FormControl>
@@ -1283,11 +1292,20 @@ export default function ViewPet() {
                                                     <div className='col-1'></div>
                                                     <div className='col-1'></div>
                                                     <div className='col-1'></div>
-                                                    <div className='col-2 text-end'>Total: </div>
-                                                    <div className='col-2 text-end'>
-                                                        {amount.toLocaleString('vi-Vn')} VND
-                                                    </div>
+
+
                                                 </FormControl>
+                                                <div className='text-end mt-3'>
+                                                    {
+                                                        hospitalization.status !== 'Discharged' ? <Button colorScheme='pink' onClick={() => setIsDisplayCost(prev => !prev)}>Estimated Cost</Button> : ''
+
+                                                    }
+                                                    {
+                                                        isDisplayCost || hospitalization.status === 'Discharged' ? <div className='mt-2'><b>Total: {' ' + amount.toLocaleString('vi-Vn')} VND </b><i>{hospitalization.status !== 'Discharged' ? '(Excuding hospitalization fee)' : ''}</i></div> : ''
+                                                    }
+
+                                                </div>
+
                                             </div>
                                         </AccordionPanel>
                                     </AccordionItem>

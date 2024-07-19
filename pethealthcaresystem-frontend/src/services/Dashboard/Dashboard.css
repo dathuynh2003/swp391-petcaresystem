@@ -2,9 +2,6 @@
   display: none; /* Ẩn đường gạch chia dọc */
 }
 
-
-
-
 .area-chart-container .recharts-cartesian-axis-label {
   font-size: 14px; /* Kích thước chữ của nhãn trục */
   fill: #333; /* Màu chữ của nhãn trục */
@@ -18,7 +15,7 @@
 
 .area-chart-container {
   width: 97%;
-  background-color: #f5f5f5;
+  background: linear-gradient(135deg, #FFFFFF, #F5F5F5);
   border: 1px solid #ddd;
   border-radius: 8px;
   padding-top: 20px;

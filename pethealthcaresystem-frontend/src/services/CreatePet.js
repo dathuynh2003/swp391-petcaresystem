@@ -34,7 +34,7 @@ export default function CreatePet() {
     try {
       const request = { ...pet };
       if (request.name === '' || request.petType === '' || request.gender === '') {
-        toast.info("Please enter Pet's name, type, gender required");
+        toast.info("Please enter Pet's name, type, sex required");
         return;
       }
       console.log(request);

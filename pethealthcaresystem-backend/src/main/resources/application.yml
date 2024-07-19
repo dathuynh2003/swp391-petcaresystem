@@ -5,12 +5,20 @@ server:
       timeout: -1
       cookie:
         name: JSESSIONID
-
+        same-site: None
+        secure: true
 spring:
   datasource:
     url: "jdbc:mysql://localhost:3306/pethealthcare"
     username: root
-    password: dat2003z
+    password: root
+#spring:
+#  datasource:
+#    url: jdbc:mysql://mysqlazuredb.mysql.database.azure.com:3306/pethealthcare?useSSL=true
+#    username: loc3012
+#    password: Phuoc123
+#
+
   jpa:
     hibernate:
       ddl-auto: update

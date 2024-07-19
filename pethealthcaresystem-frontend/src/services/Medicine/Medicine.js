@@ -3,7 +3,7 @@ import { Button, Input, Select, background, useDisclosure } from '@chakra-ui/rea
 import ReactPaginate from 'react-paginate'
 import axios from 'axios'
 import DeleteIcon from '@mui/icons-material/Delete';
-import EditIcon from '@mui/icons-material/Edit';
+import { EditIcon } from '@chakra-ui/icons';
 import './Medicine.css'
 import { SearchIcon } from '@chakra-ui/icons';
 import {
@@ -437,7 +437,7 @@ export default function Medicine() {
       <div className='row'>
         <ToastContainer />
 
-        <div className='mt-3 d-flex justify-content-between'>
+        <div className='mt-4 mb-3 d-flex justify-content-between'>
           <div>
             <Button colorScheme='teal' style={{ marginRight: '15px' }} onClick={onOpen1}>Add new medicine</Button>
             <Modal closeOnOverlayClick={false} isOpen={isOpen1} onClose={onClose1} size={'xl'}>
@@ -520,7 +520,7 @@ export default function Medicine() {
             </Modal>
 
 
-            <Button colorScheme='pink' onClick={() => changePageType('pageNoExpired')} className={currentPage === 'pageNoExpired' ? 'active' : ''}>Expired Medicine</Button>
+            {/* <Button colorScheme='pink' onClick={() => changePageType('pageNoExpired')} className={currentPage === 'pageNoExpired' ? 'active' : ''}>Expired Medicine</Button> */}
           </div>
 
 

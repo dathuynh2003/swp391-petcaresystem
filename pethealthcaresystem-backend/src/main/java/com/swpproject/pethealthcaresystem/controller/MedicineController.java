@@ -16,7 +16,8 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/medicine")
-@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
+@CrossOrigin(origins = {"http://localhost:3000", "https://pethealthcare.vercel.app"}, allowCredentials = "true")
+
 public class MedicineController {
     @Autowired
     private MedicineService medicineService;
