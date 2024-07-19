@@ -41,8 +41,41 @@ const CreateAccount = () => {
     const [fileError, setFileError] = useState('');
     const { fullName, phoneNumber, address, gender, dob, email, password, roleId } = user;
 
+    const validateEmail = (email) => {
+        const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return re.test(email);
+    };
+
+    const validatePassword = (password) => {
+        const re = /^(?=.*[A-Z]).{6,}$/; // At least 6 characters and 1 uppercase letter
+        return re.test(password);
+    };
+
+    const validatePhoneNumber = (phoneNumber) => {
+        const re = /^(0[3|5|7|8|9])+([0-9]{8})\b/; // Vietnamese phone number format
+        return re.test(phoneNumber);
+    };
+
     const onInputChange = (e) => {
-        setUser({ ...user, [e.target.name]: e.target.value });
+        const { name, value } = e.target;
+        setUser({ ...user, [name]: value });
+
+        if (name === "email" && !validateEmail(value)) {
+            setMessageEmail("Invalid email format");
+        } else {
+            setMessageEmail("");
+        }
+
+        if (name === "password" && !validatePassword(value)) {
+            setMessagePass("Password must be at least 6 characters long and contain at least one uppercase letter");
+        } else {
+            setMessagePass("");
+        }
+
+        if (name === "phoneNumber" && !validatePhoneNumber(value) && value.length >= 10) {
+            toast.error("Invalid phone number format");
+        }
+
     };
 
     const onFileChange = (e) => {
@@ -62,7 +95,7 @@ const CreateAccount = () => {
 
         if (errors.length > 0) {
             setFileError(errors.join(' '));
-            toast.error(errors.join(' '))
+            toast.error(errors.join(' '));
         } else {
             setFileError('');
             setCertificationImages(validFiles);
@@ -74,7 +107,12 @@ const CreateAccount = () => {
         setMessageEmail("");
         if (password !== confirmPass) {
             setMessagePass("Confirm password does not match");
-            toast.error("Confirm password does not match")
+            toast.error("Confirm password does not match");
+            return;
+        }
+
+        if (roleId === 3 && certificationImages.length === 0) {
+            toast.error("Please upload at least one certification image.");
             return;
         }
 
@@ -90,7 +128,7 @@ const CreateAccount = () => {
                     'Content-Type': 'multipart/form-data'
                 }
             });
-            toast.success("The user account has been created successfully.")
+            toast.success("The user account has been created successfully.");
             navigate('/account');
         } catch (error) {
             toast.error(error?.response?.data?.errorMessage ?? error?.message);
@@ -124,6 +162,7 @@ const CreateAccount = () => {
                                 value={email}
                                 onChange={onInputChange}
                             />
+                            {messageEmail && <Text color="red.500">{messageEmail}</Text>}
                         </FormControl>
                         <FormControl id="address">
                             <FormLabel>Address</FormLabel>
@@ -166,6 +205,7 @@ const CreateAccount = () => {
                                     value={password}
                                     onChange={onInputChange}
                                 />
+                                {messagePass && <Text color="red.500">{messagePass}</Text>}
                             </FormControl>
                             <FormControl id="confirmPass">
                                 <FormLabel>Confirm Password</FormLabel>

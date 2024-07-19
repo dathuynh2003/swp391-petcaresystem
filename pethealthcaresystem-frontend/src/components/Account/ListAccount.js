@@ -10,9 +10,7 @@ import {
   Tr,
   Th,
   Td,
-  Text,
   Spinner,
-  useToast,
   Modal,
   ModalOverlay,
   ModalContent,
@@ -28,11 +26,12 @@ import {
   Input,
   InputRightElement,
   IconButton,
-  VStack,
   Flex
 } from '@chakra-ui/react';
 import { Link } from 'react-router-dom';
 import { SearchIcon, ViewIcon, EditIcon, DeleteIcon } from '@chakra-ui/icons';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const ListAccount = () => {
   const [accounts, setAccounts] = useState([]);
@@ -44,7 +43,6 @@ const ListAccount = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [roleFilter, setRoleFilter] = useState(0); // Default role filter value is 0 for All
-  const toast = useToast();
 
   useEffect(() => {
     fetchAccounts();
@@ -80,13 +78,7 @@ const ListAccount = () => {
       setAccounts([response.data.data]);
     } catch (error) {
       console.error("Error searching for user:", error);
-      toast({
-        title: "Error",
-        description: "User not found or there was an error.",
-        status: "error",
-        duration: 5000,
-        isClosable: true,
-      });
+      toast.error("Error searching for user");
     }
   };
 
@@ -94,23 +86,11 @@ const ListAccount = () => {
     try {
       await axios.put(`http://localhost:8080/delete-user-by-admin/${id}`);
 
-      toast({
-        title: "Account deleted.",
-        description: "The account has been successfully deleted.",
-        status: "success",
-        duration: 5000,
-        isClosable: true,
-      });
+      toast.success("The account has been successfully deleted.")
       setAccounts(accounts.filter(account => account.userId !== id));
     } catch (error) {
       console.error("Error deleting account:", error);
-      toast({
-        title: "Error",
-        description: "There was an error deleting the account.",
-        status: "error",
-        duration: 5000,
-        isClosable: true,
-      });
+      toast.error("There was an error deleting the account.");
     }
   };
 
@@ -125,24 +105,12 @@ const ListAccount = () => {
         roleId: selectedUser.roleId,
         isActive: selectedUser.isActive
       });
-      toast({
-        title: "User updated.",
-        description: "The user has been successfully updated.",
-        status: "success",
-        duration: 5000,
-        isClosable: true,
-      });
+      toast.success("The user has been successfully updated.");
       setIsModalOpen(false);
       fetchAccounts();
     } catch (error) {
       console.error('Error updating user:', error);
-      toast({
-        title: "Error",
-        description: "There was an error updating the user.",
-        status: "error",
-        duration: 5000,
-        isClosable: true,
-      });
+      toast.error("There was an error updating the user.");
     }
   };
 
@@ -302,8 +270,20 @@ const ListAccount = () => {
               </Modal>
             )}
           </Box>
+
         </div>
       </div>
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
     </div >
   );
 };
