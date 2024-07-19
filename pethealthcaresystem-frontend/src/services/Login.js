@@ -48,10 +48,10 @@ export default function Login() {
                 localStorage.setItem('email', response.data.user.email)
                 navigate('/')
             } else {
-                setMessage("Invalid username or password!");
+                setMessage(response.data.message); // Use the message from the backend
             }
         } catch (error) {
-            setMessage("Invalid username or password!");
+            setMessage("Invalid username, password, or account is inactive."); // Fallback message
         }
     }
 

@@ -3,6 +3,9 @@ import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css'; // Import Bootstrap CSS
 import { URL } from '../../utils/constant';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 const EditAccount = () => {
     let navigate = useNavigate();
     let { userId } = useParams(); // Assuming you're passing the user ID as a route parameter
@@ -63,11 +66,11 @@ const EditAccount = () => {
                 roleId: user.roleId,
                 isActive: user.isActive
             });
-            alert("User updated successfully");
+            toast.success("User updated successfully");
             navigate('/list-account'); // Navigate to the desired route after success
         } catch (error) {
             console.error('Error updating user:', error);
-            alert(error?.response?.data?.errorMessage ?? error?.message);
+            toast.error(error?.response?.data?.errorMessage ?? error?.message);
         }
     };
 
@@ -109,6 +112,17 @@ const EditAccount = () => {
                     </form>
                 </div>
             </div>
+            <ToastContainer
+                position="top-right"
+                autoClose={5000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+            />
         </div>
     );
 };

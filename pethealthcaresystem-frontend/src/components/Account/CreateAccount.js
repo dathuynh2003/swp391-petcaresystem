@@ -15,9 +15,10 @@ import {
     Stack,
     Text,
     Textarea,
-    useToast,
 } from '@chakra-ui/react';
 import { URL } from '../../utils/constant';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 const CreateAccount = () => {
     let navigate = useNavigate();
 
@@ -30,17 +31,75 @@ const CreateAccount = () => {
         avatar: "",
         gender: "",
         dob: "",
-        roleId: 3,
+        roleId: 2,
     });
+    const [certificationImages, setCertificationImages] = useState([]);
 
     const [messageEmail, setMessageEmail] = useState('');
     const [messagePass, setMessagePass] = useState('');
     const [confirmPass, setConfirmPass] = useState('');
-    const { fullName, phoneNumber, address, gender, dob, email, password } = user;
-    const toast = useToast();
+    const [fileError, setFileError] = useState('');
+    const { fullName, phoneNumber, address, gender, dob, email, password, roleId } = user;
+
+    const validateEmail = (email) => {
+        const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return re.test(email);
+    };
+
+    const validatePassword = (password) => {
+        const re = /^(?=.*[A-Z]).{6,}$/; // At least 6 characters and 1 uppercase letter
+        return re.test(password);
+    };
+
+    const validatePhoneNumber = (phoneNumber) => {
+        const re = /^(0[3|5|7|8|9])+([0-9]{8})\b/; // Vietnamese phone number format
+        return re.test(phoneNumber);
+    };
 
     const onInputChange = (e) => {
-        setUser({ ...user, [e.target.name]: e.target.value });
+        const { name, value } = e.target;
+        setUser({ ...user, [name]: value });
+
+        if (name === "email" && !validateEmail(value)) {
+            setMessageEmail("Invalid email format");
+        } else {
+            setMessageEmail("");
+        }
+
+        if (name === "password" && !validatePassword(value)) {
+            setMessagePass("Password must be at least 6 characters long and contain at least one uppercase letter");
+        } else {
+            setMessagePass("");
+        }
+
+        if (name === "phoneNumber" && !validatePhoneNumber(value) && value.length >= 10) {
+            toast.error("Invalid phone number format");
+        }
+
+    };
+
+    const onFileChange = (e) => {
+        const files = Array.from(e.target.files);
+        const validFiles = [];
+        const errors = [];
+
+        files.forEach(file => {
+            if (file.size > 10 * 1024 * 1024) { // 10MB in bytes
+                errors.push(`This file is larger than 10MB.`);
+            } else if (!file.type.startsWith('image/')) {
+                errors.push(`This file is not an image.`);
+            } else {
+                validFiles.push(file);
+            }
+        });
+
+        if (errors.length > 0) {
+            setFileError(errors.join(' '));
+            toast.error(errors.join(' '));
+        } else {
+            setFileError('');
+            setCertificationImages(validFiles);
+        }
     };
 
     const handleRegister = async (e) => {
@@ -48,34 +107,32 @@ const CreateAccount = () => {
         setMessageEmail("");
         if (password !== confirmPass) {
             setMessagePass("Confirm password does not match");
+            toast.error("Confirm password does not match");
             return;
         }
 
+        if (roleId === 3 && certificationImages.length === 0) {
+            toast.error("Please upload at least one certification image.");
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('user', new Blob([JSON.stringify(user)], { type: 'application/json' }));
+        certificationImages.forEach((file) => {
+            formData.append('certificationImages', file);
+        });
+
         try {
-            await axios.post(`${URL}/create-user-by-admin`, user);
-            toast({
-                title: "Account created.",
-                description: "The user account has been created successfully.",
-                status: "success",
-                duration: 5000,
-                isClosable: true,
+            await axios.post(`${URL}/create-user-by-admin`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
             });
+            toast.success("The user account has been created successfully.");
             navigate('/account');
         } catch (error) {
-            toast({
-                title: "Error.",
-                description: error?.response?.data?.errorMessage ?? error?.message,
-                status: "error",
-                duration: 5000,
-                isClosable: true,
-            });
+            toast.error(error?.response?.data?.errorMessage ?? error?.message);
         }
-    };
-    const handleSubmit = () => {
-        // Perform any submit actions here, e.g., form submission, API call
-
-        // After successful submission, navigate back to '/list-account'
-        navigate('/account');
     };
 
     return (
@@ -105,6 +162,7 @@ const CreateAccount = () => {
                                 value={email}
                                 onChange={onInputChange}
                             />
+                            {messageEmail && <Text color="red.500">{messageEmail}</Text>}
                         </FormControl>
                         <FormControl id="address">
                             <FormLabel>Address</FormLabel>
@@ -147,6 +205,7 @@ const CreateAccount = () => {
                                     value={password}
                                     onChange={onInputChange}
                                 />
+                                {messagePass && <Text color="red.500">{messagePass}</Text>}
                             </FormControl>
                             <FormControl id="confirmPass">
                                 <FormLabel>Confirm Password</FormLabel>
@@ -179,12 +238,22 @@ const CreateAccount = () => {
                                 <option value="3">Vet</option>
                             </Select>
                         </FormControl>
+                        {roleId === "3" && (
+                            <FormControl id="certificationImages">
+                                <FormLabel>Certification Images</FormLabel>
+                                <Input
+                                    type="file"
+                                    multiple
+                                    onChange={onFileChange}
+                                />
+                                {fileError && <Text color="red.500">{fileError}</Text>}
+                            </FormControl>
+                        )}
                         <Button
                             type="submit"
                             colorScheme="blue"
                             size="md"
                             width="full"
-                            // onClick={handleSubmit} // Call handleSubmit function on button click
                         >
                             Submit
                         </Button>
@@ -195,6 +264,7 @@ const CreateAccount = () => {
                     </Stack>
                 </form>
             </Box>
+            <ToastContainer />
         </Container>
     );
 };

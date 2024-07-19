@@ -17,7 +17,6 @@ spring:
 #    url: jdbc:mysql://mysqlazuredb.mysql.database.azure.com:3306/pethealthcare?useSSL=true
 #    username: loc3012
 #    password: Phuoc123
-#
 
   jpa:
     hibernate:

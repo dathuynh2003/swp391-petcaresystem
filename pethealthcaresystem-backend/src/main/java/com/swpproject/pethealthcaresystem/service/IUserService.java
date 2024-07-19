@@ -17,9 +17,12 @@ public interface IUserService {
     public List<User> getVets();
 
     @Transactional
-    User createUserByAdmin(User newUser);
 
     public User updateUser(String email, User newUser) throws Exception;
+
+    @Transactional
+    User createUserByAdmin(User newUser, List<MultipartFile> certificationImageFiles) throws IOException;
+
     public Page<User> getAllUsersByRoleId(int pageNo, int pageSize, int roleId);
     public User deleteUser(int id);
     User updateUser(User newUser, int id);

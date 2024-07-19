@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -60,23 +61,27 @@ public class UserController {
         }
     }
 
-    @PostMapping("/create-user-by-admin")
-    public ResponseEntity<ResponseData> createUserByAdmin(@RequestBody User user) {
+    @PostMapping(value = "/create-user-by-admin", consumes = "multipart/form-data")
+    public ResponseEntity<ResponseData> createUserByAdmin(
+            @RequestPart("user") User user,
+            @RequestPart("certificationImages") List<MultipartFile> certificationImages) {
         try {
-            User newUser = userService.createUserByAdmin(user);
+            User newUser = userService.createUserByAdmin(user, certificationImages);
             ResponseData<User> responseData = new ResponseData<>();
             responseData.setData(newUser);
             responseData.setStatusCode(201);
             return new ResponseEntity<>(responseData, HttpStatus.CREATED);
+        } catch (IOException e) {
+            ResponseData<User> responseData = new ResponseData<>();
+            responseData.setStatusCode(500);
+            responseData.setErrorMessage(e.getMessage());
+            return new ResponseEntity<>(responseData, HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (Error e) {
             ResponseData<User> responseData = new ResponseData<>();
             responseData.setStatusCode(401);
             responseData.setErrorMessage(e.getMessage());
             return new ResponseEntity<>(responseData, HttpStatus.UNAUTHORIZED);
-
-
         }
-
     }
 
     @PostMapping("/register-gg")
@@ -180,6 +185,7 @@ public class UserController {
             response.put("user", curUser);
         } else {
             response.put("isSuccess", "false");
+            response.put("message", "Invalid username, password, or account is inactive."); // Add message
         }
         return response;
     }

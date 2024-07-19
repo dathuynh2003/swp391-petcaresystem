@@ -225,6 +225,7 @@ export default function AssignVetSchedules() {
                     date.setDate(date.getDate() + dateIndex);
                     const isAssigned = shiftDetails.some(detail => detail.shift.shiftId === shift.shiftId && new Date(detail.date).toLocaleDateString('en-GB') === formatDate(date));
                     const isPast = isShiftInThePast(shift, date);
+                    const isChecked = selectedShifts.some(item => item.shiftId === shift.shiftId && item.date === date.toISOString().split('T')[0]);
                     return (
                       <td
                         key={dateIndex}
@@ -247,7 +248,11 @@ export default function AssignVetSchedules() {
                               cursor: 'pointer',
                               width: '20px',
                               height: '20px',
-                              backgroundColor: 'teal',
+                              backgroundColor: isChecked ? 'teal' : 'transparent',
+                              border: '2px solid teal',
+                              borderRadius: '3px', /* Optional: for rounded corners */
+                              appearance: 'none',
+                              WebkitAppearance: 'none',
                             }}
                             onChange={() => handleToggleShift(shift.shiftId, date)}
                             checked={selectedShifts.some(item => item.shiftId === shift.shiftId && item.date === date.toISOString().split('T')[0])}
