@@ -118,26 +118,7 @@ public class SystemConfigController {
         }
         return response;
     }
-
-    @GetMapping("/configuration/configKeys")
-    public Map<String, Object> getAllConfigKey(HttpSession session) {
-        Map<String, Object> response = new HashMap<>();
-        try {
-            User curUser = (User) session.getAttribute("user");
-            if (curUser == null) {
-                throw new Exception("You need login first");
-            }
-            if (curUser.getRoleId() != 4) {
-                throw new Exception("Can not get configurations");
-            }
-            response.put("message", "Successfully");
-            response.put("configKeys", systemConfigService.findALlConfigKey());
-        } catch (Exception e) {
-            response.put("message", e.getMessage());
-        }
-        return response;
-    }
-
+    
     @GetMapping("/configuration/search/{key}")
     public Map<String, Object> getConfigByKey(@PathVariable String key,
                                               @RequestParam(defaultValue = "0") int page,

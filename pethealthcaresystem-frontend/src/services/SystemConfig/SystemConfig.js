@@ -49,25 +49,6 @@ export default function SystemConfig() {
         }
     }
 
-    const [configKeys, setConfigkeys] = useState([])
-    const fetchConfigKey = async () => {
-        try {
-            const response = await axios.get(`${URL}/configuration/configKeys`, { withCredentials: true })
-            if (response.data.message === 'Successfully') {
-                setConfigkeys(response.data.configKeys)
-                // console.log("Keys:")
-                // console.log(response.data.configKeys)
-            } else {
-                toast.info(response.data.message)
-            }
-        } catch (error) {
-            navigate('/404page')
-        }
-    }
-    useEffect(() => {
-        fetchConfigKey()
-    }, [])
-
     const [selectedKey, setSelectedKey] = useState("All")
     useEffect(() => {
         const fetchConfigurationsByKey = async (key, page) => {
@@ -135,9 +116,8 @@ export default function SystemConfig() {
                                             // setSelectedKey2(e.target.value ? e.target.value : "")
                                             setConfiguration((prev) => ({ ...prev, configKey: e.target.value }))
                                         }}>
-                                            {configKeys?.map((configKey, index) => (
-                                                <option key={index} value={configKey}>{configKey}</option>
-                                            ))}
+                                            <option value="petType">Pet Type</option>
+                                            <option value="medicineUnit">Medicine Unit</option>
                                         </Select>
                                     </div>
                                     {/* <div className="form-floating mb-3 mx-3">
@@ -162,9 +142,8 @@ export default function SystemConfig() {
                             <Select placeholder='Find By Key' onChange={(e) => {
                                 setSelectedKey(e.target.value ? e.target.value : "All")
                             }}>
-                                {configKeys?.map((configKey, index) => (
-                                    <option key={index} value={configKey}>{configKey}</option>
-                                ))}
+                                <option value="petType">Pet Type</option>
+                                <option value="medicineUnit">Medicine Unit</option>
                             </Select>
                         </FormControl>
                     </div>

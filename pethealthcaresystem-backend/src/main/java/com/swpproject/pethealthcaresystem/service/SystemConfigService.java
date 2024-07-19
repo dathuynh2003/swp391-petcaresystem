@@ -52,11 +52,6 @@ public class SystemConfigService implements ISystemConfigService {
     }
 
     @Override
-    public List<String> findALlConfigKey() {
-        return systemConfigRepository.findDistinctConfigKeys();
-    }
-
-    @Override
     public Page<SystemConfiguration> findAllSConfigurationsByKey(int page, int size, String key) {
         Pageable pageable = PageRequest.of(page, size);
         if (key.equals("All")) {

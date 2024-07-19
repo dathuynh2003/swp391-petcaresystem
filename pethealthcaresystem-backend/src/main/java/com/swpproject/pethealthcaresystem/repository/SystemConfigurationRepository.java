@@ -13,9 +13,6 @@ import java.util.List;
 public interface SystemConfigurationRepository extends JpaRepository<SystemConfiguration, Integer> {
     SystemConfiguration findByConfigKey(String key);
 
-    @Query("SELECT DISTINCT sc.configKey FROM SystemConfiguration sc")
-    List<String> findDistinctConfigKeys();
-
     Page<SystemConfiguration> findByConfigKeyContainingIgnoreCase(String configKey, Pageable pageable);
 
     List<SystemConfiguration> findAllByConfigKey(String configKey);
