@@ -28,4 +28,8 @@ public interface BookingRepository extends JpaRepository<Booking, Integer> {
     //Lấy những booking có reVisitDate lớn hơn curDate
     @Query("SELECT b FROM Booking b WHERE b.reVisitDate > CURRENT_DATE")
     Page<Booking> findUpComingRevisitBookings(Pageable pageable);
+
+    @Query("SELECT b FROM Booking b WHERE b.status IN ('PAID', 'Request Refund', 'Refunded', 'DONE', 'Checked_In')")
+    Page<Booking> findAllBookingWithStatus(Pageable pageable);
+
 }
