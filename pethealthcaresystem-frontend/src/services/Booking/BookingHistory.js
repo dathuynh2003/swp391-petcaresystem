@@ -411,7 +411,7 @@ const BookingHistory = () => {
                 </FormControl>
                 <Link
                     color="teal.500"
-                    href="http://localhost:8080/payments/export"
+                    href={`${URL}/payments/export`}
                     textDecoration="none"
                     fontWeight="bold"
                     fontSize="16px"
@@ -523,7 +523,7 @@ const BookingHistory = () => {
                                 <Td>{formatPrice(booking.totalAmount)} VND</Td>
                                 <Td>
                                     {(booking.status === "PAID" || booking.status === "DONE") && <Badge colorScheme="green">{booking.status}</Badge>}
-                                    {(booking.status === "Request Refund" || booking.status === 'Checked_In') && <Badge colorScheme="yellow">{booking.status}</Badge>}
+                                    {(booking.status === "Request Refund" || booking.status === 'Checked_In' || booking.status === "Pending") && <Badge colorScheme="yellow">{booking.status}</Badge>}
                                     {(booking.status === "Refunded") && <Badge colorScheme="red">{booking.status}</Badge>}
                                 </Td>
                                 <Td>

@@ -172,19 +172,19 @@ export default function Services() {
           <ModalBody>
             <FormLabel className='w-100'>
               Service's Name
-              <Input name='nameService' value={service.nameService}
+              <Input name='nameService' value={service?.nameService}
                 onChange={(e) => setService({ ...service, [e.target.name]: e.target.value })}
               />
             </FormLabel>
             <FormLabel className='w-100'>
               Service's Price
-              <Input name='price' value={service.price}
-                onChange={(e) => setService({ ...service, [e.target.name]: e.target.value })}
+              <Input name='price' value={service?.price ? Intl.NumberFormat('vi-VN').format(String(service?.price).replace(/\D/g, '')) : 0}
+                onChange={(e) => setService({ ...service, [e.target.name]: e.target.value.replace(/\./g, '') })}
               />
             </FormLabel>
             <FormLabel className='w-100'>
               Service's Description
-              <Textarea rows={4} name='description' value={service.description}
+              <Textarea rows={4} name='description' value={service?.description}
                 onChange={(e) => setService({ ...service, [e.target.name]: e.target.value })}
               />
             </FormLabel>
@@ -204,7 +204,7 @@ export default function Services() {
         </ModalContent>
       </Modal>
       <div className='row'>
-        <h2 className='text-center mb-4 mt-3' style={{color: 'teal'}}><b>Our services</b></h2>
+        <h2 className='text-center mb-4 mt-3' style={{ color: 'teal' }}><b>Our services</b></h2>
         <div className='row mx-auto mb-3 mt-4' style={{ marginBottom: '0px' }}>
           {
             services?.map((service, index) => (
@@ -216,7 +216,20 @@ export default function Services() {
                   <img src={service?.img} className="card-img-top" style={{ width: "17rem", height: "12rem" }} alt="..." />
                   <div className="card-body" style={{ height: '100px' }}>
                     <h5 className="card-title">{service?.nameService}</h5>
-                    <p className="card-text">{service?.description}</p>
+                    <p className="card-text"
+                      style={{
+                        display: '-webkit-box',
+                        WebkitBoxOrient: 'vertical',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        WebkitLineClamp: 3,
+                        maxHeight: 'calc(1.2em * 3)',
+                        lineHeight: '1.2em',
+                        whiteSpace: 'normal'
+                      }}
+                    >
+                      {service?.description}
+                    </p>
                     {roleId === '4' &&
                       <div className='text-end'>
                         <span style={{ marginRight: '20px' }} className='icon-container'>
@@ -253,8 +266,10 @@ export default function Services() {
                 </FormLabel>
                 <FormLabel className='w-100'>
                   Service's Price
-                  <Input name='price' value={selectedService?.price}
-                    onChange={(e) => setSelectedService({ ...selectedService, [e.target.name]: e.target.value })}
+                  {/* Tự động thêm dấu . tách số tiền ra mỗi 3 số 0 */}
+                  <Input name='price' value={selectedService?.price ? Intl.NumberFormat('vi-VN').format(String(selectedService?.price).replace(/\D/g, '')) : 0}
+                    // Xóa dấu . đi để gửi về BE k bị lỗi từ 10.000 -> 10
+                    onChange={(e) => setSelectedService({ ...selectedService, [e.target.name]: e.target.value.replace(/\./g, '') })}
                   />
                 </FormLabel>
                 <FormLabel className='w-100'>
@@ -295,7 +310,7 @@ export default function Services() {
                 </FormLabel>
                 <FormLabel className='w-100'>
                   Service's Price
-                  <Input readOnly name='price' value={selectedService?.price}
+                  <Input readOnly name='price' value={Intl.NumberFormat('vi-VN').format(String(selectedService?.price).replace(/\D/g, ''))}
                     onChange={(e) => setSelectedService({ ...selectedService, [e.target.name]: e.target.value })}
                   />
                 </FormLabel>

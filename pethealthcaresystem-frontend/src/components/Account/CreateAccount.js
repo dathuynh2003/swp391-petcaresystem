@@ -105,6 +105,10 @@ const CreateAccount = () => {
     const handleRegister = async (e) => {
         e.preventDefault();
         setMessageEmail("");
+        if (calculateAge(user.dob) < 13) {
+            toast.info("You need to be at least 13 years old to register")
+            return;
+        }
         if (password !== confirmPass) {
             setMessagePass("Confirm password does not match");
             toast.error("Confirm password does not match");
@@ -121,7 +125,9 @@ const CreateAccount = () => {
         certificationImages.forEach((file) => {
             formData.append('certificationImages', file);
         });
-
+        if (certificationImages.length === 0) {
+            formData.append('certificationImages', new Blob([]));
+        }
         try {
             await axios.post(`${URL}/create-user-by-admin`, formData, {
                 headers: {
@@ -133,6 +139,19 @@ const CreateAccount = () => {
         } catch (error) {
             toast.error(error?.response?.data?.errorMessage ?? error?.message);
         }
+    };
+
+    const calculateAge = (dob) => {
+        const [year, month, day] = dob.split('-').map(Number);
+        const birthDate = new Date(year, month - 1, day);
+        const today = new Date();
+        let age = today.getFullYear() - birthDate.getFullYear();
+        const monthDifference = today.getMonth() - birthDate.getMonth();
+
+        if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
+            age--;
+        }
+        return age;
     };
 
     return (
@@ -189,6 +208,7 @@ const CreateAccount = () => {
                                 <FormLabel>Date of Birth</FormLabel>
                                 <Input
                                     type="date"
+                                    max={new Date().toISOString().split('T')[0]}
                                     name="dob"
                                     value={dob}
                                     onChange={onInputChange}

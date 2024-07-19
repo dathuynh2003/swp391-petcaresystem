@@ -559,6 +559,7 @@ export default function Booking() {
                 <textarea
                   className="form-control mt-3"
                   style={{ height: '300px', resize: 'none' }}
+                  maxLength={100}
                   placeholder="Leave a comment here"
                   id="floatingTextarea2"
                   onChange={(e) => setBooking((prev) => ({ ...prev, description: e.target.value }))}
@@ -854,7 +855,7 @@ export default function Booking() {
                             <Td>{index + 1}</Td>
                             <Td>{service?.nameService}</Td>
                             <Td>{service?.description}</Td>
-                            <Td>{service?.price.toLocaleString('vi-VN')}</Td>
+                            <Td>{service?.price.toLocaleString('vi-VN')} VND</Td>
                           </Tr>
                         ))}
                       </Tbody>

@@ -5,6 +5,7 @@ import com.swpproject.pethealthcaresystem.model.*;
 import com.swpproject.pethealthcaresystem.repository.*;
 import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.apache.commons.codec.digest.HmacUtils;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +26,9 @@ public class PaymentService implements IPaymentService {
     @Autowired
     private HospitalizationRepository hospitalizationRepository;
 
+    @Value("${custom.url}")
+    private String url;
+
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     @Autowired
     private MedicalRecordRepository medicalRecordRepository;
@@ -39,7 +43,6 @@ public class PaymentService implements IPaymentService {
         payment.setBooking(curBooking);
         return paymentRepository.save(payment);
     }
-
 
 
     @Override
@@ -84,6 +87,7 @@ public class PaymentService implements IPaymentService {
 
     /**
      * This method
+     *
      * @return
      */
     @Override
@@ -124,8 +128,8 @@ public class PaymentService implements IPaymentService {
             payload.setBuyerName(payment.getUser().getFullName());
             payload.setBuyerAddress(payment.getUser().getAddress());
             payload.setItems(new ArrayList<>());
-            payload.setCancelUrl("http://localhost:3000/payment-result");
-            payload.setReturnUrl("http://localhost:3000/payment-result");
+            payload.setCancelUrl(url + "/payment-result");
+            payload.setReturnUrl(url + "/payment-result");
             String transaction = "amount=" + payload.getAmount() +
                     "&cancelUrl=" + payload.getCancelUrl() +
                     "&description=" + payload.getDescription() +
@@ -151,9 +155,9 @@ public class PaymentService implements IPaymentService {
         payload.put("description", "Paymentorder" + orderCode);
         Hospitalization hosp = hospitalizationRepository.findById(hospId)
                 .orElseThrow(() -> new Exception("Hospitalzation not found"));
-        payload.put("cancelUrl", "http://localhost:3000/viewPet/" + hosp.getPet().getPetId());
-        System.out.println("http://localhost:3000/viewPet/" + hosp.getPet().getPetId());
-        payload.put("returnUrl", "http://localhost:3000/viewPet/" + hosp.getPet().getPetId());
+        payload.put("cancelUrl", url + "/viewPet/" + hosp.getPet().getPetId());
+//        System.out.println(url + "/viewPet/" + hosp.getPet().getPetId());
+        payload.put("returnUrl", url + "/viewPet/" + hosp.getPet().getPetId());
 
         Payment updatePayment = paymentRepository.findByHospitalization(hosp);
         if (updatePayment == null) {
@@ -202,7 +206,7 @@ public class PaymentService implements IPaymentService {
             tmp.setStatus("discharged");
             hospitalizationRepository.save(tmp);
         }
-        if (medicalRecord != null){
+        if (medicalRecord != null) {
             medicalRecord.setIsPaid(true);
         }
 
@@ -234,9 +238,9 @@ public class PaymentService implements IPaymentService {
         payload.put("description", "Paymentorder" + orderCode);
         MedicalRecord medicalRecord = medicalRecordRepository.findById(medicalRecordId)
                 .orElseThrow(() -> new Exception("Medical Record not found"));
-        payload.put("cancelUrl", "http://localhost:3000/viewPet/" + medicalRecord.getPet().getPetId());
-        System.out.println("http://localhost:3000/viewPet/" + medicalRecord.getPet().getPetId());
-        payload.put("returnUrl", "http://localhost:3000/viewPet/" + medicalRecord.getPet().getPetId());
+        payload.put("cancelUrl", url + "/viewPet/" + medicalRecord.getPet().getPetId());
+//        System.out.println( url + "/viewPet/" + medicalRecord.getPet().getPetId());
+        payload.put("returnUrl",  url + "/viewPet/" + medicalRecord.getPet().getPetId());
 
         //neu payment da co medicalRecrord ID
         Payment updatePayment = paymentRepository.findByMedicalRecord(medicalRecord);

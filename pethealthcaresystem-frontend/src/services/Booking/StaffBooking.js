@@ -107,7 +107,7 @@ export default function Booking() {
             if (foundPets.length === 0) {
                 toast.info('No pets found for the entered phone number');
             }
-            setPets(response.data);
+            setPets(foundPets);
         } catch (error) {
             console.error('Error searching pets:', error);
             toast.error(error.message);
@@ -142,7 +142,17 @@ export default function Booking() {
 
     //Selected pet nào thì tính tuổi cho pet đó luôn
     const [age, setAge] = useState()
-    const choosePet = (pet) => {
+    const choosePet = async (pet) => {
+        const response = await axios.get(`${URL}/hospitalization/pet/${pet.petId}/status/admitted`, { withCredentials: true })
+        if (response.data.message !== 'List hosp is empty') {
+            toast.info("Pet is still being kept at the clinic, no more appointments can be made!")
+            return
+        }
+        const response2 = await axios.get(`${URL}/hospitalization/pet/${pet.petId}/status/pending`, { withCredentials: true })
+        if (response2.data.message !== 'List hosp is empty') {
+            toast.info('You need to pay for the previous hospitalization before booking for ' + pet.name)
+            return
+        }
         setSelectedPet(pet);
         const today = new Date();
         const dob = new Date(pet.dob);
@@ -498,56 +508,64 @@ export default function Booking() {
                                     </Button>
                                 </div>
                                 <div className="container">
-                                    {pets?.map((pet, index) => (
-                                        <div
-                                            key={index}
-                                            className="row w-100 shadow m-3 rounded-3"
-                                            style={{ height: '85px' }}
-                                            onClick={() => choosePet(pet)}
-                                        >
+                                    {pets?.map((pet, index) => {
+                                        //Tính tuổi của pet dựa vào dob (đơn vị month(s))
+                                        const today = new Date();
+                                        const dob = new Date(pet.dob);
+                                        const diffMonths = (today.getFullYear() - dob.getFullYear()) * 12 + (today.getMonth() - dob.getMonth());
+                                        const age = diffMonths !== 0 ? diffMonths : 1;
+                                        return (
                                             <div
-                                                className="pet-avatar border my-auto mx-4 rounded-circle col-4"
-                                                style={{ height: '65px', width: '65px', overflow: 'hidden', position: 'relative' }}
+                                                key={index}
+                                                className="row w-100 shadow m-3 rounded-3"
+                                                style={{ height: '85px' }}
+                                                onClick={() => choosePet(pet)}
                                             >
-                                                {/* Pet Image */}
-                                                <img
-                                                    className="rounded-circle"
-                                                    src={pet.avatar === null ? '' : pet.avatar}
-                                                    alt="PetAvatar"
-                                                    style={{
-                                                        position: 'absolute',
-                                                        top: 0,
-                                                        left: 0,
-                                                        width: '100%',
-                                                        height: '100%',
-                                                        objectFit: 'cover',
-                                                    }}
-                                                ></img>
-                                            </div>
-                                            <div className="pet-info col-8  my-2 mx-2">
-                                                <h5>{pet.name}</h5>
-                                                <div className="fs-6">
-                                                    {pet.petType}. {pet.age} Months. {pet.breed}
+                                                <div
+                                                    className="pet-avatar border my-auto mx-4 rounded-circle col-4"
+                                                    style={{ height: '65px', width: '65px', overflow: 'hidden', position: 'relative' }}
+                                                >
+                                                    {/* Pet Image */}
+                                                    <img
+                                                        className="rounded-circle"
+                                                        src={pet.avatar === null ? '' : pet.avatar}
+                                                        alt="PetAvatar"
+                                                        style={{
+                                                            position: 'absolute',
+                                                            top: 0,
+                                                            left: 0,
+                                                            width: '100%',
+                                                            height: '100%',
+                                                            objectFit: 'cover',
+                                                        }}
+                                                    ></img>
+                                                </div>
+                                                <div className="pet-info col-8  my-2 mx-2">
+                                                    <h5>{pet.name}</h5>
+                                                    <div className="fs-6">
+                                                        {pet.petType}. {age} Months. {pet.breed}
+                                                    </div>
+                                                </div>
+                                                <div
+                                                    className="pet-choose col-1 my-auto mx-4  rounded-circle"
+                                                    style={{ width: '50px', height: '50px' }}
+                                                >
+                                                    {pet.petId === selectedPet?.petId ? (
+                                                        <CheckIcon boxSize={8}
+                                                            className="rounded-circle"
+                                                            style={{
+                                                                backgroundColor: 'teal',
+                                                                color: 'white',
+                                                            }}
+                                                        />
+                                                    ) : (
+                                                        ''
+                                                    )}
                                                 </div>
                                             </div>
-                                            <div
-                                                className="pet-choose col-1 my-auto mx-4  rounded-circle"
-                                                style={{ width: '50px', height: '50px' }}
-                                            >
-                                                {pet.petId === selectedPet?.petId ? (
-                                                    <CheckIcon boxSize={8}
-                                                        className="rounded-circle"
-                                                        style={{
-                                                            backgroundColor: 'teal',
-                                                            color: 'white',
-                                                        }}
-                                                    />
-                                                ) : (
-                                                    ''
-                                                )}
-                                            </div>
-                                        </div>
-                                    ))}
+                                        )
+                                    }
+                                    )}
                                 </div>
                             </div>
                             <div className='d-flex justify-content-center gap-3'>
@@ -562,6 +580,7 @@ export default function Booking() {
                                 <textarea
                                     className="form-control mt-3"
                                     style={{ height: '300px', resize: 'none' }}
+                                    maxLength={100}
                                     placeholder="Leave a comment here"
                                     id="floatingTextarea2"
                                     onChange={(e) => setBooking((prev) => ({ ...prev, description: e.target.value }))}

@@ -11,6 +11,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.apache.catalina.util.ParameterMap;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
@@ -26,7 +27,7 @@ import java.util.Map;
 public class PaymentController {
 
     @Autowired
-    PaymentService paymentService;
+    private PaymentService paymentService;
 
     @PostMapping("/api/payment/create")
     public ResponseEntity<ResponseData> createPayment(HttpSession session,@RequestBody Payment payment) {
@@ -59,15 +60,11 @@ public class PaymentController {
     @PutMapping("/payment-update")
     public ResponseEntity<ResponseData> updatePayment(HttpSession session,@RequestBody Payment payment) {
         try {
-//            User user = (User) session.getAttribute("user");
-//            if(user != null) {
                 ResponseData<Payment> data = new ResponseData();
                 Payment updatedPayment = paymentService.updatePayment(payment);
                 data.setStatusCode(200);
                 data.setData(updatedPayment);
                 return new ResponseEntity<>(data, HttpStatus.OK);
-//            }
-//           return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         } catch (Error e) {
             ResponseData<Payment> data = new ResponseData();
             data.setErrorMessage(e.getMessage());

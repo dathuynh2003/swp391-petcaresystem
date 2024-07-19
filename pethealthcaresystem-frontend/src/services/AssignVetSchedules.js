@@ -72,7 +72,7 @@ export default function AssignVetSchedules() {
       return;
     }
 
-    const vetShiftDetails = selectedShifts.map(shift => ({
+    const vetShiftDetails = selectedShifts?.map(shift => ({
       user: { userId: selectedVet },
       shift: { shiftId: shift.shiftId },
       date: shift.date,
@@ -148,7 +148,7 @@ export default function AssignVetSchedules() {
     if (date.toDateString() !== now.toDateString()) {
       return date < now;
     }
-    const [shiftStartHour, shiftStartMinute] = shift.from_time.split(':').map(Number);
+    const [shiftStartHour, shiftStartMinute] = shift.from_time.split(':')?.map(Number);
     const shiftStartTime = new Date(date);
     shiftStartTime.setHours(shiftStartHour, shiftStartMinute, 0, 0);
     return now > shiftStartTime;
@@ -170,7 +170,7 @@ export default function AssignVetSchedules() {
                 gap: '10px',
                 marginBottom: '10px'
               }}>
-                {vets.map(vet => (
+                {vets?.map(vet => (
                   <Button
                     key={vet.userId}
                     style={{
@@ -208,7 +208,7 @@ export default function AssignVetSchedules() {
           <table className="table table-bordered">
             <thead>
               <th>Work Shift</th>
-              {[0, 1, 2, 3, 4, 5, 6].map(index => {
+              {[0, 1, 2, 3, 4, 5, 6]?.map(index => {
                 const date = new Date(currentWeek);
                 date.setDate(date.getDate() + index);
                 return (
@@ -217,10 +217,10 @@ export default function AssignVetSchedules() {
               })}
             </thead>
             <tbody>
-              {shifts.map((shift, shiftIndex) => (
+              {shifts?.map((shift, shiftIndex) => (
                 <tr key={shiftIndex}>
                   <td className="align-middle text-center">{`${shift.from_time} - ${shift.to_time}`}</td>
-                  {[0, 1, 2, 3, 4, 5, 6].map((dateIndex) => {
+                  {[0, 1, 2, 3, 4, 5, 6]?.map((dateIndex) => {
                     const date = new Date(currentWeek);
                     date.setDate(date.getDate() + dateIndex);
                     const isAssigned = shiftDetails.some(detail => detail.shift.shiftId === shift.shiftId && new Date(detail.date).toLocaleDateString('en-GB') === formatDate(date));

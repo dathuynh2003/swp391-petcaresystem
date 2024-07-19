@@ -80,6 +80,9 @@ public class UserService implements IUserService {
         if (existUser == null) {
             return null;
         }
+        if (!existUser.getIsActive()) {
+            return null;
+        }
 
         String hashedPassword = SystemUtils.passwordHash(user.getPassword());
         int userRoleId = existUser.getRoleId();
@@ -90,7 +93,7 @@ public class UserService implements IUserService {
                 return existUser;
             }
         } else {
-            if (existUser.getPassword().equals(user.getPassword())) {
+            if (existUser.getPassword().equals(hashedPassword)) {
                 existUser.setPassword("");
                 existUser.setVetShiftDetails(null);
                 return existUser;

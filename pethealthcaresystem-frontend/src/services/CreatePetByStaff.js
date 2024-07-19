@@ -7,6 +7,7 @@ import {
     NumberIncrementStepper,
     NumberDecrementStepper,
     Select,
+    Input,
 } from '@chakra-ui/react';
 import RadioCard from '../components/Radio';
 import { LIST_BREED } from '../utils/constant';
@@ -39,12 +40,15 @@ export default function CreatePetByStaff() {
     const callAPI = async () => {
         try {
             const petRequest = { ...pet };
-
             if (petRequest.owner.fullName === '' || petRequest.name === '' || petRequest.petType === '' || petRequest.gender === '') {
                 toast.info("Please enter required fields for both account and pet.");
                 return;
             }
-
+            // Kiểm tra xem ngày được chọn có lớn hơn ngày hiện tại không
+            if (pet.dob > new Date().toISOString().split('T')[0]) {
+                toast.info("Please select a valid date of birth.");
+                return; // Ngăn người dùng tiếp tục
+            }
             const response = await axios.post(`${URL}/createForAnonymous`, petRequest, { withCredentials: true });
             toast.success('Add new pet and account successfully!', 2000);
 
@@ -243,17 +247,9 @@ export default function CreatePetByStaff() {
                             type="date"
                             className="form-control"
                             id="dob"
+                            max={new Date().toISOString().split('T')[0]}
                             value={pet?.dob}
                             onChange={(e) => {
-                                const selectedDate = new Date(e.target.value);
-                                const currentDate = new Date();
-
-                                // Kiểm tra xem ngày được chọn có lớn hơn ngày hiện tại không
-                                if (selectedDate > currentDate) {
-                                    toast.info("Please select a valid date of birth.");
-                                    return; // Ngăn người dùng tiếp tục
-                                }
-
                                 setPet((prev) => ({ ...prev, dob: e.target.value }));
                             }}
                         />

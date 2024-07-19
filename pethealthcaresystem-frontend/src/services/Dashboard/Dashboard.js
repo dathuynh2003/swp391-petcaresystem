@@ -189,7 +189,7 @@ export default function Dashboard() {
     <>
       <Link
         color="teal.500"
-        href={`${URL}/payments/export`}
+        href={`${URL}/api/summary-data/export`}
         textDecoration="none"
         fontWeight="bold"
         fontSize="16px"

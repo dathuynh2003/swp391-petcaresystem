@@ -25,7 +25,7 @@ const Navbar = () => {
   }, []);
 
   const capitalizeText = (str) => {
-    let title = str.split("/")[1] ?? str;    //   /home  ["", "home"] 
+    let title = str.split("/")[0] ?? str;    //   /home  ["", "home"] 
     title = title.split('-').join(' ')
     title = title.charAt(0).toUpperCase() + title.slice(1)   //viết hoa chữ đầu tiên + phần còn lại sau ký tự đầu tiên qua hàm slice(1) 
     return title.split(/(?=[A-Z])/).join(' '); // tìm vị trí mà sau nó là 1 chữ viết hoa tách str thành str có các phần tử bắt đầu là chữ hoa  str = ["List", "Pets"]
