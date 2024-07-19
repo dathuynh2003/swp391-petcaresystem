@@ -35,7 +35,8 @@ public class ExcelExportService<T> {
         sheet = workbook.createSheet("list");
 
     }
-    private void writeHeaderRowForSummaryData(){
+
+    private void writeHeaderRowForSummaryData() {
         Row row = sheet.createRow(0);
 
         Cell cell = row.createCell(0);
@@ -62,8 +63,7 @@ public class ExcelExportService<T> {
     }
 
 
-
-    private void writeHeaderRowForPayment(){
+    private void writeHeaderRowForPayment() {
         Row row = sheet.createRow(0);
 
         Cell cell = row.createCell(0);
@@ -85,15 +85,12 @@ public class ExcelExportService<T> {
         cell.setCellValue("Amount");
 
 
-
-
-
     }
 
-    private void writeDataRowForSummaryData(){
+    private void writeDataRowForSummaryData() {
         int rowCount = 1;
-        for(T t: list){
-            if(t instanceof SummaryData){
+        for (T t : list) {
+            if (t instanceof SummaryData) {
                 SummaryData data = (SummaryData) t;
                 Row row = sheet.createRow(rowCount++);
                 Cell cell = row.createCell(0);
@@ -123,10 +120,11 @@ public class ExcelExportService<T> {
         }
 
     }
-    private void writeDataRowForPayment(){
+
+    private void writeDataRowForPayment() {
         int rowCount = 1;
-        for(T t: list){
-            if(t instanceof Payment){
+        for (T t : list) {
+            if (t instanceof Payment) {
                 Payment payment = (Payment) t;
                 Row row = sheet.createRow(rowCount++);
                 Cell cell = row.createCell(0);
@@ -136,7 +134,11 @@ public class ExcelExportService<T> {
                 cell.setCellValue(payment.getOrderCode());
 
                 cell = row.createCell(2);
-                cell.setCellValue(payment.getPaymentDate().toString());
+                if (payment.getPaymentDate() != null) {
+                    cell.setCellValue(payment.getPaymentDate().toString());
+                } else {
+                    cell.setCellValue("");
+                }
 
                 cell = row.createCell(3);
                 cell.setCellValue(payment.getPaymentType());
@@ -152,11 +154,12 @@ public class ExcelExportService<T> {
         }
 
     }
+
     public void exportSummaryData(HttpServletResponse response) throws IOException {
         writeHeaderRowForSummaryData();
         writeDataRowForSummaryData();
 
-        ServletOutputStream outputStream =  response.getOutputStream();
+        ServletOutputStream outputStream = response.getOutputStream();
         workbook.write(outputStream);
         workbook.close();
         outputStream.close();
@@ -168,7 +171,7 @@ public class ExcelExportService<T> {
         writeHeaderRowForPayment();
         writeDataRowForPayment();
 
-        ServletOutputStream outputStream =  response.getOutputStream();
+        ServletOutputStream outputStream = response.getOutputStream();
         workbook.write(outputStream);
         workbook.close();
         outputStream.close();
