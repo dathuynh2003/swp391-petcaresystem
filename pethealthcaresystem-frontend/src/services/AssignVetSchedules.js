@@ -252,7 +252,7 @@ export default function AssignVetSchedules() {
                               border: '2px solid teal',
                               borderRadius: '3px', /* Optional: for rounded corners */
                               appearance: 'none',
-                              WebkitAppearance: 'none'
+                              WebkitAppearance: 'none',
                             }}
                             onChange={() => handleToggleShift(shift.shiftId, date)}
                             checked={selectedShifts.some(item => item.shiftId === shift.shiftId && item.date === date.toISOString().split('T')[0])}

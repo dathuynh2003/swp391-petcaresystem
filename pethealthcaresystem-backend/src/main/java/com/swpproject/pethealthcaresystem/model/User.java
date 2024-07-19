@@ -40,6 +40,9 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnoreProperties("user")
     Set<VetShiftDetail> vetShiftDetails = new HashSet<>();
+
+//    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+//    private Set<Certification> certifications = new HashSet<>();
 //
 //    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
 //    Set<Cage> cages = new HashSet<>();

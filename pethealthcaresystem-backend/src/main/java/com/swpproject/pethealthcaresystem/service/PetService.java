@@ -23,6 +23,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class PetService implements IPetService {
+    public static final String AVARTAR_PET_DEFAULT = "https://res.cloudinary.com/dinklulzk/image/upload/v1719295004/logoPetCare_lktjfl.png";
+
     @Autowired
     private PetRepository petRepository;
     @Autowired
@@ -41,7 +43,7 @@ public class PetService implements IPetService {
 
         newPet.setOwner(curUser);
         newPet.setIsDeceased(false);
-        newPet.setAvatar("https://res.cloudinary.com/dinklulzk/image/upload/v1719295004/logoPetCare_lktjfl.png");
+        newPet.setAvatar(AVARTAR_PET_DEFAULT);
         return petRepository.save(newPet);
     }
 
@@ -128,7 +130,7 @@ public class PetService implements IPetService {
 
         newPet.setOwner(anonymousUser);
         newPet.setIsDeceased(false);
-        newPet.setAvatar("https://res.cloudinary.com/dinklulzk/image/upload/v1719295004/logoPetCare_lktjfl.png");
+        newPet.setAvatar(AVARTAR_PET_DEFAULT);
         return petRepository.save(newPet);
     }
 

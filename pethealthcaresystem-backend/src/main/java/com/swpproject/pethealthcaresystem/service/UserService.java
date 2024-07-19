@@ -2,7 +2,7 @@ package com.swpproject.pethealthcaresystem.service;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
-import com.swpproject.pethealthcaresystem.model.Booking;
+import com.swpproject.pethealthcaresystem.model.Certification;
 import com.swpproject.pethealthcaresystem.model.User;
 import com.swpproject.pethealthcaresystem.model.VetShiftDetail;
 import com.swpproject.pethealthcaresystem.repository.UserRepository;
@@ -28,6 +28,7 @@ public class UserService implements IUserService {
     public static final String INVALID_EMAIL = "Email is invalid";
     public static final String SUCCESSFUL_STATUS = "Verification email sent";
     private final Map<String, User> temporaryStorage = new HashMap<>();
+    public static final String AVARTAR_DEFAULT = "https://res.cloudinary.com/dinklulzk/image/upload/v1718952303/avatarDefault_vl6wzt.jpg";
 
     @Autowired
     private UserRepository userRepository;
@@ -62,7 +63,7 @@ public class UserService implements IUserService {
         user.setPhoneNumber(newUser.getPhoneNumber());
         user.setAddress(newUser.getAddress());
         user.setRoleId(1);
-        user.setAvatar("https://res.cloudinary.com/dinklulzk/image/upload/v1718952303/avatarDefault_vl6wzt.jpg");
+        user.setAvatar(AVARTAR_DEFAULT);
         user.setGender(newUser.getGender());
         user.setIsActive(false); // Đặt là không hoạt động cho đến khi xác thực
         user.setDob(newUser.getDob());
@@ -152,7 +153,7 @@ public class UserService implements IUserService {
 
     @Transactional
     @Override
-    public User createUserByAdmin(User newUser) {
+    public User createUserByAdmin(User newUser, List<MultipartFile> certificationImageFiles) throws IOException {
         Date now = new Date();
         User user = new User();
 
@@ -174,10 +175,28 @@ public class UserService implements IUserService {
         user.setPhoneNumber(newUser.getPhoneNumber());
         user.setAddress(newUser.getAddress());
         user.setRoleId(newUser.getRoleId());
-        user.setAvatar("https://res.cloudinary.com/dinklulzk/image/upload/v1718952303/avatarDefault_vl6wzt.jpg");
+        user.setAvatar(AVARTAR_DEFAULT);
         user.setGender(newUser.getGender());
         user.setIsActive(true);
         user.setDob(newUser.getDob());
+
+        user = userRepository.save(user);
+
+        // Upload certification images and set URLs
+        if (certificationImageFiles != null && !certificationImageFiles.isEmpty()) {
+            for (MultipartFile file : certificationImageFiles) {
+                if (!file.isEmpty()) {
+                    Map uploadResult = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.emptyMap());
+                    String certificationImageUrl = (String) uploadResult.get("url");
+
+                    Certification certification = new Certification();
+                    certification.setCertificationImage(certificationImageUrl);
+                    certification.setUser(user);
+
+//                    user.getCertifications().add(certification);
+                }
+            }
+        }
         return userRepository.save(user);
     }
 

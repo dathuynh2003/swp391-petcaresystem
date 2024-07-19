@@ -15,8 +15,9 @@ import {
     Stack,
     Text,
     Textarea,
-    useToast,
 } from '@chakra-ui/react';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const CreateAccount = () => {
     let navigate = useNavigate();
@@ -30,17 +31,42 @@ const CreateAccount = () => {
         avatar: "",
         gender: "",
         dob: "",
-        roleId: 3,
+        roleId: 2,
     });
+    const [certificationImages, setCertificationImages] = useState([]);
 
     const [messageEmail, setMessageEmail] = useState('');
     const [messagePass, setMessagePass] = useState('');
     const [confirmPass, setConfirmPass] = useState('');
-    const { fullName, phoneNumber, address, gender, dob, email, password } = user;
-    const toast = useToast();
+    const [fileError, setFileError] = useState('');
+    const { fullName, phoneNumber, address, gender, dob, email, password, roleId } = user;
 
     const onInputChange = (e) => {
         setUser({ ...user, [e.target.name]: e.target.value });
+    };
+
+    const onFileChange = (e) => {
+        const files = Array.from(e.target.files);
+        const validFiles = [];
+        const errors = [];
+
+        files.forEach(file => {
+            if (file.size > 10 * 1024 * 1024) { // 10MB in bytes
+                errors.push(`This file is larger than 10MB.`);
+            } else if (!file.type.startsWith('image/')) {
+                errors.push(`This file is not an image.`);
+            } else {
+                validFiles.push(file);
+            }
+        });
+
+        if (errors.length > 0) {
+            setFileError(errors.join(' '));
+            toast.error(errors.join(' '))
+        } else {
+            setFileError('');
+            setCertificationImages(validFiles);
+        }
     };
 
     const handleRegister = async (e) => {
@@ -48,34 +74,27 @@ const CreateAccount = () => {
         setMessageEmail("");
         if (password !== confirmPass) {
             setMessagePass("Confirm password does not match");
+            toast.error("Confirm password does not match")
             return;
         }
 
+        const formData = new FormData();
+        formData.append('user', new Blob([JSON.stringify(user)], { type: 'application/json' }));
+        certificationImages.forEach((file) => {
+            formData.append('certificationImages', file);
+        });
+
         try {
-            await axios.post(`http://localhost:8080/create-user-by-admin`, user);
-            toast({
-                title: "Account created.",
-                description: "The user account has been created successfully.",
-                status: "success",
-                duration: 5000,
-                isClosable: true,
+            await axios.post(`http://localhost:8080/create-user-by-admin`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
             });
+            toast.success("The user account has been created successfully.")
             navigate('/account');
         } catch (error) {
-            toast({
-                title: "Error.",
-                description: error?.response?.data?.errorMessage ?? error?.message,
-                status: "error",
-                duration: 5000,
-                isClosable: true,
-            });
+            toast.error(error?.response?.data?.errorMessage ?? error?.message);
         }
-    };
-    const handleSubmit = () => {
-        // Perform any submit actions here, e.g., form submission, API call
-
-        // After successful submission, navigate back to '/list-account'
-        navigate('/account');
     };
 
     return (
@@ -179,12 +198,22 @@ const CreateAccount = () => {
                                 <option value="3">Vet</option>
                             </Select>
                         </FormControl>
+                        {roleId === "3" && (
+                            <FormControl id="certificationImages">
+                                <FormLabel>Certification Images</FormLabel>
+                                <Input
+                                    type="file"
+                                    multiple
+                                    onChange={onFileChange}
+                                />
+                                {fileError && <Text color="red.500">{fileError}</Text>}
+                            </FormControl>
+                        )}
                         <Button
                             type="submit"
                             colorScheme="blue"
                             size="md"
                             width="full"
-                            // onClick={handleSubmit} // Call handleSubmit function on button click
                         >
                             Submit
                         </Button>
@@ -195,6 +224,7 @@ const CreateAccount = () => {
                     </Stack>
                 </form>
             </Box>
+            <ToastContainer />
         </Container>
     );
 };
