@@ -145,7 +145,8 @@ public class ExcelExportService<T> {
                 cell.setCellValue(payment.getStatus());
 
                 cell = row.createCell(5);
-                cell.setCellValue(payment.getBooking().getTotalAmount());
+                cell.setCellValue(payment.getAmount());
+
 
             }
         }
@@ -177,38 +178,6 @@ public class ExcelExportService<T> {
 
     @Autowired
     private PaymentRepository paymentRepository;
-    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
-    public ByteArrayInputStream exportPaymentsToExcel() throws IOException {
-        List<Payment> paymentList = paymentRepository.findAll();
-
-        try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-            Sheet sheet = workbook.createSheet("Payments");
-
-            // Create header row
-            String[] headers = {"ID", "Order Code", "Payment Type", "Amount","Payment Date", "Status", "Description"};
-            Row headerRow = sheet.createRow(0);
-            for (int col = 0; col < headers.length; col++) {
-                Cell cell = headerRow.createCell(col);
-                cell.setCellValue(headers[col]);
-            }
-
-            // Create data rows
-            int rowIdx = 1;
-            for (Payment payment : paymentList) {
-                Row row = sheet.createRow(rowIdx++);
-
-                row.createCell(0).setCellValue(payment.getId());
-                row.createCell(1).setCellValue(payment.getOrderCode());
-                row.createCell(2).setCellValue(payment.getPaymentType());
-                row.createCell(3).setCellValue(payment.getAmount());
-                row.createCell(4).setCellValue(payment.getPaymentDate());
-                row.createCell(5).setCellValue(payment.getStatus());
-                row.createCell(6).setCellValue(payment.getDescription());
-            }
-            workbook.write(out);
-            return new ByteArrayInputStream(out.toByteArray());
-        }
-    }
 
 }

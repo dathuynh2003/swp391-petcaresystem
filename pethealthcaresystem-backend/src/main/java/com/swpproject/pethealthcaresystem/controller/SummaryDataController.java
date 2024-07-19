@@ -16,8 +16,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/summary-data")
-@CrossOrigin(origins = {"http://localhost:3000", "https://pethealthcare.vercel.app"}, allowCredentials = "true")
-
+@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
 public class SummaryDataController {
     @Autowired
     private SummaryDataService summaryDataService;
@@ -51,7 +50,7 @@ public class SummaryDataController {
         try{
             response.setContentType("application/octet-stream");
             String headerKey = "Content-Disposition";
-            String headerValue = "attachment; filename=summarytdata.xlsx";
+            String headerValue = "attachment; filename=summarydata.xlsx";
             response.setHeader(headerKey, headerValue);
 
             List<SummaryData> list = summaryDataService.getAllData();
