@@ -4,11 +4,13 @@ import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, BarChart, Bar, AreaChart, Area, ResponsiveContainer
 } from 'recharts';
 import {
-  Button, Input, Box, Flex, Text, Stat, StatLabel, StatNumber, StatHelpText, SimpleGrid, IconButton,
+  Button, Input, Box, Flex, Text, Stat, StatLabel, StatNumber, StatHelpText, SimpleGrid, IconButton,Link
 } from '@chakra-ui/react';
 import { ToastContainer, toast } from 'react-toastify';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faFileExport } from '@fortawesome/free-solid-svg-icons';
 import { useNavigate } from 'react-router-dom';
-import { ArrowUpIcon, ArrowDownIcon, TimeIcon } from '@chakra-ui/icons';
+import { ArrowUpIcon, ArrowDownIcon, TimeIcon} from '@chakra-ui/icons';
 import UserChart from './UserChart';
 import { PureComponent } from 'react';
 import { curveCardinal } from 'd3-shape';
@@ -184,6 +186,16 @@ export default function Dashboard() {
 
   return (
     <>
+      <Link
+        color="teal.500"
+        href="http://localhost:8080/payments/export"
+        textDecoration="none"
+        fontWeight="bold"
+        fontSize="16px"
+      >
+        <FontAwesomeIcon icon={faFileExport} style={{ marginRight: '8px' }} />
+        Export File
+      </Link>
       <ToastContainer />
       <div  >
         <Box textAlign="center" mt={3} mb={5}>
