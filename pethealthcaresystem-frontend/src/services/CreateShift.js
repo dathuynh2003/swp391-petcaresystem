@@ -40,13 +40,36 @@ const CreateShift = () => {
   };
 
   const addShift = async () => {
+    const timeFormat = /^([01]\d|2[0-3]):([0-5]\d)$/;
+
     if (!newShift.from_time || !newShift.to_time) {
       toast.error('Please fill in both fields');
       return;
     }
 
-    if (new Date(`1970-01-01T${newShift.from_time}:00`) >= new Date(`1970-01-01T${newShift.to_time}:00`)) {
+    if (!timeFormat.test(newShift.from_time) || !timeFormat.test(newShift.to_time)) {
+      toast.error('Invalid time format. Please use HH:mm format.');
+      return;
+    }
+
+    const fromTime = new Date(`1970-01-01T${newShift.from_time}:00`);
+    const toTime = new Date(`1970-01-01T${newShift.to_time}:00`);
+
+    if (fromTime >= toTime) {
       toast.error('From Time must be before To Time');
+      return;
+    }
+
+    // Check for overlap with existing shifts
+    const isExisted = shifts.some((shift) => {
+      const existingFromTime = new Date(`1970-01-01T${shift.from_time}:00`);
+      const existingToTime = new Date(`1970-01-01T${shift.to_time}:00`);
+
+      return (fromTime < existingToTime && toTime > existingFromTime);
+    });
+
+    if (isExisted) {
+      toast.error('This shift is existed.');
       return;
     }
 
@@ -122,12 +145,12 @@ const CreateShift = () => {
             <form>
               <label>
                 From Time:
-                <input type="text" name="from_time" value={newShift.from_time} onChange={handleChange} />
+                <input type="text" name="from_time" value={newShift.from_time} placeholder='HH:mm' onChange={handleChange} />
               </label>
               <br />
               <label>
                 To Time:
-                <input type="text" name="to_time" value={newShift.to_time} onChange={handleChange} />
+                <input type="text" name="to_time" value={newShift.to_time} placeholder='HH:mm' onChange={handleChange} />
               </label>
             </form>
           </ModalBody>

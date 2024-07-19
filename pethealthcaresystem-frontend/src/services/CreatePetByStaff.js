@@ -83,7 +83,7 @@ export default function CreatePetByStaff() {
         }
 
         if (name === 'phoneNumber') {
-            const phoneRegex = /^(03|05|07|08|09)\d{8}$/;
+            const phoneRegex = /^((\+84|84|0)[3|5|7|8|9])+([0-9]{8})$/;
             if (value.length === 10 && !phoneRegex.test(value)) {
                 toast.info("Please enter a valid Vietnamese phone number.");
                 return;

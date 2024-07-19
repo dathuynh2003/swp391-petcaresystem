@@ -89,14 +89,21 @@ export default function Booking() {
     }, [pageNo])
 
     const loadPets = async () => {
+        const phoneNumberFormat = /^((\+84|84|0)[3|5|7|8|9])+([0-9]{8})$/;
+
         if (!phone) {
             toast.warn('Please enter a phone number');
             return;
         }
 
+        if (!phoneNumberFormat.test(phone)) {
+            toast.warn('Invalid phone number format');
+            return;
+        }
+
         try {
             const response = await axios.get(`http://localhost:8080/pets/ownerPhone/${phone}`);
-            const foundPets = response.data;
+            const foundPets = response.data.filter(pet => !pet.isDeceased);
             if (foundPets.length === 0) {
                 toast.info('No pets found for the entered phone number');
             }
