@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 import org.apache.commons.codec.digest.HmacUtils;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
@@ -37,6 +39,7 @@ public class PaymentService implements IPaymentService {
         payment.setBooking(curBooking);
         return paymentRepository.save(payment);
     }
+
 
 
     @Override
@@ -79,6 +82,15 @@ public class PaymentService implements IPaymentService {
         return existingPayment;
     }
 
+    /**
+     * This method
+     * @return
+     */
+    @Override
+    public List<Payment> getPaymentList() {
+        return paymentRepository.findAll();
+    }
+
 
     @Override
     public Payment getPaymentByOrderCode(int orderCode) {
@@ -111,28 +123,9 @@ public class PaymentService implements IPaymentService {
             payload.setBuyerPhone(payment.getUser().getPhoneNumber());
             payload.setBuyerName(payment.getUser().getFullName());
             payload.setBuyerAddress(payment.getUser().getAddress());
-
-//        List<Map<String, Object>> items = new ArrayList<>();
-//        for (int i = 0; i < payment.getBooking().getBookingDetails().size(); i++) {
-//            BookingDetail bookingDetail = payment.getBooking().getBookingDetails().get(i);
-//            Map<String, Object> item = new HashMap<>();
-//            item.put("name", bookingDetail.getPetService().getNameService());
-//            item.put("quantity", 1);
-//            item.put("price", bookingDetail.getPetService().getPrice());
-//            items.add(item);
-//        }
             payload.setItems(new ArrayList<>());
-
             payload.setCancelUrl("http://localhost:3000/payment-result");
             payload.setReturnUrl("http://localhost:3000/payment-result");
-
-//            String transaction = String.format("amount:%x,cancelUrl:%s,description:%s,orderCode:%x,returnUrl:%s",
-//                    payload.getAmount(),
-//                    payload.getCancelUrl(),
-//                    payload.getDescription(),
-//                    payload.getOrderCode(),
-//                    payload.getReturnUrl());
-//            System.out.println(transaction);
             String transaction = "amount=" + payload.getAmount() +
                     "&cancelUrl=" + payload.getCancelUrl() +
                     "&description=" + payload.getDescription() +
@@ -140,7 +133,6 @@ public class PaymentService implements IPaymentService {
                     "&returnUrl=" + payload.getReturnUrl();
             String signature = this.createSignaturePayOs(transaction);
             payload.setSignature(signature);
-
             return payload;
         } catch (Exception error) {
             throw new Error(error.getMessage());

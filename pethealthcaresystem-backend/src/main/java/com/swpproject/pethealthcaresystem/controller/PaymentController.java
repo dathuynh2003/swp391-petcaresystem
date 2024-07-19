@@ -5,7 +5,9 @@ import com.swpproject.pethealthcaresystem.dto.payment.CreatePaymentPosPayload;
 import com.swpproject.pethealthcaresystem.dto.payment.PayOsDTO;
 import com.swpproject.pethealthcaresystem.model.Payment;
 import com.swpproject.pethealthcaresystem.model.User;
+import com.swpproject.pethealthcaresystem.service.ExcelExportService;
 import com.swpproject.pethealthcaresystem.service.PaymentService;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.apache.catalina.util.ParameterMap;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +15,7 @@ import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -187,6 +190,23 @@ public class PaymentController {
         }
         return response;
     }
+    @GetMapping("/payments/export")
+    public void exportToExcel(HttpServletResponse response){
+        try{
+            response.setContentType("application/octet-stream");
+            String headerKey = "Content-Disposition";
+            String headerValue = "attachment; filename=payment.xlsx";
+            response.setHeader(headerKey, headerValue);
+
+            List<Payment> paymentList = paymentService.getPaymentList();
+            ExcelExportService<Payment> excelExportService = new ExcelExportService<>(paymentList);
+
+            excelExportService.exportPayment(response);
+        }catch (IOException exception){
+            exception.printStackTrace();
+        }
+    }
+
 
 
 }

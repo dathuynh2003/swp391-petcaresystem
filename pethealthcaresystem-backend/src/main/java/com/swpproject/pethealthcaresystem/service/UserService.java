@@ -77,19 +77,26 @@ public class UserService implements IUserService {
     @Override
     public User validateLogin(User user) {
         User existUser = userRepository.findByEmail(user.getEmail());
-        if (existUser != null && existUser.getIsActive()) {
-            int userRoleId = existUser.getRoleId();
-            if (userRoleId == CUSTOMER_ROLEID
-                    && existUser.getPassword().equals(SystemUtils.passwordHash(user.getPassword()))) {
+        if (existUser == null) {
+            return null;
+        }
+
+        String hashedPassword = SystemUtils.passwordHash(user.getPassword());
+        int userRoleId = existUser.getRoleId();
+        if (userRoleId == CUSTOMER_ROLEID) {
+            if (existUser.getPassword().equals(hashedPassword)) {
                 existUser.setPassword("");
                 existUser.setVetShiftDetails(null);
                 return existUser;
-            } else if (existUser.getPassword().equals(SystemUtils.passwordHash(user.getPassword()))) {
+            }
+        } else {
+            if (existUser.getPassword().equals(user.getPassword())) {
                 existUser.setPassword("");
                 existUser.setVetShiftDetails(null);
                 return existUser;
             }
         }
+
         return null;
     }
 
@@ -329,7 +336,7 @@ public class UserService implements IUserService {
     @Override
     public Page<User> getAllUsers(int pageNo, int pageSize) {
         Pageable pageable = PageRequest.of(pageNo, pageSize);
-        return userRepository.findAll(pageable);
+        return userRepository.findUsersWithSpecificRoles(pageable);
     }
 
     @Override

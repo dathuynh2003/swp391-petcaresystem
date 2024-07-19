@@ -4,12 +4,13 @@ import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, BarChart, Bar, AreaChart, Area, ResponsiveContainer
 } from 'recharts';
 import {
-  Button, Input, Box, Flex, Text, Stat, StatLabel, StatNumber, StatHelpText, SimpleGrid, IconButton,
+  Button, Input, Box, Flex, Text, Stat, StatLabel, StatNumber, StatHelpText, SimpleGrid, IconButton, Link
 } from '@chakra-ui/react';
 import { ToastContainer, toast } from 'react-toastify';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faFileExport } from '@fortawesome/free-solid-svg-icons';
 import { useNavigate } from 'react-router-dom';
 import { ArrowUpIcon, ArrowDownIcon, TimeIcon } from '@chakra-ui/icons';
-import { PureComponent } from 'react';
 import { curveCardinal } from 'd3-shape';
 import './Dashboard.css'
 import PeopleIcon from '@mui/icons-material/People';
@@ -20,7 +21,6 @@ import AppBlockingIcon from '@mui/icons-material/AppBlocking';
 import { URL } from '../../utils/constant'
 
 export default function Dashboard() {
-  const cardinal = curveCardinal.tension(0.2);
   let navigate = useNavigate();
   const roleId = localStorage.getItem('roleId');
   if (roleId !== '4') {
@@ -187,6 +187,16 @@ export default function Dashboard() {
 
   return (
     <>
+      <Link
+        color="teal.500"
+        href={`${URL}/payments/export`}
+        textDecoration="none"
+        fontWeight="bold"
+        fontSize="16px"
+      >
+        <FontAwesomeIcon icon={faFileExport} style={{ marginRight: '8px' }} />
+        Export File
+      </Link>
       <ToastContainer />
       <div  >
         <Box textAlign="center" mt={3} mb={5}>

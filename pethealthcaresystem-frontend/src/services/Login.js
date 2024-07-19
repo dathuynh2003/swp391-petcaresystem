@@ -67,7 +67,7 @@ export default function Login() {
             await axios.post(`${URL}/register-gg`, {
                 email: result.user.email,
                 fullName: result.user.displayName,
-                password: "111111"
+                password: result.user.email
             }, { withCredentials: true });
 
 

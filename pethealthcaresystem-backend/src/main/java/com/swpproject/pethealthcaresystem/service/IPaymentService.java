@@ -6,12 +6,15 @@ import com.swpproject.pethealthcaresystem.model.User;
 import org.json.JSONException;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
 import java.util.Map;
 
 public interface IPaymentService {
     Payment createPayment(Payment payment);
 
     Payment updatePayment(Payment payment);
+
+    List<Payment> getPaymentList();
 
     Payment getPaymentByOrderCode(int orderCode);
 

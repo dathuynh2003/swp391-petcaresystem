@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.lang.Nullable;
 
+import java.sql.Timestamp;
 import java.util.*;
 
 @NoArgsConstructor

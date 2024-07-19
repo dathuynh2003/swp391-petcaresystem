@@ -211,7 +211,6 @@ public class UserController {
     @GetMapping("/getuser")
     public User getUser(HttpSession session) {
         User curUser = (User) session.getAttribute("user");
-        System.out.println(curUser);
         try {
             if (curUser == null) {
                 throw new Exception("You need login first");
