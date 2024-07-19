@@ -1,10 +1,13 @@
 package com.swpproject.pethealthcaresystem.controller;
 
 import com.swpproject.pethealthcaresystem.model.SummaryData;
+import com.swpproject.pethealthcaresystem.service.ExcelExportService;
 import com.swpproject.pethealthcaresystem.service.SummaryDataService;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeParseException;
@@ -40,5 +43,24 @@ public class SummaryDataController {
         Date end = Date.from(LocalDate.parse(toDate).atTime(23, 59, 59).atZone(ZoneId.systemDefault()).toInstant());
         summaryDataService.generateMissingSummaryData(start, end);
         return "Missing summary data updated";
+    }
+
+    @GetMapping("export")
+    public void exportToExcel(HttpServletResponse response){
+        try{
+            response.setContentType("application/octet-stream");
+            String headerKey = "Content-Disposition";
+            String headerValue = "attachment; filename=summarytdata.xlsx";
+            response.setHeader(headerKey, headerValue);
+
+            List<SummaryData> list = summaryDataService.getAllData();
+
+            ExcelExportService<SummaryData> excelExportService = new ExcelExportService<>(list);
+
+            excelExportService.exportSummaryData(response);
+
+        }catch (IOException exception){
+            exception.printStackTrace();
+        }
     }
 }

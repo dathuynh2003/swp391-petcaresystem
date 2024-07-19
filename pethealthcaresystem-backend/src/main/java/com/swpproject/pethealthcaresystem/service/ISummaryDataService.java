@@ -11,4 +11,6 @@ public interface ISummaryDataService {
     SummaryData generateSummaryDataForDate(Date startDate, Date endDate);
 
     List<SummaryData> getSummaryDataByDateRange(Date startDate, Date endDate);
+
+    List<SummaryData> getAllData();
 }

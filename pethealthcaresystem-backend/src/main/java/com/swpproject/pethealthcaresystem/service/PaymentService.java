@@ -82,6 +82,10 @@ public class PaymentService implements IPaymentService {
         return existingPayment;
     }
 
+    /**
+     * This method
+     * @return
+     */
     @Override
     public List<Payment> getPaymentList() {
         return paymentRepository.findAll();

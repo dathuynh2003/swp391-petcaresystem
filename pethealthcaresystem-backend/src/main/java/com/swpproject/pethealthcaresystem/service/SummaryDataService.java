@@ -62,6 +62,7 @@ public class SummaryDataService implements ISummaryDataService {
         }
     }
 
+
     @Override
     public SummaryData generateSummaryDataForDate(Date startDate, Date endDate) {
         // Lấy dữ liệu từ các nguồn khác nhau và tính toán các giá trị tổng hợp
@@ -102,6 +103,12 @@ public class SummaryDataService implements ISummaryDataService {
     @Override
     public List<SummaryData> getSummaryDataByDateRange(Date startDate, Date endDate) {
         return summaryDataRepository.findByDateBetween(startDate, endDate);
+    }
+
+    @Override
+    public List<SummaryData> getAllData() {
+        List<SummaryData> list = summaryDataRepository.findAll();
+        return list;
     }
 
 
