@@ -24,24 +24,24 @@ const Home = () => {
         </div>
 
       </div> */}
-      <div className='d-flex justify-content-start' style={{ marginTop: '10px' }}><Link to={'/booking'}><Button colorScheme='teal'>Book Appointment</Button></Link></div>
+      {/* <div className='d-flex justify-content-start' style={{ marginTop: '10px' }}><Link to={'/booking'}><Button colorScheme='teal'>Book Appointment</Button></Link></div> */}
 
       <div style={{ width: '100%' }} >
 
-        <Carousel style={{ marginRight: '3%', marginTop: '1%' }}>
+        <Carousel style={{ marginRight: '3%', marginTop: '3%' }}>
           <Carousel.Item style={{ width: '100%' }} className='mx-auto' >
 
 
             <img
 
-              className="d-block w-100" style={{ height: '580px', width: '100%' }}
+              className="d-block w-100" style={{ height: '600px', width: '100%' }}
               src="https://wallpaperaccess.com/full/497354.jpg"
               // src="https://2vetpetshop.vn/wp-content/uploads/2021/04/doi-ngu-bac-sy-chuyen-gia-thu-y-2vet.jpg"
 
               alt="First slide"
             />
 
-            <Carousel.Caption>
+            <Carousel.Caption style={{ fontSize: '20px', textShadow: '2px 2px 4px rgba(0, 0, 0, 0.5)' }}>
               <h3>Pet Health Care</h3>
               <p>Our pet health care booking website allows you to easily schedule veterinary appointments online, ensuring your pet receives timely medical attention</p>
             </Carousel.Caption>
@@ -49,22 +49,22 @@ const Home = () => {
           </Carousel.Item>
           <Carousel.Item style={{ width: '100%' }} >
             <img
-              className="d-block w-100" style={{ height: '580px', width: '100%' }}
+              className="d-block w-100" style={{ height: '600px', width: '100%' }}
               src="https://nordic.allianzgi.com/-/media/allianzgi/eu/regional-content/images/pets/1920x980-tiergesundheit.jpg?rev=-1"
               alt="Second slide"
             />
-            <Carousel.Caption>
+            <Carousel.Caption style={{ fontSize: '20px', textShadow: '2px 2px 4px rgba(0, 0, 0, 0.5)' }}>
               <h3>Pet Health Care</h3>
               <p>With our user-friendly interface, you can book and manage appointments for your pet’s health check-ups, vaccinations, and treatments in just a few clicks.</p>
             </Carousel.Caption>
           </Carousel.Item>
           <Carousel.Item style={{ width: '100%' }}>
             <img
-              className="d-block w-100" style={{ height: '580px', width: '100%' }}
+              className="d-block w-100" style={{ height: '600px', width: '100%' }}
               src="https://images2.alphacoders.com/110/1108403.jpg"
               alt="Third slide"
             />
-            <Carousel.Caption>
+            <Carousel.Caption style={{ fontSize: '20px', textShadow: '2px 2px 4px rgba(0, 0, 0, 0.5)'}}>
               <h3>Pet Health Care</h3>
               <p>Our online booking system for pet health care appointments simplifies the process, allowing you to choose convenient times for your pet's check-ups and treatments.</p>
             </Carousel.Caption>
