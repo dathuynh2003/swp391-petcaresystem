@@ -40,10 +40,10 @@ public class Pet {
     @JoinColumn(name = "owner_id")
     User owner;
 
-    @OneToMany(mappedBy = "pet", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "pet")
     Set<Booking> bookings = new HashSet<>();
 
-    @OneToMany(mappedBy = "pet", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "pet")
     Set<MedicalRecord> medicalRecords = new HashSet<>();
 
     @OneToMany(mappedBy = "pet")//, cascade = CascadeType.ALL, orphanRemoval = true

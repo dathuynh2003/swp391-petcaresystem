@@ -28,7 +28,7 @@ public interface IBookingService {
 //    Page<Booking> getBookingByDateAndStatusAndPhoneNumber(Date fromDate,Date toDate, String status, String phoneNumber, int pageNo, int pageSize);
     Booking requestRefundBooking(int id);
     Booking acceptRefundBooking(int id);
-    Booking refuseRefundBooking(int id, String reason);
+    Booking refuseRefundBooking(int id);
     Booking requestRefundBookingByStaff(int bookingId);
 
     Booking finishBooking (Booking newBooking);

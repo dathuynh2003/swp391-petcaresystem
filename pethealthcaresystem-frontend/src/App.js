@@ -40,7 +40,7 @@ function App() {
 
   const location = useLocation();
   const matchVerify = useMatch('/verify/:email')
-  const hideNavbarAndSidenav = ['/login', '/register', '/verify'].includes(location.pathname) || matchVerify;
+  const hideNavbarAndSidenav = ['/login', '/register', '/verify', '/NotFound'].includes(location.pathname) || matchVerify;
   return (
 
     <div className="App">
@@ -78,13 +78,13 @@ function App() {
                 </AuthProvider>
               } />
               <Route path="/viewPet/:petId" element={
-                <ConditionalViewPet>
-                  <AuthProvider>
+                <AuthProvider>
+                  <ConditionalViewPet>
                     <Permission roleId={['1', '2', '3']} redirect={true}>
                       <ViewPet />
                     </Permission>
-                  </AuthProvider>
-                </ConditionalViewPet>
+                  </ConditionalViewPet>
+                </AuthProvider>
               } />
               <Route path="/listPets" element={
                 <AuthProvider>
@@ -245,7 +245,7 @@ function App() {
 
 
               } />
-               <Route path="/NotFound" element={<NotFound />} />
+              <Route path="/NotFound" element={<NotFound />} />
             </Routes >
 
 
@@ -265,7 +265,7 @@ const ConditionalViewPet = () => {
 
   // Nếu roleId = 3 mà không có state từ navigate thì chuyển hướng đến /page404
   if (roleId === '3' && !location.state?.fromButton) {
-    return <Navigate to="/page404" />;
+    return <Navigate to="/NotFound" />;
   }
 
   return <ViewPet />;

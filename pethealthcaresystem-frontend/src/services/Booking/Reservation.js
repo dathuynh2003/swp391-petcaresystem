@@ -248,9 +248,9 @@ const Reservation = () => {
     };
 
     return (
-        <Box p={5}>
+        <Box>
             <Box>
-                <Table variant="striped" colorScheme="teal">
+                <Table colorScheme="teal" className='my-5'>
                     <Thead>
                         <Tr>
                             <Th>Booking ID</Th>

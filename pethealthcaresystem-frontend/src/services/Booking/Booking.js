@@ -327,7 +327,7 @@ export default function Booking() {
     const payment = {
       orderCode: booking.orderCode,
       paymentType: 'Credit Card',  // You can modify this as per your requirement
-      // amount: 10000,
+      amount: curBooking.totalAmount,
       paymentDate: new Date().toISOString(),
       status: 'Pending',
       description: curBooking.description,

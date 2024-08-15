@@ -383,7 +383,7 @@ public class BookingController {
     }
 
     @PutMapping("/refuse-refund/booking/{id}")
-    public Map<String, Object> refuseRefund(@PathVariable int id, @RequestParam String reason, HttpSession session) {
+    public Map<String, Object> refuseRefund(@PathVariable int id, HttpSession session) {
         Map<String, Object> response = new HashMap<>();
         try {
             User currentUser = (User) session.getAttribute("user");
@@ -391,7 +391,7 @@ public class BookingController {
                 throw new Exception("You need login first");
             }
             response.put("message", "successfully");
-            response.put("booking", bookingService.refuseRefundBooking(id, reason));
+            response.put("booking", bookingService.refuseRefundBooking(id));
         } catch (Exception e) {
             response.put("message", e.getMessage());
         }

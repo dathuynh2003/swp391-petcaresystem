@@ -519,20 +519,20 @@ export default function ViewPet() {
                                 )}
                                 {roleId === '3' && (
                                     pet?.hospitalizations?.some(admitPet => admitPet?.status === "admitted") ? (
-                                        <Link
-                                            className='btn btn-danger col-md-12'
+                                        <Button
+                                            className='btn btn-danger col-md-12' colorScheme='red'
                                             onClick={() => handleDischarge(hospitalizations
                                                 .find(hospitalization => hospitalization.status === "admitted").id)}
                                         >
                                             Discharge
-                                        </Link>
+                                        </Button>
                                     ) : (
                                         pet?.hospitalizations?.some(admitPet => admitPet?.status === "pending") ? (
-                                            <Link
-                                                className='btn btn-warning col-md-12'
+                                            <Button
+                                                className='btn btn-warning col-md-12' colorScheme=''
                                             >
                                                 Waiting Payment
-                                            </Link>
+                                            </Button>
                                         ) : (
                                             <>
                                                 <button

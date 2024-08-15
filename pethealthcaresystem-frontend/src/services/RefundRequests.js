@@ -21,7 +21,6 @@ export default function RefundRequests() {
     const pageSize = 10
     const [bookings, setBookings] = useState(null)
     const [selectedBooking, setSelectedBooking] = useState(null)
-    const [reason, setReason] = useState('')
 
     const handlePageClick = (data) => {
         setCurrentPage(data.selected)
@@ -60,7 +59,7 @@ export default function RefundRequests() {
 
     const refuseRefundRequest = async (booking) => {
         try {
-            const response = await axios.put(`${URL}/refuse-refund/booking/${booking.id}?reason=${reason}`, {}, { withCredentials: true })
+            const response = await axios.put(`${URL}/refuse-refund/booking/${booking.id}`, {}, { withCredentials: true })
             if (response.data.message === 'successfully') {
                 toast.success('Refused refund successed')
                 window.location.reload()
@@ -136,19 +135,21 @@ export default function RefundRequests() {
                     <Modal isOpen={isOpenRefuseModal} onClose={onCloseRefuseModal} size={'xl'}>
                         <ModalOverlay />
                         <ModalContent>
-                            <ModalHeader className='fw-bold text-center my-3 justify-content-center fs-5'>Please enter the reason for your refusal</ModalHeader>
+                            <ModalHeader className='fw-bold text-center my-3 justify-content-center fs-5'>Refund Confirm</ModalHeader>
                             <ModalCloseButton />
                             <ModalBody pb={6} >
                                 <FormControl className='d-flex'>
                                     <FormLabel className='w-100'>
-                                        Reason
-                                        <Input value={reason} onChange={(e) => setReason(e.target.value)} />
+                                        Are you sure you have refunded this booking?
                                     </FormLabel>
                                 </FormControl>
                             </ModalBody>
                             <ModalFooter>
                                 <Button colorScheme='teal' mr={3} mb={3} onClick={() => refuseRefundRequest(selectedBooking)}>
-                                    Save
+                                    Yes
+                                </Button>
+                                <Button colorScheme='red' mr={3} mb={3} onClick={() => onCloseRefuseModal()}>
+                                    No
                                 </Button>
                             </ModalFooter>
                         </ModalContent>

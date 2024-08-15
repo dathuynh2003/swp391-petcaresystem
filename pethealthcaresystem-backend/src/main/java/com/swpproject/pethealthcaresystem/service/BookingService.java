@@ -270,7 +270,7 @@ public class BookingService implements IBookingService {
     }
 
     @Override
-    public Booking refuseRefundBooking(int id, String reason) {
+    public Booking refuseRefundBooking(int id) {
         Booking booking = bookingRepository.findById(id).orElseThrow(() -> new RuntimeException("Booking not found"));
         booking.setStatus("PAID");
         booking.setRefundDate(null);
