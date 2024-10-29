@@ -1,4 +1,4 @@
-# SWP391 Pet Care System
+# Pet Care System
 
 This repository hosts the Pet Care System project, which is developed to provide comprehensive solutions for pet care management. The project leverages JavaScript, Java, CSS, and HTML to deliver a robust and user-friendly application.
 
@@ -33,12 +33,15 @@ To set up the project locally, follow these steps:
    ```
 
 2. **Navigate to the project directory**
+   
   cd swp391-petcaresystem
 
-3. **Install dependencies**
+4. **Install dependencies**
+   
   npm install
 
-4. **Run the application**
+5. **Run the application**
+   
   npm start
 
 ## Usage
@@ -60,11 +63,15 @@ Contributions are welcome! Please follow these steps to contribute:
 
 1. **Fork the repository**
 2. **Create a new branch**
+   
    git checkout -b feature/your-feature-name
-3. **Make your changes**
-4. **Commit your changes**
+   
+4. **Make your changes**
+5. **Commit your changes**
+   
   git commit -m "Add your commit message"
-6. Open a pull request
+  
+7. Open a pull request
 
 ## Recent Changes
 
