@@ -49,12 +49,19 @@ To set up the project locally, follow these steps:
 Once the application is running, you can access it through your web browser. The main features include:
 
 1. **Manage Pet**
+   
    CRUD pets.
-2. **Appointment Scheduling**
+   
+3. **Appointment Scheduling**
+   
    Book, update, and cancel appointments.
-3. **Pet Medical Records**
+
+5. **Pet Medical Records**
+   
    View and manage pet medical histories.
-4. **Customer Management**
+   
+7. **Customer Management**
+   
    Manage customer information and interactions.
 
 ## Contributing
@@ -62,18 +69,18 @@ Once the application is running, you can access it through your web browser. The
 Contributions are welcome! Please follow these steps to contribute:
 
 1. **Fork the repository**
+   
 2. **Create a new branch**
    
    git checkout -b feature/your-feature-name
    
-4. **Make your changes**
-5. **Commit your changes**
+3. **Make your changes**
+ 
+4. **Commit your changes**
    
   git commit -m "Add your commit message"
   
-7. Open a pull request
-
-## Recent Changes
+5. Open a pull request
 
 ## Recent Changes
 
