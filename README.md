@@ -34,15 +34,15 @@ To set up the project locally, follow these steps:
 
 2. **Navigate to the project directory**
    
-  cd swp391-petcaresystem
+   cd swp391-petcaresystem
 
 4. **Install dependencies**
    
-  npm install
+   npm install
 
 5. **Run the application**
    
-  npm start
+   npm start
 
 ## Usage
 
@@ -78,7 +78,7 @@ Contributions are welcome! Please follow these steps to contribute:
  
 4. **Commit your changes**
    
-  git commit -m "Add your commit message"
+   git commit -m "Add your commit message"
   
 5. Open a pull request
 
